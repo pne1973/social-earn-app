@@ -1,40 +1,52 @@
+import os
 import telebot
 from supabase import create_client
 
-# DADOS DE ACESSO
-TOKEN = "SEU_TOKEN_BOTFATHER"
-URL = "SUA_URL_SUPABASE"
-KEY = "SUA_KEY_SUPABASE"
-VERCEL_LINK = "https://seu-projeto.vercel.app"
+# --- CONFIGURAÇÃO (Lê as chaves do painel Environment Variables) ---
+TOKEN = os.getenv("BOT_TOKEN")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+VERCEL_LINK = os.getenv("VERCEL_LINK")
 
+# Inicialização do Bot e do Supabase
 bot = telebot.TeleBot(TOKEN)
-supabase = create_client(URL, KEY)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
-    uid = message.from_user.id
-    uname = message.from_user.first_name
-    lang = message.from_user.language_code or 'en'
+    user_id = message.from_user.id
+    first_name = message.from_user.first_name
+    username = message.from_user.username or ""
+    lang_code = message.from_user.language_code or 'pt'
 
-    # Criar utilizador se não existir
-    supabase.table('profiles').upsert({
-        'id': uid, 
-        'username': uname, 
-        'lang': lang
-    }).execute()
+    # 1. Registar ou Atualizar o utilizador no Supabase
+    try:
+        supabase.table('profiles').upsert({
+            'id': user_id, 
+            'username': username, 
+            'lang': lang_code
+        }).execute()
+        print(f"Utilizador {user_id} registado com sucesso.")
+    except Exception as e:
+        print(f"Erro ao conectar ao Supabase: {e}")
 
-    # Mensagens traduzidas
-    txt = {
-        'pt': f"Olá {uname}! Pronto para ganhar com a nossa rede?",
-        'en': f"Hello {uname}! Ready to earn with our network?",
-    }.get(lang[:2], "Hello!")
+    # 2. Definir Mensagens (Português vs Inglês)
+    if lang_code.startswith('pt'):
+        txt = f"Olá {first_name}! 👋\n\nBem-vindo à nossa rede social! Aqui ganhas pontos por interagir. 1000 pontos valem 0,75€ via PayPal.\n\nClica no botão abaixo para começar!"
+        btn_txt = "Abrir Rede Social 🚀"
+    else:
+        txt = f"Hello {first_name}! 👋\n\nWelcome to our social network! Earn points by interacting. 1000 points = €0.75 via PayPal.\n\nClick the button below to start!"
+        btn_txt = "Open Social App 🚀"
 
-    btn_txt = "Abrir Rede Social" if lang[:2] == 'pt' else "Open Social App"
-
+    # 3. Criar o Botão do Mini App
     markup = telebot.types.InlineKeyboardMarkup()
     web_app = telebot.types.WebAppInfo(VERCEL_LINK)
-    markup.add(telebot.types.InlineKeyboardButton(btn_txt, web_app=web_app))
+    markup.add(telebot.types.InlineKeyboardButton(text=btn_txt, web_app=web_app))
 
+    # 4. Enviar Resposta
     bot.send_message(message.chat.id, txt, reply_markup=markup)
 
-bot.polling()
+# Iniciar o Bot
+if __name__ == "__main__":
+    print("O Bot @socialntworkbot está ONLINE!")
+    bot.polling(none_stop=True)
