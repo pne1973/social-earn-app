@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Earn App</title>
+    <style>
+        body { font-family: sans-serif; background-color: #efeff4; margin: 0; padding: 0; }
+        .header { background: #0088cc; color: white; padding: 15px; text-align: center; position: sticky; top: 0; }
+        .ad-space { background: #ddd; margin: 10px; height: 90px; display: flex; align-items: center; justify-content: center; border: 1px dashed #999; font-size: 12px; }
+        .post { background: white; margin: 10px; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .user-name { font-weight: bold; color: #0088cc; }
+        .btn-like { background: #f0f2f5; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .wallet-bar { background: #fff; padding: 10px; border-bottom: 1px solid #ccc; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="header">Minha Rede Social</div>
+
+<div class="wallet-bar">💰 Saldo: <span id="points">100</span> Pontos</div>
+
+<div class="ad-space">ANÚNCIO ADSTERRA AQUI (Banner 728x90)</div>
+
+<div class="post">
+    <div class="user-name">João Silva</div>
+    <p>Olá malta! Acabei de entrar nesta rede. Alguém já fez o primeiro levantamento?</p>
+    <button class="btn-like" onclick="ganharPonto()">❤️ Gostar (+2 pts)</button>
+</div>
+
+<div class="ad-space">ANÚNCIO ADSTERRA AQUI (Native Ad)</div>
+
+<div class="post">
+    <div class="user-name">Maria Tech</div>
+    <p>O segredo é interagir todos os dias para acumular pontos rápido!</p>
+    <button class="btn-like" onclick="ganharPonto()">❤️ Gostar (+2 pts)</button>
+</div>
+
+<script>
+    let pontos = 100;
+    function ganharPonto() {
+        pontos += 2;
+        document.getElementById('points').innerText = pontos;
+        // Futuramente: aqui ligamos ao Supabase
+    }
+</script>
+
+</body>
+</html>
