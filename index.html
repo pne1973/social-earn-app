@@ -9,36 +9,46 @@
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --bg: #F1F3F4; --border: #dadce0; }
         * { box-sizing: border-box; font-family: 'Google Sans', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); margin: 0; padding: 75px 0 90px; color: #202124; }
+        
+        body { background: var(--bg); margin: 0; padding: 80px 0 100px; color: #202124; line-height: 1.5; }
 
         /* HEADER */
         .header { position: fixed; top: 0; width: 100%; height: 65px; background: #fff; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 2000; }
         .logo { font-size: 22px; font-weight: bold; }
         .logo span:nth-child(1) { color: var(--g-blue); } .logo span:nth-child(2) { color: var(--g-red); } .logo span:nth-child(3) { color: var(--g-yellow); } .logo span:nth-child(4) { color: var(--g-blue); } .logo span:nth-child(5) { color: var(--g-green); }
-        .xp-badge { background: var(--g-blue); color: #fff; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; box-shadow: 0 2px 4px rgba(66,133,244,0.3); }
+        .xp-badge { background: var(--g-blue); color: #fff; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
-        /* MENU INFERIOR RESTAURADO */
-        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); height: 70px; }
-        .nav-item { flex: 1; text-align: center; padding: 10px 0; color: #5f6368; font-size: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
-        .nav-item i { font-size: 20px; margin-bottom: 2px; }
-        .nav-item.active { color: var(--g-blue); font-weight: bold; border-top: 3px solid var(--g-blue); }
+        /* MENU INFERIOR */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); height: 75px; }
+        .nav-item { flex: 1; text-align: center; color: #5f6368; font-size: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; }
+        .nav-item i { font-size: 22px; margin-bottom: 4px; }
+        .nav-item.active { color: var(--g-blue); font-weight: bold; }
 
-        /* TABS & CARDS */
-        .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; padding: 15px; animation: fadeIn 0.2s ease; }
+        /* CONTENTORES */
+        .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; padding: 0 15px; }
         .tab-content.active { display: block; }
-        .card { background: #fff; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        /* EDITOR DE POSTS */
+        .publish-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        textarea { width: 100%; border: none; outline: none; font-size: 17px; resize: none; min-height: 80px; margin-bottom: 15px; color: #3c4043; }
         
-        /* ADS */
-        .ad-banner { background: #FFF8E1; border: 1px dashed var(--g-yellow); padding: 12px; text-align: center; color: #856404; font-size: 12px; border-radius: 10px; margin-bottom: 15px; }
+        /* FEED CARDS */
+        .post-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .post-header { padding: 15px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f8f9fa; }
+        .post-user-img { width: 35px; height: 35px; background: #e8f0fe; color: var(--g-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
+        .post-content { padding: 15px; font-size: 16px; color: #3c4043; }
+        .post-img { width: 100%; max-height: 400px; object-fit: cover; border-top: 1px solid #f1f3f4; }
+        
+        .ad-card { background: #fff9e6; border: 1px dashed var(--g-yellow); padding: 15px; border-radius: 12px; margin-bottom: 16px; text-align: center; color: #856404; font-size: 13px; }
 
-        /* ADMIN STYLE */
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
-        .stat-card { background: #fff; padding: 20px; border-radius: 15px; border: 1px solid var(--border); text-align: center; }
-        .stat-card b { font-size: 24px; color: var(--g-blue); display: block; margin-top: 5px; }
-        .withdraw-item { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--g-green); display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; border-left: 5px solid var(--g-green); }
-        .btn-pay { background: var(--g-green); color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        /* BOTÕES */
+        .btn-main { background: var(--g-blue); color: #fff; border: none; padding: 10px 25px; border-radius: 24px; font-weight: bold; font-size: 14px; cursor: pointer; }
+        .btn-photo { background: none; border: none; color: var(--g-green); font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* ADMIN SECTION */
+        .admin-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: #fff; padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
+        .stat-box span { font-size: 28px; font-weight: bold; color: var(--g-blue); display: block; }
     </style>
 </head>
 <body>
@@ -49,56 +59,58 @@
     </div>
 
     <section id="tab-feed" class="tab-content active">
-        <div class="card" style="padding:15px;">
-            <textarea id="postText" placeholder="O que estás a pensar?" style="width:100%; border:none; outline:none; font-size:16px; resize:none;"></textarea>
-            <div id="preview-box" style="display:none; margin:10px 0;"><img id="img-prev" style="width:100%; border-radius:8px; max-height:200px; object-fit:cover;"></div>
-            <hr style="border:0; border-top:1px solid #f1f3f4; margin:10px 0;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <button onclick="document.getElementById('fileIn').click()" style="background:none; border:none; color:var(--g-green); font-weight:bold; cursor:pointer;"><i class="fas fa-image"></i> Foto</button>
-                <input type="file" id="fileIn" hidden accept="image/*" onchange="handlePreview(this)">
-                <button onclick="publish()" id="pubBtn" style="background:var(--g-blue); color:#fff; border:none; padding:8px 25px; border-radius:20px; font-weight:bold;">Publicar</button>
+        <div class="publish-card">
+            <textarea id="postText" placeholder="No que estás a pensar?"></textarea>
+            <div id="preview-container" style="display:none; margin-bottom:15px;">
+                <img id="img-preview" style="width:100%; border-radius:12px; max-height:250px; object-fit:cover;">
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid #f1f3f4; padding-top: 15px;">
+                <button class="btn-photo" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-image" style="font-size: 20px;"></i> Foto
+                </button>
+                <input type="file" id="fileInput" hidden accept="image/*" onchange="previewImage(this)">
+                <button class="btn-main" id="pubBtn" onclick="publish()">Publicar</button>
             </div>
         </div>
-        <div id="feed-list"></div>
+        <div id="feed-container">Carregando feed...</div>
     </section>
 
     <section id="tab-ganhos" class="tab-content">
-        <div class="card" style="padding:20px;">
-            <h3 style="margin-top:0; color:var(--g-blue);"><i class="fas fa-coins"></i> Tabela de Ganhos</h3>
-            <p>Post: <b>+15 XP</b></p>
-            <p>Gostar: <b>+2 XP</b></p>
-            <p>Convidar: <b>+100 XP</b></p>
-            <div style="background:var(--bg); padding:15px; border-radius:10px; text-align:center; margin-top:15px;">
-                <small>Câmbio: 1000 XP = 1.0000€</small>
+        <div class="publish-card">
+            <h3 style="color:var(--g-blue); margin-top:0;">💰 Como Ganhar XP</h3>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div style="display:flex; justify-content:space-between;"><span>Novo Post</span><b>+15 XP</b></div>
+                <div style="display:flex; justify-content:space-between;"><span>Dar Like</span><b>+2 XP</b></div>
+                <div style="display:flex; justify-content:space-between;"><span>Check-in Diário</span><b>+5 XP</b></div>
+                <div style="display:flex; justify-content:space-between; color:var(--g-green); font-weight:bold;"><span>Convidar Amigo</span><b>+100 XP</b></div>
             </div>
         </div>
     </section>
 
     <section id="tab-rank" class="tab-content">
-        <div class="card" style="padding:20px;">
-            <h3>🏆 Ranking Top 10</h3>
+        <div class="publish-card">
+            <h3>🏆 Top 10 Ranking</h3>
             <div id="rank-list">Carregando...</div>
         </div>
     </section>
 
     <section id="tab-saque" class="tab-content">
-        <div class="card" style="text-align:center; padding:30px 20px;">
-            <p style="color:#5f6368; margin:0;">Saldo Estimado</p>
-            <h1 id="cash-val" style="font-size:42px; color:var(--g-green); margin:10px 0;">0.0000€</h1>
-            <input type="email" placeholder="E-mail PayPal" style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px; text-align:center;">
-            <button style="width:100%; padding:14px; background:var(--g-blue); color:#fff; border:none; border-radius:24px; font-weight:bold;">Solicitar Saque</button>
-            <p style="font-size:11px; color:var(--g-red); margin-top:10px;">Mínimo para saque: 5000 XP</p>
+        <div class="publish-card" style="text-align:center; padding:40px 20px;">
+            <small style="color:#5f6368">Saldo em Carteira</small>
+            <h1 id="cash-val" style="font-size:48px; color:var(--g-green); margin:10px 0;">0.0000€</h1>
+            <input type="email" placeholder="Email do PayPal" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px; text-align:center; font-size:16px;">
+            <button class="btn-main" style="width:100%; padding:15px;">Solicitar Levantamento</button>
+            <p style="font-size:12px; color:var(--g-red); margin-top:15px;">Mínimo necessário: 5000 XP</p>
         </div>
     </section>
 
     <section id="tab-admin" class="tab-content">
         <h2 style="color:var(--g-red)">Painel Administrativo</h2>
-        <div class="admin-grid">
-            <div class="stat-card">Utilizadores<br><b id="count-u">0</b></div>
-            <div class="stat-card">Posts Totais<br><b id="count-p">0</b></div>
+        <div class="admin-stats">
+            <div class="stat-box">Utilizadores<span id="count-u">0</span></div>
+            <div class="stat-box">Posts<span id="count-p">0</span></div>
         </div>
-        <h3>💰 Pedidos de Saque</h3>
-        <div id="withdraw-list"></div>
+        <div id="admin-actions"></div>
     </section>
 
     <nav class="nav">
@@ -115,6 +127,8 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const myId = 5401881400;
 
+        let selectedImg = null;
+
         async function init() {
             if(myId !== 5401881400) document.getElementById('adm-nav').style.display = 'none';
             loadProfile();
@@ -128,54 +142,58 @@
             el.classList.add('active');
             if(id === 'tab-admin') loadAdmin();
             if(id === 'tab-rank') loadRank();
+            window.scrollTo(0,0);
         }
 
         async function loadFeed() {
-            const list = document.getElementById('feed-list');
+            const list = document.getElementById('feed-container');
             const { data } = await supabaseClient.from('posts').select('*').order('created_at', {ascending:false});
             list.innerHTML = '';
             data?.forEach((p, i) => {
-                if(i > 0 && i % 3 === 0) list.innerHTML += `<div class="ad-banner"><b>ANÚNCIO:</b> Ganha mais XP convidando os teus amigos!</div>`;
+                if(i > 0 && i % 3 === 0) list.innerHTML += `<div class="ad-card"><b>DICA:</b> Sabias que podes ganhar 100 XP por cada amigo convidado?</div>`;
+                
                 list.innerHTML += `
-                <div class="card">
-                    <div style="padding:12px; font-weight:bold; font-size:13px; color:var(--g-blue);">Utilizador #${p.user_id.toString().slice(-4)}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" style="width:100%; max-height:350px; object-fit:cover;">` : ''}
-                    <div style="padding:12px; font-size:15px;">${p.content}</div>
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-user-img">U</div>
+                        <b>Utilizador #${p.user_id.toString().slice(-4)}</b>
+                    </div>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                    <div class="post-content">${p.content}</div>
                 </div>`;
             });
         }
 
-        async function loadAdmin() {
-            const { count: u } = await supabaseClient.from('profiles').select('*', {count:'exact', head:true});
-            const { count: p } = await supabaseClient.from('posts').select('*', {count:'exact', head:true});
-            document.getElementById('count-u').innerText = u || 0;
-            document.getElementById('count-p').innerText = p || 0;
-            document.getElementById('withdraw-list').innerHTML = `
-                <div class="withdraw-item">
-                    <span><b>user_9921</b><br>5500 XP (5.50€)</span>
-                    <button class="btn-pay" onclick="alert('Pagamento processado!')">Pagar</button>
-                </div>`;
-        }
-
-        async function loadRank() {
-            const { data } = await supabaseClient.from('profiles').select('username, points').order('points', {ascending:false}).limit(10);
-            document.getElementById('rank-list').innerHTML = data?.map((u, i) => `<div style="padding:8px 0; border-bottom:1px solid #eee;">${i+1}. ${u.username} - <b>${u.points} XP</b></div>`).join('') || 'Sem dados.';
-        }
-
-        function handlePreview(input) {
-            if(input.files[0]) {
-                document.getElementById('img-prev').src = URL.createObjectURL(input.files[0]);
-                document.getElementById('preview-box').style.display = 'block';
+        function previewImage(input) {
+            if(input.files && input.files[0]) {
+                selectedImg = input.files[0];
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('img-preview').src = e.target.result;
+                    document.getElementById('preview-container').style.display = 'block';
+                }
+                reader.readAsDataURL(selectedImg);
             }
         }
 
         async function publish() {
             const txt = document.getElementById('postText').value;
-            if(!txt) return;
-            const btn = document.getElementById('pubBtn'); btn.disabled = true;
-            await supabaseClient.from('posts').insert([{ user_id: myId, content: txt }]);
-            await supabaseClient.rpc('increment_points', { user_id: myId, amount: 15 });
-            location.reload();
+            if(!txt && !selectedImg) return;
+            const btn = document.getElementById('pubBtn');
+            btn.disabled = true; btn.innerText = "A publicar...";
+
+            let imgUrl = null;
+            if(selectedImg) {
+                const fname = `p_${Date.now()}.jpg`;
+                const { data } = await supabaseClient.storage.from('post-images').upload(fname, selectedImg);
+                if(data) imgUrl = `${SUPABASE_URL}/storage/v1/object/public/post-images/${fname}`;
+            }
+
+            const { error } = await supabaseClient.from('posts').insert([{ user_id: myId, content: txt, image_url: imgUrl }]);
+            if(!error) {
+                await supabaseClient.rpc('increment_points', { user_id: myId, amount: 15 });
+                location.reload();
+            }
         }
 
         async function loadProfile() {
@@ -184,6 +202,21 @@
                 document.getElementById('userXP').innerText = data.points + " XP";
                 document.getElementById('cash-val').innerText = (data.points * 0.001).toFixed(4) + "€";
             }
+        }
+
+        async function loadRank() {
+            const { data } = await supabaseClient.from('profiles').select('username, points').order('points', {ascending:false}).limit(10);
+            document.getElementById('rank-list').innerHTML = data?.map((u, i) => `
+                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
+                    <span>${i+1}. ${u.username}</span><b>${u.points} XP</b>
+                </div>`).join('') || 'Sem dados.';
+        }
+
+        async function loadAdmin() {
+            const { count: u } = await supabaseClient.from('profiles').select('*', {count:'exact', head:true});
+            const { count: p } = await supabaseClient.from('posts').select('*', {count:'exact', head:true});
+            document.getElementById('count-u').innerText = u || 0;
+            document.getElementById('count-p').innerText = p || 0;
         }
 
         init();
