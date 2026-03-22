@@ -1,122 +1,55 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn - Oficial</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: -apple-system, sans-serif; background-color: #efeff4; margin: 0; color: #000; padding-bottom: 50px; overflow-x: hidden; }
-        .header { background: #0088cc; color: white; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .stats-bar { background: #fff; padding: 15px; display: flex; justify-content: space-around; border-bottom: 1px solid #dcdce0; font-size: 16px; font-weight: bold; }
-        .ad-placeholder { background: #f9f9f9; border: 1px dashed #bbb; margin: 10px; text-align: center; min-height: 60px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #888; border-radius: 8px; }
-        .feed { padding: 10px; }
-        .post { background: #fff; margin-bottom: 15px; border-radius: 12px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .user { color: #0088cc; font-weight: bold; margin-bottom: 8px; display: block; }
-        .btn-action { background: #0088cc; border: none; padding: 12px; border-radius: 25px; font-weight: 600; color: white; width: 100%; margin-top: 10px; cursor: pointer; transition: 0.2s; }
-        .btn-action:active { transform: scale(0.98); opacity: 0.9; }
-        #loading-overlay { text-align: center; padding: 20px; color: #888; font-weight: 500; }
-    </style>
-</head>
-<body>
+import os
+import telebot
+from telebot import types
+from flask import Flask
+from threading import Thread
 
-<div class="header">Social Earn 🚀</div>
+# --- CONFIGURAÇÃO DO SERVIDOR PARA O RENDER ---
+app = Flask('')
 
-<div class="stats-bar">
-    <div>🏆 Pontos: <span id="points">0</span></div>
-    <div>💶 Saldo: €<span id="balance">0.00</span></div>
-</div>
+@app.route('/')
+def home():
+    return "Bot is alive!"
 
-<div class="ad-placeholder">Anúncio Adsterra (Topo)</div>
+def run():
+    # O Render usa a porta 10000 por padrão se não for definida
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
 
-<div class="feed">
-    <div id="loading-overlay">A carregar os teus dados...</div>
-    
-    <div class="post">
-        <span class="user">@Admin</span>
-        <p>Bem-vindo à nova rede! Começa a ganhar pontos agora. 1000 pontos = 0,75€!</p>
-        <button class="btn-action" onclick="addPoints(5)">❤️ Gostar (+5 pts)</button>
-    </div>
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+# ----------------------------------------------
 
-    <div class="ad-placeholder">Anúncio Adsterra (Native)</div>
+# Configurações do Bot
+TOKEN = os.environ.get("TELEGRAM_TOKEN")
+VERCEL_LINK = os.environ.get("VERCEL_LINK") # https://social-earn-app-joaopinheiro1973.vercel.app
 
-    <div class="post">
-        <span class="user">@Comunidade</span>
-        <p>Alguém já fez o primeiro levantamento hoje? 💸</p>
-        <button class="btn-action" onclick="addPoints(10)">💬 Comentar (+10 pts)</button>
-    </div>
-</div>
+bot = telebot.TeleBot(TOKEN)
 
-<script>
-    // Configurações do Supabase
-    const supabaseUrl = 'https://fickstyevektwbgimapy.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+@bot.message_handler(commands=['start'])
+def start(message):
+    user_id = message.from_user.id
+    username = message.from_user.username or "User"
 
-    const tg = window.Telegram.WebApp;
-    const user = tg.initDataUnsafe?.user;
+    texto = (
+        f"Olá {username}! 👋\n\n"
+        "Bem-vindo à Social Earn. Aqui ganhas pontos por interagir!\n\n"
+        "🚀 1000 pontos = 0.75€\n\n"
+        "Clica no botão abaixo para começar a ganhar:"
+    )
 
-    async function loadData() {
-        if (!user || !user.id) {
-            document.getElementById('loading-overlay').innerText = "Erro: Abre através do Telegram!";
-            return;
-        }
-        
-        // Tenta ler os dados do utilizador
-        let { data, error } = await _supabase
-            .from('profiles')
-            .select('points')
-            .eq('id', user.id)
-            .single();
-        
-        if (data) {
-            updateUI(data.points || 0);
-        } else {
-            // Se não existe (primeira vez), cria o perfil
-            await _supabase.from('profiles').upsert({ 
-                id: user.id, 
-                username: user.username || "User_" + user.id,
-                points: 0 
-            });
-            updateUI(0);
-        }
-        document.getElementById('loading-overlay').style.display = 'none';
-    }
+    markup = types.InlineKeyboardMarkup()
+    # O link oficial da tua Mini App
+    web_app = types.WebAppInfo(VERCEL_LINK)
+    botao = types.InlineKeyboardButton("Abrir Rede Social 🚀", web_app=web_app)
+    markup.add(botao)
 
-    function updateUI(pts) {
-        document.getElementById('points').innerText = pts;
-        // Conversão: 1000 pts = 0.75€
-        const saldo = (pts * 0.00075).toFixed(2);
-        document.getElementById('balance').innerText = saldo;
-    }
+    bot.send_message(message.chat.id, texto, reply_markup=markup)
 
-    async function addPoints(val) {
-        if (!user) return;
-        
-        let currentPts = parseInt(document.getElementById('points').innerText);
-        let newPts = currentPts + val;
-        
-        // Atualiza no Banco de Dados
-        const { error } = await _supabase
-            .from('profiles')
-            .update({ points: newPts })
-            .eq('id', user.id);
-        
-        if (!error) {
-            updateUI(newPts);
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-        } else {
-            console.error("Erro Supabase:", error);
-            alert("Erro ao gravar pontos. Verifica a ligação!");
-        }
-    }
-
-    // Inicialização
-    tg.ready();
-    tg.expand();
-    loadData();
-</script>
-
-</body>
-</html>
+if __name__ == "__main__":
+    # Inicia o servidor Flask em segundo plano
+    keep_alive()
+    print("Bot em execução...")
+    # Inicia o Polling do Bot
+    bot.polling(non_stop=True)
