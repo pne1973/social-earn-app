@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network</title>
+    <title>Social Earn V2</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -14,9 +14,8 @@
         .feed { padding: 10px; }
         .post { background: #fff; margin-bottom: 15px; border-radius: 12px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .user { color: #0088cc; font-weight: bold; margin-bottom: 8px; display: block; }
-        .btn-action { background: #0088cc; border: none; padding: 12px; border-radius: 25px; font-weight: 600; color: white; width: 100%; margin-top: 10px; cursor: pointer; transition: 0.2s; }
-        .btn-action:active { transform: scale(0.98); opacity: 0.8; }
-        #loading { text-align: center; padding: 20px; color: #888; }
+        .btn-action { background: #0088cc; border: none; padding: 12px; border-radius: 25px; font-weight: 600; color: white; width: 100%; margin-top: 10px; cursor: pointer; }
+        #loading { text-align: center; padding: 20px; color: #888; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -28,28 +27,28 @@
     <div>💶 Saldo: €<span id="balance">0.00</span></div>
 </div>
 
-<div class="ad-placeholder">Anúncio Adsterra aqui</div>
+<div class="ad-placeholder">Anúncio Adsterra Topo</div>
 
 <div class="feed">
     <div id="loading">A carregar os teus dados...</div>
     
     <div class="post">
         <span class="user">@Admin</span>
-        <p>Bem-vindo ao Social Earn! Começa a interagir para ganhar pontos reais. 1000 pontos = 0,75€!</p>
+        <p>Bem-vindo! Começa a ganhar pontos agora. 1000 pontos = 0,75€!</p>
         <button class="btn-action" onclick="addPoints(5)">❤️ Gostar (+5 pts)</button>
     </div>
 
-    <div class="ad-placeholder">Anúncio Adsterra (Native)</div>
+    <div class="ad-placeholder">Anúncio Adsterra Meio</div>
 
     <div class="post">
         <span class="user">@Comunidade</span>
-        <p>Alguém já atingiu o limite de levantamento hoje? 💸</p>
+        <p>Alguém online para trocar likes? 💸</p>
         <button class="btn-action" onclick="addPoints(10)">💬 Comentar (+10 pts)</button>
     </div>
 </div>
 
 <script>
-    // CONFIGURAÇÃO REAL SUPABASE
+    // CONFIGURAÇÃO REAL SUPABASE (CORRIGIDA)
     const supabaseUrl = 'https://fickstyevektwbgimapy.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -59,17 +58,18 @@
 
     async function loadData() {
         if (!user) {
-            document.getElementById('loading').innerText = "Abre isto dentro do Telegram!";
+            document.getElementById('loading').innerText = "Abre isto no Telegram!";
             return;
         }
         
+        // Busca os pontos do utilizador
         let { data, error } = await supabase.from('profiles').select('points').eq('id', user.id).single();
         
         if (data) {
             updateUI(data.points || 0);
             document.getElementById('loading').style.display = 'none';
         } else {
-            // Se o user ainda não existir na tabela por algum motivo
+            // Se o user não existir, o Bot já o criou, mas por segurança criamos aqui também
             await supabase.from('profiles').upsert({ id: user.id, username: user.username || "User" });
             updateUI(0);
             document.getElementById('loading').style.display = 'none';
@@ -78,7 +78,6 @@
 
     function updateUI(pts) {
         document.getElementById('points').innerText = pts;
-        // 1000 pontos = 0.75€ -> 1 ponto = 0.00075€
         document.getElementById('balance').innerText = (pts * 0.00075).toFixed(2);
     }
 
@@ -88,17 +87,14 @@
         let currentPts = parseInt(document.getElementById('points').innerText);
         let newPts = currentPts + val;
         
-        const { error } = await supabase
-            .from('profiles')
-            .update({ points: newPts })
-            .eq('id', user.id);
+        // Atualiza os pontos no Supabase
+        const { error } = await supabase.from('profiles').update({ points: newPts }).eq('id', user.id);
         
         if (!error) {
             updateUI(newPts);
             tg.HapticFeedback.impactOccurred('light');
         } else {
-            console.error("Erro ao guardar pontos:", error);
-            alert("Erro ao guardar pontos. Verifica a ligação.");
+            alert("Erro ao gravar. Corra o comando SQL no Supabase!");
         }
     }
 
@@ -106,6 +102,5 @@
     tg.expand();
     loadData();
 </script>
-
 </body>
 </html>
