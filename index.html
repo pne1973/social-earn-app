@@ -15,17 +15,17 @@
         textarea { width: 100%; background: transparent; border: none; color: #fff; resize: none; font-size: 16px; outline: none; margin-bottom: 10px; min-height: 60px; }
         .actions { display: flex; justify-content: space-between; align-items: center; }
         .btn-pub { background: var(--tg-theme-button); color: #000; border: none; padding: 10px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-file { background: #333; color: #fff; border: none; padding: 10px; border-radius: 10px; cursor: pointer; }
-        .feed-post { background: #1e1e1e; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #222; position: relative; }
-        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; display: block; max-height: 350px; object-fit: cover; }
+        .btn-file { background: #333; color: #fff; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 14px; }
+        .feed-post { background: #1e1e1e; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #222; overflow: hidden; }
+        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; display: block; max-height: 400px; object-fit: cover; background: #252525; }
         .btn-delete { color: #ff4444; font-size: 12px; cursor: pointer; float: right; font-weight: bold; padding: 5px; }
-        .user-info { color: var(--tg-theme-button); font-weight: bold; margin-bottom: 5px; }
+        .user-info { color: var(--tg-theme-button); font-weight: bold; margin-bottom: 5px; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="margin:0;">SOCIAL NETWORK</h2>
+        <h2 style="margin:0; font-size: 18px;">SOCIAL NETWORK</h2>
         <div id="userXP" class="xp-badge">...</div>
     </div>
 
@@ -34,7 +34,7 @@
         <div class="actions">
             <button class="btn-file" onclick="document.getElementById('fileInput').click()">📷 Foto</button>
             <input type="file" id="fileInput" hidden accept="image/*">
-            <button class="btn-pub" onclick="handlePublish()">Publicar</button>
+            <button class="btn-pub" id="pubBtn" onclick="handlePublish()">Publicar</button>
         </div>
     </div>
 
@@ -44,19 +44,17 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // CREDENCIAIS FORNECIDAS
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // TEU ID DE ADMINISTRADOR
         const ADMIN_ID = 5401881400; 
         const userId = tg.initDataUnsafe?.user?.id || ADMIN_ID;
         const username = tg.initDataUnsafe?.user?.username || "pine1971";
 
         async function init() {
             try {
-                // Busca pontos na tabela 'profiles' usando as colunas 'id' e 'points'
+                // Sincronizado com o teu print: tabela 'profiles', colunas 'id' e 'points'
                 let { data, error } = await supabaseClient
                     .from('profiles')
                     .select('points')
@@ -67,16 +65,13 @@
                     document.getElementById('userXP').innerText = `${data.points} XP`;
                 } else {
                     document.getElementById('userXP').innerText = "0 XP";
-                    console.log("Perfil não encontrado no Supabase.");
                 }
-            } catch (e) {
-                document.getElementById('userXP').innerText = "Erro";
-            }
+            } catch (e) { console.error(e); }
             loadFeed();
         }
 
         async function loadFeed() {
-            const { data: posts, error } = await supabaseClient
+            const { data: posts } = await supabaseClient
                 .from('posts')
                 .select('*')
                 .order('created_at', { ascending: false });
@@ -91,8 +86,8 @@
                         <div class="feed-post">
                             ${isOwner ? `<span class="btn-delete" onclick="deletePost(${p.id})">APAGAR</span>` : ''}
                             <div class="user-info">@${p.username || 'utilizador'}</div>
-                            <div style="margin-bottom:10px;">${p.content || ''}</div>
-                            ${p.image_url ? `<img src="${p.image_url}" class="post-img" onerror="this.style.display='none'">` : ''}
+                            <div style="color:#ddd;">${p.content || ''}</div>
+                            ${p.image_url ? `<img src="${p.image_url}" class="post-img" onerror="this.remove()">` : ''}
                         </div>
                     `;
                 });
@@ -103,27 +98,35 @@
             const text = document.getElementById('postText').value;
             const fileInput = document.getElementById('fileInput');
             const file = fileInput.files[0];
+            const btn = document.getElementById('pubBtn');
             let imageUrl = null;
 
             if (!text && !file) return;
 
-            tg.MainButton.setText("A publicar...").show();
+            btn.disabled = true;
+            btn.innerText = "...";
 
             try {
+                // 1. Upload da Imagem se existir
                 if (file) {
-                    const fileName = `${Date.now()}_${userId}.jpg`;
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}.${fileExt}`;
+                    
                     const { data: upData, error: upErr } = await supabaseClient.storage
                         .from('post-images')
                         .upload(fileName, file);
 
                     if (upErr) throw upErr;
 
+                    // Gerar URL pública
                     const { data: urlData } = supabaseClient.storage
                         .from('post-images')
                         .getPublicUrl(fileName);
+                    
                     imageUrl = urlData.publicUrl;
                 }
 
+                // 2. Inserir post na tabela
                 const { error: postErr } = await supabaseClient.from('posts').insert([{
                     user_id: userId,
                     username: username,
@@ -133,21 +136,22 @@
 
                 if (postErr) throw postErr;
 
+                // 3. Limpar campos e recarregar
                 document.getElementById('postText').value = '';
                 fileInput.value = '';
                 init();
             } catch (err) {
-                alert("Erro ao publicar: " + err.message);
+                alert("Erro: " + err.message);
             } finally {
-                tg.MainButton.hide();
+                btn.disabled = false;
+                btn.innerText = "Publicar";
             }
         }
 
         async function deletePost(postId) {
-            if (!confirm("Apagar este post?")) return;
+            if (!confirm("Apagar post?")) return;
             const { error } = await supabaseClient.from('posts').delete().eq('id', postId);
             if (!error) init();
-            else alert("Erro ao apagar: " + error.message);
         }
 
         init();
