@@ -3,105 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pine Social Pro - Admin Edition</title>
+    <title>Pine Social - Google Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; --card-bg: #1e1e1e; }
-        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-top: 125px; padding-bottom: 95px; }
+        /* PALETA GOOGLE */
+        :root { 
+            --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853;
+            --bg-light: #F8F9FA; --text-dark: #202124; --card-white: #ffffff;
+        }
+
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-light); color: var(--text-dark); margin: 0; padding-top: 110px; padding-bottom: 85px; }
         
-        /* LAYOUT */
-        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #222; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 11px; color: #ffcc00; font-weight: bold; text-align: center; padding: 0 10px; box-sizing: border-box; }
-        .header { position: fixed; top: 60px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--tg-theme-bg); border-bottom: 1px solid #333; z-index: 1000; box-sizing: border-box; }
-        .xp-badge { background: var(--tg-theme-button); color: #000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+        /* HEADER CLEAN */
+        .header { position: fixed; top: 0; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 1px solid #e0e0e0; z-index: 2000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); box-sizing: border-box; }
+        .logo-text { font-weight: bold; font-size: 18px; letter-spacing: -1px; }
+        .logo-text span:nth-child(1) { color: var(--g-blue); }
+        .logo-text span:nth-child(2) { color: var(--g-red); }
+        .logo-text span:nth-child(3) { color: var(--g-yellow); }
+        .logo-text span:nth-child(4) { color: var(--g-blue); }
+        .logo-text span:nth-child(5) { color: var(--g-green); }
 
-        .nav-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; display: flex; border-top: 1px solid #333; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 9px; text-transform: uppercase; font-weight: bold; }
-        .nav-item.active { color: var(--tg-theme-button); }
-        .nav-item i { font-size: 18px; }
+        .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 13px; box-shadow: 0 2px 4px rgba(66,133,244,0.3); }
 
+        /* NAV BOTTOM GOOGLE STYLE */
+        .nav-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid #eee; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 9px; font-weight: 500; }
+        .nav-item.active { color: var(--g-blue); }
+        .nav-item i { font-size: 20px; }
+
+        /* CARDS & UI */
         .container { padding: 15px; width: 100%; box-sizing: border-box; }
-        .card { background: var(--card-bg); padding: 18px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; position: relative; }
-        .btn-main { width: 100%; background: var(--tg-theme-button); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .card { background: var(--card-white); padding: 18px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #dadce0; box-shadow: 0 1px 3px rgba(0,0,0,0.08); position: relative; }
         
-        textarea, input { width: 100%; background: #2a2a2a; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 10px; box-sizing: border-box; margin-top: 5px; }
+        .btn-main { width: 100%; background: var(--g-blue); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
         
-        .val { color: var(--tg-theme-button); font-weight: bold; text-align: right; }
-        .cash { font-size: 10px; color: #888; display: block; font-weight: normal; }
-        .post-footer { display: flex; justify-content: space-between; margin-top: 12px; border-top: 1px solid #333; padding-top: 10px; }
-        .action-btn { background: none; border: none; color: #777; font-size: 12px; cursor: pointer; }
-        .action-btn.liked { color: #ff4444; }
+        textarea, input { width: 100%; background: #fff; border: 1px solid #dadce0; color: var(--text-dark); padding: 12px; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        textarea:focus { border-color: var(--g-blue); outline: none; }
 
-        /* ADMIN STYLE */
-        .adm-row { background: #111; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #ffcc00; font-size: 12px; }
+        .post-footer { display: flex; justify-content: space-between; margin-top: 12px; border-top: 1px solid #f1f3f4; padding-top: 10px; }
+        .action-btn { background: none; border: none; color: #5f6368; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .action-btn.liked { color: var(--g-red); font-weight: bold; }
+
+        /* TUTORIAL OVERLAY */
+        #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 25px; box-sizing: border-box; }
+        .welcome-card { background: #fff; padding: 30px; border-radius: 24px; text-align: center; border: 1px solid #eee; box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 350px; }
+
         .hidden { display: none; }
+        #loading-trigger { color: #888; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div class="top-ad">📢 ADMIN: Painel de gestão de pagamentos ativado para o Proprietário.</div>
+    <div id="welcome-overlay" class="hidden">
+        <div class="welcome-card">
+            <div class="logo-text" style="font-size:32px; margin-bottom:15px;">
+                <span>P</span><span>i</span><span>n</span><span>e</span><span>!</span>
+            </div>
+            <p style="color:#5f6368;">Bem-vindo à rede social onde a tua atividade vale dinheiro.</p>
+            <div style="text-align:left; margin: 20px 0; font-size:14px; color:#3c4043;">
+                <p><i class="fas fa-check-circle" style="color:var(--g-green)"></i> <b>Posts</b> geram 15 XP</p>
+                <p><i class="fas fa-check-circle" style="color:var(--g-blue)"></i> <b>Amigos</b> geram 100 XP</p>
+                <p><i class="fas fa-check-circle" style="color:var(--g-yellow)"></i> <b>Levantamento</b> via PayPal</p>
+            </div>
+            <button class="btn-main" onclick="closeWelcome()" style="background:var(--g-green)">Entendido</button>
+        </div>
+    </div>
 
     <div class="header">
-        <h4 style="margin:0;">PINE SOCIAL</h4>
+        <div class="logo-text">
+            <span>P</span><span>i</span><span>n</span><span>e</span> <span>S</span><span>o</span><span>c</span><span>i</span><span>a</span><span>l</span>
+        </div>
         <div id="userXP" class="xp-badge">0 XP</div>
     </div>
 
     <nav class="nav-bottom" id="mainNav">
-        <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i>Feed</div>
-        <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-coins"></i>Ganhos</div>
-        <div class="nav-item" onclick="showTab('rank-tab', this)"><i class="fas fa-trophy"></i>Rank</div>
+        <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-stream"></i>Feed</div>
+        <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-lightbulb"></i>Ganhos</div>
+        <div class="nav-item" onclick="showTab('rank-tab', this)"><i class="fas fa-chart-line"></i>Rank</div>
+        <div class="nav-item" onclick="showTab('invite-tab', this)"><i class="fas fa-user-plus"></i>Convites</div>
         <div class="nav-item" onclick="showTab('wallet-tab', this)"><i class="fas fa-wallet"></i>Saque</div>
     </nav>
 
     <div id="feed-tab" class="container">
-        <div class="card" style="text-align:center; background: linear-gradient(145deg, #222, #111);">
-            <h5 style="margin:0 0 10px 0; color:#ffcc00;">🎁 Recompensa Diária</h5>
-            <button class="btn-main" style="padding:8px 20px; width:auto;" onclick="doCheckin()">Receber +5 XP</button>
+        <div class="card" style="border-left: 5px solid var(--g-yellow);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:500;">Bónus de hoje disponível!</span>
+                <button class="btn-main" style="width:auto; padding:6px 15px; font-size:12px; background:var(--g-yellow); color:#000;" onclick="doCheckin()">Recolher</button>
+            </div>
         </div>
 
         <div class="card">
-            <textarea id="postText" placeholder="O que estás a pensar?"></textarea>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <textarea id="postText" placeholder="Partilha algo com a rede..."></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
                 <input type="file" id="fileInput" hidden accept="image/*">
-                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; font-size:12px;"><i class="fas fa-camera"></i> Foto (Máx 500KB)</button>
+                <button onclick="document.getElementById('fileInput').click()" style="color:var(--g-blue); background:none; border:none; font-size:14px; font-weight:500;"><i class="fas fa-image"></i> Foto</button>
                 <button class="btn-main" id="pubBtn" style="width:auto; padding:8px 25px;" onclick="handlePublish()">Publicar</button>
             </div>
         </div>
         <div id="feed"></div>
-        <div id="loading-trigger" style="text-align:center; padding:20px; color:#444;">A carregar...</div>
+        <div id="loading-trigger" style="text-align:center; padding:20px;">A procurar novos posts...</div>
     </div>
 
     <div id="info-tab" class="container hidden">
         <div class="card">
-            <h2 style="color:var(--tg-theme-button);">💰 Tabela de Lucros</h2>
-            <table style="width:100%">
-                <tr><td>Postagem</td><td class="val">+15 XP <span class="cash" id="pCash">0.0150€</span></td></tr>
-                <tr><td>Check-in</td><td class="val">+5 XP <span class="cash" id="cCash">0.0050€</span></td></tr>
-                <tr><td>Like</td><td class="val">+2 XP <span class="cash" id="lCash">0.0020€</span></td></tr>
-            </table>
+            <h3 style="color:var(--g-blue);">Como lucrar</h3>
+            <p>1000 XP equivalem a <b id="conv-rate">1.0000€</b></p>
+            <div style="font-size:14px; color:#5f6368;">
+                <p>• Post: +15 XP<br>• Convite: +100 XP<br>• Check-in: +5 XP</p>
+            </div>
         </div>
     </div>
 
     <div id="rank-tab" class="container hidden"></div>
 
+    <div id="invite-tab" class="container hidden">
+        <div class="card" style="text-align:center;">
+            <h3>Convidar Amigos</h3>
+            <p style="font-size:14px; color:#666;">Copia o link e envia aos teus contactos.</p>
+            <input type="text" id="refLink" readonly style="text-align:center; background:#f8f9fa;">
+            <button class="btn-main" style="margin-top:15px; background:var(--g-green);" onclick="copyRef()">Copiar Link</button>
+        </div>
+    </div>
+
     <div id="wallet-tab" class="container hidden">
-        <div class="card">
-            <h2>Levantamento PayPal</h2>
-            <p>Saldo: <b id="walletPts">0</b> XP</p>
-            <p style="font-size:20px; color:var(--tg-theme-button);">Total: <b id="curSym">€</b> <b id="localMoney">0.0000</b></p>
-            <input type="email" id="paypalEmail" placeholder="Teu e-mail PayPal">
-            <button class="btn-main" style="margin-top:15px;" onclick="requestWithdraw()">Pedir Pagamento</button>
+        <div class="card" style="text-align:center;">
+            <h4 style="margin:0; color:#5f6368;">O teu saldo atual</h4>
+            <h1 id="localMoney" style="font-size:36px; margin:10px 0; color:var(--text-dark);">0.0000€</h1>
+            <input type="email" id="paypalEmail" placeholder="E-mail do PayPal">
+            <button class="btn-main" style="margin-top:15px;" onclick="requestWithdraw()">Levantar para PayPal</button>
         </div>
     </div>
 
     <div id="admin-tab" class="container hidden">
-        <div class="card" style="border-color:#ff4444;">
-            <h2 style="color:#ff4444;">🛡️ Painel Admin</h2>
-            <p>Users: <b id="adm-u">0</b> | Posts: <b id="adm-p">0</b></p>
-            <hr border="0" style="border-top:1px solid #333">
-            <h4>Pedidos de Saque</h4>
-            <div id="adm-withdrawals"></div>
+        <div class="card" style="border-top: 4px solid var(--g-red);">
+            <h3 style="color:var(--g-red);">Painel de Moderação</h3>
+            <div id="adm-withdraws"></div>
+            <hr border="0" style="border-top:1px solid #eee; margin:15px 0;">
+            <input type="number" id="delId" placeholder="ID do Post">
+            <button onclick="adminDel()" class="btn-main" style="background:var(--g-red); margin-top:5px;">Apagar Post</button>
         </div>
     </div>
 
@@ -109,151 +151,117 @@
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const userId = 5401881400; // pine1971
+        const userId = 5401881400; // ADMIN
 
-        let exchangeRate = 1.0; 
-        let currencySymbol = "€";
-        let currentPage = 0;
-        let isFetching = false;
+        let rate = 1.0; let sym = "€"; let currentPage = 0;
 
-        // --- NAVEGAÇÃO ---
-        function showTab(id, el) {
-            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(id).classList.remove('hidden');
-            el.classList.add('active');
-            if(id === 'feed-tab') loadFeed(true);
-            if(id === 'rank-tab') loadRanking();
-            if(id === 'admin-tab') loadAdminPanel();
-            loadProfile();
+        async function init() {
+            if(window.navigator.language.includes('BR')) { rate = 6.2; sym = "R$"; }
+            document.getElementById('conv-rate').innerText = (1 * rate).toFixed(4) + sym;
+            document.getElementById('refLink').value = "https://t.me/PineSocialBot?start=" + userId;
+            
+            if(userId === 5401881400) {
+                const nav = document.getElementById('mainNav');
+                const btn = document.createElement('div'); btn.className="nav-item"; btn.innerHTML='<i class="fas fa-shield-alt"></i>Admin';
+                btn.onclick = () => showTab('admin-tab', btn); nav.appendChild(btn);
+            }
+
+            if(!localStorage.getItem('pine_tutorial_done')) {
+                document.getElementById('welcome-overlay').classList.remove('hidden');
+            }
+
+            loadProfile(); loadFeed(true);
         }
 
-        // --- COMPRESSÃO ---
-        async function compress(file) {
-            return new Promise(res => {
-                const reader = new FileReader(); reader.readAsDataURL(file);
-                reader.onload = e => {
-                    const img = new Image(); img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height, max = 1000;
-                        if(w>h && w>max) { h *= max/w; w = max; } else if(h>max) { w *= max/h; h = max; }
-                        canvas.width = w; canvas.height = h;
-                        canvas.getContext('2d').drawImage(img,0,0,w,h);
-                        canvas.toBlob(b => res(b), 'image/jpeg', 0.6);
-                    }
-                }
-            });
+        function closeWelcome() {
+            localStorage.setItem('pine_tutorial_done', 'true');
+            document.getElementById('welcome-overlay').classList.add('hidden');
         }
 
-        // --- FUNÇÕES CORE ---
         async function loadProfile() {
             const { data } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
             if(data) {
-                const pts = data.points || 0;
-                document.getElementById('userXP').innerText = pts + " XP";
-                document.getElementById('walletPts').innerText = pts;
-                document.getElementById('localMoney').innerText = (pts * exchangeRate / 1000).toFixed(4);
+                document.getElementById('userXP').innerText = data.points + " XP";
+                document.getElementById('localMoney').innerText = (data.points * rate / 1000).toFixed(4) + sym;
             }
         }
 
-        async function handlePublish() {
-            const text = document.getElementById('postText').value;
-            const file = document.getElementById('fileInput').files[0];
-            const btn = document.getElementById('pubBtn');
-            if(!text && !file) return;
-            btn.disabled = true;
-
-            let imgUrl = null;
-            if(file) {
-                const blob = await compress(file);
-                if(blob.size > 500*1024) { alert("Erro: >500KB"); btn.disabled=false; return; }
-                const name = `${Date.now()}.jpg`;
-                await supabaseClient.storage.from('post-images').upload(name, blob);
-                imgUrl = supabaseClient.storage.from('post-images').getPublicUrl(name).data.publicUrl;
+        async function loadFeed(reset=false) {
+            if(reset) { currentPage = 0; document.getElementById('feed').innerHTML = ''; }
+            const { data } = await supabaseClient.from('posts').select('*, profiles(username)').order('created_at', {ascending:false}).range(currentPage*10, (currentPage+1)*10-1);
+            if(data) {
+                data.forEach(p => {
+                    document.getElementById('feed').innerHTML += `
+                    <div class="card">
+                        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">
+                            <b style="color:var(--g-blue)">@${p.profiles?.username || 'user'}</b>
+                            <span onclick="alert('Relatado!')" style="color:#bdc1c6;">ID: ${p.id} <i class="fas fa-flag"></i></span>
+                        </div>
+                        <p style="margin:0; font-size:15px; line-height:1.4;">${p.content || ''}</p>
+                        ${p.image_url ? `<img src="${p.image_url}" style="width:calc(100% + 36px); margin-left:-18px; margin-top:12px; border-top:1px solid #eee; border-bottom:1px solid #eee;">` : ''}
+                        <div class="post-footer">
+                            <button class="action-btn" id="l-${p.id}" onclick="toggleLike(${p.id})"><i class="far fa-heart"></i> Like</button>
+                            <span style="font-size:11px; color:#bdc1c6;">${new Date(p.created_at).toLocaleDateString()}</span>
+                        </div>
+                    </div>`;
+                });
+                currentPage++;
             }
-            await supabaseClient.from('posts').insert([{ user_id: userId, content: text, image_url: imgUrl }]);
-            await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
-            location.reload();
         }
 
         async function doCheckin() {
             const day = new Date().toISOString().split('T')[0];
             const { error } = await supabaseClient.from('checkins').insert([{ user_id: userId, day }]);
-            if(error) alert("Já fizeste check-in hoje!");
-            else { await supabaseClient.rpc('increment_points', { user_id: userId, amount: 5 }); alert("+5 XP!"); loadProfile(); }
+            if(error) alert("Já recolheu hoje!");
+            else { await supabaseClient.rpc('increment_points', { user_id: userId, amount: 5 }); loadProfile(); alert("Bónus creditado!"); }
         }
 
-        async function loadFeed(reset=false) {
-            if(isFetching) return; isFetching = true;
-            if(reset) { currentPage=0; document.getElementById('feed').innerHTML=''; }
-            const { data } = await supabaseClient.from('posts').select('*, profiles(username)').order('created_at',{ascending:false}).range(currentPage*10, (currentPage+1)*10-1);
-            if(data) {
-                data.forEach(p => {
-                    document.getElementById('feed').innerHTML += `
-                        <div class="card">
-                            <b>@${p.profiles?.username || 'user'}</b>
-                            <p>${p.content || ''}</p>
-                            ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:10px; margin-top:10px;">` : ''}
-                            <div class="post-footer">
-                                <button class="action-btn" onclick="toggleLike(${p.id}, this)"><i class="far fa-heart"></i> Like</button>
-                                <span style="font-size:10px; color:#444;">${new Date(p.created_at).toLocaleDateString()}</span>
-                            </div>
-                        </div>`;
-                });
-                currentPage++;
-            }
-            isFetching = false;
-        }
-
-        async function toggleLike(postId, btn) {
+        async function toggleLike(postId) {
             const { error } = await supabaseClient.from('post_likes').insert([{ post_id: postId, user_id: userId }]);
-            if(!error) { btn.style.color = "#ff4444"; btn.innerHTML = '<i class="fas fa-heart"></i> +2 XP'; }
+            if(!error) { 
+                const btn = document.getElementById(`l-${postId}`);
+                btn.classList.add('liked'); btn.innerHTML='<i class="fas fa-heart"></i> +2 XP';
+                await supabaseClient.rpc('increment_points', { user_id: userId, amount: 2 });
+                loadProfile();
+            }
         }
 
-        async function loadRanking() {
-            const { data } = await supabaseClient.from('profiles').select('username, points').order('points',{ascending:false}).limit(10);
-            let h = '<div class="card"><h3>🏆 Top Ranking</h3><table style="width:100%">';
-            data?.forEach((u,i) => h += `<tr style="border-bottom:1px solid #333"><td style="padding:10px">${i+1}. @${u.username}</td><td class="val">${u.points} XP</td></tr>`);
-            document.getElementById('rank-tab').innerHTML = h + '</table></div>';
+        function showTab(tab, el) {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(tab).classList.remove('hidden');
+            el.classList.add('active');
+            if(tab === 'admin-tab') loadAdmin();
+            if(tab === 'rank-tab') loadRanking();
         }
 
-        // --- ADMIN & WITHDRAW ---
         async function requestWithdraw() {
             const email = document.getElementById('paypalEmail').value;
-            const pts = parseInt(document.getElementById('walletPts').innerText);
-            if(!email.includes('@') || pts < 5000) return alert("Mínimo 5000 XP e e-mail válido!");
+            const xpText = document.getElementById('userXP').innerText;
+            const pts = parseInt(xpText);
+            if(!email.includes('@') || pts < 5000) return alert("E-mail inválido ou XP insuficiente (mínimo 5000).");
             await supabaseClient.from('withdrawals').insert([{ user_id: userId, paypal_email: email, amount_xp: pts }]);
-            alert("Pedido enviado para análise!");
+            alert("Pedido recebido!");
         }
 
-        async function loadAdminPanel() {
-            if(userId !== 5401881400) return;
-            const { count: uC } = await supabaseClient.from('profiles').select('*', {count:'exact', head:true});
-            const { count: pC } = await supabaseClient.from('posts').select('*', {count:'exact', head:true});
-            document.getElementById('adm-u').innerText = uC;
-            document.getElementById('adm-p').innerText = pC;
-
-            const { data: ws } = await supabaseClient.from('withdrawals').select('*').eq('status','pending');
+        async function loadAdmin() {
+            const { data } = await supabaseClient.from('withdrawals').select('*').eq('status','pending');
             let h = "";
-            ws?.forEach(w => h += `<div class="adm-row">Paypal: ${w.paypal_email} | ${w.amount_xp} XP <button onclick="markPaid(${w.id})" style="float:right">PAGO</button></div>`);
-            document.getElementById('adm-withdrawals').innerHTML = h || "Sem pedidos.";
+            data?.forEach(w => h += `<div style="background:#f1f3f4; padding:10px; margin-bottom:8px; border-radius:8px; font-size:12px;">${w.paypal_email} (${w.amount_xp} XP) <button onclick="markPaid(${w.id})" style="float:right; background:var(--g-green); color:#fff; border:none; border-radius:4px; padding:3px 8px;">PAGAR</button></div>`);
+            document.getElementById('adm-withdraws').innerHTML = h || "Tudo em dia.";
         }
 
-        async function markPaid(id) {
-            await supabaseClient.from('withdrawals').update({status:'completed'}).eq('id', id);
-            loadAdminPanel();
-        }
-
-        async function init() {
-            const lang = window.navigator.language;
-            if(lang.includes('BR')) { exchangeRate = 6.20; currencySymbol = "R$"; }
-            document.getElementById('curSym').innerText = currencySymbol;
-            if(userId === 5401881400) {
-                const btn = document.createElement('div'); btn.className="nav-item"; btn.innerHTML='<i class="fas fa-user-shield"></i>Admin';
-                btn.onclick = () => showTab('admin-tab', btn); document.getElementById('mainNav').appendChild(btn);
+        async function adminDel() {
+            const id = document.getElementById('delId').value;
+            if(confirm("Confirmar eliminação do post "+id+"?")) {
+                await supabaseClient.from('posts').delete().eq('id', id);
+                alert("Eliminado."); loadFeed(true);
             }
-            loadProfile(); loadFeed(true);
+        }
+
+        function copyRef() { 
+            const link = document.getElementById('refLink'); link.select(); 
+            document.execCommand('copy'); alert("Link de convite copiado!"); 
         }
 
         window.addEventListener('scroll', () => { if((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) loadFeed(); });
