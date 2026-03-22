@@ -9,30 +9,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; --card-bg: #1e1e1e; }
-        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-top: 120px; padding-bottom: 85px; }
+        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-top: 120px; padding-bottom: 90px; }
         
-        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #222; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 11px; color: #ffcc00; text-align: center; padding: 0 10px; box-sizing: border-box; }
+        /* ANÚNCIO FIXO */
+        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #222; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 11px; color: #ffcc00; font-weight: bold; padding: 0 10px; text-align: center; }
+
+        /* HEADER */
         .header { position: fixed; top: 60px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--tg-theme-bg); border-bottom: 1px solid #333; z-index: 1000; box-sizing: border-box; }
         .xp-badge { background: var(--tg-theme-button); color: #000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
+        /* NAV INFERIOR */
         .nav-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; display: flex; border-top: 1px solid #333; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 9px; text-transform: uppercase; }
+        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 9px; text-transform: uppercase; font-weight: bold; }
         .nav-item.active { color: var(--tg-theme-button); }
         .nav-item i { font-size: 18px; }
 
+        /* CONTEÚDO */
         .container { padding: 15px; }
         .card { background: var(--card-bg); padding: 18px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
         .btn-main { width: 100%; background: var(--tg-theme-button); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .hidden { display: none; }
         
-        .info-table td { padding: 12px 0; border-bottom: 1px solid #333; font-size: 14px; }
+        input, select, textarea { width: 100%; background: #2a2a2a; border: none; color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; box-sizing: border-box; }
         .val { color: var(--tg-theme-button); font-weight: bold; text-align: right; }
         .cash { font-size: 10px; color: #888; display: block; font-weight: normal; }
     </style>
 </head>
 <body>
 
-    <div class="top-ad">📢 <b>DICA:</b> Fotos comprimidas carregam mais rápido e gastam menos dados!</div>
+    <div class="top-ad">📢 ANÚNCIO: Publica fotos e ganha XP convertível em dinheiro!</div>
 
     <div class="header">
         <h4 style="margin:0;">PINE SOCIAL</h4>
@@ -40,7 +45,7 @@
     </div>
 
     <nav class="nav-bottom">
-        <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-stream"></i>Feed</div>
+        <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i>Feed</div>
         <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-coins"></i>Ganhos</div>
         <div class="nav-item" onclick="showTab('rank-tab', this)"><i class="fas fa-trophy"></i>Rank</div>
         <div class="nav-item" onclick="showTab('invite-tab', this)"><i class="fas fa-users"></i>Amigos</div>
@@ -49,33 +54,41 @@
 
     <div id="feed-tab" class="container">
         <div class="card">
-            <textarea id="postText" style="width:100%; background:none; border:none; color:#fff; outline:none; min-height:60px;" placeholder="O que estás a pensar?"></textarea>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; border-top:1px solid #333; padding-top:10px;">
+            <textarea id="postText" placeholder="O que queres partilhar?"></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
                 <input type="file" id="fileInput" hidden accept="image/*">
-                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#aaa; font-size:12px;">
-                    <i class="fas fa-compress-arrows-alt" style="color:var(--tg-theme-button);"></i> Foto (Máx 500KB)
-                </button>
-                <button class="btn-main" id="pubBtn" style="width:auto; padding:8px 25px;" onclick="handlePublish()">Publicar</button>
+                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#aaa; font-size:12px;"><i class="fas fa-camera"></i> Foto (Máx 500KB)</button>
+                <button class="btn-main" id="pubBtn" style="width:auto; padding:8px 20px;" onclick="handlePublish()">Publicar</button>
             </div>
-            <div id="uploadStatus" style="font-size:10px; color:var(--tg-theme-button); margin-top:5px; display:none;">A comprimir e enviar...</div>
+            <div id="upStatus" style="font-size:10px; color:var(--tg-theme-button); margin-top:5px; display:none;">A comprimir e enviar...</div>
         </div>
-        <div id="feed"></div>
+        <div id="feed">Carregando publicações...</div>
     </div>
 
     <div id="info-tab" class="container hidden">
         <div class="card">
-            <h2 style="color:var(--tg-theme-button); margin-top:0;">💰 Ganhos</h2>
-            <table style="width:100%; border-collapse: collapse;">
-                <tr><td>Postagem</td><td class="val">+15 XP <span class="cash">0.0150€</span></td></tr>
-                <tr><td>Convite</td><td class="val">+100 XP <span class="cash">0.1000€</span></td></tr>
-                <tr><td>Like</td><td class="val">+2 XP <span class="cash">0.0020€</span></td></tr>
+            <h2 style="color:var(--tg-theme-button); margin-top:0;">💰 Economia</h2>
+            <table style="width:100%; border-collapse:collapse;">
+                <tr><td style="padding:10px 0;">Novo Post</td><td class="val">+15 XP <span class="cash">0.0150€</span></td></tr>
+                <tr><td style="padding:10px 0;">Convite</td><td class="val">+100 XP <span class="cash">0.1000€</span></td></tr>
+                <tr><td style="padding:10px 0;">Receber Like</td><td class="val">+2 XP <span class="cash">0.0020€</span></td></tr>
             </table>
-            <p style="font-size:12px; color:#888; margin-top:15px;">
-                * <b>Upload:</b> Limite de 500KB. Fotos maiores serão comprimidas automaticamente.<br>
-                * <b>Saque:</b> Mínimo 5000 XP via PayPal.
-            </p>
+            <p style="font-size:12px; color:#888; margin-top:15px;">* Mínimo 5000 XP para levantamento via PayPal.</p>
         </div>
     </div>
+
+    <div id="wallet-tab" class="container hidden">
+        <div class="card">
+            <h2>Levantamento PayPal</h2>
+            <p>Saldo: <b id="walletXP">0</b> XP</p>
+            <p style="color:var(--tg-theme-button); font-weight:bold;">Valor: <span id="euroVal">0.0000</span>€</p>
+            <input type="email" id="paypalEmail" placeholder="Teu e-mail PayPal">
+            <button class="btn-main" style="margin-top:15px;" onclick="requestWithdraw()">Levantar Agora</button>
+        </div>
+    </div>
+
+    <div id="rank-tab" class="container hidden"><div class="card">Ranking em breve...</div></div>
+    <div id="invite-tab" class="container hidden"><div class="card">Convida amigos com o teu ID: 5401881400</div></div>
 
     <script>
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
@@ -83,36 +96,44 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const userId = 5401881400;
 
-        // --- FUNÇÃO DE COMPRESSÃO ---
+        // --- NAVEGAÇÃO CORRIGIDA ---
+        function showTab(tabId, el) {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            el.classList.add('active');
+            loadProfile(); // Atualiza XP sempre
+        }
+
+        // --- CARREGAMENTO DE PERFIL ---
+        async function loadProfile() {
+            const { data, error } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
+            if (data) {
+                const pts = data.points || 0;
+                document.getElementById('userXP').innerText = pts + " XP";
+                document.getElementById('walletXP').innerText = pts;
+                document.getElementById('euroVal').innerText = (pts / 1000).toFixed(4);
+            }
+        }
+
+        // --- COMPRESSÃO DE IMAGEM (500KB) ---
         async function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = (event) => {
+                reader.onload = (e) => {
                     const img = new Image();
-                    img.src = event.target.result;
+                    img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-
-                        // Redimensionar se for muito grande (max 1200px largura)
-                        const max_size = 1200;
-                        if (width > height) {
-                            if (width > max_size) { height *= max_size / width; width = max_size; }
-                        } else {
-                            if (height > max_size) { width *= max_size / height; height = max_size; }
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
+                        let w = img.width, h = img.height;
+                        const max = 1000;
+                        if (w > h && w > max) { h *= max / w; w = max; }
+                        else if (h > max) { w *= max / h; h = max; }
+                        canvas.width = w; canvas.height = h;
                         const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        // Comprime para JPEG com qualidade 0.7 (70%)
-                        canvas.toBlob((blob) => {
-                            resolve(blob);
-                        }, 'image/jpeg', 0.7);
+                        ctx.drawImage(img, 0, 0, w, h);
+                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.6); // 60% qualidade
                     };
                 };
             });
@@ -120,49 +141,46 @@
 
         async function handlePublish() {
             const text = document.getElementById('postText').value;
-            const fileInput = document.getElementById('fileInput');
-            const status = document.getElementById('uploadStatus');
+            const file = document.getElementById('fileInput').files[0];
             const btn = document.getElementById('pubBtn');
+            const status = document.getElementById('upStatus');
 
-            if (!text && !fileInput.files[0]) return;
+            if(!text && !file) return;
+            btn.disabled = true; status.style.display = 'block';
 
-            btn.disabled = true;
-            status.style.display = 'block';
-
-            let imageUrl = null;
-            let fileToUpload = fileInput.files[0];
-
-            if (fileToUpload) {
-                // Comprime a imagem antes de enviar
-                fileToUpload = await compressImage(fileToUpload);
-
-                // Verifica se após a compressão ainda excede 500KB
-                if (fileToUpload.size > 500 * 1024) {
-                    alert("Mesmo com compressão, a imagem excede 500KB. Tenta outra foto.");
-                    btn.disabled = false;
-                    status.style.display = 'none';
-                    return;
-                }
-
-                const fileName = `${Date.now()}_${userId}.jpg`;
-                const { data, error } = await supabaseClient.storage
-                    .from('post-images')
-                    .upload(fileName, fileToUpload);
-
-                if (!error) {
-                    imageUrl = supabaseClient.storage.from('post-images').getPublicUrl(fileName).data.publicUrl;
-                }
+            let url = null;
+            if(file) {
+                let compressed = await compressImage(file);
+                if(compressed.size > 500 * 1024) { alert("Erro: Foto maior que 500KB mesmo após compressão."); return; }
+                const name = `${Date.now()}.jpg`;
+                await supabaseClient.storage.from('post-images').upload(name, compressed);
+                url = supabaseClient.storage.from('post-images').getPublicUrl(name).data.publicUrl;
             }
 
-            await supabaseClient.from('posts').insert([
-                { user_id: userId, username: 'pine1971', content: text, image_url: imageUrl }
-            ]);
-
+            await supabaseClient.from('posts').insert([{ user_id: userId, username: 'pine1971', content: text, image_url: url }]);
             await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
             location.reload();
         }
 
-        // Funções showTab e loadProfile mantidas da versão anterior...
+        // --- CARREGAR FEED ---
+        async function loadFeed() {
+            const { data } = await supabaseClient.from('posts').select('*').order('created_at', {ascending: false});
+            const feed = document.getElementById('feed');
+            feed.innerHTML = data.map(p => `
+                <div class="card">
+                    <b style="color:var(--tg-theme-button)">@${p.username}</b>
+                    <p>${p.content || ''}</p>
+                    ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:10px; margin-top:10px;">` : ''}
+                </div>
+            `).join('');
+        }
+
+        async function init() {
+            await loadProfile();
+            await loadFeed();
+        }
+
+        init();
     </script>
 </body>
 </html>
