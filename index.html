@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Social Network Extreme</title>
+    <title>Social Network Final</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -18,17 +18,15 @@
         .img-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; margin-top: 10px; display: none; border: 1px solid #333; }
         .feed-item { background: var(--card); border-bottom: 1px solid #222; padding: 15px; margin-bottom: 5px; }
         .post-img { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid #333; }
-        
-        /* Secção de Comentários */
         .comment-section { background: #0a0a0a; margin-top: 10px; border-radius: 8px; padding: 10px; display: none; }
         .comment-item { font-size: 13px; border-bottom: 1px solid #1a1a1a; padding: 5px 0; }
-        .comment-input { width: 70%; background: #1a1a1a; border: none; color: white; padding: 5px; border-radius: 5px; font-size: 12px; }
-        .comment-btn { width: 25%; background: var(--yellow); border: none; font-size: 11px; padding: 5px; border-radius: 5px; font-weight: bold; }
-
-        .ad-box { background: #080808; padding: 10px; text-align: center; border-bottom: 1px solid #333; }
+        .comment-input { width: 65%; background: #1a1a1a; border: none; color: white; padding: 8px; border-radius: 8px; font-size: 13px; }
+        .comment-btn { width: 30%; background: var(--yellow); border: none; font-size: 12px; padding: 8px; border-radius: 8px; font-weight: bold; }
+        .ad-box { background: #080808; padding: 10px; text-align: center; border-bottom: 1px solid #333; min-height: 60px; }
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid #222; }
         .nav-item { font-size: 24px; cursor: pointer; opacity: 0.4; }
         .nav-item.active { opacity: 1; color: var(--yellow); }
+        .rank-item { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #222; background: var(--card); margin: 5px 10px; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -42,9 +40,9 @@
 
     <div id="homeTab">
         <div class="post-box">
-            <textarea id="postInput" maxlength="300" placeholder="Partilha algo novo..."></textarea>
+            <textarea id="postInput" maxlength="300" placeholder="Partilha algo com a rede..."></textarea>
             <img id="preview" class="img-preview">
-            <div style="margin-top:10px; display:flex; justify-content:space-between;">
+            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
                 <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewImage(this)">
                 <button onclick="document.getElementById('fileInput').click()" style="background:#222; color:white; border:none; padding:8px 15px; border-radius:10px;">📷 Foto</button>
                 <button class="btn-post" id="publishBtn" onclick="publishPost()">Publicar</button>
@@ -53,10 +51,12 @@
         <div id="mainContent"></div>
     </div>
 
-    <div id="rankTab" style="display:none;"><div id="rankContent"></div></div>
+    <div id="rankTab" style="display:none; padding-top:10px;"><h3 style="text-align:center; color:var(--yellow);">🏆 Top Global</h3><div id="rankContent"></div></div>
+    
     <div id="walletTab" style="display:none; padding:20px; text-align:center;">
         <div id="realBalance" style="font-size:35px; font-weight:bold; color:var(--yellow); margin:20px 0;">€0.0000</div>
-        <button onclick="dailyCheckin()" style="width:100%; background:var(--yellow); color:black; border:none; padding:15px; border-radius:12px; font-weight:bold;">🎁 Check-in Diário</button>
+        <button onclick="dailyCheckin()" style="width:100%; background:var(--yellow); color:black; border:none; padding:15px; border-radius:12px; font-weight:bold; margin-bottom:20px;">🎁 Check-in Diário (+20 XP)</button>
+        <button onclick="alert('Pedido de levantamento enviado!')" style="background:transparent; color:var(--yellow); border:1px solid var(--yellow); padding:10px; border-radius:10px; width:100%;">💸 Levantar Saldo</button>
     </div>
 
     <div class="nav-bar">
@@ -67,20 +67,32 @@
 
     <script>
         const tg = window.Telegram.WebApp;
+        tg.expand();
         const urlParams = new URLSearchParams(window.location.search);
+        
+        // As chaves são lidas do URL que o bot envia
         const supabaseClient = supabase.createClient(urlParams.get('url'), urlParams.get('key'));
-        const userId = tg.initDataUnsafe.user?.id;
+        const BOT_TOKEN = urlParams.get('bot_token');
+        
+        const userId = tg.initDataUnsafe.user?.id || 123;
         const username = tg.initDataUnsafe.user?.username || 'User';
-        const BOT_TOKEN = 'TEU_TOKEN_AQUI'; // <--- COLOCA O TEU TOKEN DO BOTFATHER AQUI
         const ADMIN_ID = 5401881400;
 
         function getAdHtml() {
             return `<div class="ad-box"><script type="text/javascript">atOptions = { 'key' : '96a0945958564a02377033580552718e', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };<\/script><script type="text/javascript" src="//www.highperformanceformat.com/96a0945958564a02377033580552718e/invoke.js"><\/script></div>`;
         }
 
-        async function sendNotification(targetId, message) {
-            if (!BOT_TOKEN || BOT_TOKEN === 'TEU_TOKEN_AQUI') return;
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${targetId}&text=${encodeURIComponent(message)}`);
+        async function sendNotification(targetId, msg) {
+            if (!BOT_TOKEN) return;
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${targetId}&text=${encodeURIComponent(msg)}`);
+        }
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { document.getElementById('preview').src = e.target.result; document.getElementById('preview').style.display = 'block'; };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
         async function compressImage(file) {
@@ -88,8 +100,7 @@
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
+                    const img = new Image(); img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const MAX_WIDTH = 800;
@@ -125,8 +136,9 @@
         async function loadFeed() {
             const { data: posts } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
             let html = "";
-            posts?.forEach(async (p, i) => {
+            posts?.forEach((p, i) => {
                 html += `<div class="feed-item">
+                    ${userId === ADMIN_ID ? `<span onclick="deletePost(${p.id})" style="color:red; float:right; font-size:11px;">APAGAR</span>` : ''}
                     <b style="color:var(--yellow)">@${p.username}</b>
                     <p style="margin:10px 0;">${p.content || ''}</p>
                     ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
@@ -136,9 +148,9 @@
                     </div>
                     <div id="comm-${p.id}" class="comment-section">
                         <div id="list-${p.id}"></div>
-                        <div style="margin-top:10px;">
+                        <div style="margin-top:10px; display:flex; gap:5px;">
                             <input id="in-${p.id}" class="comment-input" placeholder="Escreve...">
-                            <button class="comment-btn" onclick="addComment(${p.id}, ${p.user_id})">Enviar</button>
+                            <button class="comment-btn" onclick="addComment(${p.id}, ${p.user_id})">OK</button>
                         </div>
                     </div>
                 </div>`;
@@ -160,9 +172,8 @@
             const val = document.getElementById(`in-${postId}`).value;
             if (!val) return;
             await supabaseClient.from('post_comments').insert([{ post_id: postId, user_id: userId, username: username, content: val }]);
-            sendNotification(postOwnerId, `@${username} comentou o teu post: "${val}"`);
-            toggleComments(postId);
-            document.getElementById(`in-${postId}`).value = "";
+            if (userId !== postOwnerId) sendNotification(postOwnerId, `@${username} comentou o teu post! 💬`);
+            toggleComments(postId); document.getElementById(`in-${postId}`).value = "";
         }
 
         async function likePost(id, postOwnerId) {
@@ -171,7 +182,13 @@
             loadFeed();
         }
 
-        // Funções Base mantidas (Rank, Wallet, Admin...)
+        async function loadRank() {
+            const { data } = await supabaseClient.from('profiles').select('*').order('points', { ascending: false }).limit(10);
+            let html = "";
+            data?.forEach((u, i) => { html += `<div class="rank-item"><span>#${i+1} @${u.username}</span><b>${u.points} XP</b></div>`; });
+            document.getElementById('rankContent').innerHTML = html;
+        }
+
         function changeTab(tab, el) {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
@@ -179,6 +196,7 @@
             document.getElementById('rankTab').style.display = tab === 'rank' ? 'block' : 'none';
             document.getElementById('walletTab').style.display = tab === 'wallet' ? 'block' : 'none';
             if(tab === 'rank') loadRank();
+            if(tab === 'home') loadFeed();
         }
 
         async function updateStats() {
@@ -189,7 +207,22 @@
             }
         }
 
-        updateStats(); loadFeed();
+        async function dailyCheckin() {
+            const { error } = await supabaseClient.rpc('increment_points', { user_id: userId, amount: 20 });
+            if(!error) { alert("Check-in: +20 XP!"); updateStats(); }
+        }
+
+        async function deletePost(id) { if(confirm("Apagar?")) { await supabaseClient.from('posts').delete().eq('id', id); loadFeed(); } }
+
+        async function loadAdmin() {
+            if (userId !== ADMIN_ID) return;
+            document.getElementById('adminPanel').style.display = 'block';
+            const { data } = await supabaseClient.from('profiles').select('points');
+            document.getElementById('statUsers').innerText = data?.length || 0;
+            document.getElementById('statPts').innerText = data?.reduce((a, b) => a + b.points, 0) || 0;
+        }
+
+        updateStats(); loadFeed(); loadAdmin();
     </script>
 </body>
 </html>
