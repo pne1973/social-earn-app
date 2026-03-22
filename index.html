@@ -3,89 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Social Network</title>
+    <title>Social Network Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --yellow: #ffcc00; --dark: #000; --card: #121212; }
-        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; padding-bottom: 80px; }
-        .header { background: #000; padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        .points-badge { background: var(--yellow); color: black; padding: 5px 12px; border-radius: 20px; font-weight: bold; }
+        :root { --yellow: #ffcc00; --dark: #000; --card: #121212; --red: #ff4444; --gray: #888; }
+        body { background: var(--dark); color: white; font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; }
+        .header { background: #000; padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .points-badge { background: var(--yellow); color: black; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+        #adminPanel { background: var(--red); margin: 10px; padding: 15px; border-radius: 12px; display: none; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .admin-stat { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; text-align: center; font-size: 12px; }
+        .wallet-card { background: var(--card); margin: 10px; padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #222; display: none; }
+        .balance-big { font-size: 32px; font-weight: bold; color: var(--yellow); margin: 10px 0; }
+        .btn-checkin { background: #222; color: var(--yellow); border: 1px solid var(--yellow); padding: 10px; border-radius: 10px; width: 100%; font-weight: bold; margin-bottom: 15px; cursor: pointer; }
         .post-box { background: var(--card); padding: 15px; margin: 10px; border-radius: 15px; border: 1px solid #222; }
-        textarea { width: 100%; background: transparent; border: none; color: white; font-size: 16px; outline: none; height: 60px; }
-        .btn-post { background: var(--yellow); color: black; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; float: right; cursor: pointer; }
-        .feed-item { background: var(--card); border-bottom: 1px solid #222; padding: 15px; }
-        .ad-card { background: #1a1a1a; margin: 10px; border-radius: 12px; padding: 20px; border: 1px dashed var(--yellow); text-align: center; }
+        textarea { width: 100%; background: transparent; border: none; color: white; font-size: 16px; outline: none; height: 60px; resize: none; }
+        .btn-post { background: var(--yellow); color: black; border: none; padding: 8px 25px; border-radius: 20px; font-weight: bold; float: right; cursor: pointer; }
+        .feed-item { background: var(--card); border-bottom: 1px solid #1a1a1a; padding: 15px; position: relative; }
+        .btn-delete { color: var(--red); font-size: 11px; position: absolute; top: 15px; right: 15px; border: 1px solid var(--red); padding: 2px 6px; border-radius: 4px; }
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid #222; }
+        .nav-item { font-size: 24px; cursor: pointer; opacity: 0.4; transition: 0.3s; }
+        .nav-item.active { opacity: 1; color: var(--yellow); transform: scale(1.1); }
     </style>
 </head>
 <body>
     <div class="header">
-        <span style="font-weight: bold;">Social Network</span>
-        <div class="points-badge" id="userXP">-- XP</div>
+        <span style="font-weight: bold;">SOCIAL NETWORK</span>
+        <div class="points-badge" id="userXP">0 XP</div>
     </div>
-    <div class="post-box">
+
+    <div id="adminPanel">
+        <div style="font-weight: bold; font-size: 12px;">🛡️ MODO ADMIN</div>
+        <div class="admin-grid">
+            <div class="admin-stat">Users: <b id="totalUsers">-</b></div>
+            <div class="admin-stat">XP Total: <b id="totalPts">-</b></div>
+        </div>
+    </div>
+
+    <div id="walletSection" class="wallet-card">
+        <button class="btn-checkin" onclick="dailyCheckin()">🎁 Reclamar Check-in Diário (+20 XP)</button>
+        <div style="font-size: 12px; color: #888;">SALDO ESTIMADO</div>
+        <div class="balance-big" id="realBalance">€0.0000</div>
+        <button onclick="alert('Mínimo €5.00')" style="width:100%; background:var(--yellow); border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">LEVANTAR</button>
+    </div>
+
+    <div id="postSection" class="post-box">
         <textarea id="postInput" placeholder="No que estás a pensar?"></textarea>
         <button class="btn-post" onclick="publishPost()">Publicar</button>
         <div style="clear:both;"></div>
     </div>
-    <div id="feed"></div>
+
+    <div id="mainContent"></div>
+
     <div class="nav-bar">
-        <span style="color:var(--yellow); font-size:24px;">🏠</span>
-        <span style="color:#555; font-size:24px;">🏆</span>
-        <span style="color:#555; font-size:24px;">💰</span>
+        <div class="nav-item active" id="navHome" onclick="changeTab('home')">🏠</div>
+        <div class="nav-item" id="navRank" onclick="changeTab('rank')">🏆</div>
+        <div class="nav-item" id="navWallet" onclick="changeTab('wallet')">💰</div>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        const tg = window.Telegram.WebApp; tg.expand();
         const urlParams = new URLSearchParams(window.location.search);
-        const sbUrl = urlParams.get('url');
-        const sbKey = urlParams.get('key');
-        let supabaseClient;
-        if (sbUrl && sbKey) { supabaseClient = supabase.createClient(sbUrl, sbKey); }
+        const supabaseClient = supabase.createClient(urlParams.get('url'), urlParams.get('key'));
         const userId = tg.initDataUnsafe.user?.id;
+        const ADMIN_ID = 5401881400;
 
-        async function getXP() {
-            if(!supabaseClient) return;
-            const { data } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
-            if (data) document.getElementById('userXP').innerText = `${data.points} XP`;
+        async function init() {
+            if (userId === ADMIN_ID) loadAdmin();
+            updateStats(); changeTab('home');
+        }
+
+        async function updateStats() {
+            const { data } = await supabaseClient.from('profiles').select('*').eq('id', userId).single();
+            if (data) {
+                document.getElementById('userXP').innerText = `${data.points} XP`;
+                document.getElementById('realBalance').innerText = `€${(data.points * 0.0005).toFixed(4)}`;
+            }
+        }
+
+        async function changeTab(tab) {
+            const content = document.getElementById('mainContent');
+            const postBox = document.getElementById('postSection');
+            const wallet = document.getElementById('walletSection');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+            if (tab === 'home') {
+                document.getElementById('navHome').classList.add('active');
+                postBox.style.display = 'block'; wallet.style.display = 'none'; loadFeed();
+            } else if (tab === 'rank') {
+                document.getElementById('navRank').classList.add('active');
+                postBox.style.display = 'none'; wallet.style.display = 'none'; loadRank();
+            } else if (tab === 'wallet') {
+                document.getElementById('navWallet').classList.add('active');
+                postBox.style.display = 'none'; wallet.style.display = 'block'; content.innerHTML = "";
+            }
         }
 
         async function loadFeed() {
-            if(!supabaseClient) return;
             const { data: posts } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
-            const feedDiv = document.getElementById('feed');
-            feedDiv.innerHTML = "";
-            posts?.forEach((post, index) => {
-                feedDiv.innerHTML += `<div class="feed-item">
-                    <div style="color:var(--yellow); font-weight:bold; font-size:13px;">@${post.username}</div>
-                    <div style="margin:10px 0; font-size:15px;">${post.content}</div>
-                    <div style="color:#888; font-size:14px;" onclick="likePost(${post.id})">❤️ ${post.likes || 0} Likes</div>
+            let html = "";
+            posts?.forEach((p, i) => {
+                html += `<div class="feed-item">
+                    ${userId === ADMIN_ID ? `<span class="btn-delete" onclick="deletePost(${p.id})">Apagar</span>` : ''}
+                    <b style="color:var(--yellow)">@${p.username}</b><p>${p.content}</p>
+                    <small onclick="likePost(${p.id})" style="cursor:pointer">❤️ ${p.likes || 0} Likes</small>
                 </div>`;
-                if ((index + 1) % 3 === 0) {
-                    feedDiv.innerHTML += `<div class="ad-card"><div style="font-size:10px; color:var(--yellow);">ANÚNCIO</div><button onclick="tg.openLink('https://google.com')" style="background:var(--yellow); border:none; padding:5px 15px; border-radius:5px; margin-top:10px; font-weight:bold;">GANHAR XP</button></div>`;
-                }
+                if ((i+1) % 3 === 0) html += `<div style="padding:20px; text-align:center; border:1px dashed #333; margin:10px; border-radius:10px;"><small style="color:var(--yellow)">ANÚNCIO</small><br><button onclick="tg.openLink('https://google.com')" style="background:white; border:none; padding:5px 10px; border-radius:5px; margin-top:5px; font-weight:bold;">+10 XP</button></div>`;
             });
+            document.getElementById('mainContent').innerHTML = html;
         }
 
         async function publishPost() {
-            const text = document.getElementById('postInput').value;
-            if(!text || !supabaseClient) return;
-            await supabaseClient.from('posts').insert([{ user_id: userId, username: tg.initDataUnsafe.user?.username || 'User', content: text }]);
+            const val = document.getElementById('postInput').value;
+            if(!val) return;
+            await supabaseClient.from('posts').insert([{ user_id: userId, username: tg.initDataUnsafe.user?.username || 'User', content: val }]);
             await supabaseClient.rpc('increment_points', { user_id: userId, amount: 5 });
-            document.getElementById('postInput').value = "";
-            loadFeed(); getXP();
+            document.getElementById('postInput').value = ""; updateStats(); loadFeed();
         }
 
-        async function likePost(postId) {
-            if(!supabaseClient) return;
-            await supabaseClient.rpc('increment_likes', { post_id: postId });
-            await supabaseClient.rpc('increment_points', { user_id: userId, amount: 1 });
-            loadFeed(); getXP();
+        async function dailyCheckin() {
+            // Lógica simples: podes adicionar uma coluna 'last_checkin' no Supabase para validar as 24h
+            await supabaseClient.rpc('increment_points', { user_id: userId, amount: 20 });
+            alert("Ganhaste 20 XP!"); updateStats();
         }
 
-        if(supabaseClient) { getXP(); loadFeed(); }
+        async function deletePost(id) { if(confirm("Apagar?")) { await supabaseClient.from('posts').delete().eq('id', id); loadFeed(); } }
+        async function likePost(id) { await supabaseClient.rpc('increment_likes', { post_id: id }); await supabaseClient.rpc('increment_points', { user_id: userId, amount: 1 }); updateStats(); loadFeed(); }
+        async function loadRank() {
+            const { data } = await supabaseClient.from('profiles').select('username, points').order('points', { ascending: false }).limit(10);
+            let html = "<h3 style='text-align:center;'>RANKING</h3>";
+            data?.forEach((u, i) => html += `<div class="feed-item" style="display:flex; justify-content:space-between;"><span>${i+1}º @${u.username}</span><b>${u.points} XP</b></div>`);
+            document.getElementById('mainContent').innerHTML = html;
+        }
+        async function loadAdmin() {
+            document.getElementById('adminPanel').style.display = 'block';
+            const { data } = await supabaseClient.from('profiles').select('points');
+            document.getElementById('totalUsers').innerText = data.length;
+            document.getElementById('totalPts').innerText = data.reduce((a, b) => a + b.points, 0).toLocaleString();
+        }
+        init();
     </script>
 </body>
 </html>
