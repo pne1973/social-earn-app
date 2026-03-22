@@ -4,93 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pine Social Master</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --bg: #F1F3F4; --border: #dadce0; }
         * { box-sizing: border-box; font-family: 'Google Sans', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        body { background: var(--bg); margin: 0; padding: 110px 0 85px; color: #202124; overflow-x: hidden; }
+        body { background: var(--bg); margin: 0; padding: 110px 0 85px; color: #202124; }
 
-        /* HEADER E ANÚNCIO FIXOS */
-        .top-container { position: fixed; top: 0; width: 100%; z-index: 2000; }
+        /* HEADER */
+        .top-container { position: fixed; top: 0; width: 100%; z-index: 9999; }
         .ad-top { background: #FFF9E6; color: #856404; text-align: center; padding: 8px; font-size: 11px; font-weight: bold; border-bottom: 1px solid var(--g-yellow); }
         .header { background: #fff; height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); }
-        .logo { font-size: 20px; font-weight: bold; }
-        .logo span:nth-child(1) { color: var(--g-blue); } .logo span:nth-child(2) { color: var(--g-red); } .logo span:nth-child(3) { color: var(--g-yellow); } .logo span:nth-child(4) { color: var(--g-blue); } .logo span:nth-child(5) { color: var(--g-green); }
-        .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+        .logo { font-size: 20px; font-weight: bold; color: var(--g-blue); }
+        .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; }
 
-        /* NAVEGAÇÃO */
-        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; height: 75px; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; text-align: center; color: #5f6368; font-size: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        /* NAV */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; height: 75px; z-index: 9999; }
+        .nav-item { flex: 1; text-align: center; color: #5f6368; font-size: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
         .nav-item.active { color: var(--g-blue); font-weight: bold; }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
 
-        /* CONTEÚDO */
+        /* CONTENT */
         .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; padding: 0 15px; }
         .tab-content.active { display: block; }
-
-        /* CARDS */
-        .card { background: #fff; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; }
-        .publish-card { padding: 15px; }
-        textarea { width: 100%; border: none; outline: none; font-size: 16px; resize: none; min-height: 50px; background: transparent; }
+        .card { background: #fff; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 16px; padding: 15px; }
         
-        .post-header { padding: 12px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f8f9fa; }
-        .avatar { width: 32px; height: 32px; background: #e8f0fe; color: var(--g-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
-        .post-body { padding: 15px; font-size: 15px; }
-        .post-actions { padding: 10px 15px; border-top: 1px solid #f8f9fa; display: flex; gap: 20px; }
-        .act-btn { background: none; border: none; color: #5f6368; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        /* POSTS */
+        .post-card { padding: 0; overflow: hidden; }
+        .post-header { padding: 12px; font-weight: bold; border-bottom: 1px solid #f8f9fa; }
+        .post-body { padding: 15px; }
+        .post-actions { padding: 10px; border-top: 1px solid #f8f9fa; display: flex; gap: 15px; }
+        .btn-act { background: none; border: none; color: #5f6368; font-weight: bold; font-size: 13px; cursor: pointer; }
 
-        .btn-pub { background: var(--g-blue); color: #fff; border: none; padding: 8px 22px; border-radius: 20px; font-weight: bold; }
+        .btn-pub { background: var(--g-blue); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="top-container">
-        <div class="ad-top">✨ ANÚNCIO: Ganha +100 XP por cada amigo convidado!</div>
+        <div class="ad-top">ANÚNCIO: Convida amigos e ganha +100 XP por cada um!</div>
         <div class="header">
-            <div class="logo"><span>P</span><span>i</span><span>n</span><span>e</span> <span>S</span><span>o</span><span>c</span><span>i</span><span>a</span><span>l</span></div>
+            <div class="logo">Pine Social</div>
             <div id="userXP" class="xp-badge">0 XP</div>
         </div>
     </div>
 
     <section id="tab-feed" class="tab-content active">
-        <div class="card publish-card">
-            <textarea id="postText" placeholder="No que estás a pensar?"></textarea>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
-                <button onclick="alert('Foto em breve!')" style="background:none; border:none; color:var(--g-green); font-weight:bold;"><i class="fas fa-image"></i> Foto</button>
+        <div class="card">
+            <textarea id="postText" placeholder="No que estás a pensar?" style="width:100%; border:none; outline:none; font-size:16px; min-height:60px;"></textarea>
+            <div style="text-align:right; border-top:1px solid #eee; padding-top:10px;">
                 <button class="btn-pub" onclick="publish()">Publicar</button>
             </div>
         </div>
-        <div id="feed-list">A carregar feed...</div>
+        <div id="feed-list">A carregar posts...</div>
     </section>
 
     <section id="tab-ganhos" class="tab-content">
-        <div class="card" style="padding:20px;">
-            <h3>💰 Como ganhar XP</h3>
-            <p>Postar: <b>+15 XP</b> | Like: <b>+2 XP</b> | Comentar: <b>+5 XP</b></p>
+        <div class="card">
+            <h3>💰 Ganhos</h3>
+            <p>Post: +15 XP | Like: +2 XP | Comentar: +5 XP</p>
         </div>
     </section>
 
     <section id="tab-rank" class="tab-content">
-        <div class="card" style="padding:20px;">
-            <h3>🏆 Ranking Top 10</h3>
-            <div id="rank-list">A carregar ranking...</div>
+        <div class="card">
+            <h3>🏆 Ranking</h3>
+            <div id="rank-list">A carregar...</div>
         </div>
     </section>
 
     <section id="tab-saque" class="tab-content">
-        <div class="card" style="padding:30px; text-align:center;">
-            <p>Saldo Atual</p>
-            <h1 id="cash-val" style="color:var(--g-green)">0.0000€</h1>
-            <button class="btn-pub" style="width:100%">Levantar via PayPal</button>
+        <div class="card" style="text-align:center;">
+            <p>Saldo</p>
+            <h1 id="cash-val">0.0000€</h1>
+            <button class="btn-pub" style="width:100%">Levantar</button>
         </div>
     </section>
 
     <section id="tab-admin" class="tab-content">
-        <div class="card" style="padding:20px;">
+        <div class="card">
             <h3 style="color:var(--g-red)">Painel Admin</h3>
-            <p id="adm-stats">Utilizadores: -- | Posts: --</p>
+            <p id="adm-stats">A carregar estatísticas...</p>
         </div>
     </section>
 
@@ -103,81 +97,92 @@
     </nav>
 
     <script>
-        // Configuração Supabase
+        // CONFIGURAÇÃO
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const myId = 5401881400;
+        let supabase;
 
-        // Função de troca de abas (Independente do banco de dados)
-        function showTab(id, el) {
-            const contents = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < contents.length; i++) contents[i].classList.remove('active');
+        // 1. FUNÇÃO DE ABAS (PRIORIDADE ZERO - SEMPRE FUNCIONA)
+        function showTab(tabId, element) {
+            // Esconder todas
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(c => c.style.display = 'none');
             
-            const navs = document.getElementsByClassName('nav-item');
-            for (let i = 0; i < navs.length; i++) navs[i].classList.remove('active');
+            // Remover active dos icones
+            const navs = document.querySelectorAll('.nav-item');
+            navs.forEach(n => n.classList.remove('active'));
 
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
+            // Mostrar a selecionada
+            document.getElementById(tabId).style.display = 'block';
+            element.classList.add('active');
 
-            if(id === 'tab-feed') loadFeed();
-            if(id === 'tab-rank') loadRank();
+            // Carregar dados se necessário
+            if(tabId === 'tab-feed') loadFeed();
         }
 
+        // 2. INICIALIZAÇÃO SEGURA
+        window.onload = function() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                const myId = 5401881400;
+                
+                if(myId !== 5401881400) document.getElementById('adm-nav').style.display = 'none';
+                
+                loadProfile(myId);
+                loadFeed();
+            } catch (e) {
+                document.getElementById('feed-list').innerHTML = "ERRO: O sistema de base de dados não carregou.";
+            }
+        };
+
+        // 3. CARREGAR FEED COM TRATAMENTO DE ERRO
         async function loadFeed() {
             const list = document.getElementById('feed-list');
+            if(!supabase) return;
+
             const { data, error } = await supabase.from('posts').select('*').order('created_at', {ascending:false});
             
-            if(error) { list.innerHTML = "Erro ao ligar ao servidor."; return; }
+            if(error) {
+                list.innerHTML = "Erro de permissão no Supabase. Verifica as tabelas.";
+                return;
+            }
+
             list.innerHTML = '';
-            
-            data.forEach((p, i) => {
-                if(i > 0 && i % 3 === 0) list.innerHTML += `<div style="background:#FFF9E6; border:1px dashed var(--g-yellow); padding:10px; border-radius:12px; margin-bottom:15px; text-align:center; font-size:11px;"><b>ANÚNCIO:</b> Ganha XP a dobrar clicando aqui!</div>`;
-                
+            data.forEach(p => {
                 list.innerHTML += `
-                <div class="card">
-                    <div class="post-header"><div class="avatar">U</div><b>User #${p.user_id.toString().slice(-4)}</b></div>
+                <div class="card post-card">
+                    <div class="post-header">User #${p.user_id.toString().slice(-4)}</div>
                     <div class="post-body">${p.content}</div>
                     <div class="post-actions">
-                        <button class="act-btn" onclick="addXP(this, 2)"><i class="far fa-heart"></i> Like</button>
-                        <button class="act-btn" onclick="addXP(this, 5)"><i class="far fa-comment"></i> Comentar</button>
+                        <button class="btn-act" onclick="addXP(this, 2)"><i class="far fa-heart"></i> Like</button>
+                        <button class="btn-act" onclick="addXP(this, 5)"><i class="far fa-comment"></i> Comentar</button>
                     </div>
                 </div>`;
             });
         }
 
         async function addXP(btn, pts) {
-            btn.innerHTML = `<i class="fas fa-check"></i> +${pts} XP`;
-            btn.style.color = "var(--g-blue)";
-            await supabase.rpc('increment_points', { user_id: myId, amount: pts });
-            loadProfile();
+            btn.innerHTML = `+${pts} XP ✅`;
+            btn.disabled = true;
+            await supabase.rpc('increment_points', { user_id: 5401881400, amount: pts });
+            loadProfile(5401881400);
         }
 
-        async function publish() {
-            const txt = document.getElementById('postText').value;
-            if(!txt) return;
-            await supabase.from('posts').insert([{ user_id: myId, content: txt }]);
-            await supabase.rpc('increment_points', { user_id: myId, amount: 15 });
-            location.reload();
-        }
-
-        async function loadProfile() {
-            const { data } = await supabase.from('profiles').select('points').eq('id', myId).single();
+        async function loadProfile(id) {
+            const { data } = await supabase.from('profiles').select('points').eq('id', id).single();
             if(data) {
                 document.getElementById('userXP').innerText = data.points + " XP";
                 document.getElementById('cash-val').innerText = (data.points * 0.001).toFixed(4) + "€";
             }
         }
 
-        async function loadRank() {
-            const { data } = await supabase.from('profiles').select('username, points').order('points', {ascending:false}).limit(10);
-            document.getElementById('rank-list').innerHTML = data?.map((u, i) => `<p>${i+1}. ${u.username || 'User'} - ${u.points} XP</p>`).join('') || 'Sem dados.';
+        async function publish() {
+            const txt = document.getElementById('postText').value;
+            if(!txt) return;
+            await supabase.from('posts').insert([{ user_id: 5401881400, content: txt }]);
+            await supabase.rpc('increment_points', { user_id: 5401881400, amount: 15 });
+            location.reload();
         }
-
-        // Inicialização
-        if(myId !== 5401881400) document.getElementById('adm-nav').style.display = 'none';
-        loadProfile();
-        loadFeed();
     </script>
 </body>
 </html>
