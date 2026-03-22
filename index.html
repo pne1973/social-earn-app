@@ -10,50 +10,53 @@
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --bg: #F1F3F4; --border: #dadce0; }
         * { box-sizing: border-box; font-family: 'Google Sans', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { background: var(--bg); margin: 0; padding: 115px 0 85px; color: #202124; }
+        body { background: var(--bg); margin: 0; padding: 110px 0 85px; color: #202124; }
 
-        /* HEADER & ADS FIXOS NO TOPO */
-        .top-container { position: fixed; top: 0; width: 100%; z-index: 2000; }
-        .header { height: 65px; background: #fff; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .ad-top { height: 40px; background: #fff9e6; border-bottom: 1px solid var(--g-yellow); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #856404; font-weight: bold; }
+        /* HEADER & ADS FIXOS */
+        .top-container { position: fixed; top: 0; width: 100%; z-index: 2000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .ad-top { background: #FFF9E6; color: #856404; text-align: center; padding: 8px; font-size: 11px; font-weight: bold; border-bottom: 1px solid var(--g-yellow); }
+        .header { background: #fff; height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); }
         
-        .logo { font-size: 22px; font-weight: bold; }
+        .logo { font-size: 20px; font-weight: bold; }
         .logo span:nth-child(1) { color: var(--g-blue); } .logo span:nth-child(2) { color: var(--g-red); } .logo span:nth-child(3) { color: var(--g-yellow); } .logo span:nth-child(4) { color: var(--g-blue); } .logo span:nth-child(5) { color: var(--g-green); }
         .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
-        /* MENU INFERIOR */
-        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); height: 75px; }
+        /* NAVEGAÇÃO */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; height: 75px; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { flex: 1; text-align: center; color: #5f6368; font-size: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .nav-item i { font-size: 20px; margin-bottom: 4px; }
         .nav-item.active { color: var(--g-blue); font-weight: bold; }
 
-        /* CARDS & FEED */
+        /* CONTEÚDO */
         .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; padding: 0 15px; }
-        .tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+        /* CARDS */
+        .card { background: #fff; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; }
+        .publish-card { padding: 15px; }
+        textarea { width: 100%; border: none; outline: none; font-size: 16px; resize: none; min-height: 50px; color: #3c4043; }
         
-        .publish-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 18px; margin-bottom: 16px; }
-        .post-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; position: relative; }
+        .post-header { padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f8f9fa; }
+        .u-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 32px; height: 32px; background: #e8f0fe; color: var(--g-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
         
-        .post-header { padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
-        .u-avatar { width: 32px; height: 32px; background: #e8f0fe; color: var(--g-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; }
-        
-        .post-content { padding: 0 15px 15px; font-size: 15px; }
-        .post-img { width: 100%; max-height: 380px; object-fit: cover; display: block; border-top: 1px solid #f1f3f4; }
-        
-        /* BOTÕES DE INTERAÇÃO */
+        .post-img { width: 100%; max-height: 400px; object-fit: cover; border-top: 1px solid #f1f3f4; }
+        .post-body { padding: 15px; font-size: 15px; line-height: 1.4; }
+
         .post-actions { padding: 8px 15px; border-top: 1px solid #f8f9fa; display: flex; gap: 20px; }
-        .act-btn { background: none; border: none; color: #5f6368; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 8px 0; }
-        .act-btn.liked { color: var(--g-red); }
+        .act-btn { background: none; border: none; color: #5f6368; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 
-        .ad-inline { background: #fff; border: 1px dashed var(--g-yellow); padding: 12px; border-radius: 12px; margin-bottom: 16px; text-align: center; color: #856404; font-size: 12px; }
+        /* ADMIN */
+        .admin-box { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid var(--g-red); }
+        .btn-del { color: var(--g-red); border: 1px solid var(--g-red); padding: 4px 8px; border-radius: 6px; font-size: 10px; background: none; cursor: pointer; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="top-container">
-        <div class="ad-top"><i class="fas fa-bullhorn" style="margin-right:8px"></i> ANÚNCIO: Dobra os teus ganhos hoje!</div>
+        <div class="ad-top"><i class="fas fa-bullhorn"></i> GANHA XP: Convida 5 amigos e recebe 500 XP!</div>
         <div class="header">
             <div class="logo"><span>P</span><span>i</span><span>n</span><span>e</span> <span>S</span><span>o</span><span>c</span><span>i</span><span>a</span><span>l</span></div>
             <div id="userXP" class="xp-badge">0 XP</div>
@@ -61,36 +64,40 @@
     </div>
 
     <section id="tab-feed" class="tab-content active">
-        <div class="publish-card">
-            <textarea id="postText" placeholder="No que estás a pensar?" style="width:100%; border:none; outline:none; font-size:16px; resize:none; min-height:60px;"></textarea>
-            <div id="prev-box" style="display:none; margin-bottom:12px;"><img id="img-render" style="width:100%; border-radius:10px;"></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
-                <button onclick="document.getElementById('fileIn').click()" style="background:none; border:none; color:var(--g-green); font-weight:bold; cursor:pointer; font-size:14px;"><i class="fas fa-image"></i> Foto</button>
+        <div class="card publish-card">
+            <textarea id="postText" placeholder="O que tens em mente?"></textarea>
+            <div id="prev-area" style="display:none; margin-bottom:10px;"><img id="img-render" style="width:100%; border-radius:10px;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid #f1f3f4; padding-top:12px;">
+                <button onclick="document.getElementById('fileIn').click()" style="background:none; border:none; color:var(--g-green); font-weight:bold; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
                 <input type="file" id="fileIn" hidden accept="image/*" onchange="preview(this)">
                 <button onclick="publish()" id="pubBtn" style="background:var(--g-blue); color:#fff; border:none; padding:8px 22px; border-radius:20px; font-weight:bold;">Publicar</button>
             </div>
         </div>
-        <div id="feed-list">Carregando posts...</div>
+        <div id="feed-list">A carregar posts...</div>
     </section>
 
-    <section id="tab-rank" class="tab-content">
-        <div class="publish-card"><h3>🏆 Top 10 Ranking</h3><div id="rank-data"></div></div>
+    <section id="tab-admin" class="tab-content">
+        <div class="admin-box">
+            <h3 style="color:var(--g-red)">🛠 Painel Admin</h3>
+            <div id="adm-stats">Utilizadores: -- | Posts: --</div>
+            <hr>
+            <h4>Levantamentos PayPal</h4>
+            <div id="pay-list">Nenhum pedido pendente.</div>
+        </div>
     </section>
 
     <section id="tab-saque" class="tab-content">
-        <div class="publish-card" style="text-align:center;">
-            <p>Saldo Estimado</p>
-            <h1 id="cash" style="color:var(--g-green)">0.0000€</h1>
-            <input type="email" placeholder="PayPal Email" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin:10px 0;">
-            <button style="width:100%; padding:12px; background:var(--g-blue); color:#fff; border:none; border-radius:20px; font-weight:bold;">Solicitar Saque</button>
+        <div class="card" style="padding:30px; text-align:center;">
+            <p>O teu saldo</p>
+            <h1 id="cash-val" style="color:var(--g-green); font-size:40px;">0.0000€</h1>
+            <button style="width:100%; padding:15px; background:var(--g-blue); color:#fff; border:none; border-radius:30px; font-weight:bold;">Levantar via PayPal</button>
         </div>
     </section>
 
     <nav class="nav">
         <div class="nav-item active" onclick="showTab('tab-feed', this)"><i class="fas fa-home"></i>Feed</div>
-        <div class="nav-item" onclick="showTab('tab-rank', this)"><i class="fas fa-trophy"></i>Rank</div>
         <div class="nav-item" onclick="showTab('tab-saque', this)"><i class="fas fa-wallet"></i>Saque</div>
-        <div id="adm-btn" class="nav-item" onclick="showTab('tab-admin', this)"><i class="fas fa-user-shield"></i>Admin</div>
+        <div id="adm-nav" class="nav-item" onclick="showTab('tab-admin', this)"><i class="fas fa-user-shield"></i>Admin</div>
     </nav>
 
     <script>
@@ -98,44 +105,49 @@
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const myId = 5401881400;
-
-        let imgData = null;
+        let imgFile = null;
 
         async function init() {
-            if(myId !== 5401881400) document.getElementById('adm-btn').style.display = 'none';
+            if(myId !== 5401881400) document.getElementById('adm-nav').style.display = 'none';
             loadProfile();
             loadFeed();
         }
 
-        function showTab(tab, el) {
+        function showTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(tab).classList.add('active');
+            document.getElementById(id).classList.add('active');
             el.classList.add('active');
+            if(id === 'tab-admin') loadAdmin();
         }
 
         async function loadFeed() {
-            const container = document.getElementById('feed-list');
+            const list = document.getElementById('feed-list');
             const { data } = await supabase.from('posts').select('*').order('created_at', {ascending:false});
-            container.innerHTML = '';
+            list.innerHTML = '';
             
             data?.forEach((p, i) => {
-                if(i > 0 && i % 3 === 0) container.innerHTML += `<div class="ad-inline"><b>ANÚNCIO:</b> Ganha +100 XP convidando amigos!</div>`;
+                if(i > 0 && i % 3 === 0) {
+                    list.innerHTML += `<div style="background:#FFF9E6; border:1px dashed var(--g-yellow); padding:12px; border-radius:12px; margin-bottom:16px; text-align:center; font-size:12px;"><b>ADS:</b> Ganha 2€ por cada inquérito respondido!</div>`;
+                }
                 
-                container.innerHTML += `
-                <div class="post-card">
-                    <div class="post-header"><div class="u-avatar">U</div><b>Utilizador #${p.user_id.toString().slice(-4)}</b></div>
+                list.innerHTML += `
+                <div class="card">
+                    <div class="post-header">
+                        <div class="u-info"><div class="avatar">U</div><b>User #${p.user_id.toString().slice(-4)}</b></div>
+                        ${myId === 5401881400 ? `<button class="btn-del" onclick="delPost(${p.id})">Apagar</button>` : ''}
+                    </div>
                     ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    <div class="post-content" style="${p.image_url ? 'margin-top:15px' : ''}">${p.content}</div>
+                    <div class="post-body">${p.content}</div>
                     <div class="post-actions">
-                        <button class="act-btn" onclick="interact(this, 2)"><i class="far fa-heart"></i> Gostar</button>
-                        <button class="act-btn" onclick="interact(this, 5)"><i class="far fa-comment"></i> Comentar</button>
+                        <button class="act-btn" onclick="addXP(this, 2)"><i class="far fa-heart"></i> Like</button>
+                        <button class="act-btn" onclick="addXP(this, 5)"><i class="far fa-comment"></i> Comentar</button>
                     </div>
                 </div>`;
             });
         }
 
-        async function interact(btn, pts) {
+        async function addXP(btn, pts) {
             btn.style.color = pts === 2 ? 'var(--g-red)' : 'var(--g-blue)';
             btn.innerHTML = `<i class="fas fa-check"></i> +${pts} XP`;
             await supabase.rpc('increment_points', { user_id: myId, amount: pts });
@@ -144,21 +156,21 @@
 
         function preview(input) {
             if(input.files[0]) {
-                imgData = input.files[0];
-                document.getElementById('img-render').src = URL.createObjectURL(imgData);
-                document.getElementById('prev-box').style.display = 'block';
+                imgFile = input.files[0];
+                document.getElementById('img-render').src = URL.createObjectURL(imgFile);
+                document.getElementById('prev-area').style.display = 'block';
             }
         }
 
         async function publish() {
             const txt = document.getElementById('postText').value;
-            if(!txt && !imgData) return;
+            if(!txt && !imgFile) return;
             const btn = document.getElementById('pubBtn'); btn.disabled = true;
 
             let url = null;
-            if(imgData) {
+            if(imgFile) {
                 const name = `p_${Date.now()}.jpg`;
-                const { data } = await supabase.storage.from('post-images').upload(name, imgData);
+                const { data } = await supabase.storage.from('post-images').upload(name, imgFile);
                 if(data) url = `${SUPABASE_URL}/storage/v1/object/public/post-images/${name}`;
             }
 
@@ -171,7 +183,14 @@
             const { data } = await supabase.from('profiles').select('points').eq('id', myId).single();
             if(data) {
                 document.getElementById('userXP').innerText = data.points + " XP";
-                document.getElementById('cash').innerText = (data.points * 0.001).toFixed(4) + "€";
+                document.getElementById('cash-val').innerText = (data.points * 0.001).toFixed(4) + "€";
+            }
+        }
+
+        async function delPost(id) {
+            if(confirm("Apagar post?")) {
+                await supabase.from('posts').delete().eq('id', id);
+                loadFeed();
             }
         }
 
