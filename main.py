@@ -1,88 +1,59 @@
 import os
 import asyncio
 import threading
-import logging
 from flask import Flask
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
 from supabase import create_client, Client
+from urllib.parse import urlencode
 
-# --- CONFIGURAÇÃO DE LOGS (Para aparecer no Render) ---
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# --- SERVIDOR WEB (Para o Render não dar erro de porta) ---
 app = Flask(__name__)
 
 @app.route('/')
-def home():
-    return "Social Earn Bot is Online!"
+def home(): return "Social Network Bot Online!"
 
 def run_flask():
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 10000)))
 
-# --- CONFIGURAÇÃO DAS VARIÁVEIS DO RENDER ---
+# LÊ AS KEYS EXATAMENTE COMO ESTÃO NO ENVIRONMENT DO RENDER
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+BASE_WEBAPP_URL = "https://social-earn-app.vercel.app"
 
-# URL OFICIAL (Sem a barra no fim para evitar erro 404)
-WEBAPP_URL = "https://social-earn-app.vercel.app"
-
-# Verificação de segurança nos Logs do Render
-if not TOKEN:
-    logger.error("❌ ERRO: Variável TELEGRAM_TOKEN não encontrada!")
-else:
-    logger.info(f"✅ Token detetado: {TOKEN[:5]}***")
-
-if not SUPABASE_URL or not SUPABASE_KEY:
-    logger.error("❌ ERRO: Credenciais do Supabase em falta!")
-
-# Inicialização
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @dp.message(CommandStart())
-async def start_command(message: types.Message):
+async def start(message: types.Message):
     user_id = message.from_user.id
     username = message.from_user.username or f"User_{user_id}"
     
-    logger.info(f"Recibi /start de {username} ({user_id})")
-
-    # Lógica de Registo no Supabase
+    # Regista o utilizador na tabela 'profiles'
     try:
-        res = supabase.table("profiles").select("*").eq("id", user_id).execute()
-        if not res.data:
-            supabase.table("profiles").insert({
-                "id": user_id, 
-                "username": username, 
-                "points": 50
-            }).execute()
-            msg_text = f"🚀 Bem-vindo ao Social Earn, {username}!\n\nGanhaste 50 XP de bónus!"
-        else:
-            msg_text = f"Olá {username}! Pronto para ganhar mais?"
+        supabase.table("profiles").upsert({"id": user_id, "username": username, "points": 50}).execute()
     except Exception as e:
-        logger.error(f"Erro no Supabase: {e}")
-        msg_text = "Bem-vindo de volta!"
+        print(f"Erro Supabase: {e}")
 
-    # Botão que abre o Mini App
-    kb = [[types.InlineKeyboardButton(
-        text="🚀 Abrir Social Earn", 
-        web_app=types.WebAppInfo(url=WEBAPP_URL)
-    )]]
-    reply_markup = types.InlineKeyboardMarkup(inline_keyboard=kb)
+    # Envia as chaves via URL para o index.html ler
+    params = {
+        "url": SUPABASE_URL,
+        "key": SUPABASE_KEY
+    }
+    final_url = f"{BASE_WEBAPP_URL}?{urlencode(params)}"
 
-    await message.answer(msg_text, reply_markup=reply_markup)
+    kb = [[types.InlineKeyboardButton(text="🏠 Entrar na Rede Social", web_app=types.WebAppInfo(url=final_url))]]
+    
+    await message.answer(
+        f"Bem-vindo à Social Network, {username}!\n\nGanhe XP publicando e interagindo com a comunidade.", 
+        reply_markup=types.InlineKeyboardMarkup(inline_keyboard=kb)
+    )
 
 async def main():
-    logger.info("🤖 Bot a iniciar Polling...")
+    threading.Thread(target=run_flask, daemon=True).start()
+    print("🤖 Bot a iniciar Polling...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    # 1. Inicia o Flask numa thread separada
-    threading.Thread(target=run_flask, daemon=True).start()
-    
-    # 2. Inicia o Bot
     asyncio.run(main())
