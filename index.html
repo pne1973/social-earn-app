@@ -16,9 +16,9 @@
         .actions { display: flex; justify-content: space-between; align-items: center; }
         .btn-pub { background: var(--tg-theme-button); color: #000; border: none; padding: 10px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .btn-file { background: #333; color: #fff; border: none; padding: 10px; border-radius: 10px; cursor: pointer; }
-        .feed-post { background: #1e1e1e; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #222; }
-        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; display: block; max-height: 300px; object-fit: cover; }
-        .btn-delete { color: #ff4444; font-size: 12px; cursor: pointer; float: right; font-weight: bold; }
+        .feed-post { background: #1e1e1e; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #222; position: relative; }
+        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; display: block; max-height: 350px; object-fit: cover; }
+        .btn-delete { color: #ff4444; font-size: 12px; cursor: pointer; float: right; font-weight: bold; padding: 5px; }
         .user-info { color: var(--tg-theme-button); font-weight: bold; margin-bottom: 5px; }
     </style>
 </head>
@@ -44,18 +44,19 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- SUBSTITUI PELOS TEUS DADOS DO SUPABASE ---
-        const SUPABASE_URL = "A_TUA_URL_AQUI"; 
-        const SUPABASE_KEY = "A_TUA_KEY_AQUI";
+        // CREDENCIAIS FORNECIDAS
+        const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // FORÇAR O TEU ID PARA GARANTIR CONEXÃO
-        const userId = 5401881400; 
-        const username = "pine1971";
+        // TEU ID DE ADMINISTRADOR
+        const ADMIN_ID = 5401881400; 
+        const userId = tg.initDataUnsafe?.user?.id || ADMIN_ID;
+        const username = tg.initDataUnsafe?.user?.username || "pine1971";
 
         async function init() {
             try {
-                // Busca pontos na tabela 'profiles' onde a coluna é 'id'
+                // Busca pontos na tabela 'profiles' usando as colunas 'id' e 'points'
                 let { data, error } = await supabaseClient
                     .from('profiles')
                     .select('points')
@@ -66,6 +67,7 @@
                     document.getElementById('userXP').innerText = `${data.points} XP`;
                 } else {
                     document.getElementById('userXP').innerText = "0 XP";
+                    console.log("Perfil não encontrado no Supabase.");
                 }
             } catch (e) {
                 document.getElementById('userXP').innerText = "Erro";
@@ -74,8 +76,7 @@
         }
 
         async function loadFeed() {
-            // Garante que tens uma Policy de SELECT (true) na tabela posts
-            const { data: posts } = await supabaseClient
+            const { data: posts, error } = await supabaseClient
                 .from('posts')
                 .select('*')
                 .order('created_at', { ascending: false });
@@ -85,12 +86,13 @@
 
             if (posts) {
                 posts.forEach(p => {
+                    const isOwner = userId === ADMIN_ID || p.user_id === userId;
                     feedDiv.innerHTML += `
                         <div class="feed-post">
-                            ${userId === 5401881400 ? `<span class="btn-delete" onclick="deletePost(${p.id})">APAGAR</span>` : ''}
+                            ${isOwner ? `<span class="btn-delete" onclick="deletePost(${p.id})">APAGAR</span>` : ''}
                             <div class="user-info">@${p.username || 'utilizador'}</div>
-                            <div>${p.content || ''}</div>
-                            ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                            <div style="margin-bottom:10px;">${p.content || ''}</div>
+                            ${p.image_url ? `<img src="${p.image_url}" class="post-img" onerror="this.style.display='none'">` : ''}
                         </div>
                     `;
                 });
@@ -99,14 +101,17 @@
 
         async function handlePublish() {
             const text = document.getElementById('postText').value;
-            const file = document.getElementById('fileInput').files[0];
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
             let imageUrl = null;
 
             if (!text && !file) return;
 
+            tg.MainButton.setText("A publicar...").show();
+
             try {
                 if (file) {
-                    const fileName = `${Date.now()}_img.jpg`;
+                    const fileName = `${Date.now()}_${userId}.jpg`;
                     const { data: upData, error: upErr } = await supabaseClient.storage
                         .from('post-images')
                         .upload(fileName, file);
@@ -119,24 +124,30 @@
                     imageUrl = urlData.publicUrl;
                 }
 
-                await supabaseClient.from('posts').insert([{
+                const { error: postErr } = await supabaseClient.from('posts').insert([{
                     user_id: userId,
                     username: username,
                     content: text,
                     image_url: imageUrl
                 }]);
 
+                if (postErr) throw postErr;
+
                 document.getElementById('postText').value = '';
-                document.getElementById('fileInput').value = '';
+                fileInput.value = '';
                 init();
             } catch (err) {
-                alert("Erro: " + err.message);
+                alert("Erro ao publicar: " + err.message);
+            } finally {
+                tg.MainButton.hide();
             }
         }
 
         async function deletePost(postId) {
+            if (!confirm("Apagar este post?")) return;
             const { error } = await supabaseClient.from('posts').delete().eq('id', postId);
             if (!error) init();
+            else alert("Erro ao apagar: " + error.message);
         }
 
         init();
