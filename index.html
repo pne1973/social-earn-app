@@ -3,45 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pine Social Master Official</title>
+    <title>Pine Social Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --bg: #F1F3F4; --border: #dadce0; }
-        * { box-sizing: border-box; font-family: 'Google Sans', Roboto, sans-serif; }
+        * { box-sizing: border-box; font-family: 'Google Sans', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); margin: 0; padding: 75px 0 90px; color: #202124; }
 
-        /* HEADER & NAV */
+        /* HEADER */
         .header { position: fixed; top: 0; width: 100%; height: 65px; background: #fff; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 2000; }
         .logo { font-size: 22px; font-weight: bold; }
         .logo span:nth-child(1) { color: var(--g-blue); } .logo span:nth-child(2) { color: var(--g-red); } .logo span:nth-child(3) { color: var(--g-yellow); } .logo span:nth-child(4) { color: var(--g-blue); } .logo span:nth-child(5) { color: var(--g-green); }
-        .xp-badge { background: var(--g-blue); color: #fff; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+        .xp-badge { background: var(--g-blue); color: #fff; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; box-shadow: 0 2px 4px rgba(66,133,244,0.3); }
 
-        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .nav-item.active { color: var(--g-blue); font-weight: bold; }
+        /* MENU INFERIOR RESTAURADO */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); height: 70px; }
+        .nav-item { flex: 1; text-align: center; padding: 10px 0; color: #5f6368; font-size: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+        .nav-item.active { color: var(--g-blue); font-weight: bold; border-top: 3px solid var(--g-blue); }
 
-        /* TABS */
-        .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; padding: 15px; }
+        /* TABS & CARDS */
+        .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; padding: 15px; animation: fadeIn 0.2s ease; }
         .tab-content.active { display: block; }
-
-        /* CARDS & ADS */
-        .card { background: #fff; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; position: relative; }
-        .ad-banner { background: #FFF8E1; border: 1px dashed var(--g-yellow); padding: 15px; text-align: center; color: #856404; font-size: 13px; border-radius: 12px; margin-bottom: 16px; }
-        .post-img { width: 100%; max-height: 400px; object-fit: cover; display: block; }
-        .card-header { padding: 12px; display: flex; align-items: center; gap: 10px; font-weight: bold; }
-        .card-body { padding: 0 12px 12px; font-size: 15px; }
+        .card { background: #fff; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         
-        /* ADMIN PANEL IMPROVED */
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: #fff; padding: 15px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
-        .stat-card b { font-size: 20px; color: var(--g-blue); }
-        .withdraw-item { background: #fff; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--g-green); display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
-        .btn-pay { background: var(--g-green); color: #fff; border: none; padding: 6px 12px; border-radius: 15px; font-weight: bold; cursor: pointer; }
-        .btn-del { position: absolute; top: 10px; right: 10px; background: rgba(234, 67, 53, 0.1); color: var(--g-red); border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 11px; }
+        /* ADS */
+        .ad-banner { background: #FFF8E1; border: 1px dashed var(--g-yellow); padding: 12px; text-align: center; color: #856404; font-size: 12px; border-radius: 10px; margin-bottom: 15px; }
 
-        .editor { background: #fff; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
-        textarea { width: 100%; border: none; outline: none; font-size: 16px; resize: none; min-height: 50px; }
+        /* ADMIN STYLE */
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .stat-card { background: #fff; padding: 20px; border-radius: 15px; border: 1px solid var(--border); text-align: center; }
+        .stat-card b { font-size: 24px; color: var(--g-blue); display: block; margin-top: 5px; }
+        .withdraw-item { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--g-green); display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; border-left: 5px solid var(--g-green); }
+        .btn-pay { background: var(--g-green); color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -52,12 +49,12 @@
     </div>
 
     <section id="tab-feed" class="tab-content active">
-        <div class="ad-banner"><b>PATROCÍNIO:</b> Ganha 500 XP extras hoje! Clica aqui.</div>
-        <div class="editor">
-            <textarea id="postText" placeholder="Partilha algo com a comunidade..."></textarea>
-            <div id="preview-box" style="display:none; margin-bottom:10px;"><img id="img-prev" style="width:100%; border-radius:8px;"></div>
-            <div style="display:flex; justify-content:space-between;">
-                <button onclick="document.getElementById('fileIn').click()" style="background:none; border:none; color:var(--g-green); font-weight:bold; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
+        <div class="card" style="padding:15px;">
+            <textarea id="postText" placeholder="O que estás a pensar?" style="width:100%; border:none; outline:none; font-size:16px; resize:none;"></textarea>
+            <div id="preview-box" style="display:none; margin:10px 0;"><img id="img-prev" style="width:100%; border-radius:8px; max-height:200px; object-fit:cover;"></div>
+            <hr style="border:0; border-top:1px solid #f1f3f4; margin:10px 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <button onclick="document.getElementById('fileIn').click()" style="background:none; border:none; color:var(--g-green); font-weight:bold; cursor:pointer;"><i class="fas fa-image"></i> Foto</button>
                 <input type="file" id="fileIn" hidden accept="image/*" onchange="handlePreview(this)">
                 <button onclick="publish()" id="pubBtn" style="background:var(--g-blue); color:#fff; border:none; padding:8px 25px; border-radius:20px; font-weight:bold;">Publicar</button>
             </div>
@@ -65,19 +62,50 @@
         <div id="feed-list"></div>
     </section>
 
+    <section id="tab-ganhos" class="tab-content">
+        <div class="card" style="padding:20px;">
+            <h3 style="margin-top:0; color:var(--g-blue);"><i class="fas fa-coins"></i> Tabela de Ganhos</h3>
+            <p>Post: <b>+15 XP</b></p>
+            <p>Gostar: <b>+2 XP</b></p>
+            <p>Convidar: <b>+100 XP</b></p>
+            <div style="background:var(--bg); padding:15px; border-radius:10px; text-align:center; margin-top:15px;">
+                <small>Câmbio: 1000 XP = 1.0000€</small>
+            </div>
+        </div>
+    </section>
+
+    <section id="tab-rank" class="tab-content">
+        <div class="card" style="padding:20px;">
+            <h3>🏆 Ranking Top 10</h3>
+            <div id="rank-list">Carregando...</div>
+        </div>
+    </section>
+
+    <section id="tab-saque" class="tab-content">
+        <div class="card" style="text-align:center; padding:30px 20px;">
+            <p style="color:#5f6368; margin:0;">Saldo Estimado</p>
+            <h1 id="cash-val" style="font-size:42px; color:var(--g-green); margin:10px 0;">0.0000€</h1>
+            <input type="email" placeholder="E-mail PayPal" style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px; text-align:center;">
+            <button style="width:100%; padding:14px; background:var(--g-blue); color:#fff; border:none; border-radius:24px; font-weight:bold;">Solicitar Saque</button>
+            <p style="font-size:11px; color:var(--g-red); margin-top:10px;">Mínimo para saque: 5000 XP</p>
+        </div>
+    </section>
+
     <section id="tab-admin" class="tab-content">
         <h2 style="color:var(--g-red)">Painel Administrativo</h2>
         <div class="admin-grid">
-            <div class="stat-card"><small>Utilizadores</small><br><b id="count-u">0</b></div>
-            <div class="stat-card"><small>Posts Totais</small><br><b id="count-p">0</b></div>
+            <div class="stat-card">Utilizadores<br><b id="count-u">0</b></div>
+            <div class="stat-card">Posts Totais<br><b id="count-p">0</b></div>
         </div>
         <h3>💰 Pedidos de Saque</h3>
-        <div id="withdraw-list">Nenhum pedido pendente.</div>
+        <div id="withdraw-list"></div>
     </section>
 
     <nav class="nav">
         <div class="nav-item active" onclick="showTab('tab-feed', this)"><i class="fas fa-home"></i>Feed</div>
-        <div class="nav-item" onclick="showTab('tab-wallet', this)"><i class="fas fa-wallet"></i>Saque</div>
+        <div class="nav-item" onclick="showTab('tab-ganhos', this)"><i class="fas fa-coins"></i>Ganhos</div>
+        <div class="nav-item" onclick="showTab('tab-rank', this)"><i class="fas fa-trophy"></i>Rank</div>
+        <div class="nav-item" onclick="showTab('tab-saque', this)"><i class="fas fa-wallet"></i>Saque</div>
         <div id="adm-nav" class="nav-item" onclick="showTab('tab-admin', this)"><i class="fas fa-user-shield"></i>Admin</div>
     </nav>
 
@@ -86,8 +114,6 @@
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const myId = 5401881400;
-
-        let imgBlob = null;
 
         async function init() {
             if(myId !== 5401881400) document.getElementById('adm-nav').style.display = 'none';
@@ -101,28 +127,20 @@
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
             if(id === 'tab-admin') loadAdmin();
+            if(id === 'tab-rank') loadRank();
         }
 
         async function loadFeed() {
             const list = document.getElementById('feed-list');
             const { data } = await supabaseClient.from('posts').select('*').order('created_at', {ascending:false});
             list.innerHTML = '';
-            data?.forEach((p, index) => {
-                // Injeção de Anúncio a cada 3 posts
-                if(index > 0 && index % 3 === 0) {
-                    list.innerHTML += `<div class="ad-banner"><b>ANÚNCIO:</b> Queres converter XP mais rápido? Faz o upgrade!</div>`;
-                }
-                
-                const isAdmin = (myId === 5401881400);
+            data?.forEach((p, i) => {
+                if(i > 0 && i % 3 === 0) list.innerHTML += `<div class="ad-banner"><b>ANÚNCIO:</b> Ganha mais XP convidando os teus amigos!</div>`;
                 list.innerHTML += `
                 <div class="card">
-                    ${isAdmin ? `<button class="btn-del" onclick="deletePost(${p.id})">Apagar</button>` : ''}
-                    <div class="card-header">
-                        <div style="width:30px;height:30px;background:#eee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;">👤</div>
-                        Utilizador #${p.user_id.toString().slice(-4)}
-                    </div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    <div class="card-body">${p.content}</div>
+                    <div style="padding:12px; font-weight:bold; font-size:13px; color:var(--g-blue);">Utilizador #${p.user_id.toString().slice(-4)}</div>
+                    ${p.image_url ? `<img src="${p.image_url}" style="width:100%; max-height:350px; object-fit:cover;">` : ''}
+                    <div style="padding:12px; font-size:15px;">${p.content}</div>
                 </div>`;
             });
         }
@@ -130,52 +148,42 @@
         async function loadAdmin() {
             const { count: u } = await supabaseClient.from('profiles').select('*', {count:'exact', head:true});
             const { count: p } = await supabaseClient.from('posts').select('*', {count:'exact', head:true});
-            document.getElementById('count-u').innerText = u;
-            document.getElementById('count-p').innerText = p;
-            
-            // Simulação de lista de saques (conforme a Lista Mestre)
+            document.getElementById('count-u').innerText = u || 0;
+            document.getElementById('count-p').innerText = p || 0;
             document.getElementById('withdraw-list').innerHTML = `
                 <div class="withdraw-item">
                     <span><b>user_9921</b><br>5500 XP (5.50€)</span>
-                    <button class="btn-pay" onclick="alert('Pagamento enviado via API PayPal!')">Pagar</button>
+                    <button class="btn-pay" onclick="alert('Pagamento processado!')">Pagar</button>
                 </div>`;
         }
 
-        async function deletePost(id) {
-            if(confirm("Desejas apagar este post permanentemente?")) {
-                const { error } = await supabaseClient.from('posts').delete().eq('id', id);
-                if(!error) loadFeed();
-            }
+        async function loadRank() {
+            const { data } = await supabaseClient.from('profiles').select('username, points').order('points', {ascending:false}).limit(10);
+            document.getElementById('rank-list').innerHTML = data?.map((u, i) => `<div style="padding:8px 0; border-bottom:1px solid #eee;">${i+1}. ${u.username} - <b>${u.points} XP</b></div>`).join('') || 'Sem dados.';
         }
 
         function handlePreview(input) {
             if(input.files[0]) {
-                imgBlob = input.files[0];
-                document.getElementById('img-prev').src = URL.createObjectURL(imgBlob);
+                document.getElementById('img-prev').src = URL.createObjectURL(input.files[0]);
                 document.getElementById('preview-box').style.display = 'block';
             }
         }
 
         async function publish() {
             const txt = document.getElementById('postText').value;
-            if(!txt && !imgBlob) return;
+            if(!txt) return;
             const btn = document.getElementById('pubBtn'); btn.disabled = true;
-
-            let imgUrl = null;
-            if(imgBlob) {
-                const fname = `p_${Date.now()}.jpg`;
-                const { data } = await supabaseClient.storage.from('post-images').upload(fname, imgBlob);
-                if(data) imgUrl = `${SUPABASE_URL}/storage/v1/object/public/post-images/${fname}`;
-            }
-
-            await supabaseClient.from('posts').insert([{ user_id: myId, content: txt, image_url: imgUrl }]);
+            await supabaseClient.from('posts').insert([{ user_id: myId, content: txt }]);
             await supabaseClient.rpc('increment_points', { user_id: myId, amount: 15 });
             location.reload();
         }
 
         async function loadProfile() {
             const { data } = await supabaseClient.from('profiles').select('points').eq('id', myId).single();
-            if(data) document.getElementById('userXP').innerText = data.points + " XP";
+            if(data) {
+                document.getElementById('userXP').innerText = data.points + " XP";
+                document.getElementById('cash-val').innerText = (data.points * 0.001).toFixed(4) + "€";
+            }
         }
 
         init();
