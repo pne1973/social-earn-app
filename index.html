@@ -3,60 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Network Pro</title>
+    <title>Pine Social Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; --card-bg: #1e1e1e; }
-        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-bottom: 80px; }
+        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-top: 120px; padding-bottom: 80px; }
         
-        /* Header e Tabs */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; background: var(--tg-theme-bg); z-index: 100; }
-        .xp-badge { background: var(--tg-theme-button); color: #000; padding: 5px 12px; border-radius: 15px; font-weight: bold; font-size: 14px; }
-        .tab-bar { display: flex; background: #1a1a1a; border-bottom: 1px solid #333; overflow-x: auto; scrollbar-width: none; }
-        .tab { flex: 1; text-align: center; padding: 15px; cursor: pointer; color: #888; font-weight: bold; font-size: 10px; min-width: 75px; text-transform: uppercase; }
-        .tab.active { color: var(--tg-theme-button); border-bottom: 3px solid var(--tg-theme-button); }
+        /* Anúncio Fixo no Topo */
+        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #222; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 12px; color: #777; }
 
-        /* Conteúdo */
+        /* Header Secundário */
+        .header { position: fixed; top: 60px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--tg-theme-bg); border-bottom: 1px solid #333; z-index: 1000; box-sizing: border-box; }
+        .xp-badge { background: var(--tg-theme-button); color: #000; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 13px; }
+
+        /* Menu de Ícones Inferior */
+        .nav-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; display: flex; border-top: 1px solid #333; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; }
+        .nav-item.active { color: var(--tg-theme-button); }
+        .nav-item i { font-size: 20px; }
+
+        /* Estilos de Conteúdo */
         .container { padding: 15px; }
         .card { background: var(--card-bg); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
-        .btn-main { width: 100%; background: var(--tg-theme-button); color: #000; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .post-img { width: 100%; border-radius: 10px; margin: 10px 0; border: 1px solid #333; }
-        
-        /* Comentários */
-        .comment-box { margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; }
-        .comment-item { background: #252525; padding: 8px; border-radius: 8px; margin-bottom: 5px; font-size: 12px; border-left: 3px solid var(--tg-theme-button); }
-        .comment-input-group { display: flex; gap: 5px; margin-top: 8px; }
-        .comment-in { flex: 1; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 5px; }
-
+        .btn-main { width: 100%; background: var(--tg-theme-button); color: #000; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .hidden { display: none; }
-        .info-list { list-style: none; padding: 0; }
-        .info-list li { margin-bottom: 12px; font-size: 14px; color: #ccc; display: flex; align-items: center; gap: 10px; }
+        
+        /* Tabelas e Inputs */
+        input, select, textarea { width: 100%; background: #2a2a2a; border: none; color: #fff; padding: 10px; border-radius: 8px; margin-top: 5px; box-sizing: border-box; }
+        .info-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+        .info-table td { padding: 8px 0; border-bottom: 1px solid #333; font-size: 14px; }
+        .val { color: var(--tg-theme-button); font-weight: bold; text-align: right; }
     </style>
 </head>
 <body>
 
+    <div class="top-ad">
+        <span>Publicidade: <a href="#" style="color:var(--tg-theme-button); text-decoration:none;">Teu Link Aqui</a></span>
+    </div>
+
     <div class="header">
-        <h3 style="margin:0;">PINE SOCIAL</h3>
+        <h4 style="margin:0;">PINE SOCIAL</h4>
         <div id="userXP" class="xp-badge">0 XP</div>
     </div>
 
-    <div class="tab-bar">
-        <div class="tab active" onclick="showTab('feed-tab')">Feed</div>
-        <div class="tab" onclick="showTab('info-tab')">Info</div>
-        <div class="tab" onclick="showTab('rank-tab')">Ranking</div>
-        <div class="tab" onclick="showTab('invite-tab')">Convites</div>
-        <div class="tab" onclick="showTab('wallet-tab')">Saque</div>
-        <div id="adminTab" class="tab hidden" onclick="showTab('admin-tab')">Admin</div>
-    </div>
+    <nav class="nav-bottom">
+        <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i>Feed</div>
+        <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-info-circle"></i>Ganhos</div>
+        <div class="nav-item" onclick="showTab('rank-tab', this)"><i class="fas fa-trophy"></i>Ranking</div>
+        <div class="nav-item" onclick="showTab('invite-tab', this)"><i class="fas fa-user-plus"></i>Convites</div>
+        <div class="nav-item" onclick="showTab('wallet-tab', this)"><i class="fas fa-wallet"></i>Saque</div>
+        <div id="adminIcon" class="nav-item hidden" onclick="showTab('admin-tab', this)"><i class="fas fa-user-shield"></i>Admin</div>
+    </nav>
 
     <div id="feed-tab" class="container">
         <div class="card">
-            <textarea id="postText" style="width:100%; background:none; border:none; color:#fff; outline:none; min-height:50px;" placeholder="O que estás a pensar?"></textarea>
-            <div style="display:flex; justify-content:space-between; margin-top:10px;">
+            <textarea id="postText" placeholder="O que estás a pensar?"></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
                 <input type="file" id="fileInput" hidden accept="image/*">
-                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888;">📷 Foto</button>
-                <button class="btn-main" style="width:auto; padding:8px 20px;" id="pubBtn" onclick="handlePublish()">Publicar</button>
+                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888;"><i class="fas fa-camera"></i> Foto</button>
+                <button class="btn-main" style="width:auto; padding:8px 20px;" onclick="handlePublish()">Publicar</button>
             </div>
         </div>
         <div id="feed"></div>
@@ -64,137 +71,60 @@
 
     <div id="info-tab" class="container hidden">
         <div class="card">
-            <h2 style="color:var(--tg-theme-button); margin-top:0;">📖 Como Funciona?</h2>
-            <ul class="info-list">
-                <li>🚀 <b>Postagens:</b> Ganha 15 XP por cada post partilhado.</li>
-                <li>🤝 <b>Convites:</b> Ganha 100 XP por cada amigo que entrar pelo teu link.</li>
-                <li>💬 <b>Interação:</b> Comenta e faz likes para movimentar a rede.</li>
-                <li>💸 <b>Levantamentos:</b> Ao atingir 5000 XP, podes pedir o teu saque na aba "Saque".</li>
-                <li>⚠️ <b>Regras:</b> Conteúdo impróprio será removido pelos administradores.</li>
-            </ul>
+            <h2 style="color:var(--tg-theme-button); margin-top:0;">💰 Economia</h2>
+            <table class="info-table">
+                <tr><td>Postar Conteúdo</td><td class="val">+15 XP</td></tr>
+                <tr><td>Convidar Amigo</td><td class="val">+100 XP</td></tr>
+                <tr><td>Receber Like</td><td class="val">+2 XP</td></tr>
+            </table>
+            <h3>💳 Levantamentos</h3>
+            <p style="font-size:14px; color:#aaa;">Conversão: <b>1000 XP = 1,00€</b></p>
+            <p style="font-size:14px; color:#aaa;">Mínimo: <b>5000 XP</b></p>
+            <p style="font-size:14px; color:#aaa;">Método: <b>PayPal (Exclusivo)</b></p>
+        </div>
+    </div>
+
+    <div id="wallet-tab" class="container hidden">
+        <div class="card">
+            <h2>Levantamento PayPal</h2>
+            <p>Saldo: <b id="walletXP">0</b> XP</p>
+            <input type="email" id="paypalEmail" placeholder="E-mail do teu PayPal">
+            <button class="btn-main" style="margin-top:15px;" onclick="requestWithdraw()">Solicitar via PayPal</button>
         </div>
     </div>
 
     <div id="admin-tab" class="container hidden">
-        <div class="card" style="border: 2px solid #ff4444;">
-            <h2 style="margin-top:0;">🛠 Painel de Gestão</h2>
-            <div id="adminWithdrawals">Carregando pedidos de saque...</div>
-        </div>
+        <div class="card"><h2>Moderação & Saques</h2><div id="adminList"></div></div>
     </div>
-
-    <div id="rank-tab" class="container hidden"><div class="card" id="rankContent"></div></div>
-    <div id="invite-tab" class="container hidden"><div class="card" id="inviteContent"></div></div>
-    <div id="wallet-tab" class="container hidden"><div class="card" id="walletContent"></div></div>
 
     <script>
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
         const userId = 5401881400; // pine1971
 
+        function showTab(tabId, el) {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            el.classList.add('active');
+            if(tabId === 'admin-tab') loadAdmin();
+        }
+
         async function init() {
-            if(userId === 5401881400) document.getElementById('adminTab').classList.remove('hidden');
+            if(userId === 5401881400) document.getElementById('adminIcon').classList.remove('hidden');
             loadProfile();
             loadFeed();
         }
 
-        function showTab(tabId) {
-            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).classList.remove('hidden');
-            event.currentTarget.classList.add('active');
-            if(tabId === 'admin-tab') loadAdminData();
-        }
-
-        async function loadProfile() {
-            const { data } = await supabaseClient.from('profiles').select('*').eq('id', userId).single();
-            if(data) document.getElementById('userXP').innerText = `${data.points} XP`;
-        }
-
-        async function loadFeed() {
-            const { data: posts } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
-            const feedDiv = document.getElementById('feed');
-            feedDiv.innerHTML = '';
-
-            for (let i = 0; i < posts.length; i++) {
-                const p = posts[i];
-                const { data: comments } = await supabaseClient.from('post_comments').select('*').eq('post_id', p.id).order('created_at', {ascending: true});
-                
-                let commentsHtml = comments?.map(c => `
-                    <div class="comment-item">
-                        <b>@${c.username}:</b> ${c.content}
-                    </div>
-                `).join('') || '';
-
-                feedDiv.innerHTML += `
-                    <div class="card">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                            <b style="color:var(--tg-theme-button)">@${p.username}</b>
-                            ${(p.user_id === userId || userId === 5401881400) ? `<button onclick="deletePost(${p.id})" style="color:#ff4444; background:none; border:none; font-size:10px;">APAGAR</button>` : ''}
-                        </div>
-                        <div style="font-size:15px; margin-bottom:10px;">${p.content || ''}</div>
-                        ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                        
-                        <div class="comment-box">
-                            <div id="list-${p.id}">${commentsHtml}</div>
-                            <div class="comment-input-group">
-                                <input type="text" id="in-${p.id}" class="comment-in" placeholder="Comentar...">
-                                <button onclick="addComment(${p.id})" style="background:var(--tg-theme-button); border:none; border-radius:5px; padding:0 12px; font-weight:bold;">></button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                if ((i + 1) % 3 === 0) feedDiv.innerHTML += `<div style="text-align:center; color:#444; font-size:10px; margin-bottom:15px;">— ANÚNCIO —</div>`;
-            }
-        }
-
-        async function addComment(postId) {
-            const val = document.getElementById(`in-${postId}`).value;
-            if(!val) return;
-            await supabaseClient.from('post_comments').insert([{ post_id: postId, user_id: userId, username: 'pine1971', content: val }]);
-            loadFeed();
-        }
-
-        async function loadAdminData() {
-            const { data } = await supabaseClient.from('withdrawals').select('*').eq('status', 'pending');
-            const adminDiv = document.getElementById('adminWithdrawals');
-            adminDiv.innerHTML = (!data || data.length === 0) ? "Sem pedidos pendentes." : data.map(s => `
-                <div style="background:#111; padding:10px; border-radius:10px; margin-top:10px; font-size:12px;">
-                    👤 ID: ${s.user_id} | 💰 ${s.amount} XP<br>
-                    🔑 Info: ${s.info}
-                    <button onclick="approveWithdraw(${s.id})" style="background:#22c55e; color:#000; border:none; width:100%; padding:8px; margin-top:10px; border-radius:5px; font-weight:bold;">CONFIRMAR PAGAMENTO</button>
-                </div>
-            `).join('');
-        }
-
-        async function approveWithdraw(id) {
-            if(confirm("Marcar como pago?")) {
-                await supabaseClient.from('withdrawals').update({ status: 'paid' }).eq('id', id);
-                loadAdminData();
-            }
-        }
-
-        async function handlePublish() {
-            const text = document.getElementById('postText').value;
-            const file = document.getElementById('fileInput').files[0];
-            const btn = document.getElementById('pubBtn');
-            if(!text && !file) return;
-
-            btn.disabled = true;
-            let imageUrl = null;
-            if(file) {
-                const name = `${Date.now()}.jpg`;
-                await supabaseClient.storage.from('post-images').upload(name, file);
-                imageUrl = supabaseClient.storage.from('post-images').getPublicUrl(name).data.publicUrl;
-            }
-            await supabaseClient.from('posts').insert([{ user_id: userId, username: 'pine1971', content: text, image_url: imageUrl }]);
-            await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
-            location.reload();
-        }
-
-        async function deletePost(id) {
-            if(confirm("Eliminar post?")) { await supabaseClient.from('posts').delete().eq('id', id); loadFeed(); }
+        async function requestWithdraw() {
+            const email = document.getElementById('paypalEmail').value;
+            const points = parseInt(document.getElementById('userXP').innerText);
+            if(points < 5000) return alert("Mínimo 5000 XP!");
+            if(!email.includes('@')) return alert("E-mail inválido!");
+            
+            await supabaseClient.from('withdrawals').insert([{ user_id: userId, amount: points, info: `PayPal: ${email}`, status: 'pending' }]);
+            alert("Pedido PayPal enviado!");
         }
 
         init();
