@@ -3,39 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pine Social Master</title>
+    <title>Pine Social Master Official</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --bg: #F1F3F4; --border: #dadce0; }
-        body { font-family: 'Google Sans', Roboto, sans-serif; background: var(--bg); margin: 0; padding: 75px 0 90px; }
-        
-        .header { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #fff; border-bottom: 1px solid var(--border); z-index: 2000; box-sizing: border-box; height: 65px; }
-        .logo { font-weight: bold; font-size: 22px; }
+        * { box-sizing: border-box; font-family: 'Google Sans', Roboto, sans-serif; }
+        body { background: var(--bg); margin: 0; padding: 75px 0 90px; color: #202124; }
+
+        /* HEADER & NAV */
+        .header { position: fixed; top: 0; width: 100%; height: 65px; background: #fff; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 2000; }
+        .logo { font-size: 22px; font-weight: bold; }
         .logo span:nth-child(1) { color: var(--g-blue); } .logo span:nth-child(2) { color: var(--g-red); } .logo span:nth-child(3) { color: var(--g-yellow); } .logo span:nth-child(4) { color: var(--g-blue); } .logo span:nth-child(5) { color: var(--g-green); }
-        .xp-badge { background: var(--g-blue); color: #fff; padding: 8px 16px; border-radius: 24px; font-weight: bold; font-size: 13px; }
+        .xp-badge { background: var(--g-blue); color: #fff; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
-        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid var(--border); z-index: 2000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; cursor: pointer; font-size: 11px; display: flex; flex-direction: column; gap: 4px; }
-        .nav-item.active { color: var(--g-blue); font-weight: bold; border-top: 3px solid var(--g-blue); }
+        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-item.active { color: var(--g-blue); font-weight: bold; }
 
-        .tab-content { display: none; width: 100%; box-sizing: border-box; }
+        /* TABS */
+        .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; padding: 15px; }
         .tab-content.active { display: block; }
-        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
-        
-        .card { background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .btn { border: none; padding: 12px; border-radius: 24px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.3s; }
-        .btn-blue { background: var(--g-blue); color: #fff; }
-        
-        textarea { width: 100%; border: 1px solid #f1f3f4; padding: 12px; border-radius: 12px; font-size: 16px; outline: none; background: #f8f9fa; margin-bottom: 10px; resize: none; box-sizing: border-box; }
-        .post-img { width: calc(100% + 32px); margin: 12px -16px; display: block; max-height: 400px; object-fit: cover; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
-        
-        .post-actions { display: flex; gap: 20px; border-top: 1px solid #f1f3f4; padding-top: 12px; margin-top: 10px; }
-        .act-btn { background: none; border: none; color: #5f6368; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .act-btn.liked { color: var(--g-red); }
 
-        #img-preview-box { width: 100%; height: 150px; background: #f8f9fa; border-radius: 12px; margin-bottom: 10px; display: none; overflow: hidden; position: relative; border: 1px dashed #ccc; }
-        #img-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        /* CARDS & ADS */
+        .card { background: #fff; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; position: relative; }
+        .ad-banner { background: #FFF8E1; border: 1px dashed var(--g-yellow); padding: 15px; text-align: center; color: #856404; font-size: 13px; border-radius: 12px; margin-bottom: 16px; }
+        .post-img { width: 100%; max-height: 400px; object-fit: cover; display: block; }
+        .card-header { padding: 12px; display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .card-body { padding: 0 12px 12px; font-size: 15px; }
+        
+        /* ADMIN PANEL IMPROVED */
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: #fff; padding: 15px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
+        .stat-card b { font-size: 20px; color: var(--g-blue); }
+        .withdraw-item { background: #fff; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--g-green); display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .btn-pay { background: var(--g-green); color: #fff; border: none; padding: 6px 12px; border-radius: 15px; font-weight: bold; cursor: pointer; }
+        .btn-del { position: absolute; top: 10px; right: 10px; background: rgba(234, 67, 53, 0.1); color: var(--g-red); border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 11px; }
+
+        .editor { background: #fff; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+        textarea { width: 100%; border: none; outline: none; font-size: 16px; resize: none; min-height: 50px; }
     </style>
 </head>
 <body>
@@ -45,44 +51,34 @@
         <div id="userXP" class="xp-badge">0 XP</div>
     </div>
 
-    <section id="feed-tab" class="tab-content container active">
-        <div class="card">
-            <textarea id="postText" rows="3" placeholder="No que estás a pensar?"></textarea>
-            <div id="img-preview-box"><img id="img-preview" src=""></div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:var(--g-green); font-weight:bold; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
-                <input type="file" id="fileInput" hidden accept="image/*" onchange="handleImg(this)">
-                <button class="btn btn-blue" style="width:auto; padding:8px 30px;" id="pubBtn" onclick="publish()">Publicar</button>
+    <section id="tab-feed" class="tab-content active">
+        <div class="ad-banner"><b>PATROCÍNIO:</b> Ganha 500 XP extras hoje! Clica aqui.</div>
+        <div class="editor">
+            <textarea id="postText" placeholder="Partilha algo com a comunidade..."></textarea>
+            <div id="preview-box" style="display:none; margin-bottom:10px;"><img id="img-prev" style="width:100%; border-radius:8px;"></div>
+            <div style="display:flex; justify-content:space-between;">
+                <button onclick="document.getElementById('fileIn').click()" style="background:none; border:none; color:var(--g-green); font-weight:bold; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
+                <input type="file" id="fileIn" hidden accept="image/*" onchange="handlePreview(this)">
+                <button onclick="publish()" id="pubBtn" style="background:var(--g-blue); color:#fff; border:none; padding:8px 25px; border-radius:20px; font-weight:bold;">Publicar</button>
             </div>
         </div>
-        <div id="feed-list">Carregando feed...</div>
+        <div id="feed-list"></div>
     </section>
 
-    <section id="rank-tab" class="tab-content container">
-        <div class="card"><h3>🏆 Top Rankings</h3><div id="rank-list"></div></div>
-    </section>
-
-    <section id="wallet-tab" class="tab-content container">
-        <div class="card" style="text-align:center;">
-            <p>Saldo Estimado</p>
-            <h1 id="cash-val" style="color:var(--g-green)">0.0000€</h1>
-            <input type="email" placeholder="PayPal E-mail" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
-            <button class="btn btn-blue" onclick="alert('Mínimo 5000 XP')">Solicitar Saque</button>
+    <section id="tab-admin" class="tab-content">
+        <h2 style="color:var(--g-red)">Painel Administrativo</h2>
+        <div class="admin-grid">
+            <div class="stat-card"><small>Utilizadores</small><br><b id="count-u">0</b></div>
+            <div class="stat-card"><small>Posts Totais</small><br><b id="count-p">0</b></div>
         </div>
-    </section>
-
-    <section id="admin-tab" class="tab-content container">
-        <div class="card" style="border-top: 5px solid var(--g-red);">
-            <h3 style="color:var(--g-red)">Painel Administrativo</h3>
-            <div id="adm-stats"></div>
-        </div>
+        <h3>💰 Pedidos de Saque</h3>
+        <div id="withdraw-list">Nenhum pedido pendente.</div>
     </section>
 
     <nav class="nav">
-        <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i>Feed</div>
-        <div class="nav-item" onclick="showTab('rank-tab', this)"><i class="fas fa-trophy"></i>Rank</div>
-        <div class="nav-item" onclick="showTab('wallet-tab', this)"><i class="fas fa-wallet"></i>Saque</div>
-        <div id="adm-nav" class="nav-item" onclick="showTab('admin-tab', this)"><i class="fas fa-user-shield"></i>Admin</div>
+        <div class="nav-item active" onclick="showTab('tab-feed', this)"><i class="fas fa-home"></i>Feed</div>
+        <div class="nav-item" onclick="showTab('tab-wallet', this)"><i class="fas fa-wallet"></i>Saque</div>
+        <div id="adm-nav" class="nav-item" onclick="showTab('tab-admin', this)"><i class="fas fa-user-shield"></i>Admin</div>
     </nav>
 
     <script>
@@ -91,7 +87,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const myId = 5401881400;
 
-        let selectedImgBlob = null;
+        let imgBlob = null;
 
         async function init() {
             if(myId !== 5401881400) document.getElementById('adm-nav').style.display = 'none';
@@ -104,96 +100,82 @@
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-            if(id === 'rank-tab') loadRanking();
-            if(id === 'admin-tab') loadAdmin();
+            if(id === 'tab-admin') loadAdmin();
         }
 
         async function loadFeed() {
             const list = document.getElementById('feed-list');
-            const { data, error } = await supabaseClient.from('posts').select('*').order('created_at', {ascending:false});
-            if(error) return;
+            const { data } = await supabaseClient.from('posts').select('*').order('created_at', {ascending:false});
             list.innerHTML = '';
-            data.forEach(p => {
+            data?.forEach((p, index) => {
+                // Injeção de Anúncio a cada 3 posts
+                if(index > 0 && index % 3 === 0) {
+                    list.innerHTML += `<div class="ad-banner"><b>ANÚNCIO:</b> Queres converter XP mais rápido? Faz o upgrade!</div>`;
+                }
+                
+                const isAdmin = (myId === 5401881400);
                 list.innerHTML += `
                 <div class="card">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                        <div style="width:30px; height:30px; background:var(--g-blue); border-radius:50%; color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px;">${p.user_id.toString().slice(-1)}</div>
-                        <b>Utilizador #${p.user_id.toString().slice(-4)}</b>
+                    ${isAdmin ? `<button class="btn-del" onclick="deletePost(${p.id})">Apagar</button>` : ''}
+                    <div class="card-header">
+                        <div style="width:30px;height:30px;background:#eee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;">👤</div>
+                        Utilizador #${p.user_id.toString().slice(-4)}
                     </div>
-                    <p>${p.content}</p>
                     ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    <div class="post-actions">
-                        <button class="act-btn" onclick="likePost(this)"><i class="far fa-heart"></i> Gostar</button>
-                        <button class="act-btn" onclick="commentPrompt(${p.id})"><i class="far fa-comment"></i> Comentar</button>
-                    </div>
+                    <div class="card-body">${p.content}</div>
                 </div>`;
             });
         }
 
-        function handleImg(input) {
-            const file = input.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById('img-preview').src = e.target.result;
-                document.getElementById('img-preview-box').style.display = 'block';
-                selectedImgBlob = file;
+        async function loadAdmin() {
+            const { count: u } = await supabaseClient.from('profiles').select('*', {count:'exact', head:true});
+            const { count: p } = await supabaseClient.from('posts').select('*', {count:'exact', head:true});
+            document.getElementById('count-u').innerText = u;
+            document.getElementById('count-p').innerText = p;
+            
+            // Simulação de lista de saques (conforme a Lista Mestre)
+            document.getElementById('withdraw-list').innerHTML = `
+                <div class="withdraw-item">
+                    <span><b>user_9921</b><br>5500 XP (5.50€)</span>
+                    <button class="btn-pay" onclick="alert('Pagamento enviado via API PayPal!')">Pagar</button>
+                </div>`;
+        }
+
+        async function deletePost(id) {
+            if(confirm("Desejas apagar este post permanentemente?")) {
+                const { error } = await supabaseClient.from('posts').delete().eq('id', id);
+                if(!error) loadFeed();
             }
-            reader.readAsDataURL(file);
+        }
+
+        function handlePreview(input) {
+            if(input.files[0]) {
+                imgBlob = input.files[0];
+                document.getElementById('img-prev').src = URL.createObjectURL(imgBlob);
+                document.getElementById('preview-box').style.display = 'block';
+            }
         }
 
         async function publish() {
             const txt = document.getElementById('postText').value;
-            if(!txt && !selectedImgBlob) return;
-            
-            const btn = document.getElementById('pubBtn');
-            btn.disabled = true; btn.innerText = "Processando...";
+            if(!txt && !imgBlob) return;
+            const btn = document.getElementById('pubBtn'); btn.disabled = true;
 
             let imgUrl = null;
-            if(selectedImgBlob) {
-                const fileName = `img_${Date.now()}.jpg`;
-                const { data, error } = await supabaseClient.storage.from('post-images').upload(fileName, selectedImgBlob);
-                if(!error) imgUrl = SUPABASE_URL + "/storage/v1/object/public/post-images/" + fileName;
+            if(imgBlob) {
+                const fname = `p_${Date.now()}.jpg`;
+                const { data } = await supabaseClient.storage.from('post-images').upload(fname, imgBlob);
+                if(data) imgUrl = `${SUPABASE_URL}/storage/v1/object/public/post-images/${fname}`;
             }
 
-            const { error } = await supabaseClient.from('posts').insert([{ user_id: myId, content: txt, image_url: imgUrl }]);
-            if(!error) {
-                await supabaseClient.rpc('increment_points', { user_id: myId, amount: 15 });
-                location.reload();
-            } else { alert("Erro ao publicar."); btn.disabled = false; btn.innerText = "Publicar"; }
-        }
-
-        async function likePost(btn) {
-            btn.classList.add('liked'); btn.innerHTML = '<i class="fas fa-heart"></i> +2 XP';
-            await supabaseClient.rpc('increment_points', { user_id: myId, amount: 2 });
-            loadProfile();
-        }
-
-        async function commentPrompt(pid) {
-            const msg = prompt("Escreve o teu comentário:");
-            if(msg) {
-                await supabaseClient.rpc('increment_points', { user_id: myId, amount: 5 });
-                alert("Comentário enviado! +5 XP");
-                loadProfile();
-            }
+            await supabaseClient.from('posts').insert([{ user_id: myId, content: txt, image_url: imgUrl }]);
+            await supabaseClient.rpc('increment_points', { user_id: myId, amount: 15 });
+            location.reload();
         }
 
         async function loadProfile() {
             const { data } = await supabaseClient.from('profiles').select('points').eq('id', myId).single();
-            if(data) {
-                document.getElementById('userXP').innerText = data.points + " XP";
-                document.getElementById('cash-val').innerText = (data.points * 0.001).toFixed(4) + "€";
-            }
-        }
-
-        async function loadRanking() {
-            const { data } = await supabaseClient.from('profiles').select('username, points').order('points', {ascending:false}).limit(10);
-            document.getElementById('rank-list').innerHTML = data?.map((u, i) => `<div>${i+1}. @${u.username} (${u.points} XP)</div>`).join('') || 'Sem dados.';
-        }
-
-        async function loadAdmin() {
-            const { count: u } = await supabaseClient.from('profiles').select('*', {count:'exact', head:true});
-            document.getElementById('adm-stats').innerText = `Total de Utilizadores: ${u}`;
+            if(data) document.getElementById('userXP').innerText = data.points + " XP";
         }
 
         init();
