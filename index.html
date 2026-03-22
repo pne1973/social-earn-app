@@ -8,15 +8,13 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* PALETA GOOGLE */
         :root { 
             --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853;
             --bg-light: #F8F9FA; --text-dark: #202124; --card-white: #ffffff;
         }
 
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-light); color: var(--text-dark); margin: 0; padding-top: 110px; padding-bottom: 85px; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-light); color: var(--text-dark); margin: 0; padding-top: 110px; padding-bottom: 85px; overflow-x: hidden; }
         
-        /* HEADER CLEAN */
         .header { position: fixed; top: 0; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 1px solid #e0e0e0; z-index: 2000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); box-sizing: border-box; }
         .logo-text { font-weight: bold; font-size: 18px; letter-spacing: -1px; }
         .logo-text span:nth-child(1) { color: var(--g-blue); }
@@ -25,57 +23,46 @@
         .logo-text span:nth-child(4) { color: var(--g-blue); }
         .logo-text span:nth-child(5) { color: var(--g-green); }
 
-        .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 13px; box-shadow: 0 2px 4px rgba(66,133,244,0.3); }
+        .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 13px; }
 
-        /* NAV BOTTOM GOOGLE STYLE */
         .nav-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid #eee; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 9px; font-weight: 500; }
         .nav-item.active { color: var(--g-blue); }
-        .nav-item i { font-size: 20px; }
 
-        /* CARDS & UI */
+        #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 5000; display: none; align-items: center; justify-content: center; padding: 25px; box-sizing: border-box; }
+        .welcome-card { background: #fff; padding: 30px; border-radius: 24px; text-align: center; border: 1px solid #eee; box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 350px; }
+
         .container { padding: 15px; width: 100%; box-sizing: border-box; }
         .card { background: var(--card-white); padding: 18px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #dadce0; box-shadow: 0 1px 3px rgba(0,0,0,0.08); position: relative; }
         
-        .btn-main { width: 100%; background: var(--g-blue); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
-        
+        .btn-main { width: 100%; background: var(--g-blue); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         textarea, input { width: 100%; background: #fff; border: 1px solid #dadce0; color: var(--text-dark); padding: 12px; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        textarea:focus { border-color: var(--g-blue); outline: none; }
 
         .post-footer { display: flex; justify-content: space-between; margin-top: 12px; border-top: 1px solid #f1f3f4; padding-top: 10px; }
-        .action-btn { background: none; border: none; color: #5f6368; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .action-btn { background: none; border: none; color: #5f6368; font-size: 13px; cursor: pointer; }
         .action-btn.liked { color: var(--g-red); font-weight: bold; }
-
-        /* TUTORIAL OVERLAY */
-        #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 25px; box-sizing: border-box; }
-        .welcome-card { background: #fff; padding: 30px; border-radius: 24px; text-align: center; border: 1px solid #eee; box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 350px; }
-
-        .hidden { display: none; }
-        #loading-trigger { color: #888; font-size: 12px; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="welcome-overlay" class="hidden">
+    <div id="welcome-overlay">
         <div class="welcome-card">
             <div class="logo-text" style="font-size:32px; margin-bottom:15px;">
                 <span>P</span><span>i</span><span>n</span><span>e</span><span>!</span>
             </div>
-            <p style="color:#5f6368;">Bem-vindo à rede social onde a tua atividade vale dinheiro.</p>
-            <div style="text-align:left; margin: 20px 0; font-size:14px; color:#3c4043;">
-                <p><i class="fas fa-check-circle" style="color:var(--g-green)"></i> <b>Posts</b> geram 15 XP</p>
-                <p><i class="fas fa-check-circle" style="color:var(--g-blue)"></i> <b>Amigos</b> geram 100 XP</p>
-                <p><i class="fas fa-check-circle" style="color:var(--g-yellow)"></i> <b>Levantamento</b> via PayPal</p>
+            <p style="color:#5f6368;">Ganha dinheiro real ao interagir na Pine Social.</p>
+            <div style="text-align:left; margin: 20px 0; font-size:14px;">
+                <p><i class="fas fa-check-circle" style="color:var(--g-green)"></i> <b>Posts:</b> +15 XP</p>
+                <p><i class="fas fa-check-circle" style="color:var(--g-blue)"></i> <b>Amigos:</b> +100 XP</p>
+                <p><i class="fas fa-check-circle" style="color:var(--g-yellow)"></i> <b>PayPal:</b> Levantamentos reais</p>
             </div>
-            <button class="btn-main" onclick="closeWelcome()" style="background:var(--g-green)">Entendido</button>
+            <button class="btn-main" id="closeWelcomeBtn" style="background:var(--g-green)">Entendido</button>
         </div>
     </div>
 
     <div class="header">
-        <div class="logo-text">
-            <span>P</span><span>i</span><span>n</span><span>e</span> <span>S</span><span>o</span><span>c</span><span>i</span><span>a</span><span>l</span>
-        </div>
+        <div class="logo-text"><span>P</span><span>i</span><span>n</span><span>e</span> <span>S</span><span>o</span><span>c</span><span>i</span><span>a</span><span>l</span></div>
         <div id="userXP" class="xp-badge">0 XP</div>
     </div>
 
@@ -94,26 +81,21 @@
                 <button class="btn-main" style="width:auto; padding:6px 15px; font-size:12px; background:var(--g-yellow); color:#000;" onclick="doCheckin()">Recolher</button>
             </div>
         </div>
-
         <div class="card">
-            <textarea id="postText" placeholder="Partilha algo com a rede..."></textarea>
+            <textarea id="postText" placeholder="O que estás a pensar?"></textarea>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
-                <input type="file" id="fileInput" hidden accept="image/*">
                 <button onclick="document.getElementById('fileInput').click()" style="color:var(--g-blue); background:none; border:none; font-size:14px; font-weight:500;"><i class="fas fa-image"></i> Foto</button>
-                <button class="btn-main" id="pubBtn" style="width:auto; padding:8px 25px;" onclick="handlePublish()">Publicar</button>
+                <input type="file" id="fileInput" hidden accept="image/*">
+                <button class="btn-main" style="width:auto; padding:8px 25px;" onclick="handlePublish()">Publicar</button>
             </div>
         </div>
         <div id="feed"></div>
-        <div id="loading-trigger" style="text-align:center; padding:20px;">A procurar novos posts...</div>
     </div>
 
     <div id="info-tab" class="container hidden">
         <div class="card">
             <h3 style="color:var(--g-blue);">Como lucrar</h3>
             <p>1000 XP equivalem a <b id="conv-rate">1.0000€</b></p>
-            <div style="font-size:14px; color:#5f6368;">
-                <p>• Post: +15 XP<br>• Convite: +100 XP<br>• Check-in: +5 XP</p>
-            </div>
         </div>
     </div>
 
@@ -122,24 +104,23 @@
     <div id="invite-tab" class="container hidden">
         <div class="card" style="text-align:center;">
             <h3>Convidar Amigos</h3>
-            <p style="font-size:14px; color:#666;">Copia o link e envia aos teus contactos.</p>
-            <input type="text" id="refLink" readonly style="text-align:center; background:#f8f9fa;">
+            <input type="text" id="refLink" readonly style="text-align:center; background:#f8f9fa; margin-top:10px;">
             <button class="btn-main" style="margin-top:15px; background:var(--g-green);" onclick="copyRef()">Copiar Link</button>
         </div>
     </div>
 
     <div id="wallet-tab" class="container hidden">
         <div class="card" style="text-align:center;">
-            <h4 style="margin:0; color:#5f6368;">O teu saldo atual</h4>
-            <h1 id="localMoney" style="font-size:36px; margin:10px 0; color:var(--text-dark);">0.0000€</h1>
+            <h4 style="color:#5f6368;">O teu saldo</h4>
+            <h1 id="localMoney" style="font-size:36px; margin:10px 0;">0.0000€</h1>
             <input type="email" id="paypalEmail" placeholder="E-mail do PayPal">
-            <button class="btn-main" style="margin-top:15px;" onclick="requestWithdraw()">Levantar para PayPal</button>
+            <button class="btn-main" style="margin-top:15px;" onclick="requestWithdraw()">Pedir Levantamento</button>
         </div>
     </div>
 
     <div id="admin-tab" class="container hidden">
         <div class="card" style="border-top: 4px solid var(--g-red);">
-            <h3 style="color:var(--g-red);">Painel de Moderação</h3>
+            <h3 style="color:var(--g-red);">Moderação</h3>
             <div id="adm-withdraws"></div>
             <hr border="0" style="border-top:1px solid #eee; margin:15px 0;">
             <input type="number" id="delId" placeholder="ID do Post">
@@ -151,7 +132,7 @@
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const userId = 5401881400; // ADMIN
+        const userId = 5401881400;
 
         let rate = 1.0; let sym = "€"; let currentPage = 0;
 
@@ -166,16 +147,27 @@
                 btn.onclick = () => showTab('admin-tab', btn); nav.appendChild(btn);
             }
 
+            // Lógica do Tutorial
+            const overlay = document.getElementById('welcome-overlay');
             if(!localStorage.getItem('pine_tutorial_done')) {
-                document.getElementById('welcome-overlay').classList.remove('hidden');
+                overlay.style.display = 'flex';
             }
+            
+            document.getElementById('closeWelcomeBtn').addEventListener('click', () => {
+                localStorage.setItem('pine_tutorial_done', 'true');
+                overlay.style.display = 'none';
+            });
 
             loadProfile(); loadFeed(true);
         }
 
-        function closeWelcome() {
-            localStorage.setItem('pine_tutorial_done', 'true');
-            document.getElementById('welcome-overlay').classList.add('hidden');
+        function showTab(tab, el) {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(tab).classList.remove('hidden');
+            el.classList.add('active');
+            if(tab === 'admin-tab') loadAdmin();
+            if(tab === 'rank-tab') loadRanking();
         }
 
         async function loadProfile() {
@@ -195,10 +187,10 @@
                     <div class="card">
                         <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">
                             <b style="color:var(--g-blue)">@${p.profiles?.username || 'user'}</b>
-                            <span onclick="alert('Relatado!')" style="color:#bdc1c6;">ID: ${p.id} <i class="fas fa-flag"></i></span>
+                            <span onclick="alert('Denunciado!')" style="color:#bdc1c6;">ID: ${p.id} <i class="fas fa-flag"></i></span>
                         </div>
-                        <p style="margin:0; font-size:15px; line-height:1.4;">${p.content || ''}</p>
-                        ${p.image_url ? `<img src="${p.image_url}" style="width:calc(100% + 36px); margin-left:-18px; margin-top:12px; border-top:1px solid #eee; border-bottom:1px solid #eee;">` : ''}
+                        <p style="margin:0; font-size:15px;">${p.content || ''}</p>
+                        ${p.image_url ? `<img src="${p.image_url}" style="width:calc(100% + 36px); margin-left:-18px; margin-top:12px; border-top:1px solid #eee;">` : ''}
                         <div class="post-footer">
                             <button class="action-btn" id="l-${p.id}" onclick="toggleLike(${p.id})"><i class="far fa-heart"></i> Like</button>
                             <span style="font-size:11px; color:#bdc1c6;">${new Date(p.created_at).toLocaleDateString()}</span>
@@ -226,20 +218,15 @@
             }
         }
 
-        function showTab(tab, el) {
-            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(tab).classList.remove('hidden');
-            el.classList.add('active');
-            if(tab === 'admin-tab') loadAdmin();
-            if(tab === 'rank-tab') loadRanking();
+        function copyRef() { 
+            const link = document.getElementById('refLink'); link.select(); 
+            document.execCommand('copy'); alert("Link de convite copiado!"); 
         }
 
         async function requestWithdraw() {
             const email = document.getElementById('paypalEmail').value;
-            const xpText = document.getElementById('userXP').innerText;
-            const pts = parseInt(xpText);
-            if(!email.includes('@') || pts < 5000) return alert("E-mail inválido ou XP insuficiente (mínimo 5000).");
+            const pts = parseInt(document.getElementById('userXP').innerText);
+            if(!email.includes('@') || pts < 5000) return alert("E-mail inválido ou XP insuficiente.");
             await supabaseClient.from('withdrawals').insert([{ user_id: userId, paypal_email: email, amount_xp: pts }]);
             alert("Pedido recebido!");
         }
@@ -247,21 +234,16 @@
         async function loadAdmin() {
             const { data } = await supabaseClient.from('withdrawals').select('*').eq('status','pending');
             let h = "";
-            data?.forEach(w => h += `<div style="background:#f1f3f4; padding:10px; margin-bottom:8px; border-radius:8px; font-size:12px;">${w.paypal_email} (${w.amount_xp} XP) <button onclick="markPaid(${w.id})" style="float:right; background:var(--g-green); color:#fff; border:none; border-radius:4px; padding:3px 8px;">PAGAR</button></div>`);
-            document.getElementById('adm-withdraws').innerHTML = h || "Tudo em dia.";
+            data?.forEach(w => h += `<div style="background:#f1f3f4; padding:10px; margin-bottom:8px; border-radius:8px; font-size:12px;">${w.paypal_email} (${w.amount_xp} XP) <button onclick="markPaid(${w.id})" style="float:right; background:var(--g-green); color:#fff; border:none; border-radius:4px;">PAGAR</button></div>`);
+            document.getElementById('adm-withdraws').innerHTML = h || "Nada pendente.";
         }
 
         async function adminDel() {
             const id = document.getElementById('delId').value;
-            if(confirm("Confirmar eliminação do post "+id+"?")) {
+            if(confirm("Eliminar post?")) {
                 await supabaseClient.from('posts').delete().eq('id', id);
                 alert("Eliminado."); loadFeed(true);
             }
-        }
-
-        function copyRef() { 
-            const link = document.getElementById('refLink'); link.select(); 
-            document.execCommand('copy'); alert("Link de convite copiado!"); 
         }
 
         window.addEventListener('scroll', () => { if((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) loadFeed(); });
