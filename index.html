@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pine Social Ads Edition</title>
+    <title>Pine Social Master Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -16,12 +16,11 @@
         .logo span:nth-child(1) { color: var(--g-blue); } .logo span:nth-child(2) { color: var(--g-red); } .logo span:nth-child(3) { color: var(--g-yellow); } .logo span:nth-child(4) { color: var(--g-blue); } .logo span:nth-child(5) { color: var(--g-green); }
         .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
-        /* ADS STYLING - EXAMPLES */
-        .ad-container { background: #fff; border: 1px solid #dadce0; border-radius: 12px; padding: 15px; margin-bottom: 16px; position: relative; overflow: hidden; }
-        .ad-top-banner { background: linear-gradient(90deg, #fff3cd 0%, #fff 100%); border: 1px dashed var(--g-yellow); margin-bottom: 15px; }
-        .ad-label { font-size: 9px; color: #70757a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px; }
+        /* ADS */
+        .ad-container { background: #fff; border: 1px solid #dadce0; border-radius: 12px; padding: 15px; margin-bottom: 16px; }
+        .ad-top-banner { background: linear-gradient(90deg, #fff3cd 0%, #fff 100%); border: 1px dashed var(--g-yellow); margin-bottom: 15px; cursor: pointer; }
+        .ad-label { font-size: 9px; color: #70757a; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px; }
         .ad-title { font-size: 14px; font-weight: 600; color: var(--g-blue); margin-bottom: 4px; display: block; }
-        .ad-body { font-size: 13px; color: #3c4043; line-height: 1.4; }
         .ad-cta { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 700; color: var(--g-green); text-decoration: none; }
 
         /* UI */
@@ -33,6 +32,7 @@
         .btn { width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
         .btn-blue { background: var(--g-blue); color: #fff; }
         textarea { width: 100%; border: 1px solid #f1f3f4; padding: 12px; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #f8f9fa; }
+        .money-sub { font-size: 10px; color: #70757a; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -45,17 +45,9 @@
 
     <div id="feed-tab" class="container">
         <div class="ad-container ad-top-banner" onclick="tab('invite-tab', document.querySelectorAll('.nav-item')[3])">
-            <span class="ad-label"><i class="fas fa-bullhorn"></i> Destaque da Semana</span>
+            <span class="ad-label"><i class="fas fa-bullhorn"></i> Destaque</span>
             <span class="ad-title">Multiplica os teus ganhos! 🚀</span>
-            <div class="ad-body">Por cada 3 amigos que convidares, recebes um bónus extra de 300 XP.</div>
-            <div class="ad-cta">CRIAR LINK DE CONVITE ></div>
-        </div>
-
-        <div class="card" style="border-left: 5px solid var(--g-yellow); padding: 12px 16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:13px; font-weight:600;"><i class="fas fa-gift" style="color:var(--g-yellow)"></i> Bónus Diário</span>
-                <button class="btn btn-blue" style="width:auto; padding:6px 14px; font-size:11px; background:var(--g-yellow); color:#202124;" onclick="doCheckin()">Recolher +5 XP</button>
-            </div>
+            <div class="ad-cta">CONVIDAR AMIGOS ></div>
         </div>
 
         <div class="card">
@@ -67,19 +59,35 @@
                 <button class="btn btn-blue" style="width:auto; padding:8px 28px;" id="pubBtn" onclick="publish()">Publicar</button>
             </div>
         </div>
-
         <div id="feed"></div>
     </div>
 
-    <div id="info-tab" class="container hidden"></div>
+    <div id="info-tab" class="container hidden">
+        <div class="card"><h3>Tabela de Ganhos</h3><div id="earn-table"></div></div>
+    </div>
     <div id="rank-tab" class="container hidden"></div>
-    <div id="invite-tab" class="container hidden"></div>
-    <div id="wallet-tab" class="container hidden"></div>
-    <div id="admin-tab" class="container hidden"></div>
+    <div id="invite-tab" class="container hidden">
+        <div class="card" style="text-align:center;">
+            <h3>Convites</h3>
+            <input type="text" id="refLink" readonly style="width:100%; padding:10px; text-align:center; margin:10px 0; border-radius:8px; border:1px solid #ddd;">
+            <button class="btn btn-blue" onclick="copyRef()">Copiar Link</button>
+        </div>
+    </div>
+    <div id="wallet-tab" class="container hidden">
+        <div class="card" style="text-align:center;">
+            <p>Saldo Estimado</p>
+            <h1 id="localMoney">0.0000€</h1>
+            <input type="email" id="paypalEmail" placeholder="E-mail PayPal" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+            <button class="btn btn-blue" style="margin-top:10px;" onclick="requestWithdraw()">Solicitar Saque</button>
+        </div>
+    </div>
+    <div id="admin-tab" class="container hidden">
+        <div class="card"><h3>Painel Admin</h3><div id="adm-stats"></div><div id="adm-withdraws"></div></div>
+    </div>
 
     <nav class="nav">
         <div class="nav-item active" onclick="tab('feed-tab', this)"><i class="fas fa-stream"></i>Feed</div>
-        <div class="nav-item" onclick="tab('info-tab', this)"><i class="fas fa-hand-holding-usd"></i>Ganhos</div>
+        <div class="nav-item" onclick="tab('info-tab', this)"><i class="fas fa-coins"></i>Ganhos</div>
         <div class="nav-item" onclick="tab('rank-tab', this)"><i class="fas fa-medal"></i>Rank</div>
         <div class="nav-item" onclick="tab('invite-tab', this)"><i class="fas fa-users"></i>Amigos</div>
         <div class="nav-item" onclick="tab('wallet-tab', this)"><i class="fas fa-wallet"></i>Saque</div>
@@ -91,23 +99,12 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const userId = 5401881400;
 
-        let page = 0;
-
-        // EXEMPLOS DE ANÚNCIOS PARA O FEED
-        const feedAds = [
-            {
-                title: "💰 Ganha Dinheiro a Testar Apps",
-                body: "Participa na nossa comunidade de testers e recebe pagamentos via PayPal. Sem investimento.",
-                cta: "SABER MAIS"
-            },
-            {
-                title: "🛡️ VPN Grátis e Ilimitada",
-                body: "Navega com total privacidade e segurança no teu Telegram WebApp. Instala agora.",
-                cta: "INSTALAR"
-            }
-        ];
+        let rate = 1.0; let sym = "€"; let page = 0; let compressedImg = null;
 
         async function init() {
+            if(window.navigator.language.includes('BR')) { rate = 6.2; sym = "R$"; }
+            document.getElementById('refLink').value = "https://t.me/PineSocialBot?start=" + userId;
+            
             if(userId === 5401881400) {
                 const nav = document.querySelector('.nav');
                 const btn = document.createElement('div'); btn.className="nav-item"; btn.innerHTML='<i class="fas fa-shield-alt"></i>Admin';
@@ -116,47 +113,59 @@
             loadProfile(); loadFeed(true);
         }
 
+        // FUNÇÃO DE NAVEGAÇÃO CORRIGIDA
+        function tab(id, el) { 
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden')); 
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(id).classList.remove('hidden'); 
+            el.classList.add('active');
+            
+            if(id === 'rank-tab') loadRanking();
+            if(id === 'admin-tab') loadAdmin();
+            if(id === 'info-tab') loadInfo();
+        }
+
         async function loadFeed(reset=false) {
             const fDiv = document.getElementById('feed');
             if(reset) { page = 0; fDiv.innerHTML = ''; }
             const { data } = await supabaseClient.from('posts').select('*, profiles(username)').order('created_at', {ascending:false}).range(page*10, (page+1)*10-1);
             
             data?.forEach((p, idx) => {
-                // INJETAR ANÚNCIO A CADA 3 POSTS (Rodando entre os exemplos)
                 if(idx > 0 && idx % 3 === 0) {
-                    const ad = feedAds[Math.floor(Math.random() * feedAds.length)];
-                    fDiv.innerHTML += `
-                    <div class="ad-container">
-                        <span class="ad-label">Anúncio Patrocinado</span>
-                        <span class="ad-title">${ad.title}</span>
-                        <div class="ad-body">${ad.body}</div>
-                        <a href="#" class="ad-cta">${ad.cta} ></a>
-                    </div>`;
+                    fDiv.innerHTML += `<div class="ad-container"><span class="ad-label">Patrocinado</span><span class="ad-title">💰 Ganha dinheiro a testar Apps</span><div class="ad-cta">SABER MAIS ></div></div>`;
                 }
-
-                fDiv.innerHTML += `
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:10px;">
-                        <b style="color:var(--g-blue)">@${p.profiles?.username || 'user'}</b>
-                        <span style="color:#bdc1c6;">ID: ${p.id}</span>
-                    </div>
-                    <p style="margin:0; font-size:15px; line-height:1.5;">${p.content || ''}</p>
-                    ${p.image_url ? `<img src="${p.image_url}" style="width:calc(100% + 32px); margin:12px -16px 0; border-top:1px solid #f1f3f4;">` : ''}
-                </div>`;
+                fDiv.innerHTML += `<div class="card"><div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:10px;"><b style="color:var(--g-blue)">@${p.profiles?.username || 'user'}</b><span>ID: ${p.id}</span></div><p style="margin:0; font-size:15px;">${p.content || ''}</p>${p.image_url ? `<img src="${p.image_url}" style="width:calc(100% + 32px); margin:12px -16px 0;">` : ''}</div>`;
             });
             page++;
         }
 
-        function tab(id, el) { 
-            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden')); 
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(id).classList.remove('hidden'); el.classList.add('active');
-        }
-
         async function loadProfile() {
             const { data } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
-            if(data) document.getElementById('userXP').innerText = data.points + " XP";
+            if(data) {
+                document.getElementById('userXP').innerText = data.points + " XP";
+                document.getElementById('localMoney').innerText = (data.points * rate / 1000).toFixed(4) + sym;
+            }
         }
+
+        async function loadRanking() {
+            const { data } = await supabaseClient.from('profiles').select('username, points').order('points', {ascending:false}).limit(10);
+            let h = '<h3>🏆 Top 10 Elite</h3>';
+            data?.forEach((u, i) => h += `<div class="card" style="padding:10px; margin-bottom:8px; display:flex; justify-content:space-between;"><span>${i+1}. @${u.username}</span><b>${u.points} XP</b></div>`);
+            document.getElementById('rank-tab').innerHTML = h;
+        }
+
+        async function loadAdmin() {
+            const { count: u } = await supabaseClient.from('profiles').select('*', {count:'exact', head:true});
+            const { count: p } = await supabaseClient.from('posts').select('*', {count:'exact', head:true});
+            document.getElementById('adm-stats').innerHTML = `<p>Users: ${u} | Posts: ${p}</p>`;
+        }
+
+        function loadInfo() {
+            const f = (v) => (v * rate / 1000).toFixed(4) + sym;
+            document.getElementById('earn-table').innerHTML = `<p>Post: +15 XP (${f(15)})</p><p>Amigo: +100 XP (${f(100)})</p>`;
+        }
+
+        function copyRef() { const link = document.getElementById('refLink'); link.select(); document.execCommand('copy'); alert("Copiado!"); }
 
         init();
     </script>
