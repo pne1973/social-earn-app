@@ -2,227 +2,229 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Social Network Final</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Social Network Web App</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --yellow: #ffcc00; --dark: #000; --card: #121212; --red: #ff4444; --gray: #888; }
-        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; padding-bottom: 90px; overflow-x: hidden; }
-        .header { background: #000; padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .points-badge { background: var(--yellow); color: black; padding: 5px 12px; border-radius: 20px; font-weight: bold; }
-        #adminPanel { background: var(--red); margin: 10px; padding: 10px; border-radius: 12px; display: none; font-size: 12px; text-align: center; }
-        .post-box { background: var(--card); padding: 15px; margin: 10px; border-radius: 15px; border: 1px solid #222; }
-        textarea { width: 100%; background: transparent; border: none; color: white; font-size: 16px; outline: none; height: 60px; resize: none; }
-        .btn-post { background: var(--yellow); color: black; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; float: right; cursor: pointer; }
-        .img-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; margin-top: 10px; display: none; border: 1px solid #333; }
-        .feed-item { background: var(--card); border-bottom: 1px solid #222; padding: 15px; margin-bottom: 5px; }
+        :root { --bg: #0a0a0a; --card: #161616; --text: #ffffff; --yellow: #ffcf05; --gray: #888; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+        
+        /* Header & Admin */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card); border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
+        .xp-badge { background: var(--yellow); color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+        .admin-bar { background: #ff4d4d; color: white; padding: 5px; text-align: center; font-size: 11px; font-weight: bold; }
+
+        /* Post Box */
+        .post-box { background: var(--card); margin: 15px; padding: 15px; border-radius: 15px; border: 1px solid #333; }
+        textarea { width: 100%; background: transparent; border: none; color: #fff; font-size: 16px; resize: none; outline: none; min-height: 60px; }
+        .post-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .btn-photo { background: #333; padding: 8px 15px; border-radius: 10px; font-size: 14px; cursor: pointer; }
+        .btn-publish { background: var(--yellow); color: #000; border: none; padding: 10px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        /* Feed Items */
+        .feed-item { background: var(--card); margin: 15px; padding: 15px; border-radius: 15px; border: 1px solid #222; animation: fadeIn 0.5s ease; }
         .post-img { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid #333; }
-        .comment-section { background: #0a0a0a; margin-top: 10px; border-radius: 8px; padding: 10px; display: none; }
-        .comment-item { font-size: 13px; border-bottom: 1px solid #1a1a1a; padding: 5px 0; }
-        .comment-input { width: 65%; background: #1a1a1a; border: none; color: white; padding: 8px; border-radius: 8px; font-size: 13px; }
-        .comment-btn { width: 30%; background: var(--yellow); border: none; font-size: 12px; padding: 8px; border-radius: 8px; font-weight: bold; }
-        .ad-box { background: #080808; padding: 10px; text-align: center; border-bottom: 1px solid #333; min-height: 60px; }
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid #222; }
-        .nav-item { font-size: 24px; cursor: pointer; opacity: 0.4; }
-        .nav-item.active { opacity: 1; color: var(--yellow); }
-        .rank-item { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #222; background: var(--card); margin: 5px 10px; border-radius: 10px; }
+        .actions-bar { display: flex; gap: 20px; margin-top: 15px; font-size: 14px; color: var(--gray); }
+        .action-btn { cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        
+        /* Comments Section */
+        .comment-section { margin-top: 15px; padding-top: 15px; border-top: 1px solid #222; display: none; }
+        .comment-item { font-size: 13px; margin-bottom: 8px; color: #ddd; }
+        .comment-input-area { display: flex; gap: 8px; margin-top: 10px; }
+        .comment-input { flex: 1; background: #222; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 8px; font-size: 13px; }
+
+        /* Bottom Nav */
+        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(22,22,22,0.95); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; backdrop-filter: blur(10px); }
+        .nav-item { font-size: 24px; cursor: pointer; transition: 0.2s; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
+    <div id="adminPanel" class="admin-bar" style="display:none;">🛡️ MODO ADMIN ATIVO</div>
+
     <div class="header">
-        <span style="font-weight: bold;">SOCIAL NETWORK</span>
-        <div class="points-badge" id="userXP">0 XP</div>
+        <h3 style="margin:0; font-size: 18px;">SOCIAL NETWORK</h3>
+        <div id="userXP" class="xp-badge">0 XP</div>
     </div>
 
-    <div id="adminPanel">🛡️ ADMIN: <span id="statUsers">0</span> Users | <span id="statPts">0</span> XP</div>
-
-    <div id="homeTab">
-        <div class="post-box">
-            <textarea id="postInput" maxlength="300" placeholder="Partilha algo com a rede..."></textarea>
-            <img id="preview" class="img-preview">
-            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewImage(this)">
-                <button onclick="document.getElementById('fileInput').click()" style="background:#222; color:white; border:none; padding:8px 15px; border-radius:10px;">📷 Foto</button>
-                <button class="btn-post" id="publishBtn" onclick="publishPost()">Publicar</button>
-            </div>
+    <div class="post-box">
+        <textarea id="postInput" placeholder="Partilha algo com a rede..."></textarea>
+        <div id="previewArea"></div>
+        <div class="post-actions">
+            <label class="btn-photo">
+                <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewImage()">
+                📷 Foto
+            </label>
+            <button id="publishBtn" class="btn-publish" onclick="publishPost()">Publicar</button>
         </div>
-        <div id="mainContent"></div>
     </div>
 
-    <div id="rankTab" style="display:none; padding-top:10px;"><h3 style="text-align:center; color:var(--yellow);">🏆 Top Global</h3><div id="rankContent"></div></div>
-    
-    <div id="walletTab" style="display:none; padding:20px; text-align:center;">
-        <div id="realBalance" style="font-size:35px; font-weight:bold; color:var(--yellow); margin:20px 0;">€0.0000</div>
-        <button onclick="dailyCheckin()" style="width:100%; background:var(--yellow); color:black; border:none; padding:15px; border-radius:12px; font-weight:bold; margin-bottom:20px;">🎁 Check-in Diário (+20 XP)</button>
-        <button onclick="alert('Pedido de levantamento enviado!')" style="background:transparent; color:var(--yellow); border:1px solid var(--yellow); padding:10px; border-radius:10px; width:100%;">💸 Levantar Saldo</button>
+    <div id="mainFeed"></div>
+
+    <div class="nav">
+        <div class="nav-item" onclick="loadTab('home')">🏠</div>
+        <div class="nav-item" onclick="loadTab('ranking')">🏆</div>
+        <div class="nav-item" onclick="loadTab('wallet')">💰</div>
     </div>
 
-    <div class="nav-bar">
-        <span class="nav-item active" onclick="changeTab('home', this)">🏠</span>
-        <span class="nav-item" onclick="changeTab('rank', this)">🏆</span>
-        <span class="nav-item" onclick="changeTab('wallet', this)">💰</span>
-    </div>
+<script>
+    // 1. CONFIGURAÇÃO VIA URL (Segurança Render)
+    const params = new URLSearchParams(window.location.search);
+    const SUPABASE_URL = params.get('url');
+    const SUPABASE_KEY = params.get('key');
+    const BOT_TOKEN = params.get('bot_token');
+    const ADMIN_ID = 5401881400;
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        // As chaves são lidas do URL que o bot envia
-        const supabaseClient = supabase.createClient(urlParams.get('url'), urlParams.get('key'));
-        const BOT_TOKEN = urlParams.get('bot_token');
-        
-        const userId = tg.initDataUnsafe.user?.id || 123;
-        const username = tg.initDataUnsafe.user?.username || 'User';
-        const ADMIN_ID = 5401881400;
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        function getAdHtml() {
-            return `<div class="ad-box"><script type="text/javascript">atOptions = { 'key' : '96a0945958564a02377033580552718e', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };<\/script><script type="text/javascript" src="//www.highperformanceformat.com/96a0945958564a02377033580552718e/invoke.js"><\/script></div>`;
+    // 2. DADOS DO TELEGRAM
+    const tg = window.Telegram?.WebApp;
+    const user = tg?.initDataUnsafe?.user || { id: 5401881400, username: "Admin_Test" };
+    const userId = user.id;
+    const username = user.username || "User_"+userId;
+
+    if (userId === ADMIN_ID) document.getElementById('adminPanel').style.display = 'block';
+
+    // 3. INICIALIZAÇÃO
+    async function init() {
+        await checkProfile();
+        loadFeed();
+    }
+
+    async function checkProfile() {
+        let { data } = await supabaseClient.from('profiles').select('*').eq('user_id', userId).single();
+        if (!data) {
+            await supabaseClient.from('profiles').insert([{ user_id: userId, username: username, xp: 0 }]);
+            data = { xp: 0 };
         }
+        document.getElementById('userXP').innerText = `${data.xp} XP`;
+    }
 
-        async function sendNotification(targetId, msg) {
-            if (!BOT_TOKEN) return;
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${targetId}&text=${encodeURIComponent(msg)}`);
-        }
+    // 4. FUNÇÃO PUBLIKAR (COM FIX DE FOTO)
+    async function publishPost() {
+        const text = document.getElementById('postInput').value;
+        const file = document.getElementById('fileInput').files[0];
+        const btn = document.getElementById('publishBtn');
+        let imgUrl = null;
 
-        function previewImage(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => { document.getElementById('preview').src = e.target.result; document.getElementById('preview').style.display = 'block'; };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+        if (!text && !file) return;
+        btn.disabled = true;
+        btn.innerText = "A enviar...";
 
-        async function compressImage(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                    const img = new Image(); img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 800;
-                        let width = img.width, height = img.height;
-                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                        canvas.width = width; canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.6);
-                    };
-                };
-            });
-        }
-
-        async function publishPost() {
-            const text = document.getElementById('postInput').value;
-            const file = document.getElementById('fileInput').files[0];
-            const btn = document.getElementById('publishBtn');
-            let imgUrl = null;
-            if (!text && !file) return;
-            btn.innerText = "..."; btn.disabled = true;
+        try {
             if (file) {
-                const compressed = await compressImage(file);
                 const fName = `${Date.now()}_${userId}.jpg`;
-                const { data } = await supabaseClient.storage.from('post-images').upload(fName, compressed);
-                if (data) imgUrl = supabaseClient.storage.from('post-images').getPublicUrl(fName).data.publicUrl;
+                const { error: upErr } = await supabaseClient.storage.from('post-images').upload(fName, file);
+                if (upErr) throw upErr;
+
+                const { data: urlData } = supabaseClient.storage.from('post-images').getPublicUrl(fName);
+                imgUrl = urlData.publicUrl;
             }
-            await supabaseClient.from('posts').insert([{ user_id: userId, username: username, content: text, image_url: imgUrl }]);
+
+            await supabaseClient.from('posts').insert([{ 
+                user_id: userId, username: username, content: text, image_url: imgUrl 
+            }]);
+
+            // Ganhar XP
             await supabaseClient.rpc('increment_points', { user_id: userId, amount: imgUrl ? 10 : 5 });
+            
             location.reload();
+        } catch (e) {
+            alert("Erro: " + e.message);
+            btn.disabled = false;
+            btn.innerText = "Publicar";
         }
+    }
 
-        async function loadFeed() {
-            const { data: posts } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
-            let html = "";
-            posts?.forEach((p, i) => {
-                html += `<div class="feed-item">
-                    ${userId === ADMIN_ID ? `<span onclick="deletePost(${p.id})" style="color:red; float:right; font-size:11px;">APAGAR</span>` : ''}
+    // 5. CARREGAR FEED + ADSTERRA
+    async function loadFeed() {
+        const { data: posts } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
+        let html = "";
+        
+        posts?.forEach((p, index) => {
+            html += `
+            <div class="feed-item">
+                <div style="display:flex; justify-content:space-between">
                     <b style="color:var(--yellow)">@${p.username}</b>
-                    <p style="margin:10px 0;">${p.content || ''}</p>
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    <div style="margin-top:10px; font-size:13px; display:flex; gap:15px;">
-                        <span onclick="likePost(${p.id}, ${p.user_id})">❤️ ${p.likes || 0}</span>
-                        <span onclick="toggleComments(${p.id})">💬 Comentar</span>
+                    ${userId === ADMIN_ID ? `<span style="color:red; font-size:10px" onclick="deletePost(${p.id})">APAGAR</span>` : ''}
+                </div>
+                <p>${p.content || ''}</p>
+                ${p.image_url ? `<img src="${p.image_url}" class="post-img" onerror="this.style.display='none'">` : ''}
+                
+                <div class="actions-bar">
+                    <div class="action-btn" onclick="likePost(${p.id}, ${p.user_id})">❤️ ${p.likes || 0}</div>
+                    <div class="action-btn" onclick="toggleComments(${p.id})">💬 Comentar</div>
+                </div>
+
+                <div id="box-${p.id}" class="comment-section">
+                    <div id="list-${p.id}"></div>
+                    <div class="comment-input-area">
+                        <input id="in-${p.id}" class="comment-input" placeholder="Escreve um comentário...">
+                        <button class="btn-publish" style="padding:5px 10px" onclick="addComment(${p.id}, ${p.user_id})">OK</button>
                     </div>
-                    <div id="comm-${p.id}" class="comment-section">
-                        <div id="list-${p.id}"></div>
-                        <div style="margin-top:10px; display:flex; gap:5px;">
-                            <input id="in-${p.id}" class="comment-input" placeholder="Escreve...">
-                            <button class="comment-btn" onclick="addComment(${p.id}, ${p.user_id})">OK</button>
-                        </div>
-                    </div>
+                </div>
+            </div>`;
+
+            // Inserir Anúncio Adsterra a cada 3 posts
+            if ((index + 1) % 3 === 0) {
+                html += `<div style="text-align:center; margin:15px;">
+                    <small style="color:#666; display:block; margin-bottom:5px;">Publicidade</small>
+                    <div style="background:#222; height:50px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#555;">ADSTERRA BANNER AREA</div>
                 </div>`;
-                if ((i + 1) % 3 === 0) html += getAdHtml();
-            });
-            document.getElementById('mainContent').innerHTML = html;
-        }
-
-        async function toggleComments(postId) {
-            const div = document.getElementById(`comm-${postId}`);
-            div.style.display = div.style.display === 'none' ? 'block' : 'none';
-            if (div.style.display === 'block') {
-                const { data } = await supabaseClient.from('post_comments').select('*').eq('post_id', postId).order('created_at', { ascending: true });
-                document.getElementById(`list-${postId}`).innerHTML = data.map(c => `<div class="comment-item"><b>@${c.username}:</b> ${c.content}</div>`).join('');
             }
+        });
+        document.getElementById('mainFeed').innerHTML = html || "<p style='text-align:center; margin-top:50px; opacity:0.5;'>O feed está vazio.</p>";
+    }
+
+    // 6. COMENTÁRIOS E NOTIFICAÇÕES
+    async function toggleComments(postId) {
+        const box = document.getElementById(`box-${postId}`);
+        box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        if(box.style.display === 'block') {
+            const { data } = await supabaseClient.from('post_comments').select('*').eq('post_id', postId).order('created_at', {ascending: true});
+            document.getElementById(`list-${postId}`).innerHTML = data.map(c => `<div class="comment-item"><b>@${c.username}:</b> ${c.content}</div>`).join('');
+        }
+    }
+
+    async function addComment(postId, ownerId) {
+        const input = document.getElementById(`in-${postId}`);
+        const text = input.value;
+        if(!text) return;
+
+        await supabaseClient.from('post_comments').insert([{ post_id: postId, user_id: userId, username: username, content: text }]);
+        
+        // Notificar via Telegram
+        if(BOT_TOKEN && userId !== ownerId) {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${ownerId}&text=💬 @${username} comentou no teu post!`);
         }
 
-        async function addComment(postId, postOwnerId) {
-            const val = document.getElementById(`in-${postId}`).value;
-            if (!val) return;
-            await supabaseClient.from('post_comments').insert([{ post_id: postId, user_id: userId, username: username, content: val }]);
-            if (userId !== postOwnerId) sendNotification(postOwnerId, `@${username} comentou o teu post! 💬`);
-            toggleComments(postId); document.getElementById(`in-${postId}`).value = "";
-        }
+        input.value = "";
+        toggleComments(postId);
+    }
 
-        async function likePost(id, postOwnerId) {
-            await supabaseClient.rpc('increment_likes', { post_id: id });
-            if (userId !== postOwnerId) sendNotification(postOwnerId, `@${username} deu Like no teu post! ❤️`);
+    async function likePost(postId, ownerId) {
+        await supabaseClient.rpc('increment_likes', { row_id: postId });
+        if(BOT_TOKEN && userId !== ownerId) {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${ownerId}&text=❤️ @${username} deu like no teu post!`);
+        }
+        loadFeed();
+    }
+
+    async function deletePost(postId) {
+        if(confirm("Apagar post?")) {
+            await supabaseClient.from('posts').delete().eq('id', postId);
             loadFeed();
         }
+    }
 
-        async function loadRank() {
-            const { data } = await supabaseClient.from('profiles').select('*').order('points', { ascending: false }).limit(10);
-            let html = "";
-            data?.forEach((u, i) => { html += `<div class="rank-item"><span>#${i+1} @${u.username}</span><b>${u.points} XP</b></div>`; });
-            document.getElementById('rankContent').innerHTML = html;
-        }
+    function previewImage() {
+        const file = document.getElementById('fileInput').files[0];
+        if(file) document.getElementById('previewArea').innerHTML = `<p style="font-size:10px; color:var(--yellow)">✓ Imagem selecionada</p>`;
+    }
 
-        function changeTab(tab, el) {
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('homeTab').style.display = tab === 'home' ? 'block' : 'none';
-            document.getElementById('rankTab').style.display = tab === 'rank' ? 'block' : 'none';
-            document.getElementById('walletTab').style.display = tab === 'wallet' ? 'block' : 'none';
-            if(tab === 'rank') loadRank();
-            if(tab === 'home') loadFeed();
-        }
-
-        async function updateStats() {
-            const { data } = await supabaseClient.from('profiles').select('*').eq('id', userId).single();
-            if (data) {
-                document.getElementById('userXP').innerText = `${data.points} XP`;
-                document.getElementById('realBalance').innerText = `€${(data.points * 0.0005).toFixed(4)}`;
-            }
-        }
-
-        async function dailyCheckin() {
-            const { error } = await supabaseClient.rpc('increment_points', { user_id: userId, amount: 20 });
-            if(!error) { alert("Check-in: +20 XP!"); updateStats(); }
-        }
-
-        async function deletePost(id) { if(confirm("Apagar?")) { await supabaseClient.from('posts').delete().eq('id', id); loadFeed(); } }
-
-        async function loadAdmin() {
-            if (userId !== ADMIN_ID) return;
-            document.getElementById('adminPanel').style.display = 'block';
-            const { data } = await supabaseClient.from('profiles').select('points');
-            document.getElementById('statUsers').innerText = data?.length || 0;
-            document.getElementById('statPts').innerText = data?.reduce((a, b) => a + b.points, 0) || 0;
-        }
-
-        updateStats(); loadFeed(); loadAdmin();
-    </script>
+    init();
+</script>
 </body>
 </html>
