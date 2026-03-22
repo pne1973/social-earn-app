@@ -3,36 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pine Social Official</title>
+    <title>Pine Social Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --bg: #F8F9FA; --txt: #202124; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 80px 0 95px; overflow-x: hidden; }
-        
-        /* HEADER */
-        .header { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 1px solid #dadce0; z-index: 2000; box-sizing: border-box; height: 70px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 80px 0 95px; }
+        .header { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 1px solid #dadce0; z-index: 2000; box-sizing: border-box; }
         .logo { font-weight: bold; font-size: 20px; }
         .logo span:nth-child(1) { color: var(--g-blue); } .logo span:nth-child(2) { color: var(--g-red); } .logo span:nth-child(3) { color: var(--g-yellow); } .logo span:nth-child(4) { color: var(--g-blue); } .logo span:nth-child(5) { color: var(--g-green); }
         .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; }
-
-        /* NAVEGAÇÃO INFERIOR CORRIGIDA */
         .nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid #dadce0; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; cursor: pointer; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.2s; }
-        .nav-item i { font-size: 18px; }
+        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; cursor: pointer; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .nav-item.active { color: var(--g-blue); }
-
-        /* CONTAINERS */
         .container { padding: 15px; max-width: 500px; margin: 0 auto; box-sizing: border-box; width: 100%; }
         .card { background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .btn { width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
         .btn-blue { background: var(--g-blue); color: #fff; }
-        textarea { width: 100%; border: 1px solid #f1f3f4; padding: 12px; border-radius: 8px; font-size: 15px; box-sizing: border-box; background: #f8f9fa; outline: none; }
         .hidden { display: none !important; }
-        
-        /* POST STYLE */
-        .post-img { width: calc(100% + 32px); margin: 12px -16px 0; border-top: 1px solid #eee; display: block; }
-        .admin-stat { background: #f8f9fa; border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center; }
+        .rank-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .admin-stat { background: #fff5f5; border: 1px solid var(--g-red); padding: 10px; border-radius: 8px; text-align: center; }
     </style>
 </head>
 <body>
@@ -44,61 +34,39 @@
 
     <section id="feed-tab" class="tab-content container">
         <div class="card">
-            <textarea id="postText" rows="3" placeholder="O que queres partilhar?"></textarea>
-            <div style="display:flex; justify-content:space-between; margin-top:10px; align-items:center;">
-                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:var(--g-blue); font-weight:600; cursor:pointer;"><i class="fas fa-image"></i> Foto</button>
-                <input type="file" id="fileInput" hidden accept="image/*" onchange="handleFile(this)">
-                <button class="btn btn-blue" style="width:auto; padding:8px 25px;" id="pubBtn" onclick="publish()">Publicar</button>
-            </div>
-            <div id="upload-status" style="display:none; font-size:11px; color:var(--g-blue); margin-top:5px;">A processar...</div>
+            <textarea id="postText" rows="3" placeholder="O que tens em mente?" style="width:100%; border:1px solid #eee; padding:10px; border-radius:8px; outline:none;"></textarea>
+            <button class="btn btn-blue" style="margin-top:10px;" id="pubBtn" onclick="publish()">Publicar</button>
         </div>
         <div id="feed-list"></div>
     </section>
 
-    <section id="info-tab" class="tab-content container hidden">
+    <section id="rank-tab" class="tab-content container hidden">
         <div class="card">
-            <h3>💰 Ganhos Detalhados</h3>
-            <div id="earn-table" style="line-height: 2;"></div>
-            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-            <p style="font-size:12px; color:#666;">Taxa: 1000 XP = <span id="conv-rate">1.0000€</span></p>
-        </div>
-    </section>
-
-    <section id="rank-tab" class="tab-content container hidden"></section>
-
-    <section id="invite-tab" class="tab-content container hidden">
-        <div class="card" style="text-align:center;">
-            <i class="fas fa-users" style="font-size:40px; color:var(--g-green); margin-bottom:15px;"></i>
-            <h3>Convites</h3>
-            <input type="text" id="refLink" readonly style="width:100%; padding:12px; text-align:center; border-radius:8px; border:1px solid #ddd; background:#f8f9fa;">
-            <button class="btn btn-blue" style="background:var(--g-green); margin-top:10px;" onclick="copyRef()">Copiar Link</button>
-        </div>
-    </section>
-
-    <section id="wallet-tab" class="tab-content container hidden">
-        <div class="card" style="text-align:center;">
-            <p>Saldo Estimado</p>
-            <h1 id="localMoney">0.0000€</h1>
-            <input type="email" id="paypalEmail" placeholder="Teu e-mail PayPal" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;">
-            <p style="color:var(--g-red); font-size:12px; margin:10px 0;">Mínimo para saque: 5000 XP</p>
-            <button class="btn btn-blue" onclick="requestWithdraw()">Solicitar Saque</button>
+            <h3>🏆 Top 10 Elite</h3>
+            <div id="rank-list">A carregar ranking...</div>
         </div>
     </section>
 
     <section id="admin-tab" class="tab-content container hidden">
         <div class="card" style="border-top: 4px solid var(--g-red);">
-            <h3 style="color:var(--g-red);">Admin Panel</h3>
-            <div id="adm-stats" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
-            <h4 style="margin-top:20px;">Saques Pendentes</h4>
-            <div id="adm-withdraws"></div>
+            <h3 style="color:var(--g-red)">Painel Admin</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
+                <div class="admin-stat">Utilizadores<br><b id="adm-u">-</b></div>
+                <div class="admin-stat">Posts<br><b id="adm-p">-</b></div>
+            </div>
+            <h4>Saques Pendentes</h4>
+            <div id="adm-w"></div>
         </div>
     </section>
 
+    <section id="info-tab" class="tab-content container hidden"><div class="card"><h3>Economia</h3><p>1000 XP = 1.0000€</p></div></section>
+    <section id="wallet-tab" class="tab-content container hidden"><div class="card"><h3>Saque</h3><p>Mínimo 5000 XP</p></div></section>
+
     <nav class="nav">
         <div class="nav-item active" data-tab="feed-tab"><i class="fas fa-home"></i>Feed</div>
-        <div class="nav-item" data-tab="info-tab"><i class="fas fa-coins"></i>Ganhos</div>
         <div class="nav-item" data-tab="rank-tab"><i class="fas fa-trophy"></i>Rank</div>
-        <div class="nav-item" data-tab="invite-tab"><i class="fas fa-users"></i>Amigos</div>
+        <div class="nav-item" data-tab="admin-tab"><i class="fas fa-shield-alt"></i>Admin</div>
+        <div class="nav-item" data-tab="info-tab"><i class="fas fa-coins"></i>Ganhos</div>
         <div class="nav-item" data-tab="wallet-tab"><i class="fas fa-wallet"></i>Saque</div>
     </nav>
 
@@ -106,162 +74,67 @@
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const userId = 5401881400; // O teu ID fixo
+        const userId = 5401881400;
 
-        let rate = 1.0; let sym = "€";
-
-        // INICIALIZAÇÃO
         async function init() {
-            if(window.navigator.language.includes('BR')) { rate = 6.2; sym = "R$"; }
-            document.getElementById('conv-rate').innerText = (1 * rate).toFixed(4) + sym;
-            document.getElementById('refLink').value = "https://t.me/PineSocialBot?start=" + userId;
-            
-            setupNavigation();
+            setupNav();
             loadProfile();
             loadFeed();
         }
 
-        // NAVEGAÇÃO CORRIGIDA (EVENT LISTENERS)
-        function setupNavigation() {
-            const items = document.querySelectorAll('.nav-item');
-            items.forEach(item => {
+        function setupNav() {
+            document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const tabId = item.getAttribute('data-tab');
-                    
-                    // Esconder todas
                     document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-                    items.forEach(i => i.classList.remove('active'));
-                    
-                    // Mostrar alvo
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                     document.getElementById(tabId).classList.remove('hidden');
                     item.classList.add('active');
-
-                    // Carregar dados específicos
                     if(tabId === 'rank-tab') loadRanking();
                     if(tabId === 'admin-tab') loadAdmin();
-                    if(tabId === 'info-tab') loadInfo();
                 });
             });
-
-            // Adicionar botão Admin se for o dono
-            if(userId === 5401881400) {
-                const nav = document.querySelector('.nav');
-                const admBtn = document.createElement('div');
-                admBtn.className = "nav-item";
-                admBtn.setAttribute('data-tab', 'admin-tab');
-                admBtn.innerHTML = '<i class="fas fa-shield-alt"></i>Admin';
-                nav.appendChild(admBtn);
-                admBtn.addEventListener('click', () => {
-                    document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-                    document.getElementById('admin-tab').classList.remove('hidden');
-                    loadAdmin();
-                });
-            }
         }
 
         async function loadFeed() {
+            const { data } = await supabaseClient.from('posts').select('*').order('created_at', {ascending:false});
             const list = document.getElementById('feed-list');
-            list.innerHTML = '<p style="text-align:center; padding:20px; color:#999;">A carregar feed...</p>';
-            
-            const { data, error } = await supabaseClient.from('posts').select('*, profiles(username)').order('created_at', {ascending:false});
-            
-            if(data && data.length > 0) {
-                list.innerHTML = '';
-                data.forEach(p => {
-                    list.innerHTML += `
-                    <div class="card">
-                        <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:8px;">
-                            <b style="color:var(--g-blue)">@${p.profiles?.username || 'utilizador'}</b>
-                            <span style="color:#bdc1c6;">ID: ${p.id}</span>
-                        </div>
-                        <p style="margin:0; font-size:15px; line-height:1.4;">${p.content || ''}</p>
-                        ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                        <div style="margin-top:12px; border-top:1px solid #f8f8f8; padding-top:8px;">
-                            <button style="background:none; border:none; color:#5f6368; font-weight:bold; font-size:13px;" onclick="toggleLike(${p.id}, this)"><i class="far fa-heart"></i> Like (+2 XP)</button>
-                        </div>
-                    </div>`;
-                });
-            } else {
-                list.innerHTML = '<p style="text-align:center; padding:30px; color:#999;">Ainda não há posts no feed.</p>';
-            }
+            list.innerHTML = data?.length ? '' : '<p style="text-align:center;color:#999;">Feed vazio.</p>';
+            data?.forEach(p => {
+                list.innerHTML += `<div class="card"><small>ID: ${p.id}</small><p>${p.content}</p></div>`;
+            });
         }
 
         async function publish() {
             const txt = document.getElementById('postText').value;
-            const btn = document.getElementById('pubBtn');
-            if(!txt && !compressedImg) return;
-            
-            btn.disabled = true;
-            btn.innerText = "A publicar...";
-
-            let imgUrl = null;
-            if(compressedImg) {
-                const fileName = `img_${Date.now()}.jpg`;
-                const blob = await (await fetch(compressedImg)).blob();
-                await supabaseClient.storage.from('post-images').upload(fileName, blob);
-                imgUrl = SUPABASE_URL + "/storage/v1/object/public/post-images/" + fileName;
-            }
-
-            const { error } = await supabaseClient.from('posts').insert([{ user_id: userId, content: txt, image_url: imgUrl }]);
-            
+            if(!txt) return;
+            const { error } = await supabaseClient.from('posts').insert([{ user_id: userId, content: txt }]);
             if(!error) {
                 await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
-                document.getElementById('postText').value = "";
-                compressedImg = null;
-                alert("Publicado com sucesso!");
-                loadProfile();
-                loadFeed(); // Recarregar feed imediatamente
-            } else {
-                alert("Erro ao publicar!");
+                alert("Publicado!");
+                location.reload();
             }
-            btn.disabled = false;
-            btn.innerText = "Publicar";
         }
 
-        // --- FUNÇÕES DE APOIO ---
-        async function loadProfile() {
-            const { data } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
-            if(data) {
-                document.getElementById('userXP').innerText = data.points + " XP";
-                document.getElementById('localMoney').innerText = (data.points * rate / 1000).toFixed(4) + sym;
-            }
+        async function loadRanking() {
+            const { data } = await supabaseClient.from('profiles').select('username, points').order('points', {ascending:false}).limit(10);
+            const rList = document.getElementById('rank-list');
+            rList.innerHTML = '';
+            data?.forEach((u, i) => {
+                rList.innerHTML += `<div class="rank-item"><span>${i+1}. @${u.username || 'user'}</span><b>${u.points} XP</b></div>`;
+            });
         }
 
         async function loadAdmin() {
             const { count: u } = await supabaseClient.from('profiles').select('*', {count:'exact', head:true});
             const { count: p } = await supabaseClient.from('posts').select('*', {count:'exact', head:true});
-            document.getElementById('adm-stats').innerHTML = `
-                <div class="admin-stat">Users<br><b>${u}</b></div>
-                <div class="admin-stat">Posts<br><b>${p}</b></div>`;
+            document.getElementById('adm-u').innerText = u;
+            document.getElementById('adm-p').innerText = p;
         }
 
-        function loadInfo() {
-            const f = (v) => (v * rate / 1000).toFixed(4) + sym;
-            document.getElementById('earn-table').innerHTML = `
-                <div>Post: <b>+15 XP (${f(15)})</b></div>
-                <div>Amigo: <b>+100 XP (${f(100)})</b></div>
-                <div>Like: <b>+2 XP (${f(2)})</b></div>`;
-        }
-
-        async function handleFile(input) {
-            const file = input.files[0]; if(!file) return;
-            document.getElementById('upload-status').style.display = 'block';
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let w = img.width, h = img.height;
-                    const max = 800;
-                    if(w > h && w > max) { h *= max/w; w = max; } else if(h > max) { w *= max/h; h = max; }
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    compressedImg = canvas.toDataURL('image/jpeg', 0.6);
-                    document.getElementById('upload-status').innerText = "Imagem pronta!";
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+        async function loadProfile() {
+            const { data } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
+            if(data) document.getElementById('userXP').innerText = data.points + " XP";
         }
 
         init();
