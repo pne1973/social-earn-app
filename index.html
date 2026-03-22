@@ -3,57 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pine Social Network</title>
+    <title>Social Network Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; --card-bg: #1e1e1e; }
-        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-bottom: 80px; }
         
-        /* Menu e Header */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; background: var(--tg-theme-bg); z-index: 1000; }
+        /* Header e Tabs */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; background: var(--tg-theme-bg); z-index: 100; }
         .xp-badge { background: var(--tg-theme-button); color: #000; padding: 5px 12px; border-radius: 15px; font-weight: bold; font-size: 14px; }
-        .tab-bar { display: flex; background: #1a1a1a; border-bottom: 1px solid #333; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        .tab { flex: 1; text-align: center; padding: 15px; cursor: pointer; color: #888; font-weight: bold; font-size: 12px; min-width: 85px; }
+        .tab-bar { display: flex; background: #1a1a1a; border-bottom: 1px solid #333; overflow-x: auto; scrollbar-width: none; }
+        .tab { flex: 1; text-align: center; padding: 15px; cursor: pointer; color: #888; font-weight: bold; font-size: 10px; min-width: 75px; text-transform: uppercase; }
         .tab.active { color: var(--tg-theme-button); border-bottom: 3px solid var(--tg-theme-button); }
 
-        /* UI de Cards */
+        /* Conteúdo */
         .container { padding: 15px; }
         .card { background: var(--card-bg); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
-        .btn-main { width: 100%; background: var(--tg-theme-button); color: #000; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid #333; }
+        .btn-main { width: 100%; background: var(--tg-theme-button); color: #000; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .post-img { width: 100%; border-radius: 10px; margin: 10px 0; border: 1px solid #333; }
         
-        /* Interação */
-        .post-actions { display: flex; gap: 15px; margin-top: 12px; border-top: 1px solid #333; padding-top: 10px; }
-        .action-btn { background: none; border: none; color: #aaa; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .comment-item { background: #252525; padding: 8px; border-radius: 8px; margin-top: 5px; font-size: 13px; }
-        
-        /* Anúncios */
-        .ad-space { background: #1a1a1a; border: 1px dashed #444; padding: 25px; border-radius: 15px; text-align: center; color: #555; font-size: 11px; margin-bottom: 15px; }
-        
+        /* Comentários */
+        .comment-box { margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; }
+        .comment-item { background: #252525; padding: 8px; border-radius: 8px; margin-bottom: 5px; font-size: 12px; border-left: 3px solid var(--tg-theme-button); }
+        .comment-input-group { display: flex; gap: 5px; margin-top: 8px; }
+        .comment-in { flex: 1; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 5px; }
+
         .hidden { display: none; }
-        input, textarea { width: 100%; background: #2a2a2a; border: none; color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; }
+        .info-list { list-style: none; padding: 0; }
+        .info-list li { margin-bottom: 12px; font-size: 14px; color: #ccc; display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h3 style="margin:0;">SOCIAL NETWORK</h3>
+        <h3 style="margin:0;">PINE SOCIAL</h3>
         <div id="userXP" class="xp-badge">0 XP</div>
     </div>
 
     <div class="tab-bar">
-        <div class="tab active" onclick="showTab('feed-tab')">FEED</div>
-        <div class="tab" onclick="showTab('rank-tab')">RANKING</div>
-        <div class="tab" onclick="showTab('invite-tab')">CONVITES</div>
-        <div class="tab" onclick="showTab('wallet-tab')">CARTEIRA</div>
-        <div id="adminTab" class="tab hidden" onclick="showTab('admin-tab')">ADMIN</div>
+        <div class="tab active" onclick="showTab('feed-tab')">Feed</div>
+        <div class="tab" onclick="showTab('info-tab')">Info</div>
+        <div class="tab" onclick="showTab('rank-tab')">Ranking</div>
+        <div class="tab" onclick="showTab('invite-tab')">Convites</div>
+        <div class="tab" onclick="showTab('wallet-tab')">Saque</div>
+        <div id="adminTab" class="tab hidden" onclick="showTab('admin-tab')">Admin</div>
     </div>
 
     <div id="feed-tab" class="container">
         <div class="card">
-            <textarea id="postText" placeholder="O que estás a pensar?"></textarea>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <textarea id="postText" style="width:100%; background:none; border:none; color:#fff; outline:none; min-height:50px;" placeholder="O que estás a pensar?"></textarea>
+            <div style="display:flex; justify-content:space-between; margin-top:10px;">
                 <input type="file" id="fileInput" hidden accept="image/*">
                 <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888;">📷 Foto</button>
                 <button class="btn-main" style="width:auto; padding:8px 20px;" id="pubBtn" onclick="handlePublish()">Publicar</button>
@@ -62,39 +62,29 @@
         <div id="feed"></div>
     </div>
 
-    <div id="rank-tab" class="container hidden">
+    <div id="info-tab" class="container hidden">
         <div class="card">
-            <h2 style="text-align:center;">🏆 Top Utilizadores</h2>
-            <div id="rankingList"></div>
-        </div>
-    </div>
-
-    <div id="invite-tab" class="container hidden">
-        <div class="card" style="text-align:center;">
-            <h2>Ganha XP Grátis</h2>
-            <p>Recebes <span style="color:var(--tg-theme-button);">100 XP</span> por cada amigo!</p>
-            <div id="inviteLink" style="background:#111; padding:15px; border-radius:10px; margin:20px 0; font-size:12px; border:1px dashed #555; word-break: break-all;">---</div>
-            <button class="btn-main" onclick="copyLink()">Copiar Link</button>
-            <p style="margin-top:15px; color:#888;">Convidados: <span id="countInvites">0</span></p>
-        </div>
-    </div>
-
-    <div id="wallet-tab" class="container hidden">
-        <div class="card">
-            <h2>Levantamentos</h2>
-            <p>Saldo: <span id="walletXP" style="color:var(--tg-theme-button);">0</span> XP</p>
-            <input type="text" id="pixKey" placeholder="Chave para Pagamento (PIX/Crypto)">
-            <button class="btn-main" style="margin-top:15px;" onclick="requestWithdraw()">Solicitar Levantamento</button>
-            <p style="font-size:10px; color:#555; margin-top:10px;">Mínimo: 5000 XP</p>
+            <h2 style="color:var(--tg-theme-button); margin-top:0;">📖 Como Funciona?</h2>
+            <ul class="info-list">
+                <li>🚀 <b>Postagens:</b> Ganha 15 XP por cada post partilhado.</li>
+                <li>🤝 <b>Convites:</b> Ganha 100 XP por cada amigo que entrar pelo teu link.</li>
+                <li>💬 <b>Interação:</b> Comenta e faz likes para movimentar a rede.</li>
+                <li>💸 <b>Levantamentos:</b> Ao atingir 5000 XP, podes pedir o teu saque na aba "Saque".</li>
+                <li>⚠️ <b>Regras:</b> Conteúdo impróprio será removido pelos administradores.</li>
+            </ul>
         </div>
     </div>
 
     <div id="admin-tab" class="container hidden">
-        <div class="card">
-            <h2>Painel Admin</h2>
-            <div id="adminStats">Carregando métricas...</div>
+        <div class="card" style="border: 2px solid #ff4444;">
+            <h2 style="margin-top:0;">🛠 Painel de Gestão</h2>
+            <div id="adminWithdrawals">Carregando pedidos de saque...</div>
         </div>
     </div>
+
+    <div id="rank-tab" class="container hidden"><div class="card" id="rankContent"></div></div>
+    <div id="invite-tab" class="container hidden"><div class="card" id="inviteContent"></div></div>
+    <div id="wallet-tab" class="container hidden"><div class="card" id="walletContent"></div></div>
 
     <script>
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
@@ -102,12 +92,9 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const userId = 5401881400; // pine1971
-        const username = "pine1971";
-        const botUser = "O_TEU_BOT"; // MUDA PARA O USER DO TEU BOT
 
         async function init() {
             if(userId === 5401881400) document.getElementById('adminTab').classList.remove('hidden');
-            document.getElementById('inviteLink').innerText = `https://t.me/${botUser}?start=${userId}`;
             loadProfile();
             loadFeed();
         }
@@ -117,15 +104,12 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById(tabId).classList.remove('hidden');
             event.currentTarget.classList.add('active');
-            if(tabId === 'rank-tab') loadRanking();
+            if(tabId === 'admin-tab') loadAdminData();
         }
 
         async function loadProfile() {
             const { data } = await supabaseClient.from('profiles').select('*').eq('id', userId).single();
-            if(data) {
-                document.getElementById('userXP').innerText = `${data.points} XP`;
-                document.getElementById('walletXP').innerText = data.points;
-            }
+            if(data) document.getElementById('userXP').innerText = `${data.points} XP`;
         }
 
         async function loadFeed() {
@@ -135,23 +119,59 @@
 
             for (let i = 0; i < posts.length; i++) {
                 const p = posts[i];
-                const { data: comments } = await supabaseClient.from('post_comments').select('*').eq('post_id', p.id);
+                const { data: comments } = await supabaseClient.from('post_comments').select('*').eq('post_id', p.id).order('created_at', {ascending: true});
                 
+                let commentsHtml = comments?.map(c => `
+                    <div class="comment-item">
+                        <b>@${c.username}:</b> ${c.content}
+                    </div>
+                `).join('') || '';
+
                 feedDiv.innerHTML += `
                     <div class="card">
-                        <div style="display:flex; justify-content:space-between;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                             <b style="color:var(--tg-theme-button)">@${p.username}</b>
-                            ${(p.user_id === userId || userId === 5401881400) ? `<span onclick="deletePost(${p.id})" style="color:#ff4444; font-size:10px;">APAGAR</span>` : ''}
+                            ${(p.user_id === userId || userId === 5401881400) ? `<button onclick="deletePost(${p.id})" style="color:#ff4444; background:none; border:none; font-size:10px;">APAGAR</button>` : ''}
                         </div>
-                        <p style="white-space:pre-wrap;">${p.content || ''}</p>
+                        <div style="font-size:15px; margin-bottom:10px;">${p.content || ''}</div>
                         ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                        <div class="post-actions">
-                            <button class="action-btn" onclick="alert('Like!')">❤️ Like</button>
-                            <button class="action-btn" onclick="alert('Comentários em breve na UI')">💬 ${comments ? comments.length : 0}</button>
+                        
+                        <div class="comment-box">
+                            <div id="list-${p.id}">${commentsHtml}</div>
+                            <div class="comment-input-group">
+                                <input type="text" id="in-${p.id}" class="comment-in" placeholder="Comentar...">
+                                <button onclick="addComment(${p.id})" style="background:var(--tg-theme-button); border:none; border-radius:5px; padding:0 12px; font-weight:bold;">></button>
+                            </div>
                         </div>
                     </div>
                 `;
-                if ((i + 1) % 3 === 0) feedDiv.innerHTML += `<div class="ad-space">[ ESPAÇO PARA ANÚNCIO ]</div>`;
+                if ((i + 1) % 3 === 0) feedDiv.innerHTML += `<div style="text-align:center; color:#444; font-size:10px; margin-bottom:15px;">— ANÚNCIO —</div>`;
+            }
+        }
+
+        async function addComment(postId) {
+            const val = document.getElementById(`in-${postId}`).value;
+            if(!val) return;
+            await supabaseClient.from('post_comments').insert([{ post_id: postId, user_id: userId, username: 'pine1971', content: val }]);
+            loadFeed();
+        }
+
+        async function loadAdminData() {
+            const { data } = await supabaseClient.from('withdrawals').select('*').eq('status', 'pending');
+            const adminDiv = document.getElementById('adminWithdrawals');
+            adminDiv.innerHTML = (!data || data.length === 0) ? "Sem pedidos pendentes." : data.map(s => `
+                <div style="background:#111; padding:10px; border-radius:10px; margin-top:10px; font-size:12px;">
+                    👤 ID: ${s.user_id} | 💰 ${s.amount} XP<br>
+                    🔑 Info: ${s.info}
+                    <button onclick="approveWithdraw(${s.id})" style="background:#22c55e; color:#000; border:none; width:100%; padding:8px; margin-top:10px; border-radius:5px; font-weight:bold;">CONFIRMAR PAGAMENTO</button>
+                </div>
+            `).join('');
+        }
+
+        async function approveWithdraw(id) {
+            if(confirm("Marcar como pago?")) {
+                await supabaseClient.from('withdrawals').update({ status: 'paid' }).eq('id', id);
+                loadAdminData();
             }
         }
 
@@ -163,38 +183,18 @@
 
             btn.disabled = true;
             let imageUrl = null;
-
             if(file) {
                 const name = `${Date.now()}.jpg`;
                 await supabaseClient.storage.from('post-images').upload(name, file);
                 imageUrl = supabaseClient.storage.from('post-images').getPublicUrl(name).data.publicUrl;
             }
-
-            await supabaseClient.from('posts').insert([{ user_id: userId, username, content: text, image_url: imageUrl }]);
+            await supabaseClient.from('posts').insert([{ user_id: userId, username: 'pine1971', content: text, image_url: imageUrl }]);
             await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
             location.reload();
         }
 
-        async function loadRanking() {
-            const { data } = await supabaseClient.from('profiles').select('username, points').order('points', { ascending: false }).limit(10);
-            document.getElementById('rankingList').innerHTML = data.map((u, i) => `
-                <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #333;">
-                    <span>${i+1}. @${u.username}</span>
-                    <b style="color:var(--tg-theme-button)">${u.points} XP</b>
-                </div>
-            `).join('');
-        }
-
-        async function copyLink() {
-            navigator.clipboard.writeText(document.getElementById('inviteLink').innerText);
-            alert("Link copiado!");
-        }
-
         async function deletePost(id) {
-            if(confirm("Eliminar?")) {
-                await supabaseClient.from('posts').delete().eq('id', id);
-                loadFeed();
-            }
+            if(confirm("Eliminar post?")) { await supabaseClient.from('posts').delete().eq('id', id); loadFeed(); }
         }
 
         init();
