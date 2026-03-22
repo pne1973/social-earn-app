@@ -3,90 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn V4</title>
+    <title>Social Earn - Feed Nativo</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: -apple-system, sans-serif; background-color: #f0f2f5; margin: 0; padding-bottom: 50px; }
-        .header { background: #0088cc; color: white; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100; }
-        .stats { background: #fff; padding: 15px; display: flex; justify-content: space-around; border-bottom: 1px solid #ddd; font-weight: bold; }
-        .ad-box { background: #eee; border: 1px dashed #999; margin: 10px; padding: 10px; text-align: center; color: #666; font-size: 12px; border-radius: 8px; }
-        .feed { padding: 10px; }
-        .post { background: #fff; margin-bottom: 10px; border-radius: 10px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .btn-points { background: #0088cc; color: white; border: none; padding: 10px; width: 100%; border-radius: 20px; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        #loading { text-align: center; padding: 20px; color: #0088cc; }
+        body { font-family: -apple-system, sans-serif; background-color: #f0f2f5; margin: 0; padding-bottom: 80px; color: #1c1e21; }
+        .header { background: #0088cc; color: white; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        
+        /* Carteira */
+        .wallet-card { background: white; margin: 10px; border-radius: 15px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .stat-box { background: #f8f9fa; padding: 10px; border-radius: 10px; border: 1px solid #eee; }
+        .stat-label { font-size: 11px; color: #65676b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 18px; font-weight: bold; color: #0088cc; display: block; }
+        
+        .btn-withdraw { background: #ccc; color: white; border: none; padding: 12px; width: 100%; border-radius: 25px; font-weight: bold; cursor: not-allowed; }
+        .btn-withdraw.active { background: #28a745; cursor: pointer; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); }
+
+        /* Contentor do Native Banner */
+        .native-ad-box { margin: 15px 10px; padding: 5px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
+        .ad-label { font-size: 10px; color: #999; text-align: center; margin-bottom: 5px; display: block; }
+
+        /* Posts */
+        .post { background: white; margin: 10px; border-radius: 12px; padding: 15px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .post-user { font-weight: bold; color: #0088cc; font-size: 14px; }
+        .post-content { margin: 10px 0; font-size: 15px; line-height: 1.4; }
+        .btn-action { background: #e7f3ff; color: #0088cc; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        
+        #loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #0088cc; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
 
 <div class="header">Social Earn 🚀</div>
 
-<div class="stats">
-    <div>🏆 Pontos: <span id="points">0</span></div>
-    <div>💶 Saldo: €<span id="balance">0.00</span></div>
-</div>
+<div id="loading">A ligar à rede...</div>
 
-<div class="ad-box">Anúncio Adsterra Topo</div>
-
-<div class="feed">
-    <div id="loading">A ligar ao servidor...</div>
+<div id="main-content" style="display:none;">
     
-    <div class="post">
-        <strong>@Admin</strong>
-        <p>Ganha 5 pontos clicando abaixo!</p>
-        <button class="btn-points" onclick="addPoints(5)">❤️ Gostar (+5 pts)</button>
+    <div class="wallet-card">
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-label">🏆 Meus Pontos</span>
+                <span class="stat-value" id="points">0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">💶 Saldo Estimado</span>
+                <span class="stat-value">€<span id="balance">0.00</span></span>
+            </div>
+        </div>
+        <button id="withdraw-btn" class="btn-withdraw" onclick="requestWithdraw()">Mínimo €5.00 para Saque</button>
     </div>
+
+    <div class="post">
+        <span class="post-user">@Admin_Social</span>
+        <p class="post-content">Ganhar dinheiro online nunca foi tão fácil. Clica no botão abaixo para validar a tua atividade diária! ✨</p>
+        <button class="btn-action" onclick="addPoints(5)">❤️ Gostar (+5 pts)</button>
+    </div>
+
+    <div class="native-ad-box">
+        <span class="ad-label">RECOMENDADO PARA TI</span>
+        <script async="async" data-cfasync="false" src="https://pl28956833.profitablecpmratenetwork.com/573694a9ae5d9b7de992bc7d8441b76e/invoke.js"></script>
+        <div id="container-573694a9ae5d9b7de992bc7d8441b76e"></div>
+    </div>
+
+    <div class="post">
+        <span class="post-user">@Comunidade</span>
+        <p class="post-content">Sabias que se usares a app todos os dias, o teu bónus de pontos aumenta? Não percas o teu streak! 🔥</p>
+        <button class="btn-action" onclick="addPoints(10)">💬 Comentar (+10 pts)</button>
+    </div>
+
 </div>
 
 <script>
     const supabaseUrl = 'https://fickstyevektwbgimapy.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    const _client = supabase.createClient(supabaseUrl, supabaseKey);
 
     const tg = window.Telegram.WebApp;
     const user = tg.initDataUnsafe?.user;
 
-    async function loadUser() {
+    async function init() {
         if (!user) {
-            document.getElementById('loading').innerText = "Abre no Telegram!";
+            document.getElementById('loading').innerText = "⚠️ Erro: Abre pelo Telegram!";
             return;
         }
 
-        // Tenta buscar pontos. Se não existir, cria o perfil.
-        let { data, error } = await _supabase.from('profiles').select('points').eq('id', user.id).maybeSingle();
+        let { data, error } = await _client.from('profiles').select('points').eq('id', user.id).maybeSingle();
 
         if (!data) {
-            await _supabase.from('profiles').insert([{ id: user.id, username: user.username || 'User', points: 0 }]);
-            updateDisplay(0);
+            await _client.from('profiles').insert([{ id: user.id, username: user.username || 'User', points: 0 }]);
+            updateUI(0);
         } else {
-            updateDisplay(data.points);
+            updateUI(data.points);
         }
+
         document.getElementById('loading').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
     }
 
-    function updateDisplay(pts) {
+    function updateUI(pts) {
         document.getElementById('points').innerText = pts;
-        document.getElementById('balance').innerText = (pts * 0.00075).toFixed(2);
+        const saldoValue = (pts * 0.00075).toFixed(2);
+        document.getElementById('balance').innerText = saldoValue;
+
+        const btn = document.getElementById('withdraw-btn');
+        if (parseFloat(saldoValue) >= 5.00) {
+            btn.classList.add('active');
+            btn.style.cursor = "pointer";
+            btn.innerText = "Levantar Dinheiro 💸";
+        }
     }
 
     async function addPoints(val) {
-        if (!user) return;
         let current = parseInt(document.getElementById('points').innerText);
         let novo = current + val;
 
-        const { error } = await _supabase.from('profiles').update({ points: novo }).eq('id', user.id);
+        const { error } = await _client.from('profiles').update({ points: novo }).eq('id', user.id);
         
         if (!error) {
-            updateDisplay(novo);
+            updateUI(novo);
             tg.HapticFeedback.impactOccurred('medium');
         } else {
-            alert("Erro ao gravar! Verifique o SQL no Supabase.");
+            console.error("Erro Supabase:", error);
+        }
+    }
+
+    function requestWithdraw() {
+        const saldo = document.getElementById('balance').innerText;
+        if (parseFloat(saldo) < 5.0) {
+            tg.showAlert("Precisas de pelo menos 5.00€ para solicitar o pagamento!");
+        } else {
+            tg.showConfirm("Desejas converter os teus pontos em pagamento para o teu ID: " + user.id + "?", (confirm) => {
+                if(confirm) tg.showAlert("Pedido de saque enviado com sucesso! Aguarda a nossa mensagem.");
+            });
         }
     }
 
     tg.ready();
     tg.expand();
-    loadUser();
+    init();
 </script>
 </body>
 </html>
