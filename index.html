@@ -3,141 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn - Feed Nativo</title>
+    <title>Social Earn Elite v2</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: -apple-system, sans-serif; background-color: #f0f2f5; margin: 0; padding-bottom: 80px; color: #1c1e21; }
-        .header { background: #0088cc; color: white; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        :root { --gold: #ffcc00; --dark: #0d0d0d; --card: #1e1e1e; --text: #ffffff; --admin: #dc2626; --success: #4ade80; }
+        body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); margin: 0; padding-bottom: 100px; overflow-x: hidden; }
         
-        /* Carteira */
-        .wallet-card { background: white; margin: 10px; border-radius: 15px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-        .stat-box { background: #f8f9fa; padding: 10px; border-radius: 10px; border: 1px solid #eee; }
-        .stat-label { font-size: 11px; color: #65676b; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-value { font-size: 18px; font-weight: bold; color: #0088cc; display: block; }
-        
-        .btn-withdraw { background: #ccc; color: white; border: none; padding: 12px; width: 100%; border-radius: 25px; font-weight: bold; cursor: not-allowed; }
-        .btn-withdraw.active { background: #28a745; cursor: pointer; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); }
+        /* ADMIN PANEL */
+        .admin-box { background: var(--admin); margin: 15px; padding: 15px; border-radius: 15px; display: none; border: 1px solid white; box-shadow: 0 0 15px rgba(220, 38, 38, 0.4); position: relative; z-index: 2000; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+        .admin-stat { background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px; text-align: center; font-size: 11px; }
 
-        /* Contentor do Native Banner */
-        .native-ad-box { margin: 15px 10px; padding: 5px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
-        .ad-label { font-size: 10px; color: #999; text-align: center; margin-bottom: 5px; display: block; }
-
-        /* Posts */
-        .post { background: white; margin: 10px; border-radius: 12px; padding: 15px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .post-user { font-weight: bold; color: #0088cc; font-size: 14px; }
-        .post-content { margin: 10px 0; font-size: 15px; line-height: 1.4; }
-        .btn-action { background: #e7f3ff; color: #0088cc; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        /* DASHBOARD & PROGRESS */
+        .dashboard { background: linear-gradient(145deg, #252525, #121212); margin: 15px; border-radius: 20px; padding: 20px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .dash-row { display: flex; justify-content: space-around; margin-bottom: 15px; }
+        .val-big { font-size: 24px; font-weight: 900; color: var(--gold); display: block; }
+        .label-small { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
         
-        #loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #0088cc; font-weight: bold; font-size: 18px; }
+        .progress-container { background: #333; height: 10px; border-radius: 5px; margin: 10px 0; overflow: hidden; border: 1px solid #444; }
+        #progress-bar { background: linear-gradient(90deg, #ffcc00, #ffee00); height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+
+        .btn-main { background: var(--gold); color: #000; border: none; width: 100%; padding: 14px; border-radius: 12px; font-weight: 900; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(255, 204, 0, 0.2); }
+        .btn-main:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
+
+        /* INVITE SECTION */
+        .invite-card { background: #1a1a1a; margin: 15px; padding: 15px; border-radius: 15px; border: 1px dashed var(--gold); text-align: center; }
+        .invite-title { color: var(--gold); font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px; }
+        .btn-invite { background: white; color: black; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; margin-top: 10px; font-size: 12px; cursor: pointer; }
+
+        /* FEED POSTS */
+        .post { background: var(--card); margin: 15px; border-radius: 15px; padding: 15px; border: 1px solid #333; }
+        .post-author { color: var(--gold); font-weight: bold; font-size: 13px; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .btn-earn { background: #2a2a2a; color: white; border: 1px solid #444; padding: 12px; width: 100%; border-radius: 10px; font-weight: 600; margin-top: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        /* ADS */
+        .ad-divider { background: #111; padding: 20px 5px; border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); margin: 20px 0; text-align: center; position: relative; }
+        .ad-tag { font-size: 9px; color: var(--gold); opacity: 0.6; position: absolute; top: 5px; left: 10px; font-weight: bold; }
+
+        /* NAV */
+        .nav-bottom { position: fixed; bottom: 15px; left: 15px; right: 15px; background: rgba(20,20,20,0.95); backdrop-filter: blur(10px); border-radius: 20px; display: flex; justify-content: space-around; padding: 15px; border: 1px solid #333; z-index: 1000; }
+        .nav-link { color: #555; font-size: 20px; transition: 0.3s; }
+        .nav-link.active { color: var(--gold); }
+        
+        .floating-pts { position: absolute; color: var(--gold); font-weight: 900; animation: rise 0.8s ease-out forwards; pointer-events: none; z-index: 3000; }
+        @keyframes rise { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-60px); } }
     </style>
 </head>
 <body>
 
-<div class="header">Social Earn 🚀</div>
+<div id="admin-panel" class="admin-box">
+    <span style="font-weight:900; font-size:12px;"><i class="fas fa-shield-alt"></i> MASTER ADMIN: 5401881400</span>
+    <div class="admin-grid">
+        <div class="admin-stat">Users<br><b id="adm-users">0</b></div>
+        <div class="admin-stat">Pts Totais<br><b id="adm-points">0</b></div>
+        <div class="admin-stat">Pendentes<br><b id="adm-withdraws">0</b></div>
+    </div>
+    <button onclick="checkWithdrawals()" style="width:100%; margin-top:10px; font-size:10px; padding:6px; border:none; border-radius:6px; font-weight:bold; background:white; color:red;">GERIR PAGAMENTOS</button>
+</div>
 
-<div id="loading">A ligar à rede...</div>
-
-<div id="main-content" style="display:none;">
-    
-    <div class="wallet-card">
-        <div class="stats-grid">
-            <div class="stat-box">
-                <span class="stat-label">🏆 Meus Pontos</span>
-                <span class="stat-value" id="points">0</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">💶 Saldo Estimado</span>
-                <span class="stat-value">€<span id="balance">0.00</span></span>
-            </div>
+<div class="dashboard">
+    <div class="dash-row">
+        <div style="text-align:center">
+            <span class="label-small">Meus XP</span>
+            <span class="val-big" id="points">0</span>
         </div>
-        <button id="withdraw-btn" class="btn-withdraw" onclick="requestWithdraw()">Mínimo €5.00 para Saque</button>
+        <div style="text-align:center">
+            <span class="label-small">Saldo Real</span>
+            <span class="val-big">€<span id="balance">0.0000</span></span>
+        </div>
     </div>
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    <span class="label-small" style="font-size:8px; text-align:center; display:block; opacity:0.7;" id="progress-text">Progresso: 0%</span>
+    <button id="withdraw-btn" class="btn-main" onclick="requestWithdraw()" disabled style="margin-top:10px;">META: €5.0000</button>
+</div>
 
+<div class="invite-card">
+    <span class="invite-title"><i class="fas fa-rocket"></i> Ganhe Bónus por Convite</span>
+    <p style="font-size:11px; color:#aaa; margin:5px 0;">Clica abaixo para gerar o teu link e ganhar 15% extra.</p>
+    <button class="btn-invite" onclick="generateInvite()">CONVIDAR AMIGOS</button>
+</div>
+
+<div id="feed">
     <div class="post">
-        <span class="post-user">@Admin_Social</span>
-        <p class="post-content">Ganhar dinheiro online nunca foi tão fácil. Clica no botão abaixo para validar a tua atividade diária! ✨</p>
-        <button class="btn-action" onclick="addPoints(5)">❤️ Gostar (+5 pts)</button>
+        <span class="post-author"><i class="fas fa-check-circle"></i> Sistema Elite</span>
+        <p style="font-size:14px; color:#ddd;">Interage com os posts e observa o teu saldo subir com 4 casas decimais!</p>
+        <button class="btn-earn" onclick="earn(event, 5)"><i class="fas fa-gem"></i> Ganhar +5 XP</button>
     </div>
 
-    <div class="native-ad-box">
-        <span class="ad-label">RECOMENDADO PARA TI</span>
+    <div class="ad-divider">
+        <span class="ad-tag">ANÚNCIO</span>
         <script async="async" data-cfasync="false" src="https://pl28956833.profitablecpmratenetwork.com/573694a9ae5d9b7de992bc7d8441b76e/invoke.js"></script>
         <div id="container-573694a9ae5d9b7de992bc7d8441b76e"></div>
     </div>
 
     <div class="post">
-        <span class="post-user">@Comunidade</span>
-        <p class="post-content">Sabias que se usares a app todos os dias, o teu bónus de pontos aumenta? Não percas o teu streak! 🔥</p>
-        <button class="btn-action" onclick="addPoints(10)">💬 Comentar (+10 pts)</button>
+        <span class="post-author"><i class="fas fa-user-check"></i> Comunidade</span>
+        <p style="font-size:14px; color:#ddd;">Já geraste o teu link hoje? Convites são a forma mais rápida de atingir os 5€.</p>
+        <button class="btn-earn" onclick="earn(event, 10)"><i class="fas fa-gem"></i> Ganhar +10 XP</button>
     </div>
-
 </div>
 
+<nav class="nav-bottom">
+    <i class="fas fa-home nav-link active"></i>
+    <i class="fas fa-wallet nav-link" onclick="requestWithdraw()"></i>
+    <i class="fas fa-share-alt nav-link" onclick="generateInvite()"></i>
+    <i class="fas fa-cog nav-link" onclick="tg.showAlert('Configurações em breve')"></i>
+</nav>
+
 <script>
+    const ADMIN_ID = 5401881400; 
+    const VALOR_PT = 0.00075;
+    const BOT_USERNAME = "socialntworkbot"; 
+
     const supabaseUrl = 'https://fickstyevektwbgimapy.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
     const _client = supabase.createClient(supabaseUrl, supabaseKey);
-
     const tg = window.Telegram.WebApp;
     const user = tg.initDataUnsafe?.user;
 
     async function init() {
-        if (!user) {
-            document.getElementById('loading').innerText = "⚠️ Erro: Abre pelo Telegram!";
-            return;
+        if (!user) return;
+        
+        if (user.id === ADMIN_ID) {
+            document.getElementById('admin-panel').style.display = 'block';
+            loadAdminData();
         }
 
-        let { data, error } = await _client.from('profiles').select('points').eq('id', user.id).maybeSingle();
-
+        let { data } = await _client.from('profiles').select('points').eq('id', user.id).maybeSingle();
         if (!data) {
-            await _client.from('profiles').insert([{ id: user.id, username: user.username || 'User', points: 0 }]);
+            const referrer = tg.initDataUnsafe?.start_param || null;
+            await _client.from('profiles').insert([{ id: user.id, username: user.username || 'User', points: 0, referred_by: referrer }]);
             updateUI(0);
         } else {
             updateUI(data.points);
         }
-
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
     }
 
     function updateUI(pts) {
         document.getElementById('points').innerText = pts;
-        const saldoValue = (pts * 0.00075).toFixed(2);
-        document.getElementById('balance').innerText = saldoValue;
+        const realCash = (pts * VALOR_PT);
+        document.getElementById('balance').innerText = realCash.toFixed(4);
+        
+        const percent = Math.min((realCash / 5) * 100, 100);
+        document.getElementById('progress-bar').style.width = percent + "%";
+        document.getElementById('progress-text').innerText = "Progresso: " + percent.toFixed(1) + "%";
 
         const btn = document.getElementById('withdraw-btn');
-        if (parseFloat(saldoValue) >= 5.00) {
-            btn.classList.add('active');
-            btn.style.cursor = "pointer";
-            btn.innerText = "Levantar Dinheiro 💸";
+        if (realCash >= 5.0) {
+            btn.disabled = false;
+            btn.innerText = "EFETUAR SAQUE";
+            btn.style.background = "#4ade80";
         }
     }
 
-    async function addPoints(val) {
+    async function earn(event, val) {
+        const floating = document.createElement("div");
+        floating.className = "floating-pts";
+        floating.innerText = "+" + val;
+        floating.style.left = event.pageX + "px";
+        floating.style.top = event.pageY + "px";
+        document.body.appendChild(floating);
+        setTimeout(() => floating.remove(), 800);
+
         let current = parseInt(document.getElementById('points').innerText);
         let novo = current + val;
-
-        const { error } = await _client.from('profiles').update({ points: novo }).eq('id', user.id);
         
+        const { error } = await _client.from('profiles').update({ points: novo }).eq('id', user.id);
         if (!error) {
             updateUI(novo);
-            tg.HapticFeedback.impactOccurred('medium');
-        } else {
-            console.error("Erro Supabase:", error);
+            tg.HapticFeedback.impactOccurred('light');
         }
     }
 
-    function requestWithdraw() {
-        const saldo = document.getElementById('balance').innerText;
-        if (parseFloat(saldo) < 5.0) {
-            tg.showAlert("Precisas de pelo menos 5.00€ para solicitar o pagamento!");
-        } else {
-            tg.showConfirm("Desejas converter os teus pontos em pagamento para o teu ID: " + user.id + "?", (confirm) => {
-                if(confirm) tg.showAlert("Pedido de saque enviado com sucesso! Aguarda a nossa mensagem.");
-            });
-        }
+    function generateInvite() {
+        const link = `https://t.me/${BOT_USERNAME}?start=${user.id}`;
+        const shareLink = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent("Ganha dinheiro real apenas interagindo nesta rede social! 💰")}`;
+        tg.openTelegramLink(shareLink);
+    }
+
+    async function requestWithdraw() {
+        const pts = parseInt(document.getElementById('points').innerText);
+        const valor = (pts * VALOR_PT);
+        
+        tg.showConfirm(`Confirmar levantamento de €${valor.toFixed(2)}?`, async (ok) => {
+            if(ok) {
+                const { error } = await _client.from('withdrawals').insert([{
+                    user_id: user.id,
+                    username: user.username || 'User',
+                    amount: valor,
+                    status: 'pending'
+                }]);
+                if(!error) tg.showAlert("Pedido enviado! Verificaremos a tua conta.");
+            }
+        });
+    }
+
+    async function loadAdminData() {
+        const { count: usersCount } = await _client.from('profiles').select('*', { count: 'exact', head: true });
+        document.getElementById('adm-users').innerText = usersCount;
+        const { data: ptsData } = await _client.from('profiles').select('points');
+        const total = ptsData.reduce((a, b) => a + (b.points || 0), 0);
+        document.getElementById('adm-points').innerText = total;
+        const { count: wCount } = await _client.from('withdrawals').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+        document.getElementById('adm-withdraws').innerText = wCount;
+    }
+
+    function checkWithdrawals() {
+        tg.showAlert("Tens pagamentos pendentes! Verifica a tabela 'withdrawals' no teu Supabase.");
     }
 
     tg.ready();
