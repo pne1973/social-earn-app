@@ -8,28 +8,42 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --bg: #F8F9FA; --border: #dadce0; }
-        body { font-family: 'Google Sans', Roboto, sans-serif; background: var(--bg); margin: 0; padding: 75px 0 90px; }
+        body { font-family: 'Google Sans', Roboto, sans-serif; background: var(--bg); margin: 0; padding: 75px 0 90px; -webkit-tap-highlight-color: transparent; }
         
+        /* HEADER & NAV */
         .header { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #fff; border-bottom: 1px solid var(--border); z-index: 2000; box-sizing: border-box; height: 65px; }
-        .logo { font-weight: bold; font-size: 22px; }
+        .logo { font-weight: bold; font-size: 22px; letter-spacing: -0.5px; }
         .logo span:nth-child(1) { color: var(--g-blue); } .logo span:nth-child(2) { color: var(--g-red); } .logo span:nth-child(3) { color: var(--g-yellow); } .logo span:nth-child(4) { color: var(--g-blue); } .logo span:nth-child(5) { color: var(--g-green); }
         .xp-badge { background: #E8F0FE; color: var(--g-blue); padding: 8px 16px; border-radius: 24px; font-weight: bold; font-size: 13px; border: 1px solid #c2e7ff; }
 
         .nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid var(--border); z-index: 2000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; text-align: center; padding: 14px 0; color: #5f6368; cursor: pointer; font-size: 11px; display: flex; flex-direction: column; gap: 4px; }
+        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; cursor: pointer; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.2s; }
+        .nav-item i { font-size: 20px; }
         .nav-item.active { color: var(--g-blue); font-weight: bold; }
 
-        .tab-content { display: none; width: 100%; box-sizing: border-box; }
+        /* CONTAINERS */
+        .tab-content { display: none; width: 100%; box-sizing: border-box; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         .container { padding: 16px; max-width: 500px; margin: 0 auto; }
         
+        /* CARDS & POSTS */
         .card { background: #fff; padding: 16px; border-radius: 16px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-        .btn { border: none; padding: 12px; border-radius: 24px; font-weight: 600; cursor: pointer; width: 100%; }
+        .btn { border: none; padding: 12px; border-radius: 24px; font-weight: 600; cursor: pointer; width: 100%; font-size: 14px; }
         .btn-blue { background: var(--g-blue); color: #fff; }
         
-        textarea { width: 100%; border: 1px solid #f1f3f4; padding: 12px; border-radius: 12px; font-size: 16px; outline: none; background: #f8f9fa; margin-bottom: 10px; resize: none; box-sizing: border-box; }
-        .post-actions { display: flex; gap: 15px; border-top: 1px solid #f1f3f4; padding-top: 12px; margin-top: 10px; }
-        .act-btn { background: none; border: none; color: #5f6368; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        textarea { width: 100%; border: 1px solid #f1f3f4; padding: 15px; border-radius: 16px; font-size: 16px; outline: none; background: #f8f9fa; margin-bottom: 10px; resize: none; box-sizing: border-box; }
+        
+        .post-actions { display: flex; gap: 20px; border-top: 1px solid #f1f3f4; padding-top: 12px; margin-top: 10px; }
+        .act-btn { background: none; border: none; color: #5f6368; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 5px; }
+        .act-btn i { font-size: 16px; }
+        .act-btn.liked { color: var(--g-red); }
+        .act-btn.liked i { font-weight: 900; }
+
+        /* ECONOMY TABLE */
+        .earn-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f3f4; font-size: 14px; }
+        .earn-val { color: var(--g-green); font-weight: bold; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -40,48 +54,62 @@
     </div>
 
     <section id="feed-tab" class="tab-content container active">
-        <div class="card">
-            <textarea id="postText" rows="3" placeholder="O que estás a pensar?"></textarea>
-            <div style="display:flex; justify-content:flex-end;">
+        <div class="card" style="border: 1px solid var(--g-blue); background: #fdfdfd;">
+            <textarea id="postText" rows="3" placeholder="No que estás a pensar?"></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <button onclick="alert('Funcionalidade de Foto em manutenção')" style="background:none; border:none; color:var(--g-green); font-weight:bold;"><i class="fas fa-image"></i> Foto</button>
                 <button class="btn btn-blue" style="width:auto; padding:8px 30px;" id="pubBtn" onclick="publish()">Publicar</button>
             </div>
         </div>
-        <div id="feed-list">A carregar posts...</div>
+        <div id="feed-list"></div>
     </section>
 
     <section id="info-tab" class="tab-content container">
         <div class="card">
-            <h3>📊 Tabela de Ganhos</h3>
-            <p>Post: +15 XP | Comentário: +5 XP | Like: +2 XP</p>
+            <h3 style="margin-top:0; color:var(--g-blue);"><i class="fas fa-coins"></i> Tabela de Ganhos</h3>
+            <div class="earn-row"><span>Novo Post</span><span class="earn-val">+15 XP</span></div>
+            <div class="earn-row"><span>Gostar de Post</span><span class="earn-val">+2 XP</span></div>
+            <div class="earn-row"><span>Comentar</span><span class="earn-val">+5 XP</span></div>
+            <div class="earn-row"><span>Convidar Amigo</span><span class="earn-val">+100 XP</span></div>
+            <div style="margin-top:20px; background:#e8f0fe; padding:15px; border-radius:12px; text-align:center;">
+                <small>Taxa de Conversão Oficial:</small><br>
+                <b style="font-size:18px;">1000 XP = 1.0000€</b>
+            </div>
         </div>
     </section>
 
     <section id="rank-tab" class="tab-content container">
-        <div class="card"><h3>🏆 Top Rankings</h3><div id="rank-list"></div></div>
+        <div class="card">
+            <h3 style="margin-top:0;"><i class="fas fa-trophy" style="color:var(--g-yellow)"></i> Top 10 Ranking</h3>
+            <div id="rank-list">Carregando classificação...</div>
+        </div>
     </section>
 
     <section id="wallet-tab" class="tab-content container">
-        <div class="card" style="text-align:center;">
-            <p>O teu saldo estimado</p>
-            <h1 id="cash-val" style="color:var(--g-green)">0.0000€</h1>
-            <input type="email" placeholder="E-mail PayPal" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px; text-align:center;">
-            <button class="btn btn-blue" onclick="alert('Mínimo 5000 XP')">Solicitar Saque</button>
+        <div class="card" style="text-align:center; padding:30px 20px;">
+            <p style="color:#5f6368; margin-bottom:5px;">Saldo Disponível</p>
+            <h1 id="cash-val" style="font-size:42px; color:var(--g-green); margin:0 0 20px 0;">0.0000€</h1>
+            <input type="email" id="ppEmail" placeholder="E-mail do teu PayPal" style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px; text-align:center; font-size:16px;">
+            <p style="font-size:11px; color:var(--g-red); font-weight:bold; margin-bottom:15px;">MÍNIMO PARA LEVANTAMENTO: 5000 XP</p>
+            <button class="btn btn-blue" onclick="requestWithdraw()">Solicitar Saque via PayPal</button>
         </div>
     </section>
 
     <section id="admin-tab" class="tab-content container">
-        <div class="card" style="border-top: 5px solid var(--g-red);">
-            <h3>🛠 Painel Admin</h3>
-            <div id="adm-stats">Carregando estatísticas...</div>
+        <div class="card" style="border-top: 6px solid var(--g-red);">
+            <h3 style="color:var(--g-red)">Painel de Administração</h3>
+            <div id="adm-stats" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"></div>
+            <h4 style="margin-top:20px;">Pedidos de Saque</h4>
+            <div id="adm-withdraws" style="font-size:12px;"></div>
         </div>
     </section>
 
     <nav class="nav">
-        <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i><br>Feed</div>
-        <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-coins"></i><br>Ganhos</div>
-        <div class="nav-item" onclick="showTab('rank-tab', this)"><i class="fas fa-trophy"></i><br>Rank</div>
-        <div class="nav-item" onclick="showTab('wallet-tab', this)"><i class="fas fa-wallet"></i><br>Saque</div>
-        <div class="nav-item" id="admin-nav" onclick="showTab('admin-tab', this)"><i class="fas fa-user-shield"></i><br>Admin</div>
+        <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i>Feed</div>
+        <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-coins"></i>Ganhos</div>
+        <div class="nav-item" onclick="showTab('rank-tab', this)"><i class="fas fa-trophy"></i>Rank</div>
+        <div class="nav-item" onclick="showTab('wallet-tab', this)"><i class="fas fa-wallet"></i>Saque</div>
+        <div class="nav-item" id="admin-nav" onclick="showTab('admin-tab', this)"><i class="fas fa-user-shield"></i>Admin</div>
     </nav>
 
     <script>
@@ -91,6 +119,8 @@
         const myId = 5401881400;
 
         async function init() {
+            // Esconder Admin se não for o dono
+            if(myId !== 5401881400) document.getElementById('admin-nav').style.display = 'none';
             loadProfile();
             loadFeed();
         }
@@ -102,24 +132,30 @@
             el.classList.add('active');
             if(id === 'rank-tab') loadRanking();
             if(id === 'admin-tab') loadAdmin();
+            window.scrollTo(0,0);
         }
 
         async function loadFeed() {
             const list = document.getElementById('feed-list');
-            // Busca simples sem joins para evitar o erro de "carregar posts"
-            const { data, error } = await supabaseClient.from('posts').select('*').order('created_at', {ascending:false});
-            
-            if(error) { list.innerHTML = "Erro ao conectar."; return; }
+            const { data } = await supabaseClient.from('posts').select('*').order('created_at', {ascending:false});
             
             list.innerHTML = '';
-            data.forEach(p => {
+            data?.forEach((p, i) => {
+                // Injeção de ADS a cada 3 posts
+                if(i > 0 && i % 3 === 0) {
+                    list.innerHTML += `<div class="card" style="background:#fff8e1; border:1px dashed var(--g-yellow); text-align:center; font-size:13px; color:#856404;"><b>ANÚNCIO:</b> Ganha XP extra convidando amigos!</div>`;
+                }
+
                 list.innerHTML += `
                 <div class="card">
-                    <b style="color:var(--g-blue)">Utilizador #${p.user_id.toString().slice(-4)}</b>
-                    <p>${p.content}</p>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                        <div style="width:35px; height:35px; background:var(--g-blue); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">${p.user_id.toString().slice(-1)}</div>
+                        <b>Utilizador #${p.user_id.toString().slice(-4)}</b>
+                    </div>
+                    <p style="margin:0; font-size:15px; line-height:1.5;">${p.content}</p>
                     <div class="post-actions">
                         <button class="act-btn" onclick="likePost(this)"><i class="far fa-heart"></i> Gostar</button>
-                        <button class="act-btn" onclick="addCommentPrompt(${p.id})"><i class="far fa-comment"></i> Comentar</button>
+                        <button class="act-btn" onclick="commentPost(${p.id})"><i class="far fa-comment"></i> Comentar</button>
                     </div>
                 </div>`;
             });
@@ -127,24 +163,26 @@
 
         async function publish() {
             const txt = document.getElementById('postText').value; if(!txt) return;
+            const btn = document.getElementById('pubBtn'); btn.disabled = true; btn.innerText = "...";
             const { error } = await supabaseClient.from('posts').insert([{ user_id: myId, content: txt }]);
             if(!error) {
                 await supabaseClient.rpc('increment_points', { user_id: myId, amount: 15 });
                 location.reload();
-            }
+            } else { alert("Erro ao publicar."); btn.disabled = false; }
         }
 
         async function likePost(btn) {
-            btn.style.color = "var(--g-red)"; btn.innerHTML = '<i class="fas fa-heart"></i> +2 XP';
+            if(btn.classList.contains('liked')) return;
+            btn.classList.add('liked'); btn.innerHTML = '<i class="fas fa-heart"></i> +2 XP';
             await supabaseClient.rpc('increment_points', { user_id: myId, amount: 2 });
             loadProfile();
         }
 
-        async function addCommentPrompt(pid) {
+        async function commentPost(pid) {
             const msg = prompt("Escreve o teu comentário:");
             if(msg) {
                 await supabaseClient.rpc('increment_points', { user_id: myId, amount: 5 });
-                alert("Comentário enviado! +5 XP");
+                alert("Comentário registado! +5 XP");
                 loadProfile();
             }
         }
@@ -153,19 +191,25 @@
             const { data } = await supabaseClient.from('profiles').select('points').eq('id', myId).single();
             if(data) {
                 document.getElementById('userXP').innerText = data.points + " XP";
-                document.getElementById('cash-val').innerText = (data.points * 0.001).toFixed(4) + '€';
+                document.getElementById('cash-val').innerText = (data.points * 0.001).toFixed(4) + "€";
             }
         }
 
         async function loadRanking() {
             const { data } = await supabaseClient.from('profiles').select('username, points').order('points', {ascending:false}).limit(10);
-            document.getElementById('rank-list').innerHTML = data?.map((u, i) => `<div>${i+1}. ${u.username} (${u.points} XP)</div>`).join('') || 'Sem dados.';
+            document.getElementById('rank-list').innerHTML = data?.map((u, i) => `
+                <div class="earn-row">
+                    <span>${i+1}. @${u.username}</span>
+                    <span class="earn-val">${u.points} XP</span>
+                </div>`).join('') || 'Sem dados.';
         }
 
         async function loadAdmin() {
             const { count: u } = await supabaseClient.from('profiles').select('*', {count:'exact', head:true});
             const { count: p } = await supabaseClient.from('posts').select('*', {count:'exact', head:true});
-            document.getElementById('adm-stats').innerHTML = `Utilizadores: ${u} | Posts: ${p}`;
+            document.getElementById('adm-stats').innerHTML = `
+                <div class="card" style="text-align:center">Users<br><b>${u}</b></div>
+                <div class="card" style="text-align:center">Posts<br><b>${p}</b></div>`;
         }
 
         init();
