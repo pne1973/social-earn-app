@@ -7,71 +7,186 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --yellow: #ffcc00; --dark: #000; --card: #121212; --red: #ff4444; --gray: #888; }
-        body { background: var(--dark); color: white; font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; }
+        :root { --yellow: #ffcc00; --dark: #000; --card: #121212; --red: #ff4444; }
+        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; padding-bottom: 90px; overflow-x: hidden; }
+        
+        /* Header */
         .header { background: #000; padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .points-badge { background: var(--yellow); color: black; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
-        #adminPanel { background: var(--red); margin: 10px; padding: 15px; border-radius: 12px; display: none; }
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .admin-stat { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; text-align: center; font-size: 12px; }
-        .wallet-card { background: var(--card); margin: 10px; padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #222; display: none; }
-        .balance-big { font-size: 32px; font-weight: bold; color: var(--yellow); margin: 10px 0; }
-        .btn-checkin { background: #222; color: var(--yellow); border: 1px solid var(--yellow); padding: 10px; border-radius: 10px; width: 100%; font-weight: bold; margin-bottom: 15px; cursor: pointer; }
+        .points-badge { background: var(--yellow); color: black; padding: 5px 12px; border-radius: 20px; font-weight: bold; }
+        
+        /* Admin Panel */
+        #adminPanel { background: var(--red); margin: 10px; padding: 10px; border-radius: 12px; display: none; font-size: 12px; text-align: center; }
+        
+        /* Post Box */
         .post-box { background: var(--card); padding: 15px; margin: 10px; border-radius: 15px; border: 1px solid #222; }
         textarea { width: 100%; background: transparent; border: none; color: white; font-size: 16px; outline: none; height: 60px; resize: none; }
-        .btn-post { background: var(--yellow); color: black; border: none; padding: 8px 25px; border-radius: 20px; font-weight: bold; float: right; cursor: pointer; }
-        .feed-item { background: var(--card); border-bottom: 1px solid #1a1a1a; padding: 15px; position: relative; }
-        .btn-delete { color: var(--red); font-size: 11px; position: absolute; top: 15px; right: 15px; border: 1px solid var(--red); padding: 2px 6px; border-radius: 4px; }
+        .btn-post { background: var(--yellow); color: black; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; float: right; cursor: pointer; }
+        .btn-post:disabled { opacity: 0.5; cursor: not-allowed; }
+        .img-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; margin-top: 10px; display: none; border: 1px solid #333; }
+        
+        /* Feed */
+        .feed-item { background: var(--card); border-bottom: 1px solid #222; padding: 15px; position: relative; }
+        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid #333; display: block; }
+        
+        /* Navigation */
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid #222; }
-        .nav-item { font-size: 24px; cursor: pointer; opacity: 0.4; transition: 0.3s; }
-        .nav-item.active { opacity: 1; color: var(--yellow); transform: scale(1.1); }
+        .nav-item { font-size: 24px; cursor: pointer; opacity: 0.5; transition: 0.3s; }
+        .nav-item.active { opacity: 1; color: var(--yellow); }
+
+        .loading-spinner { text-align: center; padding: 20px; color: #888; }
     </style>
 </head>
 <body>
+
     <div class="header">
-        <span style="font-weight: bold;">SOCIAL NETWORK</span>
+        <span style="font-weight: bold; letter-spacing: 1px;">SOCIAL NETWORK</span>
         <div class="points-badge" id="userXP">0 XP</div>
     </div>
 
-    <div id="adminPanel">
-        <div style="font-weight: bold; font-size: 12px;">🛡️ MODO ADMIN</div>
-        <div class="admin-grid">
-            <div class="admin-stat">Users: <b id="totalUsers">-</b></div>
-            <div class="admin-stat">XP Total: <b id="totalPts">-</b></div>
-        </div>
-    </div>
+    <div id="adminPanel">🛡️ ADMIN: <span id="statUsers">0</span> Users | <span id="statPts">0</span> XP</div>
 
-    <div id="walletSection" class="wallet-card">
-        <button class="btn-checkin" onclick="dailyCheckin()">🎁 Reclamar Check-in Diário (+20 XP)</button>
-        <div style="font-size: 12px; color: #888;">SALDO ESTIMADO</div>
-        <div class="balance-big" id="realBalance">€0.0000</div>
-        <button onclick="alert('Mínimo €5.00')" style="width:100%; background:var(--yellow); border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">LEVANTAR</button>
+    <div id="walletSection" style="display:none; padding:20px; text-align:center;">
+        <button onclick="dailyCheckin()" style="width:100%; background:#222; color:var(--yellow); border:1px solid var(--yellow); padding:12px; border-radius:12px; font-weight:bold; margin-bottom:20px;">🎁 Check-in Diário (+20 XP)</button>
+        <div style="font-size:12px; color:#888;">SALDO ESTIMADO</div>
+        <div id="realBalance" style="font-size:32px; font-weight:bold; color:var(--yellow); margin:10px 0;">€0.0000</div>
     </div>
 
     <div id="postSection" class="post-box">
-        <textarea id="postInput" placeholder="No que estás a pensar?"></textarea>
-        <button class="btn-post" onclick="publishPost()">Publicar</button>
-        <div style="clear:both;"></div>
+        <textarea id="postInput" placeholder="Partilha algo com a rede..."></textarea>
+        <img id="preview" class="img-preview">
+        <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewImage(this)">
+            <button onclick="document.getElementById('fileInput').click()" style="background:#222; color:white; border:none; padding:10px; border-radius:12px; font-size:14px; cursor:pointer;">📷 Foto</button>
+            <button class="btn-post" id="publishBtn" onclick="publishPost()">Publicar</button>
+        </div>
     </div>
 
-    <div id="mainContent"></div>
+    <div id="mainContent">
+        <div class="loading-spinner">A carregar feed...</div>
+    </div>
 
     <div class="nav-bar">
-        <div class="nav-item active" id="navHome" onclick="changeTab('home')">🏠</div>
-        <div class="nav-item" id="navRank" onclick="changeTab('rank')">🏆</div>
-        <div class="nav-item" id="navWallet" onclick="changeTab('wallet')">💰</div>
+        <span class="nav-item active" onclick="changeTab('home', this)">🏠</span>
+        <span class="nav-item" onclick="changeTab('rank', this)">🏆</span>
+        <span class="nav-item" onclick="changeTab('wallet', this)">💰</span>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp; tg.expand();
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
         const urlParams = new URLSearchParams(window.location.search);
-        const supabaseClient = supabase.createClient(urlParams.get('url'), urlParams.get('key'));
-        const userId = tg.initDataUnsafe.user?.id;
+        const supabaseUrl = urlParams.get('url');
+        const supabaseKey = urlParams.get('key');
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        const userId = tg.initDataUnsafe.user?.id || 12345; // 12345 para testes fora do TG
         const ADMIN_ID = 5401881400;
 
-        async function init() {
-            if (userId === ADMIN_ID) loadAdmin();
-            updateStats(); changeTab('home');
+        // Preview da imagem selecionada
+        function previewImage(input) {
+            const preview = document.getElementById('preview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { 
+                    preview.src = e.target.result; 
+                    preview.style.display = 'block'; 
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Compressor de Imagem (converte para JPEG 60% qualidade, max 800px)
+        async function compressImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800; 
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.6); 
+                    };
+                };
+            });
+        }
+
+        async function publishPost() {
+            const text = document.getElementById('postInput').value;
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const btn = document.getElementById('publishBtn');
+            let imgUrl = null;
+
+            if (!text && !file) return;
+
+            btn.innerText = "A enviar...";
+            btn.disabled = true;
+
+            try {
+                if (file) {
+                    const compressedFile = await compressImage(file);
+                    const fileName = `${Date.now()}_${userId}.jpg`;
+                    const { data, error } = await supabaseClient.storage
+                        .from('post-images')
+                        .upload(fileName, compressedFile);
+                    
+                    if (error) throw error;
+                    imgUrl = supabaseClient.storage.from('post-images').getPublicUrl(fileName).data.publicUrl;
+                }
+
+                await supabaseClient.from('posts').insert([{ 
+                    user_id: userId, 
+                    username: tg.initDataUnsafe.user?.username || 'Utilizador',
+                    content: text,
+                    image_url: imgUrl
+                }]);
+
+                await supabaseClient.rpc('increment_points', { user_id: userId, amount: imgUrl ? 10 : 5 });
+                location.reload(); 
+            } catch (err) {
+                alert("Erro ao publicar: " + err.message);
+                btn.innerText = "Publicar";
+                btn.disabled = false;
+            }
+        }
+
+        async function loadFeed() {
+            const { data: posts } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
+            let html = "";
+            if (!posts || posts.length === 0) {
+                html = "<div style='text-align:center; padding:50px; color:#555;'>Ainda não há posts.</div>";
+            } else {
+                posts.forEach(p => {
+                    html += `<div class="feed-item">
+                        ${userId === ADMIN_ID ? `<span onclick="deletePost(${p.id})" style="color:red; float:right; font-size:12px; font-weight:bold;">APAGAR</span>` : ''}
+                        <b style="color:var(--yellow)">@${p.username}</b>
+                        <p style="margin:10px 0; line-height:1.4;">${p.content || ''}</p>
+                        ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
+                        <div style="margin-top:10px; font-size:13px; color:#888; display:inline-block;" onclick="likePost(${p.id})">❤️ ${p.likes || 0} Likes</div>
+                    </div>`;
+                });
+            }
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        async function changeTab(tab, el) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('postSection').style.display = tab === 'home' ? 'block' : 'none';
+            document.getElementById('walletSection').style.display = tab === 'wallet' ? 'block' : 'none';
+            document.getElementById('mainContent').style.display = (tab === 'home' || tab === 'rank') ? 'block' : 'none';
+            
+            if (tab === 'home') loadFeed();
+            if (tab === 'rank') loadRank();
         }
 
         async function updateStats() {
@@ -82,67 +197,38 @@
             }
         }
 
-        async function changeTab(tab) {
-            const content = document.getElementById('mainContent');
-            const postBox = document.getElementById('postSection');
-            const wallet = document.getElementById('walletSection');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-
-            if (tab === 'home') {
-                document.getElementById('navHome').classList.add('active');
-                postBox.style.display = 'block'; wallet.style.display = 'none'; loadFeed();
-            } else if (tab === 'rank') {
-                document.getElementById('navRank').classList.add('active');
-                postBox.style.display = 'none'; wallet.style.display = 'none'; loadRank();
-            } else if (tab === 'wallet') {
-                document.getElementById('navWallet').classList.add('active');
-                postBox.style.display = 'none'; wallet.style.display = 'block'; content.innerHTML = "";
+        async function deletePost(id) {
+            if(confirm("Desejas apagar este post permanentemente?")) {
+                await supabaseClient.from('posts').delete().eq('id', id);
+                loadFeed();
             }
         }
 
-        async function loadFeed() {
-            const { data: posts } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
-            let html = "";
-            posts?.forEach((p, i) => {
-                html += `<div class="feed-item">
-                    ${userId === ADMIN_ID ? `<span class="btn-delete" onclick="deletePost(${p.id})">Apagar</span>` : ''}
-                    <b style="color:var(--yellow)">@${p.username}</b><p>${p.content}</p>
-                    <small onclick="likePost(${p.id})" style="cursor:pointer">❤️ ${p.likes || 0} Likes</small>
-                </div>`;
-                if ((i+1) % 3 === 0) html += `<div style="padding:20px; text-align:center; border:1px dashed #333; margin:10px; border-radius:10px;"><small style="color:var(--yellow)">ANÚNCIO</small><br><button onclick="tg.openLink('https://google.com')" style="background:white; border:none; padding:5px 10px; border-radius:5px; margin-top:5px; font-weight:bold;">+10 XP</button></div>`;
-            });
-            document.getElementById('mainContent').innerHTML = html;
-        }
-
-        async function publishPost() {
-            const val = document.getElementById('postInput').value;
-            if(!val) return;
-            await supabaseClient.from('posts').insert([{ user_id: userId, username: tg.initDataUnsafe.user?.username || 'User', content: val }]);
-            await supabaseClient.rpc('increment_points', { user_id: userId, amount: 5 });
-            document.getElementById('postInput').value = ""; updateStats(); loadFeed();
+        async function likePost(id) {
+            await supabaseClient.rpc('increment_likes', { post_id: id });
+            loadFeed();
         }
 
         async function dailyCheckin() {
-            // Lógica simples: podes adicionar uma coluna 'last_checkin' no Supabase para validar as 24h
-            await supabaseClient.rpc('increment_points', { user_id: userId, amount: 20 });
-            alert("Ganhaste 20 XP!"); updateStats();
+            const { error } = await supabaseClient.rpc('increment_points', { user_id: userId, amount: 20 });
+            if (!error) {
+                alert("Check-in realizado! +20 XP");
+                updateStats();
+            }
         }
-
-        async function deletePost(id) { if(confirm("Apagar?")) { await supabaseClient.from('posts').delete().eq('id', id); loadFeed(); } }
-        async function likePost(id) { await supabaseClient.rpc('increment_likes', { post_id: id }); await supabaseClient.rpc('increment_points', { user_id: userId, amount: 1 }); updateStats(); loadFeed(); }
-        async function loadRank() {
-            const { data } = await supabaseClient.from('profiles').select('username, points').order('points', { ascending: false }).limit(10);
-            let html = "<h3 style='text-align:center;'>RANKING</h3>";
-            data?.forEach((u, i) => html += `<div class="feed-item" style="display:flex; justify-content:space-between;"><span>${i+1}º @${u.username}</span><b>${u.points} XP</b></div>`);
-            document.getElementById('mainContent').innerHTML = html;
-        }
+        
         async function loadAdmin() {
+            if (userId !== ADMIN_ID) return;
             document.getElementById('adminPanel').style.display = 'block';
             const { data } = await supabaseClient.from('profiles').select('points');
-            document.getElementById('totalUsers').innerText = data.length;
-            document.getElementById('totalPts').innerText = data.reduce((a, b) => a + b.points, 0).toLocaleString();
+            if (data) {
+                document.getElementById('statUsers').innerText = data.length;
+                document.getElementById('statPts').innerText = data.reduce((a, b) => a + b.points, 0);
+            }
         }
-        init();
+
+        // Inicialização
+        updateStats(); loadFeed(); loadAdmin();
     </script>
 </body>
 </html>
