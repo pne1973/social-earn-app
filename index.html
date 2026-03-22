@@ -39,4 +39,73 @@
         <button class="btn-action" onclick="addPoints(5)">❤️ Gostar (+5 pts)</button>
     </div>
 
-    
+    <div class="ad-placeholder">Anúncio Adsterra (Native)</div>
+
+    <div class="post">
+        <span class="user">@Comunidade</span>
+        <p>Alguém já atingiu o limite de levantamento hoje? 💸</p>
+        <button class="btn-action" onclick="addPoints(10)">💬 Comentar (+10 pts)</button>
+    </div>
+</div>
+
+<script>
+    // CONFIGURAÇÃO REAL SUPABASE
+    const supabaseUrl = 'https://fickstyevektwbgimapy.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const tg = window.Telegram.WebApp;
+    const user = tg.initDataUnsafe.user;
+
+    async function loadData() {
+        if (!user) {
+            document.getElementById('loading').innerText = "Abre isto dentro do Telegram!";
+            return;
+        }
+        
+        let { data, error } = await supabase.from('profiles').select('points').eq('id', user.id).single();
+        
+        if (data) {
+            updateUI(data.points || 0);
+            document.getElementById('loading').style.display = 'none';
+        } else {
+            // Se o user ainda não existir na tabela por algum motivo
+            await supabase.from('profiles').upsert({ id: user.id, username: user.username || "User" });
+            updateUI(0);
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    function updateUI(pts) {
+        document.getElementById('points').innerText = pts;
+        // 1000 pontos = 0.75€ -> 1 ponto = 0.00075€
+        document.getElementById('balance').innerText = (pts * 0.00075).toFixed(2);
+    }
+
+    async function addPoints(val) {
+        if (!user) return;
+        
+        let currentPts = parseInt(document.getElementById('points').innerText);
+        let newPts = currentPts + val;
+        
+        const { error } = await supabase
+            .from('profiles')
+            .update({ points: newPts })
+            .eq('id', user.id);
+        
+        if (!error) {
+            updateUI(newPts);
+            tg.HapticFeedback.impactOccurred('light');
+        } else {
+            console.error("Erro ao guardar pontos:", error);
+            alert("Erro ao guardar pontos. Verifica a ligação.");
+        }
+    }
+
+    tg.ready();
+    tg.expand();
+    loadData();
+</script>
+
+</body>
+</html>
