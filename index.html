@@ -8,25 +8,24 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; }
-        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding: 15px; overflow-x: hidden; }
+        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding: 15px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .xp-badge { background: var(--tg-theme-button); color: #000; padding: 8px 15px; border-radius: 20px; font-weight: bold; box-shadow: 0 2px 10px rgba(255,204,0,0.3); }
+        .xp-badge { background: var(--tg-theme-button); color: #000; padding: 8px 15px; border-radius: 20px; font-weight: bold; min-width: 60px; text-align: center; }
         .post-box { background: #1e1e1e; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; }
         textarea { width: 100%; background: transparent; border: none; color: #fff; resize: none; font-size: 16px; outline: none; margin-bottom: 10px; min-height: 60px; }
         .actions { display: flex; justify-content: space-between; align-items: center; }
         .btn-pub { background: var(--tg-theme-button); color: #000; border: none; padding: 10px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .btn-file { background: #333; color: #fff; border: none; padding: 10px; border-radius: 10px; cursor: pointer; }
-        .feed-post { background: #1e1e1e; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #222; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; display: block; object-fit: cover; max-height: 300px; }
+        .feed-post { background: #1e1e1e; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #222; }
+        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; display: block; max-height: 300px; object-fit: cover; }
         .btn-delete { color: #ff4444; font-size: 12px; cursor: pointer; float: right; font-weight: bold; }
-        .user-info { color: var(--tg-theme-button); font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        .user-info { color: var(--tg-theme-button); font-weight: bold; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="margin:0; font-size: 20px;">SOCIAL NETWORK</h2>
+        <h2 style="margin:0;">SOCIAL NETWORK</h2>
         <div id="userXP" class="xp-badge">...</div>
     </div>
 
@@ -45,29 +44,28 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- SUBSTITUI PELOS TEUS DADOS REAIS ---
+        // --- SUBSTITUI PELOS TEUS DADOS DO SUPABASE ---
         const SUPABASE_URL = "A_TUA_URL_AQUI"; 
         const SUPABASE_KEY = "A_TUA_KEY_AQUI";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const ADMIN_ID = 5401881400;
-        const user = tg.initDataUnsafe?.user || { id: ADMIN_ID, username: "pine1971" };
-        const userId = user.id;
+        // FORÇAR O TEU ID PARA GARANTIR CONEXÃO
+        const userId = 5401881400; 
+        const username = "pine1971";
 
         async function init() {
             try {
-                // Sincronizado com o teu print: tabela 'profiles', colunas 'points' e 'id'
-                const { data, error } = await supabaseClient
+                // Busca pontos na tabela 'profiles' onde a coluna é 'id'
+                let { data, error } = await supabaseClient
                     .from('profiles')
                     .select('points')
                     .eq('id', userId)
-                    .single();
+                    .maybeSingle();
 
                 if (data) {
                     document.getElementById('userXP').innerText = `${data.points} XP`;
                 } else {
-                    document.getElementById('userXP').innerText = `0 XP`;
-                    console.log("Perfil não encontrado, usando 0.");
+                    document.getElementById('userXP').innerText = "0 XP";
                 }
             } catch (e) {
                 document.getElementById('userXP').innerText = "Erro";
@@ -76,7 +74,8 @@
         }
 
         async function loadFeed() {
-            const { data: posts, error } = await supabaseClient
+            // Garante que tens uma Policy de SELECT (true) na tabela posts
+            const { data: posts } = await supabaseClient
                 .from('posts')
                 .select('*')
                 .order('created_at', { ascending: false });
@@ -84,19 +83,18 @@
             const feedDiv = document.getElementById('feed');
             feedDiv.innerHTML = '';
 
-            posts?.forEach(p => {
-                // Tu ou o Admin podem apagar
-                const canDelete = userId === ADMIN_ID || p.user_id === userId;
-                
-                feedDiv.innerHTML += `
-                    <div class="feed-post">
-                        ${canDelete ? `<span class="btn-delete" onclick="deletePost(${p.id})">APAGAR</span>` : ''}
-                        <div class="user-info">@${p.username || 'utilizador'}</div>
-                        <div style="margin: 5px 0;">${p.content || ''}</div>
-                        ${p.image_url ? `<img src="${p.image_url}" class="post-img" onerror="this.style.display='none'">` : ''}
-                    </div>
-                `;
-            });
+            if (posts) {
+                posts.forEach(p => {
+                    feedDiv.innerHTML += `
+                        <div class="feed-post">
+                            ${userId === 5401881400 ? `<span class="btn-delete" onclick="deletePost(${p.id})">APAGAR</span>` : ''}
+                            <div class="user-info">@${p.username || 'utilizador'}</div>
+                            <div>${p.content || ''}</div>
+                            ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                        </div>
+                    `;
+                });
+            }
         }
 
         async function handlePublish() {
@@ -106,48 +104,39 @@
 
             if (!text && !file) return;
 
-            tg.MainButton.setText("A publicar...").show();
-
             try {
                 if (file) {
-                    const fileName = `${Date.now()}_${userId}.jpg`;
-                    const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                    const fileName = `${Date.now()}_img.jpg`;
+                    const { data: upData, error: upErr } = await supabaseClient.storage
                         .from('post-images')
                         .upload(fileName, file);
 
-                    if (uploadError) throw uploadError;
+                    if (upErr) throw upErr;
 
-                    const { data: publicUrlData } = supabaseClient.storage
+                    const { data: urlData } = supabaseClient.storage
                         .from('post-images')
                         .getPublicUrl(fileName);
-                    
-                    imageUrl = publicUrlData.publicUrl;
+                    imageUrl = urlData.publicUrl;
                 }
 
-                const { error: postError } = await supabaseClient.from('posts').insert([{
+                await supabaseClient.from('posts').insert([{
                     user_id: userId,
-                    username: user.username || "pine1971",
+                    username: username,
                     content: text,
                     image_url: imageUrl
                 }]);
 
-                if (postError) throw postError;
-
                 document.getElementById('postText').value = '';
                 document.getElementById('fileInput').value = '';
-                init(); // Recarrega XP e Feed
+                init();
             } catch (err) {
                 alert("Erro: " + err.message);
-            } finally {
-                tg.MainButton.hide();
             }
         }
 
         async function deletePost(postId) {
-            if (!confirm("Queres mesmo apagar este post?")) return;
             const { error } = await supabaseClient.from('posts').delete().eq('id', postId);
-            if (error) alert("Erro ao apagar: " + error.message);
-            else init();
+            if (!error) init();
         }
 
         init();
