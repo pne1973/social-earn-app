@@ -34,4 +34,89 @@
     <div id="loading-overlay">A carregar os teus dados...</div>
     
     <div class="post">
-        <span class="user">@
+        <span class="user">@Admin</span>
+        <p>Bem-vindo à nova rede! Começa a ganhar pontos agora. 1000 pontos = 0,75€!</p>
+        <button class="btn-action" onclick="addPoints(5)">❤️ Gostar (+5 pts)</button>
+    </div>
+
+    <div class="ad-placeholder">Anúncio Adsterra (Native)</div>
+
+    <div class="post">
+        <span class="user">@Comunidade</span>
+        <p>Alguém já fez o primeiro levantamento hoje? 💸</p>
+        <button class="btn-action" onclick="addPoints(10)">💬 Comentar (+10 pts)</button>
+    </div>
+</div>
+
+<script>
+    // Configurações do Supabase
+    const supabaseUrl = 'https://fickstyevektwbgimapy.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const tg = window.Telegram.WebApp;
+    const user = tg.initDataUnsafe?.user;
+
+    async function loadData() {
+        if (!user || !user.id) {
+            document.getElementById('loading-overlay').innerText = "Erro: Abre através do Telegram!";
+            return;
+        }
+        
+        // Tenta ler os dados do utilizador
+        let { data, error } = await _supabase
+            .from('profiles')
+            .select('points')
+            .eq('id', user.id)
+            .single();
+        
+        if (data) {
+            updateUI(data.points || 0);
+        } else {
+            // Se não existe (primeira vez), cria o perfil
+            await _supabase.from('profiles').upsert({ 
+                id: user.id, 
+                username: user.username || "User_" + user.id,
+                points: 0 
+            });
+            updateUI(0);
+        }
+        document.getElementById('loading-overlay').style.display = 'none';
+    }
+
+    function updateUI(pts) {
+        document.getElementById('points').innerText = pts;
+        // Conversão: 1000 pts = 0.75€
+        const saldo = (pts * 0.00075).toFixed(2);
+        document.getElementById('balance').innerText = saldo;
+    }
+
+    async function addPoints(val) {
+        if (!user) return;
+        
+        let currentPts = parseInt(document.getElementById('points').innerText);
+        let newPts = currentPts + val;
+        
+        // Atualiza no Banco de Dados
+        const { error } = await _supabase
+            .from('profiles')
+            .update({ points: newPts })
+            .eq('id', user.id);
+        
+        if (!error) {
+            updateUI(newPts);
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        } else {
+            console.error("Erro Supabase:", error);
+            alert("Erro ao gravar pontos. Verifica a ligação!");
+        }
+    }
+
+    // Inicialização
+    tg.ready();
+    tg.expand();
+    loadData();
+</script>
+
+</body>
+</html>
