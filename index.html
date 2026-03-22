@@ -7,22 +7,38 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --bg: #F8F9FA; --txt: #202124; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 80px 0 95px; }
-        .header { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 1px solid #dadce0; z-index: 2000; box-sizing: border-box; }
-        .logo { font-weight: bold; font-size: 20px; }
+        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --bg: #F1F3F4; --txt: #202124; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); margin: 0; padding: 70px 0 80px; }
+        
+        /* HEADER */
+        .header { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #fff; border-bottom: 1px solid #dadce0; z-index: 1000; box-sizing: border-box; }
+        .logo { font-weight: bold; font-size: 22px; }
         .logo span:nth-child(1) { color: var(--g-blue); } .logo span:nth-child(2) { color: var(--g-red); } .logo span:nth-child(3) { color: var(--g-yellow); } .logo span:nth-child(4) { color: var(--g-blue); } .logo span:nth-child(5) { color: var(--g-green); }
-        .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; }
-        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid #dadce0; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; cursor: pointer; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .nav-item.active { color: var(--g-blue); }
+        .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+
+        /* NAV */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid #dadce0; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; cursor: pointer; font-size: 11px; display: flex; flex-direction: column; gap: 4px; transition: 0.2s; }
+        .nav-item i { font-size: 18px; }
+        .nav-item.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); background: #f8f9fa; }
+
+        /* CONTAINERS */
         .container { padding: 15px; max-width: 500px; margin: 0 auto; box-sizing: border-box; width: 100%; }
-        .card { background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .btn { width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .card { background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn { width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-blue { background: var(--g-blue); color: #fff; }
+        
+        /* FEED & ADS */
+        textarea { width: 100%; border: 1px solid #eee; padding: 10px; border-radius: 8px; font-size: 15px; outline: none; background: #f8f9fa; margin-bottom: 10px; }
+        .post-img { width: calc(100% + 32px); margin: 10px -16px; display: block; max-height: 350px; object-fit: cover; }
+        .ad-card { background: #fff8e1; border: 1px dashed var(--g-yellow); padding: 12px; border-radius: 12px; margin-bottom: 15px; text-align: center; color: #856404; font-size: 13px; }
+        
+        /* ACTIONS */
+        .actions { display: flex; gap: 20px; border-top: 1px solid #f1f3f4; padding-top: 10px; margin-top: 10px; }
+        .act-btn { background: none; border: none; color: #5f6368; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .act-btn.liked { color: var(--g-red); }
+
         .hidden { display: none !important; }
-        .rank-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
-        .admin-stat { background: #fff5f5; border: 1px solid var(--g-red); padding: 10px; border-radius: 8px; text-align: center; }
     </style>
 </head>
 <body>
@@ -33,40 +49,66 @@
     </div>
 
     <section id="feed-tab" class="tab-content container">
+        <div class="ad-card"><b>Destaque:</b> Ganhe +100 XP por cada amigo! 🚀</div>
+        
         <div class="card">
-            <textarea id="postText" rows="3" placeholder="O que tens em mente?" style="width:100%; border:1px solid #eee; padding:10px; border-radius:8px; outline:none;"></textarea>
-            <button class="btn btn-blue" style="margin-top:10px;" id="pubBtn" onclick="publish()">Publicar</button>
+            <textarea id="postText" rows="3" placeholder="No que estás a pensar?"></textarea>
+            <div id="img-status" style="font-size:11px; color:var(--g-blue); margin-bottom:10px;" class="hidden">Foto processada! ✅</div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:var(--g-green); font-weight:bold; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
+                <input type="file" id="fileInput" hidden accept="image/*" onchange="handleImg(this)">
+                <button class="btn btn-blue" style="width:auto; padding:8px 25px;" id="pubBtn" onclick="publish()">Publicar</button>
+            </div>
         </div>
         <div id="feed-list"></div>
     </section>
 
+    <section id="info-tab" class="tab-content container hidden">
+        <div class="card">
+            <h3 style="color:var(--g-blue); border-bottom:2px solid var(--g-blue); padding-bottom:10px;">📊 Tabela de Ganhos</h3>
+            <table style="width:100%; line-height:2.5;">
+                <tr><td>Postagem</td><td style="text-align:right;"><b style="color:var(--g-green)">+15 XP</b></td></tr>
+                <tr><td>Convidar Amigo</td><td style="text-align:right;"><b style="color:var(--g-green)">+100 XP</b></td></tr>
+                <tr><td>Gostar (Like)</td><td style="text-align:right;"><b style="color:var(--g-green)">+2 XP</b></td></tr>
+                <tr><td>Check-in Diário</td><td style="text-align:right;"><b style="color:var(--g-green)">+5 XP</b></td></tr>
+            </table>
+            <div style="margin-top:20px; text-align:center; background:#f8f9fa; padding:15px; border-radius:10px;">
+                <small>Taxa de Câmbio:</small><br>
+                <b style="font-size:18px;">1000 XP = <span id="rate-display">1.0000€</span></b>
+            </div>
+        </div>
+    </section>
+
     <section id="rank-tab" class="tab-content container hidden">
         <div class="card">
-            <h3>🏆 Top 10 Elite</h3>
-            <div id="rank-list">A carregar ranking...</div>
+            <h3 style="margin-top:0;"><i class="fas fa-trophy" style="color:var(--g-yellow)"></i> Top 10 Ranking</h3>
+            <div id="rank-list">Carregando classificação...</div>
+        </div>
+    </section>
+
+    <section id="wallet-tab" class="tab-content container hidden">
+        <div class="card" style="text-align:center;">
+            <p>Saldo para levantamento</p>
+            <h1 id="cash-val" style="font-size:35px; color:var(--g-green); margin:10px 0;">0.0000€</h1>
+            <input type="email" id="ppEmail" placeholder="Teu e-mail PayPal" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; text-align:center; margin-bottom:15px;">
+            <p style="color:var(--g-red); font-size:11px; font-weight:bold;">MÍNIMO: 5000 XP</p>
+            <button class="btn btn-blue" onclick="requestWithdraw()">Solicitar PayPal</button>
         </div>
     </section>
 
     <section id="admin-tab" class="tab-content container hidden">
-        <div class="card" style="border-top: 4px solid var(--g-red);">
-            <h3 style="color:var(--g-red)">Painel Admin</h3>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
-                <div class="admin-stat">Utilizadores<br><b id="adm-u">-</b></div>
-                <div class="admin-stat">Posts<br><b id="adm-p">-</b></div>
-            </div>
-            <h4>Saques Pendentes</h4>
-            <div id="adm-w"></div>
+        <div class="card" style="border-top: 5px solid var(--g-red);">
+            <h3 style="color:var(--g-red)">Admin Master</h3>
+            <div id="adm-data" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
+            <h4 style="margin-top:20px;">Saques Solicitados</h4>
+            <div id="adm-withdraws" style="font-size:12px;"></div>
         </div>
     </section>
 
-    <section id="info-tab" class="tab-content container hidden"><div class="card"><h3>Economia</h3><p>1000 XP = 1.0000€</p></div></section>
-    <section id="wallet-tab" class="tab-content container hidden"><div class="card"><h3>Saque</h3><p>Mínimo 5000 XP</p></div></section>
-
     <nav class="nav">
         <div class="nav-item active" data-tab="feed-tab"><i class="fas fa-home"></i>Feed</div>
-        <div class="nav-item" data-tab="rank-tab"><i class="fas fa-trophy"></i>Rank</div>
-        <div class="nav-item" data-tab="admin-tab"><i class="fas fa-shield-alt"></i>Admin</div>
         <div class="nav-item" data-tab="info-tab"><i class="fas fa-coins"></i>Ganhos</div>
+        <div class="nav-item" data-tab="rank-tab"><i class="fas fa-trophy"></i>Rank</div>
         <div class="nav-item" data-tab="wallet-tab"><i class="fas fa-wallet"></i>Saque</div>
     </nav>
 
@@ -74,67 +116,144 @@
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const userId = 5401881400;
+        const myId = 5401881400;
+
+        let compressedImg = null;
+        let rate = 1.0; let symbol = "€";
 
         async function init() {
-            setupNav();
+            if(window.navigator.language.includes('BR')) { rate = 6.2; symbol = "R$"; }
+            document.getElementById('rate-display').innerText = (1 * rate).toFixed(4) + symbol;
+            
+            setupNavigation();
             loadProfile();
             loadFeed();
+
+            // Adicionar Admin se for o dono
+            if(myId === 5401881400) {
+                const nav = document.querySelector('.nav');
+                const btn = document.createElement('div'); btn.className="nav-item"; btn.setAttribute('data-tab','admin-tab');
+                btn.innerHTML='<i class="fas fa-shield-alt"></i>Admin'; nav.appendChild(btn);
+                btn.onclick = () => switchTab('admin-tab', btn);
+            }
         }
 
-        function setupNav() {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const tabId = item.getAttribute('data-tab');
-                    document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                    document.getElementById(tabId).classList.remove('hidden');
-                    item.classList.add('active');
-                    if(tabId === 'rank-tab') loadRanking();
-                    if(tabId === 'admin-tab') loadAdmin();
-                });
+        function setupNavigation() {
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.onclick = () => switchTab(btn.getAttribute('data-tab'), btn);
             });
         }
 
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            btn.classList.add('active');
+            
+            if(tabId === 'rank-tab') loadRanking();
+            if(tabId === 'admin-tab') loadAdmin();
+            if(tabId === 'wallet-tab') loadProfile();
+        }
+
         async function loadFeed() {
-            const { data } = await supabaseClient.from('posts').select('*').order('created_at', {ascending:false});
             const list = document.getElementById('feed-list');
-            list.innerHTML = data?.length ? '' : '<p style="text-align:center;color:#999;">Feed vazio.</p>';
-            data?.forEach(p => {
-                list.innerHTML += `<div class="card"><small>ID: ${p.id}</small><p>${p.content}</p></div>`;
+            const { data } = await supabaseClient.from('posts').select('*, profiles(username)').order('created_at', {ascending:false});
+            
+            list.innerHTML = '';
+            data?.forEach((p, index) => {
+                // Injeção de ADS a cada 3 posts
+                if(index > 0 && index % 3 === 0) {
+                    list.innerHTML += `<div class="ad-card">💰 <b>Ganhe XP rápido:</b> Complete ofertas Pine!</div>`;
+                }
+
+                list.innerHTML += `
+                <div class="card">
+                    <div style="font-weight:bold; color:var(--g-blue); margin-bottom:8px;">@${p.profiles?.username || 'user'}</div>
+                    <p style="margin:0; font-size:15px;">${p.content}</p>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                    <div class="actions">
+                        <button class="act-btn" onclick="likePost(${p.id}, this)"><i class="far fa-heart"></i> Like (+2 XP)</button>
+                        <button class="act-btn" onclick="alert('Comentários em breve!')"><i class="far fa-comment"></i> Comentar</button>
+                    </div>
+                </div>`;
             });
         }
 
         async function publish() {
             const txt = document.getElementById('postText').value;
-            if(!txt) return;
-            const { error } = await supabaseClient.from('posts').insert([{ user_id: userId, content: txt }]);
+            if(!txt && !compressedImg) return;
+            const btn = document.getElementById('pubBtn');
+            btn.disabled = true; btn.innerText = "...";
+
+            let imgUrl = null;
+            if(compressedImg) {
+                const name = `p_${Date.now()}.jpg`;
+                const blob = await (await fetch(compressedImg)).blob();
+                await supabaseClient.storage.from('post-images').upload(name, blob);
+                imgUrl = SUPABASE_URL + "/storage/v1/object/public/post-images/" + name;
+            }
+
+            const { error } = await supabaseClient.from('posts').insert([{ user_id: myId, content: txt, image_url: imgUrl }]);
             if(!error) {
-                await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
-                alert("Publicado!");
+                await supabaseClient.rpc('increment_points', { user_id: myId, amount: 15 });
                 location.reload();
+            } else {
+                alert("Erro ao publicar.");
+                btn.disabled = false;
+            }
+        }
+
+        async function likePost(pid, btn) {
+            if(btn.classList.contains('liked')) return;
+            btn.classList.add('liked');
+            btn.innerHTML = '<i class="fas fa-heart"></i> +2 XP';
+            await supabaseClient.rpc('increment_points', { user_id: myId, amount: 2 });
+            loadProfile();
+        }
+
+        async function handleImg(input) {
+            const file = input.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    if(w > 800) { h *= 800/w; w = 800; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    compressedImg = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('img-status').classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function loadProfile() {
+            const { data } = await supabaseClient.from('profiles').select('points').eq('id', myId).single();
+            if(data) {
+                document.getElementById('userXP').innerText = data.points + " XP";
+                document.getElementById('cash-val').innerText = (data.points * rate / 1000).toFixed(4) + symbol;
             }
         }
 
         async function loadRanking() {
             const { data } = await supabaseClient.from('profiles').select('username, points').order('points', {ascending:false}).limit(10);
             const rList = document.getElementById('rank-list');
-            rList.innerHTML = '';
-            data?.forEach((u, i) => {
-                rList.innerHTML += `<div class="rank-item"><span>${i+1}. @${u.username || 'user'}</span><b>${u.points} XP</b></div>`;
-            });
+            rList.innerHTML = data.map((u, i) => `
+                <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee;">
+                    <span>${i+1}. @${u.username}</span>
+                    <b style="color:var(--g-blue)">${u.points} XP</b>
+                </div>`).join('');
         }
 
         async function loadAdmin() {
             const { count: u } = await supabaseClient.from('profiles').select('*', {count:'exact', head:true});
             const { count: p } = await supabaseClient.from('posts').select('*', {count:'exact', head:true});
-            document.getElementById('adm-u').innerText = u;
-            document.getElementById('adm-p').innerText = p;
-        }
-
-        async function loadProfile() {
-            const { data } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
-            if(data) document.getElementById('userXP').innerText = data.points + " XP";
+            document.getElementById('adm-data').innerHTML = `
+                <div style="background:#f8f9fa; padding:10px; border-radius:8px; text-align:center;">Users<br><b>${u}</b></div>
+                <div style="background:#f8f9fa; padding:10px; border-radius:8px; text-align:center;">Posts<br><b>${p}</b></div>`;
         }
 
         init();
