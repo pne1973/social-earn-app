@@ -7,15 +7,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { background-color: #121212; }
-        body { 
-            background-color: #121212; color: #ffffff; 
-            font-family: -apple-system, sans-serif;
-            padding-top: 190px; padding-bottom: 20px;
-        }
+        /* DESIGN SYSTEM - GOOGLE DARK EDITION */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { background-color: #121212; height: 100%; }
+        body { background-color: #121212; color: #ffffff; font-family: -apple-system, sans-serif; min-height: 100vh; padding-top: 185px; padding-bottom: 20px; }
 
-        /* HEADER & STATS */
+        /* HEADER FIXO COM STATUS */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
         .ad-top { background: #1a1a1a; color: #ffcc00; padding: 8px; text-align: center; font-size: 10px; font-weight: bold; border-bottom: 1px solid #333; }
         
@@ -24,18 +21,30 @@
         .stat-pill span { display: block; font-size: 9px; color: #888; text-transform: uppercase; margin-bottom: 2px; }
         .stat-pill b { font-size: 14px; color: #ffcc00; }
 
-        .tabs { display: flex; background: #121212; justify-content: space-around; }
-        .tab-item { flex: 1; padding: 15px 5px; text-align: center; color: #888; font-size: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; }
+        .tabs { display: flex; background: #121212; border-top: 1px solid #333; }
+        .tab-item { flex: 1; padding: 14px 5px; text-align: center; color: #888; font-size: 9px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
 
+        /* CONTENT */
         .content { padding: 15px; max-width: 500px; margin: 0 auto; }
         .page { display: none; }
         .page.active { display: block; }
         .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
+
+        /* ADMIN STYLE (RECUPERADO DO ANTERIOR) */
+        .admin-stat-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
+        .admin-stat-card { flex: 1; background: #111; padding: 12px 5px; border-radius: 8px; border: 1px solid #222; text-align: center; }
+        .admin-stat-title { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 5px; }
+        .admin-stat-value { font-size: 18px; font-weight: bold; }
         
-        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .finance-box { background: #1a1a1a; border-radius: 10px; padding: 15px; border: 1px solid #333; margin-top: 10px; }
+        .finance-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; }
+        
         .admin-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
-        .admin-table th, .admin-table td { text-align: left; padding: 8px; border-bottom: 1px solid #333; }
+        .admin-table th { text-align: left; color: #666; padding: 8px; border-bottom: 1px solid #333; }
+        .admin-table td { padding: 8px; border-bottom: 1px solid #222; }
+
+        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
         .finance-pos { color: #00ff00; }
         .finance-neg { color: #ff4444; }
         .admin-link { display: none; }
@@ -44,12 +53,12 @@
 <body>
 
     <div class="header-fixed">
-        <div class="ad-top">📢 APEX SOCIAL: Ganhe +2 XP de Check-in Diário!</div>
+        <div class="ad-top">📢 APEX SOCIAL: Ganhe 10% dos amigos + Bónus de Check-in!</div>
         
         <div class="user-stats-bar">
             <div class="stat-pill"><span>Saldo Total</span><b id="topBalance">0.0000€</b></div>
             <div class="stat-pill"><span>Amigos</span><b id="topRefs">0</b></div>
-            <div class="stat-pill"><span>Renda Passiva</span><b id="topRefGains">0.0000€</b></div>
+            <div class="stat-pill"><span>Renda Rede</span><b id="topRefGains">0.0000€</b></div>
         </div>
 
         <div class="tabs">
@@ -62,38 +71,70 @@
 
     <main class="content">
         <div id="feed-page" class="page active">
-            <div id="checkinCard" class="card" style="display:none; background: linear-gradient(45deg, #1e1e1e, #2a2a1a); border: 1px solid #ffcc00;">
-                <h4 style="color:#ffcc00;">🎁 Bónus Diário Disponível!</h4>
+            <div id="checkinCard" class="card" style="display:none; border: 1px solid #ffcc00; background: rgba(255,204,0,0.05);">
+                <h4 style="color:#ffcc00; font-size: 14px;">🎁 Bónus de hoje disponível!</h4>
                 <button class="btn-pub" onclick="doCheckin()">Receber +2.0 XP</button>
             </div>
             <div class="card">
-                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; outline:none;" placeholder="No que estás a pensar?"></textarea>
-                <button class="btn-pub" onclick="publish()">Publicar</button>
-                <div id="rewardHint" style="font-size:10px; color:#666; margin-top:8px;">A calcular...</div>
+                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; resize:none; outline:none; font-size:15px; min-height:60px;" placeholder="O que está a pensar?"></textarea>
+                <button class="btn-pub" onclick="publish()">Publicar Post</button>
+                <div id="rewardHint" style="font-size:10px; color:#666; margin-top:8px;">A calcular recompensas...</div>
             </div>
-            <div id="feed-items">A carregar...</div>
+            <div id="feed-items">Carregando feed...</div>
         </div>
 
         <div id="wallet-page" class="page">
             <div class="card" style="text-align:center;">
-                <h4 style="color:#ffcc00;">Link de Afiliado</h4>
-                <div id="refLink" style="background:#111; padding:12px; margin:15px 0; font-size:11px; border:1px dashed #444; color:#ffcc00; word-break: break-all;">A carregar...</div>
-                <button class="btn-pub" onclick="copyRef()">Copiar Link</button>
+                <h4 style="color:#ffcc00;">Sistema de Afiliados</h4>
+                <p style="font-size:12px; color:#888; margin:10px 0;">Copia o link e ganha 10% de comissão vitalícia sobre os teus amigos!</p>
+                <div id="refLink" style="background:#111; padding:12px; margin-bottom:15px; font-size:11px; border:1px dashed #444; color:#ffcc00; word-break: break-all;">...</div>
+                <button class="btn-pub" onclick="copyRef()"><i class="fas fa-copy"></i> Copiar Link</button>
+            </div>
+        </div>
+
+        <div id="info-page" class="page">
+            <div class="card">
+                <h4 style="color:#ffcc00; margin-bottom:10px;">Regras de Ganhos</h4>
+                <div style="font-size:13px; line-height:1.8;">
+                    • <b>Check-in Diário:</b> +2.0 XP<br>
+                    • <b>Posts 1-5:</b> 5.0 XP cada<br>
+                    • <b>Posts 6-10:</b> 2.5 XP cada<br>
+                    • <b>Posts 11+:</b> 0.5 XP cada<br>
+                    • <b>Rede:</b> 10% de bónus sobre convidados
+                </div>
             </div>
         </div>
 
         <div id="admin-page" class="page">
-            <div class="card" style="border:1px solid #ff4444">
-                <h3 style="color:#ff4444; margin-bottom:10px;">Monitor de Lucro Apex</h3>
-                <div id="admSummary" style="font-size:12px;"></div>
+            <div class="card" style="border: 1px solid #ff4444;">
+                <h3 style="color:#ff4444; margin-bottom:15px;"><i class="fas fa-chart-line"></i> Dashboard Financeira Apex</h3>
+                
+                <div class="admin-stat-row">
+                    <div class="admin-stat-card"><div class="admin-stat-title">Utilizadores</div><div id="admUsers" class="admin-stat-value">0</div></div>
+                    <div class="admin-stat-card"><div class="admin-stat-title">Posts Totais</div><div id="admPosts" class="admin-stat-value">0</div></div>
+                    <div class="admin-stat-card"><div class="admin-stat-title">XP Circulante</div><div id="admXP" class="admin-stat-value">0</div></div>
+                </div>
+
+                <div class="finance-box">
+                    <div class="finance-row"><span>Dívida Acumulada:</span><b id="admDebt" class="finance-neg">0.0000€</b></div>
+                    <div class="finance-row"><span>Receita Est. (Adsterra):</span><b id="admRev" class="finance-pos">0.0000€</b></div>
+                    <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11px; color:#aaa;">LUCRO LÍQUIDO:</span>
+                        <h2 id="admProfit" class="finance-pos">0.0000€</h2>
+                    </div>
+                </div>
             </div>
+
             <div class="card">
-                <h4 style="color:#ffcc00;">Maiores Afiliadores</h4>
+                <h4 style="color:#ffcc00; margin-bottom:10px;"><i class="fas fa-users"></i> Ranking de Afiliadores</h4>
                 <table class="admin-table">
-                    <thead><tr><th>User ID</th><th>Amigos</th><th>Comissão (€)</th></tr></thead>
+                    <thead><tr><th>ID (Fim)</th><th>Amigos</th><th>Comissão (€)</th></tr></thead>
                     <tbody id="admRefTable"></tbody>
                 </table>
             </div>
+            
+            <button class="btn-pub" style="background:#ff4444; color:#fff;" onclick="clearFeed()">Resetar Feed</button>
         </div>
     </main>
 
@@ -118,18 +159,9 @@
                 
                 let next = dailyPosts < 5 ? 5.0 : (dailyPosts < 10 ? 2.5 : 0.5);
                 document.getElementById('rewardHint').innerHTML = `Hoje: <b>${dailyPosts} posts</b> | Próximo: <b>${next} XP</b>`;
-                
-                // Mostrar checkin se for novo dia (simulação)
                 document.getElementById('checkinCard').style.display = 'block'; 
             }
             if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
-        }
-
-        async function doCheckin() {
-            await client.rpc('increment_points', { user_id: myId, amount: 2.0 });
-            document.getElementById('checkinCard').style.display = 'none';
-            getProfile();
-            alert("Ganhaste +2.0 XP de Check-in!");
         }
 
         async function publish() {
@@ -143,17 +175,37 @@
             getProfile();
         }
 
+        async function doCheckin() {
+            await client.rpc('increment_points', { user_id: myId, amount: 2.0 });
+            document.getElementById('checkinCard').style.display = 'none';
+            getProfile();
+            alert("Check-in realizado: +2.0 XP!");
+        }
+
         async function updateAdmin() {
-            const { data: users } = await client.from('profiles').select('*').order('referral_points', { ascending: false });
-            const { count: posts } = await client.from('posts').select('*', { count: 'exact' });
-            let totalXP = 0; let tableHTML = '';
+            const { data: users, count: uCount } = await client.from('profiles').select('*', { count: 'exact' });
+            const { count: pCount } = await client.from('posts').select('*', { count: 'exact' });
+            
+            let totalXP = 0;
+            let tableHTML = '';
             users.forEach(u => {
-                totalXP += u.points;
+                totalXP += (u.points || 0);
                 tableHTML += `<tr><td>...${u.id.toString().slice(-4)}</td><td>${u.referrals_count || 0}</td><td class="finance-pos">${(u.referral_points * 0.0010).toFixed(4)}€</td></tr>`;
             });
+
             const debt = totalXP * 0.0010;
-            const rev = posts * 18 * 0.0010; 
-            document.getElementById('admSummary').innerHTML = `Dívida: <b class="finance-neg">${debt.toFixed(4)}€</b> | Est. Receita: <b class="finance-pos">${rev.toFixed(4)}€</b><br><h2>LUCRO: ${(rev-debt).toFixed(4)}€</h2>`;
+            const rev = (pCount * 18 * 0.0010); // Base: 18 views por post
+            const profit = rev - debt;
+
+            document.getElementById('admUsers').innerText = uCount;
+            document.getElementById('admPosts').innerText = pCount;
+            document.getElementById('admXP').innerText = totalXP.toFixed(0);
+            document.getElementById('admDebt').innerText = debt.toFixed(4) + "€";
+            document.getElementById('admRev').innerText = rev.toFixed(4) + "€";
+            
+            const pEl = document.getElementById('admProfit');
+            pEl.innerText = profit.toFixed(4) + "€";
+            pEl.className = profit >= 0 ? 'finance-pos' : 'finance-neg';
             document.getElementById('admRefTable').innerHTML = tableHTML;
         }
 
@@ -167,7 +219,7 @@
 
         function copyRef() {
             navigator.clipboard.writeText(document.getElementById('refLink').innerText);
-            alert("Copiado!");
+            alert("Link copiado!");
         }
 
         getProfile();
