@@ -7,90 +7,100 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; --card-bg: #1e1e1e; }
-        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-top: 120px; padding-bottom: 90px; }
+        :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; --card-bg: #1e1e1e; --border: #333; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-top: 120px; padding-bottom: 90px; }
         
-        /* ANÚNCIO FIXO */
-        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #222; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 11px; color: #ffcc00; font-weight: bold; padding: 0 10px; text-align: center; }
-
-        /* HEADER */
-        .header { position: fixed; top: 60px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--tg-theme-bg); border-bottom: 1px solid #333; z-index: 1000; box-sizing: border-box; }
+        /* FIXOS */
+        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #1a1a1a; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 11px; color: var(--tg-theme-button); font-weight: bold; padding: 0 10px; text-align: center; }
+        .header { position: fixed; top: 60px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--tg-theme-bg); border-bottom: 1px solid var(--border); z-index: 1000; box-sizing: border-box; }
         .xp-badge { background: var(--tg-theme-button); color: #000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
-        /* NAV INFERIOR */
-        .nav-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; display: flex; border-top: 1px solid #333; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+        /* FEED & CARDS */
+        .container { padding: 15px; display: none; max-width: 500px; margin: 0 auto; }
+        .container.active { display: block !important; }
+        .card { background: var(--card-bg); border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border); overflow: hidden; }
+        
+        /* ÁREA DE PUBLICAÇÃO */
+        .publish-box { padding: 15px; }
+        textarea { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 80px; box-sizing: border-box; font-size: 15px; }
+        
+        /* POST DESIGN */
+        .post-header { padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-avatar { width: 35px; height: 35px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--tg-theme-button); font-weight: bold; }
+        .post-content { padding: 0 15px 12px; font-size: 15px; line-height: 1.5; color: #e1e1e1; }
+        .post-img { width: 100%; display: block; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: #151515; }
+        .post-actions { padding: 10px 15px; display: flex; gap: 20px; border-top: 1px solid #252525; }
+        .action-btn { background: none; border: none; color: #aaa; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; transition: 0.2s; }
+        .action-btn:active { transform: scale(0.9); }
+        .action-btn.liked { color: var(--tg-theme-button); }
+
+        /* ANÚNCIO NATIVO NO FEED */
+        .native-ad { background: linear-gradient(45deg, #1e1e1e, #252525); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px dashed var(--tg-theme-button); text-align: center; }
+
+        /* NAV */
+        .nav-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; display: flex; border-top: 1px solid var(--border); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 9px; text-transform: uppercase; font-weight: bold; }
         .nav-item.active { color: var(--tg-theme-button); }
-        .nav-item i { font-size: 18px; }
-
-        /* CONTEÚDO */
-        .container { padding: 15px; display: none; }
-        .container.active { display: block !important; }
-        .card { background: var(--card-bg); padding: 18px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
-        .btn-main { width: 100%; background: var(--tg-theme-button); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        
-        input, select, textarea { width: 100%; background: #2a2a2a; border: none; color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; box-sizing: border-box; }
-        .val { color: var(--tg-theme-button); font-weight: bold; text-align: right; }
-        .cash { font-size: 10px; color: #888; display: block; font-weight: normal; }
+        .btn-main { background: var(--tg-theme-button); color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="top-ad">📢 ANÚNCIO: Publica fotos e ganha XP convertível em dinheiro!</div>
+    <div class="top-ad">📢 ANÚNCIO: Convida amigos e ganha +100 XP por cada um!</div>
 
     <div class="header">
-        <h4 style="margin:0;">PINE SOCIAL</h4>
+        <h4 style="margin:0; letter-spacing: 1px;">PINE <span style="color:var(--tg-theme-button)">SOCIAL</span></h4>
         <div id="userXP" class="xp-badge">0 XP</div>
+    </div>
+
+    <div id="feed-tab" class="container active">
+        <div class="card publish-box">
+            <textarea id="postText" placeholder="O que estás a pensar?"></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+                <input type="file" id="fileInput" hidden accept="image/*">
+                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; font-size:13px;"><i class="fas fa-image"></i> Adicionar Foto</button>
+                <button class="btn-main" id="pubBtn" onclick="handlePublish()">Publicar</button>
+            </div>
+            <div id="upStatus" style="font-size:11px; color:var(--tg-theme-button); margin-top:8px; display:none;"><i class="fas fa-spinner fa-spin"></i> A processar...</div>
+        </div>
+        <div id="feed">Carregando feed...</div>
+    </div>
+
+    <div id="info-tab" class="container">
+        <div class="card" style="padding:18px;">
+            <h2 style="color:var(--tg-theme-button); margin-top:0;">💰 Economia</h2>
+            <p>Postagem: <b>+15 XP</b></p>
+            <p>Convidar Amigo: <b>+100 XP</b></p>
+            <p>Receber Like: <b>+2 XP</b></p>
+            <hr border="0" style="height:1px; background:var(--border); margin:15px 0;">
+            <p style="font-size:13px; color:#888;">Câmbio: 1000 XP = 1.0000€</p>
+        </div>
+    </div>
+
+    <div id="wallet-tab" class="container">
+        <div class="card" style="padding:18px; text-align:center;">
+            <h2>Levantamento</h2>
+            <h1 style="color:var(--tg-theme-button); font-size:32px; margin:10px 0;"><span id="euroVal">0.0000</span>€</h1>
+            <p style="font-size:12px; color:#888;">Mínimo de 5000 XP para PayPal</p>
+            <input type="email" id="paypalEmail" placeholder="Teu e-mail PayPal" style="margin-top:10px;">
+            <button class="btn-main" style="width:100%; margin-top:15px;">Pedir Saque</button>
+        </div>
+    </div>
+
+    <div id="admin-tab" class="container">
+        <div class="card" style="padding:18px; border: 1px solid #EA4335;">
+            <h3 style="color:#EA4335">🛠 Painel Admin</h3>
+            <div id="adm-stats">A carregar estatísticas do sistema...</div>
+        </div>
     </div>
 
     <nav class="nav-bottom">
         <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i>Feed</div>
         <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-coins"></i>Ganhos</div>
-        <div id="adm-nav" class="nav-item" onclick="showTab('admin-tab', this)"><i class="fas fa-shield-alt"></i>Admin</div>
+        <div id="adm-nav" class="nav-item" onclick="showTab('admin-tab', this)"><i class="fas fa-user-shield"></i>Admin</div>
         <div class="nav-item" onclick="showTab('wallet-tab', this)"><i class="fas fa-wallet"></i>Saque</div>
     </nav>
-
-    <div id="feed-tab" class="container active">
-        <div class="card">
-            <textarea id="postText" placeholder="O que queres partilhar?"></textarea>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                <input type="file" id="fileInput" hidden accept="image/*">
-                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#aaa; font-size:12px;"><i class="fas fa-camera"></i> Foto (Máx 500KB)</button>
-                <button class="btn-main" id="pubBtn" style="width:auto; padding:8px 20px;" onclick="handlePublish()">Publicar</button>
-            </div>
-            <div id="upStatus" style="font-size:10px; color:var(--tg-theme-button); margin-top:5px; display:none;">A comprimir e enviar...</div>
-        </div>
-        <div id="feed">Carregando publicações...</div>
-    </div>
-
-    <div id="info-tab" class="container">
-        <div class="card">
-            <h2 style="color:var(--tg-theme-button); margin-top:0;">💰 Economia</h2>
-            <table style="width:100%; border-collapse:collapse;">
-                <tr><td style="padding:10px 0;">Postagem</td><td class="val">+15 XP <span class="cash">0.0150€</span></td></tr>
-                <tr><td style="padding:10px 0;">Convite Amigo</td><td class="val">+100 XP <span class="cash">0.1000€</span></td></tr>
-                <tr><td style="padding:10px 0;">Like Recebido</td><td class="val">+2 XP <span class="cash">0.0020€</span></td></tr>
-            </table>
-            <p style="font-size:12px; color:#888; margin-top:15px;">* Mínimo 5000 XP para levantamento.</p>
-        </div>
-    </div>
-
-    <div id="wallet-tab" class="container">
-        <div class="card" style="text-align:center;">
-            <h2>Levantamento PayPal</h2>
-            <p>Saldo: <b id="walletXP">0</b> XP</p>
-            <h1 style="color:var(--tg-theme-button); margin:10px 0;"><span id="euroVal">0.0000</span>€</h1>
-            <input type="email" id="paypalEmail" placeholder="Teu e-mail PayPal">
-            <button class="btn-main" style="margin-top:15px;" onclick="requestWithdraw()">Levantar Agora</button>
-        </div>
-    </div>
-
-    <div id="admin-tab" class="container">
-        <div class="card" style="border: 1px solid var(--g-red);">
-            <h3 style="color:var(--tg-theme-button)">🛠 Painel Admin (5401881400)</h3>
-            <div id="adm-stats">A carregar estatísticas...</div>
-        </div>
-    </div>
 
     <script>
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
@@ -98,16 +108,12 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const userId = 5401881400;
 
-        // NAVEGAÇÃO À PROVA DE ERRO
         function showTab(tabId, el) {
-            const containers = document.querySelectorAll('.container');
-            for(let i=0; i<containers.length; i++) containers[i].style.display = 'none';
-            
-            const navItems = document.querySelectorAll('.nav-item');
-            for(let i=0; i<navItems.length; i++) navItems[i].classList.remove('active');
-
+            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(tabId).style.display = 'block';
             el.classList.add('active');
+            if(tabId === 'feed-tab') loadFeed();
             loadProfile();
         }
 
@@ -116,29 +122,8 @@
             if (data) {
                 const pts = data.points || 0;
                 document.getElementById('userXP').innerText = pts + " XP";
-                document.getElementById('walletXP').innerText = pts;
                 document.getElementById('euroVal').innerText = (pts * 0.0010).toFixed(4);
             }
-        }
-
-        async function compressImage(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height;
-                        if (w > 1000) { h *= 1000 / w; w = 1000; }
-                        canvas.width = w; canvas.height = h;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, w, h);
-                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.6);
-                    };
-                };
-            });
         }
 
         async function handlePublish() {
@@ -152,13 +137,30 @@
 
             let url = null;
             if(file) {
-                let compressed = await compressImage(file);
-                const name = `${Date.now()}.jpg`;
-                await supabaseClient.storage.from('post-images').upload(name, compressed);
-                url = supabaseClient.storage.from('post-images').getPublicUrl(name).data.publicUrl;
-            }
+                // Compressão simples
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = async () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 800; canvas.height = (img.height / img.width) * 800;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, 800, canvas.height);
+                        canvas.toBlob(async (blob) => {
+                            const name = `${Date.now()}.jpg`;
+                            await supabaseClient.storage.from('post-images').upload(name, blob);
+                            url = supabaseClient.storage.from('post-images').getPublicUrl(name).data.publicUrl;
+                            savePost(text, url);
+                        }, 'image/jpeg', 0.7);
+                    };
+                };
+            } else { savePost(text, null); }
+        }
 
-            await supabaseClient.from('posts').insert([{ user_id: userId, content: text, image_url: url }]);
+        async function savePost(content, url) {
+            await supabaseClient.from('posts').insert([{ user_id: userId, content: content, image_url: url }]);
             await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
             location.reload();
         }
@@ -166,18 +168,43 @@
         async function loadFeed() {
             const { data } = await supabaseClient.from('posts').select('*').order('created_at', {ascending: false});
             const feed = document.getElementById('feed');
-            feed.innerHTML = data.map(p => `
+            feed.innerHTML = '';
+
+            data.forEach((p, index) => {
+                // Inserir anúncio a cada 3 posts
+                if(index > 0 && index % 3 === 0) {
+                    feed.innerHTML += `
+                    <div class="native-ad">
+                        <small style="color:#888; font-size:10px;">ANÚNCIO PATROCINADO</small>
+                        <p style="margin:5px 0; font-size:14px;">Queres mais XP? Convida um amigo agora!</p>
+                        <button class="btn-main" style="padding:5px 15px; font-size:11px;">CONVIDAR</button>
+                    </div>`;
+                }
+
+                feed.innerHTML += `
                 <div class="card">
-                    <b style="color:var(--tg-theme-button)">User #${p.user_id.toString().slice(-4)}</b>
-                    <p>${p.content || ''}</p>
-                    ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:10px; margin-top:10px;">` : ''}
-                </div>
-            `).join('');
+                    <div class="post-header">
+                        <div class="user-info">
+                            <div class="user-avatar"><i class="fas fa-user"></i></div>
+                            <div>
+                                <div style="font-weight:bold; font-size:14px;">Utilizador #${p.user_id.toString().slice(-4)}</div>
+                                <div style="font-size:10px; color:#888;">${new Date(p.created_at).toLocaleDateString()}</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-ellipsis-h" style="color:#555;"></i>
+                    </div>
+                    <div class="post-content">${p.content || ''}</div>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
+                    <div class="post-actions">
+                        <button class="action-btn" onclick="this.classList.toggle('liked')"><i class="fas fa-heart"></i> Like</button>
+                        <button class="action-btn"><i class="fas fa-share"></i> Partilhar</button>
+                        <button class="action-btn" style="margin-left:auto; color:#444;"><i class="fas fa-flag"></i></button>
+                    </div>
+                </div>`;
+            });
         }
 
-        // Bloqueio Admin
         if(userId !== 5401881400) document.getElementById('adm-nav').style.display = 'none';
-
         loadProfile();
         loadFeed();
     </script>
