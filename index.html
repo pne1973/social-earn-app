@@ -3,79 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social</title>
+    <title>Apex Social Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* DESIGN SYSTEM - GOOGLE EDITION */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { background-color: #121212; height: 100%; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #121212; }
         body { 
             background-color: #121212; color: #ffffff; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            min-height: 100vh; padding-top: 165px; padding-bottom: 20px;
+            font-family: -apple-system, sans-serif;
+            padding-top: 190px; padding-bottom: 20px;
         }
 
-        /* HEADER & MONETIZATION */
+        /* HEADER & STATS */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
-        .ad-top { background: #1a1a1a; color: #ffcc00; padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; letter-spacing: 0.5px; }
-        .nav-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; }
-        .xp-pill { background: #ffcc00; color: #000; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; box-shadow: 0 2px 8px rgba(255,204,0,0.2); white-space: nowrap; }
+        .ad-top { background: #1a1a1a; color: #ffcc00; padding: 8px; text-align: center; font-size: 10px; font-weight: bold; border-bottom: 1px solid #333; }
+        
+        .user-stats-bar { display: flex; justify-content: space-around; background: #1a1a1a; padding: 12px 5px; border-bottom: 1px solid #252525; }
+        .stat-pill { text-align: center; flex: 1; }
+        .stat-pill span { display: block; font-size: 9px; color: #888; text-transform: uppercase; margin-bottom: 2px; }
+        .stat-pill b { font-size: 14px; color: #ffcc00; }
 
-        /* TABS NAVIGATION */
-        .tabs { display: flex; background: #1a1a1a; border-top: 1px solid #333; width: 100%; justify-content: space-around; }
-        .tab-item { flex: 1; padding: 14px 5px; text-align: center; color: #888; font-size: 9px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; white-space: nowrap; }
-        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
+        .tabs { display: flex; background: #121212; justify-content: space-around; }
+        .tab-item { flex: 1; padding: 15px 5px; text-align: center; color: #888; font-size: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; }
 
-        /* LAYOUT */
         .content { padding: 15px; max-width: 500px; margin: 0 auto; }
         .page { display: none; }
         .page.active { display: block; }
         .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
         
-        /* POSTS & ACTIONS */
-        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; }
-        .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; border-bottom: 1px solid #252525; }
-        .post-avatar { width: 34px; height: 34px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; border: 1px solid #444; }
-        .post-text { padding: 15px; font-size: 15px; line-height: 1.5; color: #f0f0f0; }
-        .post-img { width: 100%; height: 300px; object-fit: cover; display: block; background: #000; border-top: 1px solid #252525; }
-        .post-actions { display: flex; padding: 12px 15px; border-top: 1px solid #252525; gap: 18px; color: #aaa; font-size: 13px; }
-        .action-btn { cursor: pointer; display: flex; align-items: center; gap: 6px; }
-
-        /* COMMENTS */
-        .comment-section { background: #161616; padding: 12px; display: none; border-top: 1px solid #252525; }
-        .comment-list { max-height: 180px; overflow-y: auto; margin-bottom: 12px; }
-        .comment-item { font-size: 12px; color: #ccc; padding: 6px 0; border-bottom: 1px solid #222; }
-        .comment-item b { color: #ffcc00; margin-right: 4px; }
-        .comment-input-wrap { display: flex; gap: 8px; }
-        .comment-input { flex: 1; background: #252525; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; outline: none; }
-
-        /* ADMIN DASHBOARD STYLES */
-        .admin-stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 10px; background: #111; border-radius: 8px; border: 1px solid #222; }
-        .admin-stat-card { flex: 1; text-align: center; border-right: 1px solid #333; padding: 0 10px; }
-        .admin-stat-card:last-child { border-right: none; }
-        .admin-stat-title { font-size: 11px; color: #888; margin-bottom: 5px; text-transform: uppercase; }
-        .admin-stat-value { font-size: 20px; font-weight: bold; color: #fff; }
-        .finance-positive { color: #00ff00; }
-        .finance-negative { color: #ff4444; }
-
-        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-share-alt { background: #333; color: #fff; border: 1px solid #444; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+        .admin-table th, .admin-table td { text-align: left; padding: 8px; border-bottom: 1px solid #333; }
+        .finance-pos { color: #00ff00; }
+        .finance-neg { color: #ff4444; }
         .admin-link { display: none; }
     </style>
 </head>
 <body>
 
     <div class="header-fixed">
-        <div class="ad-top">📢 APEX SOCIAL: Ganhe dinheiro real interagindo!</div>
-        <div class="nav-main">
-            <h3 style="font-size: 18px;">APEX <span style="color:#ffcc00">SOCIAL</span></h3>
-            <div id="userXP" class="xp-pill">0 XP • 0.0000€</div>
+        <div class="ad-top">📢 APEX SOCIAL: Ganhe +2 XP de Check-in Diário!</div>
+        
+        <div class="user-stats-bar">
+            <div class="stat-pill"><span>Saldo Total</span><b id="topBalance">0.0000€</b></div>
+            <div class="stat-pill"><span>Amigos</span><b id="topRefs">0</b></div>
+            <div class="stat-pill"><span>Renda Passiva</span><b id="topRefGains">0.0000€</b></div>
         </div>
+
         <div class="tabs">
             <div class="tab-item active" onclick="openTab('feed-page', this)">Feed</div>
-            <div class="tab-item" onclick="openTab('earn-page', this)">Ranking</div>
-            <div class="tab-item" onclick="openTab('wallet-page', this)">Carteira</div>
+            <div class="tab-item" onclick="openTab('wallet-page', this)">Rede</div>
             <div class="tab-item" onclick="openTab('info-page', this)">Info</div>
             <div id="adm-tab" class="tab-item admin-link" onclick="openTab('admin-page', this)">Admin</div>
         </div>
@@ -83,90 +62,37 @@
 
     <main class="content">
         <div id="feed-page" class="page active">
-            <div class="card">
-                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; resize:none; outline:none; font-size:15px; min-height:60px;" placeholder="O que está a pensar?"></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                    <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer; font-size:14px;"><i class="fas fa-image"></i> Foto</button>
-                    <input type="file" id="fileInput" hidden accept="image/*">
-                    <span id="procStatus" style="display:none; color:#ffcc00; font-size:11px;">Processando...</span>
-                    <button class="btn-pub" onclick="publish()">Publicar</button>
-                </div>
+            <div id="checkinCard" class="card" style="display:none; background: linear-gradient(45deg, #1e1e1e, #2a2a1a); border: 1px solid #ffcc00;">
+                <h4 style="color:#ffcc00;">🎁 Bónus Diário Disponível!</h4>
+                <button class="btn-pub" onclick="doCheckin()">Receber +2.0 XP</button>
             </div>
-            <div id="feed-items">Carregando feed...</div>
-        </div>
-
-        <div id="earn-page" class="page">
             <div class="card">
-                <h3 style="color:#ffcc00; margin-bottom:15px;">Top Ganhadores</h3>
-                <div id="rankingList" style="font-size:14px; line-height:2.2;"></div>
+                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; outline:none;" placeholder="No que estás a pensar?"></textarea>
+                <button class="btn-pub" onclick="publish()">Publicar</button>
+                <div id="rewardHint" style="font-size:10px; color:#666; margin-top:8px;">A calcular...</div>
             </div>
+            <div id="feed-items">A carregar...</div>
         </div>
 
         <div id="wallet-page" class="page">
-            <div class="card" style="text-align:center; padding:30px 15px;">
-                <p style="font-size:13px; color:#888;">Saldo Disponível (Base CPM 1.000)</p>
-                <h1 id="mainValue" style="color:#ffcc00; font-size:42px; margin:15px 0;">0.0000<small style="font-size:20px;">€</small></h1>
-                <h3 id="currencyLabel" style="color:#aaa; font-weight:normal;">---</h3>
-                <p style="font-size:11px; color:#555; margin-top:20px;">Mínimo para levantamento: 5000 XP (5,00€)</p>
-            </div>
-            <div class="card">
-                <p style="font-size:12px; margin-bottom:8px;">Link de convite:</p>
-                <code id="invLink" style="font-size:10px; color:#ffcc00; display:block; background:#111; padding:10px; border-radius:5px; border:1px solid #333; margin-bottom:10px;">...</code>
-                <button class="btn-share-alt" onclick="shareApp()"><i class="fas fa-user-plus"></i> Convidar Amigos</button>
-            </div>
-        </div>
-
-        <div id="info-page" class="page">
-            <div class="card">
-                <h4 style="color:#ffcc00; margin-bottom:10px;"><i class="fas fa-coins"></i> Recompensas</h4>
-                <p style="font-size:13px; color:#ccc; line-height:1.6;">Cada 1000 XP acumulados valem 1,00 na sua moeda local.</p>
-                <div style="margin-top:10px; font-size:12px; color:#888;">Post: +15 XP (0,015) | Comentário: +5 XP (0,005)</div>
+            <div class="card" style="text-align:center;">
+                <h4 style="color:#ffcc00;">Link de Afiliado</h4>
+                <div id="refLink" style="background:#111; padding:12px; margin:15px 0; font-size:11px; border:1px dashed #444; color:#ffcc00; word-break: break-all;">A carregar...</div>
+                <button class="btn-pub" onclick="copyRef()">Copiar Link</button>
             </div>
         </div>
 
         <div id="admin-page" class="page">
             <div class="card" style="border:1px solid #ff4444">
-                <h3 style="color:#ff4444; margin-bottom:15px;"><i class="fas fa-chart-line"></i> Dashboard Financeira Apex</h3>
-                
-                <div class="admin-stat-row">
-                    <div class="admin-stat-card">
-                        <div class="admin-stat-title">Utilizadores</div>
-                        <div id="admUsers" class="admin-stat-value">...</div>
-                    </div>
-                    <div class="admin-stat-card">
-                        <div class="admin-stat-title">Posts Totais</div>
-                        <div id="admPosts" class="admin-stat-value">...</div>
-                    </div>
-                    <div class="admin-stat-card">
-                        <div class="admin-stat-title">XP Circulante</div>
-                        <div id="admXP" class="admin-stat-value">...</div>
-                    </div>
-                </div>
-
-                <div class="card" style="background:#1a1a1a; padding:15px; border:1px solid #333;">
-                    <h4 style="color:#aaa; font-size:13px; margin-bottom:12px; text-transform:uppercase;">Saúde Financeira (Simulação Adsterra CPM 1.00)</h4>
-                    
-                    <div class="admin-stat-row" style="background:transparent; padding:0; border:none; margin-bottom:15px;">
-                        <div class="admin-stat-card" style="text-align:left; border-right:1px solid #333;">
-                            <div class="admin-stat-title">Minha Receita Estimada</div>
-                            <div id="admRevenue" class="admin-stat-value finance-positive">0.0000€</div>
-                            <p style="font-size:10px; color:#555;">(Base: 2 anúncios vistos por post publicado)</p>
-                        </div>
-                        <div class="admin-stat-card" style="text-align:right;">
-                            <div class="admin-stat-title">Total a Pagar (Dívida)</div>
-                            <div id="admDebt" class="admin-stat-value finance-negative">0.0000€</div>
-                            <p style="font-size:10px; color:#555;">(Total de XP acumulado por todos os users)</p>
-                        </div>
-                    </div>
-
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding-top:15px; border-top:1px solid #333;">
-                        <p style="font-size:12px; color:#ccc;">Margem de Lucro Estimada (Líquido):</p>
-                        <h2 id="admProfit" class="finance-positive" style="font-size:24px;">0.0000€</h2>
-                    </div>
-                </div>
-
-                <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
-                <button class="btn-pub" style="background:#ff4444; color:#fff; width:100%;" onclick="clearAllPosts()">RESETAR FEED (Zerar Posts)</button>
+                <h3 style="color:#ff4444; margin-bottom:10px;">Monitor de Lucro Apex</h3>
+                <div id="admSummary" style="font-size:12px;"></div>
+            </div>
+            <div class="card">
+                <h4 style="color:#ffcc00;">Maiores Afiliadores</h4>
+                <table class="admin-table">
+                    <thead><tr><th>User ID</th><th>Amigos</th><th>Comissão (€)</th></tr></thead>
+                    <tbody id="admRefTable"></tbody>
+                </table>
             </div>
         </div>
     </main>
@@ -175,180 +101,76 @@
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
-        const myId = 5401881400;
+        const myId = 5401881400; 
+        let dailyPosts = 0;
 
-        const userConfig = {
-            isBR: (navigator.language || '').includes('BR'),
-            get symbol() { return this.isBR ? 'R$' : '€' },
-            get label() { return this.isBR ? 'Real Brasileiro (BRL)' : 'Euro (EUR)' },
-            cpmRate: 0.0010, // 1000 XP = 1.000€
-            adsterraCPM: 1.00 // O seu ganho médio por 1000 impressões (Adsterra)
-        };
+        async function getProfile() {
+            const { data } = await client.from('profiles').select('*').eq('id', myId).single();
+            if (data) {
+                document.getElementById('topBalance').innerText = (data.points * 0.0010).toFixed(4) + "€";
+                document.getElementById('topRefs').innerText = data.referrals_count || 0;
+                document.getElementById('topRefGains').innerText = (data.referral_points * 0.0010).toFixed(4) + "€";
+                document.getElementById('refLink').innerText = `https://apexsocial.app/?ref=${myId}`;
+
+                const today = new Date().toISOString().split('T')[0];
+                const { count } = await client.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', myId).gte('created_at', today);
+                dailyPosts = count || 0;
+                
+                let next = dailyPosts < 5 ? 5.0 : (dailyPosts < 10 ? 2.5 : 0.5);
+                document.getElementById('rewardHint').innerHTML = `Hoje: <b>${dailyPosts} posts</b> | Próximo: <b>${next} XP</b>`;
+                
+                // Mostrar checkin se for novo dia (simulação)
+                document.getElementById('checkinCard').style.display = 'block'; 
+            }
+            if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
+        }
+
+        async function doCheckin() {
+            await client.rpc('increment_points', { user_id: myId, amount: 2.0 });
+            document.getElementById('checkinCard').style.display = 'none';
+            getProfile();
+            alert("Ganhaste +2.0 XP de Check-in!");
+        }
+
+        async function publish() {
+            const txt = document.getElementById('postText').value;
+            if(!txt) return;
+            let reward = dailyPosts < 5 ? 5.0 : (dailyPosts < 10 ? 2.5 : 0.5);
+            await client.from('posts').insert([{ user_id: myId, content: txt }]);
+            await client.rpc('increment_points', { user_id: myId, amount: reward });
+            await client.rpc('process_referral_bonus', { user_id: myId, bonus_amount: reward * 0.1 });
+            document.getElementById('postText').value = '';
+            getProfile();
+        }
+
+        async function updateAdmin() {
+            const { data: users } = await client.from('profiles').select('*').order('referral_points', { ascending: false });
+            const { count: posts } = await client.from('posts').select('*', { count: 'exact' });
+            let totalXP = 0; let tableHTML = '';
+            users.forEach(u => {
+                totalXP += u.points;
+                tableHTML += `<tr><td>...${u.id.toString().slice(-4)}</td><td>${u.referrals_count || 0}</td><td class="finance-pos">${(u.referral_points * 0.0010).toFixed(4)}€</td></tr>`;
+            });
+            const debt = totalXP * 0.0010;
+            const rev = posts * 18 * 0.0010; 
+            document.getElementById('admSummary').innerHTML = `Dívida: <b class="finance-neg">${debt.toFixed(4)}€</b> | Est. Receita: <b class="finance-pos">${rev.toFixed(4)}€</b><br><h2>LUCRO: ${(rev-debt).toFixed(4)}€</h2>`;
+            document.getElementById('admRefTable').innerHTML = tableHTML;
+        }
 
         function openTab(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-            if(id === 'feed-page') fetchFeed();
-            if(id === 'earn-page') fetchRanking();
-            if(id === 'admin-page') fetchAdminDashboard();
-            window.scrollTo(0,0);
+            if(id === 'admin-page') updateAdmin();
         }
 
-        async function getProfile() {
-            const { data } = await client.from('profiles').select('points').eq('id', myId).single();
-            if (data) {
-                const pts = data.points || 0;
-                const money = (pts * userConfig.cpmRate).toFixed(4);
-                document.getElementById('userXP').innerText = `${pts} XP • ${money}${userConfig.symbol}`;
-                const mainVal = document.getElementById('mainValue');
-                if(mainVal) mainVal.innerHTML = `${money}<small style="font-size:20px; margin-left:5px;">${userConfig.symbol}</small>`;
-                const label = document.getElementById('currencyLabel');
-                if(label) label.innerText = userConfig.label;
-                document.getElementById('invLink').innerText = `https://apexsocial.app/join?ref=${myId}`;
-            }
-            if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
+        function copyRef() {
+            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
+            alert("Copiado!");
         }
 
-        async function fetchFeed() {
-            const { data: posts } = await client.from('posts').select('*').order('created_at', {ascending: false}).limit(10);
-            const list = document.getElementById('feed-items');
-            list.innerHTML = '';
-            if(posts) {
-                for (let i = 0; i < posts.length; i++) {
-                    const p = posts[i];
-                    const { data: comms } = await client.from('comments').select('*').eq('post_id', p.id).order('created_at', {ascending: true});
-                    const el = document.createElement('div');
-                    el.className = 'post';
-                    el.innerHTML = `
-                        <div class="post-header"><div class="post-avatar">${p.user_id.toString().slice(-1)}</div><span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span></div>
-                        <div class="post-text">${p.content || ''}</div>
-                        ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                        <div class="post-actions">
-                            <div class="action-btn" onclick="addXP(2, this)"><i class="far fa-heart"></i> Like</div>
-                            <div class="action-btn" onclick="toggleComments('${p.id}')"><i class="far fa-comment"></i> ${comms?comms.length:0}</div>
-                            <div class="action-btn" onclick="sharePost('${p.content || ''}')"><i class="fas fa-share-nodes"></i> Partilhar</div>
-                        </div>
-                        <div id="box-${p.id}" class="comment-section">
-                            <div class="comment-list">${comms?comms.map(c=>`<div class="comment-item"><b>User #${c.user_id.toString().slice(-4)}:</b> ${c.content}</div>`).join(''):''}</div>
-                            <div class="comment-input-wrap"><input type="text" id="input-${p.id}" class="comment-input" placeholder="Comentar..."><button onclick="sendComment('${p.id}')" class="btn-pub" style="padding:5px 10px; font-size:11px;">OK</button></div>
-                        </div>
-                    `;
-                    list.appendChild(el);
-                    if((i+1)%3===0) list.innerHTML += `<div style="text-align:center; color:#ffcc00; font-size:10px; padding:10px; opacity:0.4;">📢 ADSTERRA PLACEHOLDER: GANHOS ATIVOS</div>`;
-                }
-            }
-        }
-
-        // --- NOVA FUNÇÃO MASTER: ADMIN FINANCE DASHBOARD ---
-        async function fetchAdminDashboard() {
-            // 1. Coletar dados brutos do Supabase
-            const { count: uCount } = await client.from('profiles').select('*', { count: 'exact', head: true });
-            const { count: pCount } = await client.from('posts').select('*', { count: 'exact', head: true });
-            const { data: allUsers } = await client.from('profiles').select('points');
-
-            // 2. Calcular XP Circulante
-            let totalXP = 0;
-            if(allUsers) allUsers.forEach(u => totalXP += (u.points || 0));
-
-            // 3. Simulação Financeira (Base CPM Adsterra 1.000€)
-            // Custo Master: Dívida com os utilizadores (€)
-            const totalDebt = (totalXP * userConfig.cpmRate); // 1 XP = 0.0010€
-            
-            // Receita Estimada Master (Modelo Sustentável)
-            // Assumimos que cada post gera, em média, 2 impressões de anúncios visualizadas no feed por outros usuários.
-            // CPM Adsterra 1.000€ -> 1 impressão = 0.0010€ (O seu ganho).
-            const estimatedViewsPerPost = 2; // Número de anúncios que você assume que cada post gera.
-            const totalEstimatedViews = pCount * estimatedViewsPerPost;
-            const myEstimatedRevenue = (totalEstimatedViews * (userConfig.adsterraCPM / 1000));
-
-            // Lucro Líquido
-            const netProfit = myEstimatedRevenue - totalDebt;
-
-            // 4. Atualizar a Interface do Admin
-            document.getElementById('admUsers').innerText = uCount || 0;
-            document.getElementById('admPosts').innerText = pCount || 0;
-            document.getElementById('admXP').innerText = totalXP || 0;
-            
-            document.getElementById('admRevenue').innerText = myEstimatedRevenue.toFixed(4) + "€";
-            document.getElementById('admDebt').innerText = totalDebt.toFixed(4) + "€";
-            
-            const profitEl = document.getElementById('admProfit');
-            profitEl.innerText = netProfit.toFixed(4) + "€";
-            
-            if(netProfit >= 0) {
-                profitEl.className = 'finance-positive';
-            } else {
-                profitEl.className = 'finance-negative';
-            }
-        }
-
-        // --- FIM DA NOVA DASHBOARD ADMIN ---
-
-        async function sendComment(postId) {
-            const val = document.getElementById(`input-${postId}`).value;
-            if(!val) return;
-            await client.from('comments').insert([{ post_id: postId, user_id: myId, content: val }]);
-            await client.rpc('increment_points', { user_id: myId, amount: 5 });
-            fetchFeed(); getProfile();
-        }
-
-        function toggleComments(id) {
-            const box = document.getElementById(`box-${id}`);
-            box.style.display = box.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function sharePost(text) {
-            if (navigator.share) navigator.share({ title: 'Apex Social', text: text, url: window.location.href });
-        }
-
-        function shareApp() {
-            const link = document.getElementById('invLink').innerText;
-            if (navigator.share) navigator.share({ title: 'Apex Social', text: 'Vem ganhar dinheiro!', url: link });
-        }
-
-        async function addXP(amt, btn) {
-            await client.rpc('increment_points', { user_id: myId, amount: amt });
-            if(btn) btn.style.color = "#ffcc00";
-            getProfile();
-        }
-
-        async function publish() {
-            const txt = document.getElementById('postText').value;
-            const file = document.getElementById('fileInput').files[0];
-            if(!txt && !file) return;
-            document.getElementById('procStatus').style.display = 'inline';
-            let img = null;
-            if(file) {
-                const name = `p_${Date.now()}.jpg`;
-                await client.storage.from('post-images').upload(name, file);
-                img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
-            }
-            await client.from('posts').insert([{ user_id: myId, content: txt, image_url: img }]);
-            await client.rpc('increment_points', { user_id: myId, amount: 15 });
-            document.getElementById('postText').value = '';
-            document.getElementById('procStatus').style.display = 'none';
-            fetchFeed(); getProfile();
-        }
-
-        async function fetchRanking() {
-            const { data } = await client.from('profiles').select('id, points').order('points', {ascending: false}).limit(10);
-            const list = document.getElementById('rankingList');
-            if(list && data) {
-                list.innerHTML = '';
-                data.forEach((u, i) => {
-                    const gain = (u.points * userConfig.cpmRate).toFixed(4);
-                    list.innerHTML += `<p>#${i+1} User...${u.id.toString().slice(-4)} <span style="float:right; color:#ffcc00;">${gain}${userConfig.symbol}</span></p>`;
-                });
-            }
-        }
-
-        async function clearAllPosts() {
-            if(confirm("Deseja apagar todos os posts?")) { await client.from('posts').delete().neq('id', 0); fetchFeed(); }
-        }
-
-        getProfile(); fetchFeed();
+        getProfile();
     </script>
 </body>
 </html>
