@@ -3,260 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pine Social Pro - Admin Edition</title>
+    <title>Pine Social Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; --card-bg: #1e1e1e; }
-        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-top: 125px; padding-bottom: 95px; }
+        body { font-family: sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-top: 120px; padding-bottom: 90px; }
         
-        /* LAYOUT */
-        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #222; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 11px; color: #ffcc00; font-weight: bold; text-align: center; padding: 0 10px; box-sizing: border-box; }
+        /* ANÚNCIO FIXO */
+        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #222; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 11px; color: #ffcc00; font-weight: bold; padding: 0 10px; text-align: center; }
+
+        /* HEADER */
         .header { position: fixed; top: 60px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--tg-theme-bg); border-bottom: 1px solid #333; z-index: 1000; box-sizing: border-box; }
         .xp-badge { background: var(--tg-theme-button); color: #000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
+        /* NAV INFERIOR */
         .nav-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; display: flex; border-top: 1px solid #333; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 9px; text-transform: uppercase; font-weight: bold; }
         .nav-item.active { color: var(--tg-theme-button); }
         .nav-item i { font-size: 18px; }
 
-        .container { padding: 15px; width: 100%; box-sizing: border-box; }
-        .card { background: var(--card-bg); padding: 18px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; position: relative; }
+        /* CONTEÚDO */
+        .container { padding: 15px; }
+        .card { background: var(--card-bg); padding: 18px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
         .btn-main { width: 100%; background: var(--tg-theme-button); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .hidden { display: none; }
         
-        textarea, input { width: 100%; background: #2a2a2a; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 10px; box-sizing: border-box; margin-top: 5px; }
-        
+        input, select, textarea { width: 100%; background: #2a2a2a; border: none; color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; box-sizing: border-box; }
         .val { color: var(--tg-theme-button); font-weight: bold; text-align: right; }
         .cash { font-size: 10px; color: #888; display: block; font-weight: normal; }
-        .post-footer { display: flex; justify-content: space-between; margin-top: 12px; border-top: 1px solid #333; padding-top: 10px; }
-        .action-btn { background: none; border: none; color: #777; font-size: 12px; cursor: pointer; }
-        .action-btn.liked { color: #ff4444; }
-
-        /* ADMIN STYLE */
-        .adm-row { background: #111; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #ffcc00; font-size: 12px; }
-        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="top-ad">📢 ADMIN: Painel de gestão de pagamentos ativado para o Proprietário.</div>
+    <div class="top-ad">📢 ANÚNCIO: Publica fotos e ganha XP convertível em dinheiro!</div>
 
     <div class="header">
         <h4 style="margin:0;">PINE SOCIAL</h4>
         <div id="userXP" class="xp-badge">0 XP</div>
     </div>
 
-    <nav class="nav-bottom" id="mainNav">
+    <nav class="nav-bottom">
         <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i>Feed</div>
         <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-coins"></i>Ganhos</div>
         <div class="nav-item" onclick="showTab('rank-tab', this)"><i class="fas fa-trophy"></i>Rank</div>
+        <div class="nav-item" onclick="showTab('invite-tab', this)"><i class="fas fa-users"></i>Amigos</div>
         <div class="nav-item" onclick="showTab('wallet-tab', this)"><i class="fas fa-wallet"></i>Saque</div>
     </nav>
 
     <div id="feed-tab" class="container">
-        <div class="card" style="text-align:center; background: linear-gradient(145deg, #222, #111);">
-            <h5 style="margin:0 0 10px 0; color:#ffcc00;">🎁 Recompensa Diária</h5>
-            <button class="btn-main" style="padding:8px 20px; width:auto;" onclick="doCheckin()">Receber +5 XP</button>
-        </div>
-
         <div class="card">
-            <textarea id="postText" placeholder="O que estás a pensar?"></textarea>
+            <textarea id="postText" placeholder="O que queres partilhar?"></textarea>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
                 <input type="file" id="fileInput" hidden accept="image/*">
-                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; font-size:12px;"><i class="fas fa-camera"></i> Foto (Máx 500KB)</button>
-                <button class="btn-main" id="pubBtn" style="width:auto; padding:8px 25px;" onclick="handlePublish()">Publicar</button>
+                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#aaa; font-size:12px;"><i class="fas fa-camera"></i> Foto (Máx 500KB)</button>
+                <button class="btn-main" id="pubBtn" style="width:auto; padding:8px 20px;" onclick="handlePublish()">Publicar</button>
             </div>
+            <div id="upStatus" style="font-size:10px; color:var(--tg-theme-button); margin-top:5px; display:none;">A comprimir e enviar...</div>
         </div>
-        <div id="feed"></div>
-        <div id="loading-trigger" style="text-align:center; padding:20px; color:#444;">A carregar...</div>
+        <div id="feed">Carregando publicações...</div>
     </div>
 
     <div id="info-tab" class="container hidden">
         <div class="card">
-            <h2 style="color:var(--tg-theme-button);">💰 Tabela de Lucros</h2>
-            <table style="width:100%">
-                <tr><td>Postagem</td><td class="val">+15 XP <span class="cash" id="pCash">0.0150€</span></td></tr>
-                <tr><td>Check-in</td><td class="val">+5 XP <span class="cash" id="cCash">0.0050€</span></td></tr>
-                <tr><td>Like</td><td class="val">+2 XP <span class="cash" id="lCash">0.0020€</span></td></tr>
+            <h2 style="color:var(--tg-theme-button); margin-top:0;">💰 Economia</h2>
+            <table style="width:100%; border-collapse:collapse;">
+                <tr><td style="padding:10px 0;">Novo Post</td><td class="val">+15 XP <span class="cash">0.0150€</span></td></tr>
+                <tr><td style="padding:10px 0;">Convite</td><td class="val">+100 XP <span class="cash">0.1000€</span></td></tr>
+                <tr><td style="padding:10px 0;">Receber Like</td><td class="val">+2 XP <span class="cash">0.0020€</span></td></tr>
             </table>
+            <p style="font-size:12px; color:#888; margin-top:15px;">* Mínimo 5000 XP para levantamento via PayPal.</p>
         </div>
     </div>
-
-    <div id="rank-tab" class="container hidden"></div>
 
     <div id="wallet-tab" class="container hidden">
         <div class="card">
             <h2>Levantamento PayPal</h2>
-            <p>Saldo: <b id="walletPts">0</b> XP</p>
-            <p style="font-size:20px; color:var(--tg-theme-button);">Total: <b id="curSym">€</b> <b id="localMoney">0.0000</b></p>
+            <p>Saldo: <b id="walletXP">0</b> XP</p>
+            <p style="color:var(--tg-theme-button); font-weight:bold;">Valor: <span id="euroVal">0.0000</span>€</p>
             <input type="email" id="paypalEmail" placeholder="Teu e-mail PayPal">
-            <button class="btn-main" style="margin-top:15px;" onclick="requestWithdraw()">Pedir Pagamento</button>
+            <button class="btn-main" style="margin-top:15px;" onclick="requestWithdraw()">Levantar Agora</button>
         </div>
     </div>
 
-    <div id="admin-tab" class="container hidden">
-        <div class="card" style="border-color:#ff4444;">
-            <h2 style="color:#ff4444;">🛡️ Painel Admin</h2>
-            <p>Users: <b id="adm-u">0</b> | Posts: <b id="adm-p">0</b></p>
-            <hr border="0" style="border-top:1px solid #333">
-            <h4>Pedidos de Saque</h4>
-            <div id="adm-withdrawals"></div>
-        </div>
-    </div>
+    <div id="rank-tab" class="container hidden"><div class="card">Ranking em breve...</div></div>
+    <div id="invite-tab" class="container hidden"><div class="card">Convida amigos com o teu ID: 5401881400</div></div>
 
     <script>
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const userId = 5401881400; // pine1971
+        const userId = 5401881400;
 
-        let exchangeRate = 1.0; 
-        let currencySymbol = "€";
-        let currentPage = 0;
-        let isFetching = false;
-
-        // --- NAVEGAÇÃO ---
-        function showTab(id, el) {
+        // --- NAVEGAÇÃO CORRIGIDA ---
+        function showTab(tabId, el) {
             document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(tabId).classList.remove('hidden');
             el.classList.add('active');
-            if(id === 'feed-tab') loadFeed(true);
-            if(id === 'rank-tab') loadRanking();
-            if(id === 'admin-tab') loadAdminPanel();
-            loadProfile();
+            loadProfile(); // Atualiza XP sempre
         }
 
-        // --- COMPRESSÃO ---
-        async function compress(file) {
-            return new Promise(res => {
-                const reader = new FileReader(); reader.readAsDataURL(file);
-                reader.onload = e => {
-                    const img = new Image(); img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height, max = 1000;
-                        if(w>h && w>max) { h *= max/w; w = max; } else if(h>max) { w *= max/h; h = max; }
-                        canvas.width = w; canvas.height = h;
-                        canvas.getContext('2d').drawImage(img,0,0,w,h);
-                        canvas.toBlob(b => res(b), 'image/jpeg', 0.6);
-                    }
-                }
-            });
-        }
-
-        // --- FUNÇÕES CORE ---
+        // --- CARREGAMENTO DE PERFIL ---
         async function loadProfile() {
-            const { data } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
-            if(data) {
+            const { data, error } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
+            if (data) {
                 const pts = data.points || 0;
                 document.getElementById('userXP').innerText = pts + " XP";
-                document.getElementById('walletPts').innerText = pts;
-                document.getElementById('localMoney').innerText = (pts * exchangeRate / 1000).toFixed(4);
+                document.getElementById('walletXP').innerText = pts;
+                document.getElementById('euroVal').innerText = (pts / 1000).toFixed(4);
             }
+        }
+
+        // --- COMPRESSÃO DE IMAGEM (500KB) ---
+        async function compressImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        const max = 1000;
+                        if (w > h && w > max) { h *= max / w; w = max; }
+                        else if (h > max) { w *= max / h; h = max; }
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.6); // 60% qualidade
+                    };
+                };
+            });
         }
 
         async function handlePublish() {
             const text = document.getElementById('postText').value;
             const file = document.getElementById('fileInput').files[0];
             const btn = document.getElementById('pubBtn');
-            if(!text && !file) return;
-            btn.disabled = true;
+            const status = document.getElementById('upStatus');
 
-            let imgUrl = null;
+            if(!text && !file) return;
+            btn.disabled = true; status.style.display = 'block';
+
+            let url = null;
             if(file) {
-                const blob = await compress(file);
-                if(blob.size > 500*1024) { alert("Erro: >500KB"); btn.disabled=false; return; }
+                let compressed = await compressImage(file);
+                if(compressed.size > 500 * 1024) { alert("Erro: Foto maior que 500KB mesmo após compressão."); return; }
                 const name = `${Date.now()}.jpg`;
-                await supabaseClient.storage.from('post-images').upload(name, blob);
-                imgUrl = supabaseClient.storage.from('post-images').getPublicUrl(name).data.publicUrl;
+                await supabaseClient.storage.from('post-images').upload(name, compressed);
+                url = supabaseClient.storage.from('post-images').getPublicUrl(name).data.publicUrl;
             }
-            await supabaseClient.from('posts').insert([{ user_id: userId, content: text, image_url: imgUrl }]);
+
+            await supabaseClient.from('posts').insert([{ user_id: userId, username: 'pine1971', content: text, image_url: url }]);
             await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
             location.reload();
         }
 
-        async function doCheckin() {
-            const day = new Date().toISOString().split('T')[0];
-            const { error } = await supabaseClient.from('checkins').insert([{ user_id: userId, day }]);
-            if(error) alert("Já fizeste check-in hoje!");
-            else { await supabaseClient.rpc('increment_points', { user_id: userId, amount: 5 }); alert("+5 XP!"); loadProfile(); }
-        }
-
-        async function loadFeed(reset=false) {
-            if(isFetching) return; isFetching = true;
-            if(reset) { currentPage=0; document.getElementById('feed').innerHTML=''; }
-            const { data } = await supabaseClient.from('posts').select('*, profiles(username)').order('created_at',{ascending:false}).range(currentPage*10, (currentPage+1)*10-1);
-            if(data) {
-                data.forEach(p => {
-                    document.getElementById('feed').innerHTML += `
-                        <div class="card">
-                            <b>@${p.profiles?.username || 'user'}</b>
-                            <p>${p.content || ''}</p>
-                            ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:10px; margin-top:10px;">` : ''}
-                            <div class="post-footer">
-                                <button class="action-btn" onclick="toggleLike(${p.id}, this)"><i class="far fa-heart"></i> Like</button>
-                                <span style="font-size:10px; color:#444;">${new Date(p.created_at).toLocaleDateString()}</span>
-                            </div>
-                        </div>`;
-                });
-                currentPage++;
-            }
-            isFetching = false;
-        }
-
-        async function toggleLike(postId, btn) {
-            const { error } = await supabaseClient.from('post_likes').insert([{ post_id: postId, user_id: userId }]);
-            if(!error) { btn.style.color = "#ff4444"; btn.innerHTML = '<i class="fas fa-heart"></i> +2 XP'; }
-        }
-
-        async function loadRanking() {
-            const { data } = await supabaseClient.from('profiles').select('username, points').order('points',{ascending:false}).limit(10);
-            let h = '<div class="card"><h3>🏆 Top Ranking</h3><table style="width:100%">';
-            data?.forEach((u,i) => h += `<tr style="border-bottom:1px solid #333"><td style="padding:10px">${i+1}. @${u.username}</td><td class="val">${u.points} XP</td></tr>`);
-            document.getElementById('rank-tab').innerHTML = h + '</table></div>';
-        }
-
-        // --- ADMIN & WITHDRAW ---
-        async function requestWithdraw() {
-            const email = document.getElementById('paypalEmail').value;
-            const pts = parseInt(document.getElementById('walletPts').innerText);
-            if(!email.includes('@') || pts < 5000) return alert("Mínimo 5000 XP e e-mail válido!");
-            await supabaseClient.from('withdrawals').insert([{ user_id: userId, paypal_email: email, amount_xp: pts }]);
-            alert("Pedido enviado para análise!");
-        }
-
-        async function loadAdminPanel() {
-            if(userId !== 5401881400) return;
-            const { count: uC } = await supabaseClient.from('profiles').select('*', {count:'exact', head:true});
-            const { count: pC } = await supabaseClient.from('posts').select('*', {count:'exact', head:true});
-            document.getElementById('adm-u').innerText = uC;
-            document.getElementById('adm-p').innerText = pC;
-
-            const { data: ws } = await supabaseClient.from('withdrawals').select('*').eq('status','pending');
-            let h = "";
-            ws?.forEach(w => h += `<div class="adm-row">Paypal: ${w.paypal_email} | ${w.amount_xp} XP <button onclick="markPaid(${w.id})" style="float:right">PAGO</button></div>`);
-            document.getElementById('adm-withdrawals').innerHTML = h || "Sem pedidos.";
-        }
-
-        async function markPaid(id) {
-            await supabaseClient.from('withdrawals').update({status:'completed'}).eq('id', id);
-            loadAdminPanel();
+        // --- CARREGAR FEED ---
+        async function loadFeed() {
+            const { data } = await supabaseClient.from('posts').select('*').order('created_at', {ascending: false});
+            const feed = document.getElementById('feed');
+            feed.innerHTML = data.map(p => `
+                <div class="card">
+                    <b style="color:var(--tg-theme-button)">@${p.username}</b>
+                    <p>${p.content || ''}</p>
+                    ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:10px; margin-top:10px;">` : ''}
+                </div>
+            `).join('');
         }
 
         async function init() {
-            const lang = window.navigator.language;
-            if(lang.includes('BR')) { exchangeRate = 6.20; currencySymbol = "R$"; }
-            document.getElementById('curSym').innerText = currencySymbol;
-            if(userId === 5401881400) {
-                const btn = document.createElement('div'); btn.className="nav-item"; btn.innerHTML='<i class="fas fa-user-shield"></i>Admin';
-                btn.onclick = () => showTab('admin-tab', btn); document.getElementById('mainNav').appendChild(btn);
-            }
-            loadProfile(); loadFeed(true);
+            await loadProfile();
+            await loadFeed();
         }
 
-        window.addEventListener('scroll', () => { if((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) loadFeed(); });
         init();
     </script>
 </body>
