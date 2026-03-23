@@ -10,7 +10,7 @@
         /* DESIGN SYSTEM - GOOGLE DARK */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { background-color: #121212; height: 100%; }
-        body { background-color: #121212; color: #ffffff; font-family: -apple-system, sans-serif; padding-top: 185px; padding-bottom: 20px; }
+        body { background-color: #121212; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding-top: 185px; padding-bottom: 20px; }
 
         /* HEADER & STATUS BAR */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
@@ -31,12 +31,18 @@
         .page.active { display: block; }
         .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
 
-        /* PÁGINA INFO (ESTILO RECUPERADO) */
+        /* FEED ITEMS */
+        .post-item { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid #333; }
+        .post-user { font-size: 11px; color: #ffcc00; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .post-content { font-size: 14px; color: #eee; line-height: 1.5; }
+        .post-date { font-size: 9px; color: #555; margin-top: 10px; }
+
+        /* PÁGINA INFO */
         .info-table { border: 1px solid #333; border-radius: 8px; overflow: hidden; margin: 15px 0; }
         .info-row { display: flex; padding: 12px 10px; font-size: 12px; border-bottom: 1px solid #222; background: #1e1e1e; }
         .info-header { display: flex; background: #1a1a1a; padding: 10px; font-size: 11px; font-weight: bold; color: #ffcc00; border-bottom: 1px solid #333; }
 
-        /* ADMIN DASHBOARD (ESTILO RECUPERADO) */
+        /* ADMIN DASHBOARD */
         .admin-stat-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
         .admin-stat-card { flex: 1; background: #111; padding: 12px 5px; border-radius: 8px; border: 1px solid #222; text-align: center; }
         .admin-stat-title { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 5px; }
@@ -45,6 +51,7 @@
         .finance-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; }
 
         .btn-pub { background: #ffcc00; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn-pub:active { transform: scale(0.98); opacity: 0.9; }
         .finance-pos { color: #00ff00; }
         .finance-neg { color: #ff4444; }
         .admin-link { display: none; }
@@ -63,7 +70,7 @@
             <div class="tab-item active" onclick="openTab('feed-page', this)">Feed</div>
             <div class="tab-item" onclick="openTab('wallet-page', this)">Rede</div>
             <div class="tab-item" onclick="openTab('info-page', this)">Info</div>
-            <div id="adm-tab" class="tab-item admin-link" onclick="openTab('admin-page', this)">Admin</div>
+            <div id="adm-tab" class="tab-item admin-link" style="color: #ff4444;" onclick="openTab('admin-page', this)">Admin</div>
         </div>
     </div>
 
@@ -76,9 +83,9 @@
             <div class="card">
                 <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; outline:none; font-size:15px; min-height:60px;" placeholder="O que está a pensar?"></textarea>
                 <button class="btn-pub" onclick="publish()">Publicar Post</button>
-                <div id="rewardHint" style="font-size:10px; color:#666; margin-top:8px;">A calcular recompensas...</div>
+                <div id="rewardHint" style="font-size:10px; color:#666; margin-top:8px;">A carregar perfil...</div>
             </div>
-            <div id="feed-items">Carregando feed...</div>
+            <div id="feed-items">A carregar feed...</div>
         </div>
 
         <div id="info-page" class="page">
@@ -98,6 +105,15 @@
                     <h5 style="color:#ffcc00; font-size:12px; margin-bottom:5px;">Bónus de Rede (10%)</h5>
                     <p style="font-size:11px; color:#ccc;">Receba automaticamente 10% de todo o XP que os seus amigos convidados gerarem!</p>
                 </div>
+            </div>
+        </div>
+
+        <div id="wallet-page" class="page">
+            <div class="card" style="text-align:center;">
+                <h4 style="color:#ffcc00;">A Tua Rede</h4>
+                <p style="font-size: 11px; color: #888; margin-top: 5px;">Convida amigos e ganha 10% do que eles produzirem.</p>
+                <div id="refLink" style="background:#111; padding:12px; margin:15px 0; font-size:11px; border:1px dashed #444; color:#ffcc00; word-break:break-all;">...</div>
+                <button class="btn-pub" onclick="copyRef()">Copiar Link de Convite</button>
             </div>
         </div>
 
@@ -121,14 +137,6 @@
                 <button class="btn-pub" style="background:#ff4444; color:#fff;" onclick="clearFeed()">RESETAR FEED (Zerar Posts)</button>
             </div>
         </div>
-
-        <div id="wallet-page" class="page">
-            <div class="card" style="text-align:center;">
-                <h4 style="color:#ffcc00;">A Tua Rede</h4>
-                <div id="refLink" style="background:#111; padding:12px; margin:15px 0; font-size:11px; border:1px dashed #444; color:#ffcc00; word-break:break-all;">...</div>
-                <button class="btn-pub" onclick="copyRef()">Copiar Link de Convite</button>
-            </div>
-        </div>
     </main>
 
     <script>
@@ -137,6 +145,11 @@
         const client = supabase.createClient(SB_URL, SB_KEY);
         const myId = 5401881400; 
         let dailyPosts = 0;
+
+        async function init() {
+            await getProfile();
+            await loadFeed();
+        }
 
         async function getProfile() {
             const { data } = await client.from('profiles').select('*').eq('id', myId).single();
@@ -157,15 +170,45 @@
             if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
         }
 
+        async function loadFeed() {
+            const { data: posts, error } = await client
+                .from('posts')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            const container = document.getElementById('feed-items');
+            if (error) {
+                container.innerHTML = "Erro ao carregar feed.";
+                return;
+            }
+
+            container.innerHTML = posts.map(p => `
+                <div class="post-item">
+                    <div class="post-user">
+                        <span>USER #${p.user_id.toString().slice(-4)}</span>
+                        <span style="color: #444;">ID: ${p.id}</span>
+                    </div>
+                    <div class="post-content">${p.content}</div>
+                    <div class="post-date">${new Date(p.created_at).toLocaleString('pt-PT')}</div>
+                </div>
+            `).join('');
+        }
+
         async function publish() {
             const txt = document.getElementById('postText').value;
             if(!txt) return;
+            
             let reward = dailyPosts < 5 ? 5.0 : (dailyPosts < 10 ? 2.5 : 0.5);
-            await client.from('posts').insert([{ user_id: myId, content: txt }]);
-            await client.rpc('increment_points', { user_id: myId, amount: reward });
-            await client.rpc('process_referral_bonus', { user_id: myId, bonus_amount: reward * 0.1 });
-            document.getElementById('postText').value = '';
-            getProfile();
+            
+            const { error } = await client.from('posts').insert([{ user_id: myId, content: txt }]);
+            if(!error) {
+                await client.rpc('increment_points', { user_id: myId, amount: reward });
+                await client.rpc('process_referral_bonus', { user_id: myId, bonus_amount: reward * 0.1 });
+                document.getElementById('postText').value = '';
+                await getProfile();
+                await loadFeed();
+            }
         }
 
         async function doCheckin() {
@@ -175,20 +218,33 @@
         }
 
         async function updateAdmin() {
-            const { data: users, count: uCount } = await client.from('profiles').select('*', { count: 'exact' });
-            const { count: pCount } = await client.from('posts').select('*', { count: 'exact' });
-            let totalXP = 0; users.forEach(u => totalXP += u.points);
+            const { data: users } = await client.from('profiles').select('points');
+            const { count: pCount } = await client.from('posts').select('*', { count: 'exact', head: true });
+            
+            let totalXP = 0; 
+            users.forEach(u => totalXP += (u.points || 0));
             
             const debt = totalXP * 0.0010;
-            const rev = (pCount * 18 * 0.0010); // 18 views por post estimadas
+            const rev = (pCount * 18 * 0.0010); 
             
-            document.getElementById('admUsers').innerText = uCount;
+            document.getElementById('admUsers').innerText = users.length;
             document.getElementById('admPosts').innerText = pCount;
             document.getElementById('admXP').innerText = totalXP.toFixed(0);
             document.getElementById('admDebt').innerText = debt.toFixed(4) + "€";
             document.getElementById('admRev').innerText = rev.toFixed(4) + "€";
-            document.getElementById('admProfit').innerText = (rev - debt).toFixed(4) + "€";
-            document.getElementById('admProfit').className = (rev-debt) >= 0 ? 'finance-pos' : 'finance-neg';
+            
+            const profit = rev - debt;
+            const profEl = document.getElementById('admProfit');
+            profEl.innerText = profit.toFixed(4) + "€";
+            profEl.className = profit >= 0 ? 'finance-pos' : 'finance-neg';
+        }
+
+        async function clearFeed() {
+            if(confirm("Deseja apagar TODOS os posts?")) {
+                await client.from('posts').delete().neq('id', 0);
+                loadFeed();
+                if(document.getElementById('admin-page').classList.contains('active')) updateAdmin();
+            }
         }
 
         function openTab(id, el) {
@@ -200,11 +256,11 @@
         }
 
         function copyRef() {
-            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
-            alert("Link copiado!");
+            const link = document.getElementById('refLink').innerText;
+            navigator.clipboard.writeText(link).then(() => alert("Link copiado!"));
         }
 
-        getProfile();
+        init();
     </script>
 </body>
 </html>
