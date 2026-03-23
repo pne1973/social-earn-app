@@ -20,11 +20,28 @@
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
         .ad-top { background: #1a1a1a; color: #ffcc00; padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; letter-spacing: 0.5px; }
         .nav-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; }
-        .xp-pill { background: #ffcc00; color: #000; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; box-shadow: 0 2px 8px rgba(255,204,0,0.2); }
+        .xp-pill { background: #ffcc00; color: #000; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; box-shadow: 0 2px 8px rgba(255,204,0,0.2); white-space: nowrap; }
 
-        /* TABS NAVIGATION */
-        .tabs { display: flex; background: #1a1a1a; border-top: 1px solid #333; overflow-x: auto; }
-        .tab-item { flex: 1; min-width: 80px; padding: 14px; text-align: center; color: #888; font-size: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        /* TABS NAVIGATION - AJUSTADO PARA NÃO TRANSBORDAR */
+        .tabs { 
+            display: flex; 
+            background: #1a1a1a; 
+            border-top: 1px solid #333; 
+            width: 100%;
+            justify-content: space-around; /* Distribui igualmente no espaço disponível */
+        }
+        .tab-item { 
+            flex: 1; 
+            padding: 14px 5px; /* Reduzi o padding lateral */
+            text-align: center; 
+            color: #888; 
+            font-size: 9px; /* Fonte levemente menor para caber tudo */
+            font-weight: bold; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            transition: 0.3s;
+            white-space: nowrap;
+        }
         .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
 
         /* LAYOUT */
@@ -40,7 +57,7 @@
         .info-list { margin-top: 8px; list-style: none; }
         .info-list li { margin-bottom: 5px; display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding-bottom: 4px; }
 
-        /* POSTS & ACTIONS */
+        /* POSTS */
         .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; }
         .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; }
         .post-avatar { width: 34px; height: 34px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; }
@@ -58,7 +75,7 @@
     <div class="header-fixed">
         <div class="ad-top">📢 APEX SOCIAL: Ganhe dinheiro real interagindo!</div>
         <div class="nav-main">
-            <h3>APEX <span style="color:#ffcc00">SOCIAL</span></h3>
+            <h3 style="font-size: 18px;">APEX <span style="color:#ffcc00">SOCIAL</span></h3>
             <div id="userXP" class="xp-pill">0 XP • 0.00€</div>
         </div>
         <div class="tabs">
@@ -108,7 +125,6 @@
             <div class="card">
                 <div class="info-section">
                     <h4 class="info-title"><i class="fas fa-coins"></i> Como Ganhar</h4>
-                    <p class="info-text">No Apex Social, a sua interação vale dinheiro real. Utilizamos o modelo CPM 1.00 (1000 XP = 1,00 na sua moeda).</p>
                     <ul class="info-list info-text">
                         <li><span>Convidar Amigo</span> <b>+100 XP</b></li>
                         <li><span>Publicar Post</span> <b>+15 XP</b></li>
@@ -117,22 +133,9 @@
                         <li><span>Check-in Diário</span> <b>+5 XP</b></li>
                     </ul>
                 </div>
-
                 <div class="info-section">
-                    <h4 class="info-title"><i class="fas fa-shield-halved"></i> Privacidade & Anúncios</h4>
-                    <p class="info-text">
-                        Para manter a plataforma gratuita e pagar as recompensas, exibimos anúncios. <br><br>
-                        <b>Transparência:</b> Não vendemos os seus dados pessoais. Os anúncios são injetados automaticamente no feed. O sistema utiliza apenas a sua localização (País) para ajustar a moeda e exibir anúncios relevantes para a sua região.
-                    </p>
-                </div>
-
-                <div class="info-section">
-                    <h4 class="info-title"><i class="fas fa-hand-holding-dollar"></i> Regras de Saque</h4>
-                    <p class="info-text">
-                        1. O valor mínimo é de 5000 XP (5,00€ ou 5,00R$).<br>
-                        2. Os pagamentos são processados via PayPal.<br>
-                        3. Tentativas de fraude ou spam resultarão no banimento da conta e perda do saldo.
-                    </p>
+                    <h4 class="info-title"><i class="fas fa-shield-halved"></i> Privacidade</h4>
+                    <p class="info-text">Os anúncios financiam os pagamentos. Não vendemos os seus dados. Usamos apenas a sua região para ajustar a moeda correta.</p>
                 </div>
             </div>
         </div>
@@ -176,9 +179,13 @@
                 const pts = data.points || 0;
                 const money = (pts * userConfig.cpmRate).toFixed(2);
                 document.getElementById('userXP').innerText = `${pts} XP • ${money}${userConfig.symbol}`;
-                const preciseMoney = (pts * userConfig.cpmRate).toFixed(4);
-                document.getElementById('mainValue').innerHTML = `${preciseMoney}<small style="font-size:20px; margin-left:5px;">${userConfig.symbol}</small>`;
-                document.getElementById('currencyLabel').innerText = userConfig.label;
+                
+                const mainVal = document.getElementById('mainValue');
+                if(mainVal) mainVal.innerHTML = `${(pts * userConfig.cpmRate).toFixed(4)}<small style="font-size:20px; margin-left:5px;">${userConfig.symbol}</small>`;
+                
+                const label = document.getElementById('currencyLabel');
+                if(label) label.innerText = userConfig.label;
+                
                 document.getElementById('invLink').innerText = `https://apexsocial.app/join?ref=${myId}`;
             }
             if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
@@ -189,9 +196,7 @@
             const list = document.getElementById('feed-items');
             list.innerHTML = '';
             if(posts) {
-                for (let i = 0; i < posts.length; i++) {
-                    const p = posts[i];
-                    const { data: comms } = await client.from('comments').select('*').eq('post_id', p.id).order('created_at', {ascending: true});
+                posts.forEach(p => {
                     const el = document.createElement('div');
                     el.className = 'post';
                     el.innerHTML = `
@@ -203,15 +208,11 @@
                         ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
                         <div class="post-actions">
                             <div class="action-btn" onclick="addXP(2, this)"><i class="far fa-heart"></i> <span>0</span></div>
-                            <div class="action-btn" onclick="toggleComments('${p.id}')"><i class="far fa-comment"></i> <span>${comms?comms.length:0}</span></div>
-                        </div>
-                        <div id="box-${p.id}" class="comment-section">
-                            <div class="comment-list">${comms?comms.map(c=>`<div class="comment-item"><b>User #${c.user_id.toString().slice(-4)}:</b> ${c.content}</div>`).join(''):''}</div>
+                            <div class="action-btn"><i class="far fa-comment"></i> <span>0</span></div>
                         </div>
                     `;
                     list.appendChild(el);
-                    if((i+1)%3===0) list.innerHTML += `<div style="text-align:center; color:#ffcc00; font-size:10px; padding:10px; opacity:0.4;">📢 PUBLICIDADE: O SEU APOIO MANTÉM OS GANHOS</div>`;
-                }
+                });
             }
         }
 
@@ -219,11 +220,6 @@
             await client.rpc('increment_points', { user_id: myId, amount: amt });
             if(btn) btn.style.color = "#ffcc00";
             getProfile();
-        }
-
-        function toggleComments(id) {
-            const box = document.getElementById(`box-${id}`);
-            box.style.display = box.style.display === 'block' ? 'none' : 'block';
         }
 
         async function publish() {
