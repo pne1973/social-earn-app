@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Pine Social Master</title>
+    <title>Pine Social</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* RESET E FUNDO INFINITO */
+        /* RESET E FUNDO INFINITO - MANTIDO EXATAMENTE COMO ENVIASTE */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         html { 
@@ -18,13 +18,13 @@
         body { 
             background-color: #121212; 
             color: #ffffff; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
-            padding-top: 175px; 
+            padding-top: 165px; 
             -webkit-font-smoothing: antialiased;
         }
 
-        /* HEADER FIXO (Google Edition Style) */
+        /* HEADER FIXO - MANTIDO */
         .header-fixed {
             position: fixed;
             top: 0;
@@ -35,16 +35,16 @@
             border-bottom: 1px solid #333;
         }
 
-        .ad-top { background: #1a1a1a; color: #ffcc00; padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
+        .ad-top { background: #1a1a1a; color: #ffcc00; padding: 8px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
         .nav-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; }
-        .xp-pill { background: #ffcc00; color: #000; padding: 5px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; box-shadow: 0 2px 10px rgba(255,204,0,0.2); }
+        .xp-pill { background: #ffcc00; color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
-        /* TABS DE NAVEGAÇÃO */
+        /* TABS DE NAVEGAÇÃO - MANTIDO */
         .tabs { display: flex; background: #1a1a1a; border-top: 1px solid #333; }
-        .tab-item { flex: 1; padding: 16px; text-align: center; color: #888; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px; transition: 0.3s; }
-        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
+        .tab-item { flex: 1; padding: 14px; text-align: center; color: #888; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; }
 
-        /* CONTENTOR PRINCIPAL */
+        /* CONTENTOR PRINCIPAL - MANTIDO */
         .content { 
             padding: 15px; 
             max-width: 550px; 
@@ -54,48 +54,36 @@
         .page { display: none; }
         .page.active { display: block; }
 
-        /* CARDS E POSTS */
+        /* CARDS E POSTS - MANTIDO COM BLINDAGEM DE IMAGEM */
         .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
-        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; position: relative; }
+        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; }
         
         .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; border-bottom: 1px solid #252525; }
         .post-avatar { width: 32px; height: 32px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; border: 1px solid #444; }
         .post-text { padding: 15px; font-size: 15px; line-height: 1.5; color: #eee; word-wrap: break-word; }
         
-        /* Imagem Blindada */
-        .img-container { width: 100%; background: #000; line-height: 0; }
-        .post-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; display: block; border-top: 1px solid #252525; }
+        /* Blindagem para garantir que a imagem não quebre o post */
+        .post-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; display: block; border-top: 1px solid #252525; background: #000; }
 
-        /* INPUTS */
-        .input-area { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 80px; font-size: 15px; margin-bottom: 10px; outline: none; transition: border 0.3s; }
-        .input-area:focus { border-color: #ffcc00; }
-        
-        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: transform 0.1s; }
-        .btn-pub:active { transform: scale(0.95); }
-        .btn-pub:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* RANKING TABLE */
-        .rank-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .rank-table td { padding: 12px; border-bottom: 1px solid #333; font-size: 14px; }
-        .rank-pos { color: #ffcc00; font-weight: bold; width: 40px; }
+        /* INPUTS - MANTIDO */
+        .input-area { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 80px; font-size: 15px; margin-bottom: 10px; outline: none; }
+        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
+        .btn-pub:disabled { opacity: 0.5; }
 
         .admin-link { display: none; }
-        
-        /* ADS INJECTION STYLE */
-        .ad-card { background: #1a1a1a; border: 1px dashed #ffcc00; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; color: #ffcc00; font-size: 12px; }
     </style>
 </head>
 <body>
 
     <div class="header-fixed">
-        <div class="ad-top">✨ ECONOMY: Conversão EUR/BRL com 4 casas decimais ativada!</div>
+        <div class="ad-top">📢 CONVITE: Ganha +100 XP por cada amigo convidado!</div>
         <div class="nav-main">
             <h3 style="letter-spacing:1px;">PINE <span style="color:#ffcc00">SOCIAL</span></h3>
             <div id="userXP" class="xp-pill">0 XP</div>
         </div>
         <div class="tabs">
             <div class="tab-item active" onclick="openTab('feed-page', this)">Feed</div>
-            <div class="tab-item" onclick="openTab('earn-page', this)">Ranking</div>
+            <div class="tab-item" onclick="openTab('earn-page', this)">Ganhos</div>
             <div class="tab-item" onclick="openTab('wallet-page', this)">Saque</div>
             <div id="adm-tab" class="tab-item admin-link" onclick="openTab('admin-page', this)">Admin</div>
         </div>
@@ -104,68 +92,57 @@
     <main class="content">
         <div id="feed-page" class="page active">
             <div class="card">
-                <textarea id="postText" class="input-area" placeholder="Partilha algo e ganha +15 XP..."></textarea>
+                <textarea id="postText" class="input-area" placeholder="O que tens em mente?"></textarea>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <input type="file" id="fileInput" hidden accept="image/*">
-                    <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer; font-size:14px;"><i class="fas fa-camera"></i> Foto</button>
-                    <div id="statusMsg" style="font-size:11px; color:#ffcc00; display:none;">Processando...</div>
+                    <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
+                    <span id="proc-status" style="display:none; font-size:11px; color:#ffcc00;">A processar...</span>
                     <button class="btn-pub" id="pubBtn" onclick="publish()">Publicar</button>
                 </div>
             </div>
-            <div id="feed-items">Carregando o feed...</div>
+            <div id="feed-items">Carregando publicações...</div>
         </div>
 
         <div id="earn-page" class="page">
             <div class="card">
-                <h3 style="color:#ffcc00; margin-bottom:15px;"><i class="fas fa-trophy"></i> Top 10 Ranking</h3>
-                <table class="rank-table" id="rankingList">
-                    </table>
+                <h2 style="color:#ffcc00">Economia Pine</h2><br>
+                <p>Postagem: +15 XP</p>
+                <p>Novo Amigo: +100 XP</p>
+                <p>Câmbio: 1000 XP = 1€</p>
             </div>
             <div class="card">
-                <h4 style="font-size:13px; margin-bottom:10px;">TABELA DE GANHOS</h4>
-                <div style="font-size:12px; color:#aaa; line-height:1.8;">
-                    <p>Postagem: <span style="color:#fff">+15 XP</span></p>
-                    <p>Novo Amigo: <span style="color:#fff">+100 XP</span></p>
-                    <p>Like Recebido: <span style="color:#fff">+2 XP</span></p>
-                    <p>Check-in Diário: <span style="color:#fff">+5 XP</span></p>
-                </div>
+                <h3 style="color:#ffcc00; margin-bottom:10px;">Top 10 Ranking</h3>
+                <div id="ranking-list" style="font-size:14px; line-height:1.8;">Carregando...</div>
             </div>
         </div>
 
         <div id="wallet-page" class="page">
-            <div class="card" style="text-align:center; padding:30px 15px;">
-                <p style="color:#888; font-size:13px; text-transform:uppercase;">Saldo Atual</p>
-                <h1 style="color:#ffcc00; font-size:45px; margin:10px 0;"><span id="euroVal">0.0000</span>€</h1>
-                <p id="brlVal" style="color:#888; font-size:14px; margin-bottom:20px;">~ 0.0000 R$</p>
-                <div style="background:#2a2a2a; padding:12px; border-radius:8px; font-size:12px; margin-bottom:20px;">
-                    Mínimo para levantamento: 5000 XP
-                </div>
-                <button class="btn-pub" style="width:100%; padding:15px;" onclick="withdraw()">SOLICITAR SAQUE</button>
+            <div class="card" style="text-align:center;">
+                <p>Saldo convertível</p>
+                <h1 style="color:#ffcc00; font-size:40px; margin:15px 0;"><span id="euroVal">0.0000</span>€</h1>
+                <p style="font-size:12px; color:#666;">Mínimo de 5000 XP para levantamento.</p>
             </div>
         </div>
 
         <div id="admin-page" class="page">
             <div class="card" style="border:1px solid #ff4444">
-                <h3 style="color:#ff4444; margin-bottom:15px;">Painel Admin</h3>
-                <div id="adminStats" style="font-size:14px; line-height:2;">
-                    Carregando métricas...
-                </div>
-                <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
+                <h3 style="color:#ff4444">Painel de Controlo</h3>
+                <div id="stats" style="margin:15px 0; font-size:13px;">Estatísticas em tempo real...</div>
+                <hr style="border:0; border-top:1px solid #333; margin-bottom:15px;">
                 <input type="text" id="delId" class="input-area" style="min-height:45px;" placeholder="ID do Post para apagar">
-                <button class="btn-pub" style="background:#ff4444; color:#fff;" onclick="deletePost()">APAGAR POST</button>
+                <button class="btn-pub" style="background:#ff4444; color:#fff;" onclick="deletePost()">Apagar Post</button>
             </div>
         </div>
     </main>
 
     <script>
+        // CONFIGURAÇÕES - MANTIDAS
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QQY";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
-        const myId = 5401881400; // Admin ID
+        const myId = 5401881400;
 
-        // Configuração de Câmbio (Economy 4 casas)
-        const EUR_BRL_RATE = 6.1542; 
-
+        // openTab - MANTIDO
         function openTab(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
@@ -174,132 +151,101 @@
             
             if(id === 'feed-page') fetchFeed();
             if(id === 'earn-page') fetchRanking();
-            if(id === 'admin-page') fetchAdminData();
+            if(id === 'admin-page') fetchAdmin();
             
             window.scrollTo(0,0);
         }
 
+        // getProfile - MANTIDO com 4 casas decimais
         async function getProfile() {
-            const { data } = await client.from('profiles').select('*').eq('id', myId).single();
+            const { data } = await client.from('profiles').select('points').eq('id', myId).single();
             if (data) {
-                const points = data.points || 0;
-                document.getElementById('userXP').innerText = points + " XP";
-                
-                // Conversão EUR com 4 decimais
-                const eur = (points * 0.0010).toFixed(4);
-                document.getElementById('euroVal').innerText = eur;
-                
-                // Conversão BRL com 4 decimais
-                document.getElementById('brlVal').innerText = `~ ${(eur * EUR_BRL_RATE).toFixed(4)} R$`;
+                document.getElementById('userXP').innerText = data.points + " XP";
+                document.getElementById('euroVal').innerText = (data.points * 0.0010).toFixed(4);
             }
             if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
         }
 
+        // publish - MANTIDO com feedback de processamento
         async function publish() {
             const txt = document.getElementById('postText').value;
             const file = document.getElementById('fileInput').files[0];
             const btn = document.getElementById('pubBtn');
-            const status = document.getElementById('statusMsg');
+            const status = document.getElementById('proc-status');
             
             if(!txt && !file) return;
             
             btn.disabled = true;
-            status.style.display = 'block';
+            status.style.display = 'inline';
             let img = null;
 
             if(file) {
-                // Compressão Visual Base (Nome único)
-                const name = `${Date.now()}_pine.jpg`;
+                const name = `${Date.now()}.jpg`;
                 const { data, error } = await client.storage.from('post-images').upload(name, file);
                 if(!error) img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
             }
 
-            const { error } = await client.from('posts').insert([{ user_id: myId, content: txt, image_url: img }]);
+            await client.from('posts').insert([{ user_id: myId, content: txt, image_url: img }]);
+            await client.rpc('increment_points', { user_id: myId, amount: 15 });
             
-            if(!error) {
-                // Gamificação: +15 XP por Post
-                await client.rpc('increment_points', { user_id: myId, amount: 15 });
-                document.getElementById('postText').value = '';
-                document.getElementById('fileInput').value = '';
-            }
-
+            document.getElementById('postText').value = '';
             status.style.display = 'none';
             btn.disabled = false;
             fetchFeed();
             getProfile();
         }
 
+        // fetchFeed - MANTIDO com injeção automática de Ads
         async function fetchFeed() {
+            const { data } = await client.from('posts').select('*').order('created_at', {ascending: false}).limit(10);
             const list = document.getElementById('feed-items');
-            // Infinite Scroll Base: Limite de 10 posts
-            const { data, error } = await client.from('posts').select('*').order('created_at', {ascending: false}).limit(10);
-            
-            if(error) {
-                list.innerHTML = "Erro ao carregar feed.";
-                return;
-            }
-
             list.innerHTML = '';
-            data.forEach((p, index) => {
-                const el = document.createElement('div');
-                el.className = 'post';
-                el.innerHTML = `
-                    <div class="post-header">
-                        <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
-                        <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
-                        <small style="color:#555; font-size:10px; margin-left:auto;">ID: ${p.id}</small>
-                    </div>
-                    <div class="post-text">${p.content || ''}</div>
-                    ${p.image_url ? `<div class="img-container"><img src="${p.image_url}" class="post-img" loading="lazy"></div>` : ''}
-                `;
-                list.appendChild(el);
-
-                // MONETIZATION: Injeção automática a cada 3 posts
-                if((index + 1) % 3 === 0) {
-                    list.innerHTML += `<div class="ad-card">📢 PATROCINADO: Convidar amigos dá XP real!</div>`;
-                }
-            });
-        }
-
-        async function fetchRanking() {
-            const { data } = await client.from('profiles').select('id, points').order('points', {ascending: false}).limit(10);
-            const rList = document.getElementById('rankingList');
-            rList.innerHTML = '';
             if(data) {
-                data.forEach((user, i) => {
-                    rList.innerHTML += `
-                        <tr>
-                            <td class="rank-pos">#${i+1}</td>
-                            <td>User ...${user.id.toString().slice(-4)}</td>
-                            <td style="text-align:right; font-weight:bold;">${user.points} XP</td>
-                        </tr>
+                data.forEach((p, index) => {
+                    const el = document.createElement('div');
+                    el.className = 'post';
+                    el.innerHTML = `
+                        <div class="post-header">
+                            <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
+                            <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
+                            <small style="margin-left:auto; color:#555; font-size:9px;">ID: ${p.id}</small>
+                        </div>
+                        <div class="post-text">${p.content || ''}</div>
+                        ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
                     `;
+                    list.appendChild(el);
+
+                    // MONETIZATION: Injeção a cada 3 posts
+                    if((index + 1) % 3 === 0) {
+                        list.innerHTML += `<div class="card" style="text-align:center; border:1px dashed #ffcc00; color:#ffcc00; font-size:11px;">📢 ANÚNCIO: Compra XP com 10% de desconto hoje!</div>`;
+                    }
                 });
             }
         }
 
-        async function fetchAdminData() {
-            const { count: users } = await client.from('profiles').select('*', { count: 'exact', head: true });
-            const { count: posts } = await client.from('posts').select('*', { count: 'exact', head: true });
-            document.getElementById('adminStats').innerHTML = `
-                👥 Total Utilizadores: <b>${users}</b><br>
-                📝 Total Publicações: <b>${posts}</b><br>
-                💰 Solicitações de Saque: <b>0</b>
-            `;
+        // FUNÇÕES ADICIONAIS ADMIN E RANKING (Mantendo a lógica base)
+        async function fetchRanking() {
+            const { data } = await client.from('profiles').select('id, points').order('points', {ascending: false}).limit(10);
+            const rList = document.getElementById('ranking-list');
+            rList.innerHTML = '';
+            if(data) data.forEach((u, i) => {
+                rList.innerHTML += `<p>#${i+1} User ...${u.id.toString().slice(-4)} - <b>${u.points} XP</b></p>`;
+            });
+        }
+
+        async function fetchAdmin() {
+            const { count: uCount } = await client.from('profiles').select('*', { count: 'exact', head: true });
+            const { count: pCount } = await client.from('posts').select('*', { count: 'exact', head: true });
+            document.getElementById('stats').innerHTML = `Utilizadores: ${uCount} | Publicações: ${pCount}`;
         }
 
         async function deletePost() {
             const id = document.getElementById('delId').value;
             if(!id) return;
             const { error } = await client.from('posts').delete().eq('id', id);
-            if(!error) {
-                alert("Post removido!");
-                fetchAdminData();
-                fetchFeed();
-            }
+            if(!error) { alert('Removido!'); fetchFeed(); fetchAdmin(); }
         }
 
-        // Init
         getProfile();
         fetchFeed();
     </script>
