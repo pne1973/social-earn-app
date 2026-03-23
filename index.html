@@ -8,35 +8,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; --card-bg: #1e1e1e; --border: #333; }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-top: 120px; padding-bottom: 90px; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--tg-theme-bg); color: var(--tg-theme-text); margin: 0; padding-top: 120px; padding-bottom: 90px; overflow-x: hidden; }
         
-        /* FIXOS */
-        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #1a1a1a; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 11px; color: var(--tg-theme-button); font-weight: bold; padding: 0 10px; text-align: center; }
+        /* HEADER & ADS */
+        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #1a1a1a; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 11px; color: var(--tg-theme-button); font-weight: bold; padding: 0 10px; text-align: center; box-sizing: border-box; }
         .header { position: fixed; top: 60px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--tg-theme-bg); border-bottom: 1px solid var(--border); z-index: 1000; box-sizing: border-box; }
-        .xp-badge { background: var(--tg-theme-button); color: #000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+        .xp-badge { background: var(--tg-theme-button); color: #000; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
-        /* FEED & CARDS */
-        .container { padding: 15px; display: none; max-width: 500px; margin: 0 auto; }
+        /* CONTENT CONTAINERS */
+        .container { padding: 15px; display: none; max-width: 500px; margin: 0 auto; box-sizing: border-box; }
         .container.active { display: block !important; }
-        .card { background: var(--card-bg); border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border); overflow: hidden; }
         
-        /* ÁREA DE PUBLICAÇÃO */
-        .publish-box { padding: 15px; }
-        textarea { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 80px; box-sizing: border-box; font-size: 15px; }
-        
-        /* POST DESIGN */
-        .post-header { padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; }
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .user-avatar { width: 35px; height: 35px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--tg-theme-button); font-weight: bold; }
-        .post-content { padding: 0 15px 12px; font-size: 15px; line-height: 1.5; color: #e1e1e1; }
-        .post-img { width: 100%; display: block; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: #151515; }
-        .post-actions { padding: 10px 15px; display: flex; gap: 20px; border-top: 1px solid #252525; }
-        .action-btn { background: none; border: none; color: #aaa; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; transition: 0.2s; }
-        .action-btn:active { transform: scale(0.9); }
-        .action-btn.liked { color: var(--tg-theme-button); }
+        /* PUBLISH BOX */
+        .publish-card { background: var(--card-bg); border-radius: 15px; border: 1px solid var(--border); padding: 15px; margin-bottom: 20px; }
+        textarea { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 80px; box-sizing: border-box; font-size: 15px; margin-bottom: 10px; }
 
-        /* ANÚNCIO NATIVO NO FEED */
-        .native-ad { background: linear-gradient(45deg, #1e1e1e, #252525); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px dashed var(--tg-theme-button); text-align: center; }
+        /* FEED CARDS - ORGANIZAÇÃO TOTAL */
+        .post-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; width: 100%; }
+        .post-header { padding: 12px 15px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #252525; }
+        .avatar { width: 40px; height: 40px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--tg-theme-button); font-weight: bold; flex-shrink: 0; }
+        .user-meta { display: flex; flex-direction: column; }
+        .user-name { font-weight: bold; font-size: 14px; color: var(--tg-theme-button); }
+        .post-date { font-size: 11px; color: #888; }
+        
+        .post-body { padding: 15px; font-size: 15px; line-height: 1.4; color: #eee; word-wrap: break-word; }
+        .post-img { width: 100%; max-height: 400px; object-fit: cover; border-top: 1px solid var(--border); display: block; }
+        
+        .post-footer { padding: 10px 15px; display: flex; border-top: 1px solid #252525; background: #1a1a1a; }
+        .action-btn { background: none; border: none; color: #aaa; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: bold; }
 
         /* NAV */
         .nav-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; display: flex; border-top: 1px solid var(--border); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
@@ -50,49 +49,34 @@
     <div class="top-ad">📢 ANÚNCIO: Convida amigos e ganha +100 XP por cada um!</div>
 
     <div class="header">
-        <h4 style="margin:0; letter-spacing: 1px;">PINE <span style="color:var(--tg-theme-button)">SOCIAL</span></h4>
+        <h4 style="margin:0;">PINE <span style="color:var(--tg-theme-button)">SOCIAL</span></h4>
         <div id="userXP" class="xp-badge">0 XP</div>
     </div>
 
     <div id="feed-tab" class="container active">
-        <div class="card publish-box">
-            <textarea id="postText" placeholder="O que estás a pensar?"></textarea>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+        <div class="publish-card">
+            <textarea id="postText" placeholder="O que tens em mente?"></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
                 <input type="file" id="fileInput" hidden accept="image/*">
-                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; font-size:13px;"><i class="fas fa-image"></i> Adicionar Foto</button>
+                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; font-size:13px; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
                 <button class="btn-main" id="pubBtn" onclick="handlePublish()">Publicar</button>
             </div>
-            <div id="upStatus" style="font-size:11px; color:var(--tg-theme-button); margin-top:8px; display:none;"><i class="fas fa-spinner fa-spin"></i> A processar...</div>
+            <div id="upStatus" style="font-size:11px; color:var(--tg-theme-button); margin-top:10px; display:none;"><i class="fas fa-spinner fa-spin"></i> A processar...</div>
         </div>
-        <div id="feed">Carregando feed...</div>
+        <div id="feed">Carregando feed organizado...</div>
     </div>
 
     <div id="info-tab" class="container">
-        <div class="card" style="padding:18px;">
-            <h2 style="color:var(--tg-theme-button); margin-top:0;">💰 Economia</h2>
-            <p>Postagem: <b>+15 XP</b></p>
-            <p>Convidar Amigo: <b>+100 XP</b></p>
-            <p>Receber Like: <b>+2 XP</b></p>
-            <hr border="0" style="height:1px; background:var(--border); margin:15px 0;">
-            <p style="font-size:13px; color:#888;">Câmbio: 1000 XP = 1.0000€</p>
-        </div>
+        <div class="publish-card"><h2>💰 Tabela de Ganhos</h2><p>Post: 15 XP | Convite: 100 XP</p></div>
     </div>
-
     <div id="wallet-tab" class="container">
-        <div class="card" style="padding:18px; text-align:center;">
-            <h2>Levantamento</h2>
-            <h1 style="color:var(--tg-theme-button); font-size:32px; margin:10px 0;"><span id="euroVal">0.0000</span>€</h1>
-            <p style="font-size:12px; color:#888;">Mínimo de 5000 XP para PayPal</p>
-            <input type="email" id="paypalEmail" placeholder="Teu e-mail PayPal" style="margin-top:10px;">
-            <button class="btn-main" style="width:100%; margin-top:15px;">Pedir Saque</button>
+        <div class="publish-card" style="text-align:center;">
+            <p>Saldo (4 decimais)</p>
+            <h1 style="color:var(--tg-theme-button)"><span id="euroVal">0.0000</span>€</h1>
         </div>
     </div>
-
     <div id="admin-tab" class="container">
-        <div class="card" style="padding:18px; border: 1px solid #EA4335;">
-            <h3 style="color:#EA4335">🛠 Painel Admin</h3>
-            <div id="adm-stats">A carregar estatísticas do sistema...</div>
-        </div>
+        <div class="publish-card" style="border:1px solid #EA4335"><h3>🛠 Admin</h3><div id="adm-stats">A carregar...</div></div>
     </div>
 
     <nav class="nav-bottom">
@@ -137,30 +121,12 @@
 
             let url = null;
             if(file) {
-                // Compressão simples
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = async (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = async () => {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = 800; canvas.height = (img.height / img.width) * 800;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, 800, canvas.height);
-                        canvas.toBlob(async (blob) => {
-                            const name = `${Date.now()}.jpg`;
-                            await supabaseClient.storage.from('post-images').upload(name, blob);
-                            url = supabaseClient.storage.from('post-images').getPublicUrl(name).data.publicUrl;
-                            savePost(text, url);
-                        }, 'image/jpeg', 0.7);
-                    };
-                };
-            } else { savePost(text, null); }
-        }
+                const name = `${Date.now()}.jpg`;
+                const { data, error } = await supabaseClient.storage.from('post-images').upload(name, file);
+                if(!error) url = supabaseClient.storage.from('post-images').getPublicUrl(name).data.publicUrl;
+            }
 
-        async function savePost(content, url) {
-            await supabaseClient.from('posts').insert([{ user_id: userId, content: content, image_url: url }]);
+            await supabaseClient.from('posts').insert([{ user_id: userId, content: text, image_url: url }]);
             await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
             location.reload();
         }
@@ -170,35 +136,21 @@
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
 
-            data.forEach((p, index) => {
-                // Inserir anúncio a cada 3 posts
-                if(index > 0 && index % 3 === 0) {
-                    feed.innerHTML += `
-                    <div class="native-ad">
-                        <small style="color:#888; font-size:10px;">ANÚNCIO PATROCINADO</small>
-                        <p style="margin:5px 0; font-size:14px;">Queres mais XP? Convida um amigo agora!</p>
-                        <button class="btn-main" style="padding:5px 15px; font-size:11px;">CONVIDAR</button>
-                    </div>`;
-                }
-
+            data.forEach(p => {
+                const date = new Date(p.created_at).toLocaleDateString();
                 feed.innerHTML += `
-                <div class="card">
+                <div class="post-card">
                     <div class="post-header">
-                        <div class="user-info">
-                            <div class="user-avatar"><i class="fas fa-user"></i></div>
-                            <div>
-                                <div style="font-weight:bold; font-size:14px;">Utilizador #${p.user_id.toString().slice(-4)}</div>
-                                <div style="font-size:10px; color:#888;">${new Date(p.created_at).toLocaleDateString()}</div>
-                            </div>
+                        <div class="avatar">${p.user_id.toString().slice(-1)}</div>
+                        <div class="user-meta">
+                            <span class="user-name">Utilizador #${p.user_id.toString().slice(-4)}</span>
+                            <span class="post-date">${date}</span>
                         </div>
-                        <i class="fas fa-ellipsis-h" style="color:#555;"></i>
                     </div>
-                    <div class="post-content">${p.content || ''}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
-                    <div class="post-actions">
-                        <button class="action-btn" onclick="this.classList.toggle('liked')"><i class="fas fa-heart"></i> Like</button>
-                        <button class="action-btn"><i class="fas fa-share"></i> Partilhar</button>
-                        <button class="action-btn" style="margin-left:auto; color:#444;"><i class="fas fa-flag"></i></button>
+                    <div class="post-body">${p.content || ''}</div>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                    <div class="post-footer">
+                        <button class="action-btn"><i class="far fa-heart"></i> Gostar</button>
                     </div>
                 </div>`;
             });
