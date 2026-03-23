@@ -1,49 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Apex Social - Enterprise OS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* DESIGN SYSTEM - PREMIUM CLEAN DARK */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { background-color: #000; height: 100%; }
+        body { background-color: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding-top: 195px; padding-bottom: 20px; }
+
+        /* HEADER & STATUS BAR (MANTIDOS) */
+        .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #000; border-bottom: 1px solid #1a1a1a; }
+        .ad-banner-top { background: #080808; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #ffcc00; border-bottom: 1px solid #111; font-weight: bold; letter-spacing: 1px; }
+        .user-stats-bar { display: flex; justify-content: space-around; background: #050505; padding: 15px 5px; border-bottom: 1px solid #111; }
+        .stat-pill { text-align: center; flex: 1; border-right: 1px solid #1a1a1a; }
+        .stat-pill:last-child { border-right: none; }
+        .stat-pill span { display: block; font-size: 8px; color: #555; text-transform: uppercase; margin-bottom: 3px; }
+        .stat-pill b { font-size: 11px; color: #ffcc00; }
+        .tabs { display: flex; background: #000; }
+        .tab-item { flex: 1; padding: 16px 5px; text-align: center; color: #555; font-size: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-bottom: 3px solid transparent; }
+        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; }
+
+        /* CONTENT */
+        .content { padding: 15px; max-width: 500px; margin: 0 auto; }
+        .page { display: none; }
+        .page.active { display: block !important; }
+
+        /* NOVO ADMIN DASHBOARD - VISUAL ENTERPRISE */
+        .admin-card { background: #0a0a0a; border-radius: 16px; padding: 25px; margin-bottom: 20px; border: 1px solid #1a1a1a; }
+        .section-header { margin-bottom: 20px; border-left: 4px solid #ffcc00; padding-left: 12px; }
+        .section-header h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px; color: #fff; }
+        .section-header p { font-size: 10px; color: #444; margin-top: 4px; }
+
+        .kpi-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .kpi-box { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #222; text-align: left; }
+        .kpi-box span { font-size: 9px; color: #666; text-transform: uppercase; font-weight: bold; }
+        .kpi-box b { font-size: 26px; color: #fff; display: block; margin-top: 5px; }
+
+        .finance-main { background: linear-gradient(180deg, #111 0%, #080808 100%); padding: 25px; border-radius: 16px; border: 1px solid #222; margin-top: 15px; text-align: center; }
+        .finance-val { font-size: 38px; color: #ff4444; font-weight: 800; letter-spacing: -1px; margin: 10px 0; }
+        .finance-sub { font-size: 11px; color: #555; text-transform: uppercase; }
+
+        .pay-table { width: 100%; margin-top: 10px; border-collapse: separate; border-spacing: 0 8px; }
+        .pay-row { background: #000; border: 1px solid #1a1a1a; border-radius: 10px; }
+        .pay-row td { padding: 15px; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a; }
+        .pay-row td:first-child { border-left: 1px solid #1a1a1a; border-radius: 10px 0 0 10px; }
+        .pay-row td:last-child { border-right: 1px solid #1a1a1a; border-radius: 0 10px 10px 0; text-align: right; }
+
+        .btn-pay { background: #fff; color: #000; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 800; font-size: 10px; cursor: pointer; text-transform: uppercase; }
+        .btn-ban { background: #ff4444; color: #fff; border: none; padding: 18px; border-radius: 12px; font-weight: 800; width: 100%; margin-top: 12px; cursor: pointer; font-size: 13px; }
+        
+        input.admin-input { width: 100%; background: #111; border: 1px solid #222; padding: 18px; color: #fff; border-radius: 12px; font-size: 16px; outline: none; transition: 0.3s; }
+        input.admin-input:focus { border-color: #ff4444; }
+    </style>
+</head>
+<body>
+
+    <div class="header-fixed">
+        <div class="ad-banner-top">APEX SOCIAL • ADMIN COMMAND CENTER</div>
+        <div class="user-stats-bar">
+            <div class="stat-pill"><span>XP Global</span><b id="topXP">0</b></div>
+            <div class="stat-pill"><span>Saldo Total</span><b id="topBalance">0.0000€</b></div>
+            <div class="stat-pill"><span>Saúde</span><b id="topHealth" style="color:#28a745;">ESTÁVEL</b></div>
+            <div class="stat-pill"><span>Modo</span><b>MASTER</b></div>
+        </div>
+        <div class="tabs">
+            <div class="tab-item active" onclick="openTab('feed-page', this)">Feed</div>
+            <div class="tab-item" onclick="openTab('wallet-page', this)">Rede</div>
+            <div class="tab-item" onclick="openTab('info-page', this)">Info</div>
+            <div id="adm-tab" class="tab-item" style="display:none; color:#ff4444;" onclick="openTab('admin-page', this)">ADMIN</div>
+        </div>
+    </div>
+
+    <main class="content">
+        <div id="feed-page" class="page active"><div id="feed-container">A carregar feed...</div></div>
+        <div id="wallet-page" class="page"></div>
+        <div id="info-page" class="page"></div>
+
         <div id="admin-page" class="page">
             
-            <div class="card" style="border-top: 4px solid #ffcc00; background: #0c0c0c;">
-                <h2 style="font-size: 14px; color: #ffcc00; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">
-                    <i class="fas fa-chart-line"></i> Performance de Rede
-                </h2>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div style="background: #000; padding: 20px; border-radius: 12px; border: 1px solid #222; text-align: center;">
-                        <span style="font-size: 10px; color: #777; display: block; margin-bottom: 8px; text-transform: uppercase;">Membros</span>
-                        <b id="admUsers" style="font-size: 24px; color: #fff;">0</b>
+            <section class="admin-card">
+                <div class="section-header">
+                    <h2>Performance de Rede</h2>
+                    <p>Métricas de utilização em tempo real</p>
+                </div>
+                <div class="kpi-container">
+                    <div class="kpi-box">
+                        <span>Utilizadores</span>
+                        <b id="admUsers">0</b>
                     </div>
-                    <div style="background: #000; padding: 20px; border-radius: 12px; border: 1px solid #222; text-align: center;">
-                        <span style="font-size: 10px; color: #777; display: block; margin-bottom: 8px; text-transform: uppercase;">Posts</span>
-                        <b id="admPosts" style="font-size: 24px; color: #fff;">0</b>
+                    <div class="kpi-box">
+                        <span>Publicações</span>
+                        <b id="admPosts">0</b>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="card" style="background: #111; border: 1px solid #333;">
-                <h2 style="font-size: 14px; color: #ff4444; text-transform: uppercase; margin-bottom: 20px;">
-                    <i class="fas fa-wallet"></i> Tesouraria e Pagamentos
-                </h2>
-                <div style="margin-bottom: 20px;">
-                    <span style="font-size: 11px; color: #aaa; display: block;">DÍVIDA TOTAL DA REDE (CASH-OUT):</span>
-                    <b id="admBurn" style="font-size: 32px; color: #ff4444; display: block; margin: 10px 0;">0.0000€</b>
-                    <small id="admDebtXP" style="font-size: 12px; color: #555;">0 XP EMITIDOS</small>
+            <section class="admin-card">
+                <div class="section-header">
+                    <h2>Tesouraria Global</h2>
+                    <p>Monitorização de passivos e pagamentos</p>
+                </div>
+                <div class="finance-main">
+                    <span class="finance-sub">Dívida Total Acumulada (Cash-out)</span>
+                    <div class="finance-val" id="admBurn">0.0000€</div>
+                    <span class="finance-sub" id="admDebtXP">0 XP EMITIDOS</span>
                 </div>
                 
-                <hr style="border: 0; border-top: 1px solid #222; margin: 20px 0;">
-                
-                <h3 style="font-size: 12px; color: #28a745; margin-bottom: 15px; text-transform: uppercase;">Aprovação de Saques (>5000 XP)</h3>
-                <div id="admPayments" style="background: #000; border-radius: 10px; padding: 5px; min-height: 100px;">
-                    <p style="font-size: 12px; color: #444; text-align: center; padding: 40px 0;">Nenhum pedido de saque pendente.</p>
-                </div>
-            </div>
-
-            <div class="card" style="border-bottom: 4px solid #555;">
-                <h2 style="font-size: 14px; color: #fff; text-transform: uppercase; margin-bottom: 20px;">
-                    <i class="fas fa-shield-alt"></i> Controlo de Segurança
-                </h2>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <label style="font-size: 11px; color: #777;">ELIMINAR POST POR ID (IRREVERSÍVEL):</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="delId" placeholder="Ex: 125" style="flex: 1; background: #000; border: 2px solid #333; padding: 15px; color: #fff; border-radius: 8px; font-size: 16px; font-weight: bold; outline: none;">
-                        <button onclick="adminDelete()" style="background: #ff4444; color: #fff; border: none; padding: 0 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px;">BANIR</button>
+                <div style="margin-top: 30px;">
+                    <h3 style="font-size: 11px; color: #ffcc00; text-transform: uppercase; margin-bottom: 15px;">Aprovação de Pagamentos (+5000 XP)</h3>
+                    <div id="admPayments">
+                        <p style="text-align: center; color: #333; font-size: 11px; padding: 20px;">Nenhum levantamento pendente.</p>
                     </div>
                 </div>
-            </div>
+            </section>
+
+            <section class="admin-card">
+                <div class="section-header">
+                    <h2>Segurança e Moderação</h2>
+                    <p>Gestão de integridade de conteúdo</p>
+                </div>
+                <div style="margin-top: 15px;">
+                    <span style="font-size: 10px; color: #555; display: block; margin-bottom: 10px;">ELIMINAR POST PELO ID:</span>
+                    <input type="number" id="delId" class="admin-input" placeholder="Ex: 1042">
+                    <button onclick="adminDelete()" class="btn-ban">ELIMINAR PERMANENTEMENTE</button>
+                </div>
+            </section>
+
         </div>
+    </main>
+
+    <script>
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const client = supabase.createClient(SB_URL, SB_KEY);
+        const myId = 5401881400; 
+
+        async function init() {
+            getProfile();
+            loadFeed();
+            if(myId === 5401881400) {
+                document.getElementById('adm-tab').style.display = 'block';
+                loadAdminStats();
+            }
+        }
+
+        async function loadAdminStats() {
+            const { data: users } = await client.from('profiles').select('*').order('points', { ascending: false });
+            const { count: pCount } = await client.from('posts').select('*', { count: 'exact', head: true });
+            
+            const totalXP = users.reduce((acc, curr) => acc + (curr.points || 0), 0);
+            const totalEuro = (totalXP * 0.0001);
+
+            document.getElementById('admUsers').innerText = users.length;
+            document.getElementById('admPosts').innerText = pCount;
+            document.getElementById('admDebtXP').innerText = Math.floor(totalXP).toLocaleString() + " XP EMITIDOS";
+            document.getElementById('admBurn').innerText = totalEuro.toFixed(4) + "€";
+
+            let payHtml = '<table class="pay-table">';
+            const eligible = users.filter(u => u.points >= 5000);
+            
+            if(eligible.length > 0) {
+                eligible.forEach(u => {
+                    payHtml += `
+                    <tr class="pay-row">
+                        <td>
+                            <b style="font-size:13px; color:#fff;">User #${u.id.toString().slice(-6)}</b><br>
+                            <span style="font-size:11px; color:#ffcc00;">${(u.points * 0.0001).toFixed(4)}€</span>
+                        </td>
+                        <td>
+                            <button class="btn-pay" onclick="confirmPay(${u.id})">PAGAR</button>
+                        </td>
+                    </tr>`;
+                });
+                payHtml += '</table>';
+                document.getElementById('admPayments').innerHTML = payHtml;
+            }
+        }
+
+        async function adminDelete() {
+            const id = document.getElementById('delId').value;
+            if(!id) return alert("Insira um ID");
+            const { error } = await client.from('posts').delete().eq('id', id);
+            if(!error) {
+                alert("Post removido com sucesso.");
+                loadAdminStats();
+            }
+        }
+
+        function openTab(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+        }
+
+        /* Funções de Perfil e Feed permanecem como antes */
+        async function getProfile() {
+            const { data } = await client.from('profiles').select('*').eq('id', myId).single();
+            if (data) {
+                document.getElementById('topXP').innerText = Math.floor(data.points || 0).toLocaleString();
+                document.getElementById('topBalance').innerText = (data.points * 0.0001).toFixed(4) + "€";
+            }
+        }
+
+        async function loadFeed() {
+            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
+            const container = document.getElementById('feed-container');
+            container.innerHTML = posts.map(p => `<div style="background:#080808; padding:15px; border-radius:12px; margin-bottom:10px; border:1px solid #111;"><small style="color:#333;">ID: ${p.id}</small><p style="margin-top:5px;">${p.content}</p></div>`).join('');
+        }
+
+        init();
+    </script>
+</body>
+</html>
