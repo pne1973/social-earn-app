@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Pine Social</title>
+    <title>Apex Social</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -16,35 +16,34 @@
             min-height: 100vh; padding-top: 165px; padding-bottom: 20px;
         }
 
-        /* HEADER & MONETIZATION (FIXED) */
+        /* HEADER & MONETIZATION */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
         .ad-top { background: #1a1a1a; color: #ffcc00; padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; letter-spacing: 0.5px; }
         .nav-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; }
         .xp-pill { background: #ffcc00; color: #000; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; box-shadow: 0 2px 8px rgba(255,204,0,0.2); }
 
-        /* TABS NAVIGATION */
+        /* TABS */
         .tabs { display: flex; background: #1a1a1a; border-top: 1px solid #333; }
         .tab-item { flex: 1; padding: 14px; text-align: center; color: #888; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
         .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
 
-        /* LAYOUT & CARDS */
+        /* CONTENT CARDS */
         .content { padding: 15px; max-width: 500px; margin: 0 auto; }
         .page { display: none; }
         .page.active { display: block; }
         .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
         
-        /* POST STYLE & IMAGE BINDING (300px) */
+        /* POSTS */
         .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; position: relative; }
         .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; border-bottom: 1px solid #252525; }
         .post-avatar { width: 34px; height: 34px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; font-size: 14px; border: 1px solid #444; }
         .post-text { padding: 15px; font-size: 15px; line-height: 1.5; color: #f0f0f0; }
         .post-img { width: 100%; height: 300px; object-fit: cover; display: block; border-top: 1px solid #252525; background: #000; }
 
-        /* SOCIAL ACTIONS */
+        /* ACTIONS & COMMENTS */
         .post-actions { display: flex; padding: 12px 15px; border-top: 1px solid #252525; gap: 25px; color: #aaa; font-size: 14px; }
         .action-btn { cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .action-btn:hover { color: #ffcc00; }
-        
         .comment-section { background: #161616; padding: 12px; display: none; border-top: 1px solid #252525; }
         .comment-list { max-height: 180px; overflow-y: auto; margin-bottom: 12px; }
         .comment-item { font-size: 12px; color: #ccc; padding: 6px 0; border-bottom: 1px solid #222; }
@@ -53,23 +52,21 @@
         .comment-input { flex: 1; background: #252525; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; outline: none; }
 
         .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-pub:active { transform: scale(0.95); opacity: 0.8; }
         .admin-link { display: none; }
-        .flag-icon { margin-left: auto; color: #444; font-size: 13px; }
     </style>
 </head>
 <body>
 
     <div class="header-fixed">
-        <div class="ad-top">📢 PINE SOCIAL: Ganha +100 XP por cada amigo convidado!</div>
+        <div class="ad-top">📢 APEX SOCIAL: Ganhe dinheiro real interagindo!</div>
         <div class="nav-main">
-            <h3>PINE <span style="color:#ffcc00">SOCIAL</span></h3>
+            <h3>APEX <span style="color:#ffcc00">SOCIAL</span></h3>
             <div id="userXP" class="xp-pill">0 XP</div>
         </div>
         <div class="tabs">
             <div class="tab-item active" onclick="openTab('feed-page', this)">Feed</div>
             <div class="tab-item" onclick="openTab('earn-page', this)">Ranking</div>
-            <div class="tab-item" onclick="openTab('wallet-page', this)">Saque</div>
+            <div class="tab-item" onclick="openTab('wallet-page', this)">Carteira</div>
             <div id="adm-tab" class="tab-item admin-link" onclick="openTab('admin-page', this)">Admin</div>
         </div>
     </div>
@@ -77,45 +74,42 @@
     <main class="content">
         <div id="feed-page" class="page active">
             <div class="card">
-                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; resize:none; outline:none; font-size:15px; min-height:60px;" placeholder="O que queres partilhar hoje?"></textarea>
+                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; resize:none; outline:none; font-size:15px; min-height:60px;" placeholder="O que está a pensar?"></textarea>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                    <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer; font-size:14px;"><i class="fas fa-image"></i> Adicionar Foto</button>
+                    <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer; font-size:14px;"><i class="fas fa-image"></i> Foto</button>
                     <input type="file" id="fileInput" hidden accept="image/*">
                     <span id="procStatus" style="display:none; color:#ffcc00; font-size:11px;">Processando...</span>
                     <button class="btn-pub" onclick="publish()">Publicar</button>
                 </div>
             </div>
-            <div id="feed-items">Carregando as melhores publicações...</div>
+            <div id="feed-items">A carregar novidades...</div>
         </div>
 
         <div id="earn-page" class="page">
             <div class="card">
-                <h3 style="color:#ffcc00; margin-bottom:15px;">Top 10 Utilizadores</h3>
+                <h3 style="color:#ffcc00; margin-bottom:15px;">Top Ganhadores</h3>
                 <div id="rankingList" style="font-size:14px; line-height:2.2;"></div>
-            </div>
-            <div class="card" style="font-size:12px; color:#888;">
-                <p>Post: +15 XP | Amigo: +100 XP | Like: +2 XP | Check-in: +5 XP</p>
             </div>
         </div>
 
         <div id="wallet-page" class="page">
             <div class="card" style="text-align:center; padding:30px 15px;">
-                <p style="font-size:13px; color:#888;">O teu saldo atual</p>
-                <h1 style="color:#ffcc00; font-size:42px; margin:15px 0;"><span id="eurVal">0.0000</span>€</h1>
-                <h3 id="brlVal" style="color:#aaa;">Euro (EUR)</h3>
-                <p style="font-size:11px; color:#555; margin-top:20px;">Levantamento mínimo: 5000 XP</p>
+                <p style="font-size:13px; color:#888;">Ganhos Estimados (CPM 1.00)</p>
+                <h1 id="mainValue" style="color:#ffcc00; font-size:42px; margin:15px 0;">0.0000</h1>
+                <h3 id="currencyLabel" style="color:#aaa; font-weight: normal;">---</h3>
+                <p style="font-size:11px; color:#555; margin-top:20px;">Mínimo para saque: 5000 XP</p>
             </div>
             <div class="card">
-                <p style="font-size:12px; margin-bottom:8px;">Teu link de convite único:</p>
-                <code id="invLink" style="font-size:10px; color:#ffcc00; display:block; background:#111; padding:10px; border-radius:5px; border:1px solid #333;">https://pinesocial.app/join?ref=5401881400</code>
+                <p style="font-size:12px; margin-bottom:8px;">Seu link de convite:</p>
+                <code id="invLink" style="font-size:10px; color:#ffcc00; display:block; background:#111; padding:10px; border-radius:5px; border:1px solid #333;">...</code>
             </div>
         </div>
 
         <div id="admin-page" class="page">
             <div class="card" style="border:1px solid #ff4444">
-                <h3 style="color:#ff4444; margin-bottom:15px;">Painel de Controlo Admin</h3>
+                <h3 style="color:#ff4444; margin-bottom:15px;">Admin Panel</h3>
                 <div id="admStats" style="font-size:13px; margin-bottom:20px;">...</div>
-                <button class="btn-pub" style="background:#ff4444; color:#fff; width:100%;" onclick="clearAllPosts()">ELIMINAR TODOS OS POSTS (ID Reset)</button>
+                <button class="btn-pub" style="background:#ff4444; color:#fff; width:100%;" onclick="clearAllPosts()">RESET FEED</button>
             </div>
         </div>
     </main>
@@ -126,26 +120,14 @@
         const client = supabase.createClient(SB_URL, SB_KEY);
         const myId = 5401881400;
 
-        // --- SISTEMA AUTOMÁTICO DE LOCALIZAÇÃO ---
+        // --- AUTOMAÇÃO DE MOEDA E CPM ---
         const userConfig = {
-            lang: navigator.language || 'pt-PT',
             isBR: (navigator.language || '').includes('BR'),
             get symbol() { return this.isBR ? 'R$' : '€' },
-            get rate() { return this.isBR ? 0.00615 : 0.0010 },
-            get label() { return this.isBR ? 'Real (BRL)' : 'Euro (EUR)' }
+            get label() { return this.isBR ? 'Real Brasileiro (BRL)' : 'Euro (EUR)' },
+            cpmRate: 0.0010 // 1000 XP = 1.00 Unidade
         };
 
-        // Tradução básica inicial
-        window.onload = () => {
-            if (!userConfig.lang.startsWith('pt')) {
-                const btn = document.querySelector('.btn-pub');
-                if(btn) btn.innerText = 'Publish';
-                const input = document.getElementById('postText');
-                if(input) input.placeholder = "What's on your mind?";
-            }
-        };
-
-        // SISTEMA DE NAVEGAÇÃO
         function openTab(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
@@ -154,106 +136,75 @@
             if(id === 'feed-page') fetchFeed();
             if(id === 'earn-page') fetchRanking();
             if(id === 'admin-page') fetchAdminData();
-            window.scrollTo(0,0);
         }
 
-        // ECONOMIA E PERFIL
         async function getProfile() {
             const { data } = await client.from('profiles').select('points').eq('id', myId).single();
             if (data) {
                 const pts = data.points || 0;
                 document.getElementById('userXP').innerText = pts + " XP";
                 
-                const convertedValue = (pts * userConfig.rate).toFixed(4);
-                
-                const valSpan = document.getElementById('eurVal');
-                if (valSpan) valSpan.innerText = convertedValue;
-                
-                const walletH1 = document.querySelector('#wallet-page h1');
-                if (walletH1) walletH1.innerHTML = `<span id="eurVal">${convertedValue}</span>${userConfig.symbol}`;
-                
-                const label = document.getElementById('brlVal');
-                if (label) label.innerText = userConfig.label;
+                // Cálculo de Ganho Estimado (CPM 1.00)
+                const estimatedGain = (pts * userConfig.cpmRate).toFixed(4);
+                document.getElementById('mainValue').innerHTML = `${estimatedGain}<small style="font-size:20px; margin-left:5px;">${userConfig.symbol}</small>`;
+                document.getElementById('currencyLabel').innerText = userConfig.label;
+                document.getElementById('invLink').innerText = `https://apexsocial.app/join?ref=${myId}`;
             }
-            if(myId === 5401881400) {
-                const adm = document.getElementById('adm-tab');
-                if(adm) adm.style.display = 'block';
-            }
+            if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
         }
 
-        // FEED & COMENTÁRIOS
         async function fetchFeed() {
             const { data: posts } = await client.from('posts').select('*').order('created_at', {ascending: false}).limit(10);
             const list = document.getElementById('feed-items');
             list.innerHTML = '';
-            
             if(posts) {
                 for (let i = 0; i < posts.length; i++) {
                     const p = posts[i];
                     const { data: comms } = await client.from('comments').select('*').eq('post_id', p.id).order('created_at', {ascending: true});
-                    
                     const el = document.createElement('div');
                     el.className = 'post';
                     el.innerHTML = `
                         <div class="post-header">
                             <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
                             <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
-                            <div class="flag-icon"><i class="fas fa-flag"></i></div>
                         </div>
                         <div class="post-text">${p.content || ''}</div>
-                        ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
+                        ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
                         <div class="post-actions">
                             <div class="action-btn" onclick="addXP(2, this)"><i class="far fa-heart"></i> <span>0</span></div>
-                            <div class="action-btn" onclick="toggleComments('${p.id}')"><i class="far fa-comment"></i> <span>${comms ? comms.length : 0}</span></div>
-                            <div class="action-btn" onclick="shareSocial('${p.id}')"><i class="fas fa-share-nodes"></i></div>
+                            <div class="action-btn" onclick="toggleComments('${p.id}')"><i class="far fa-comment"></i> <span>${comms?comms.length:0}</span></div>
                         </div>
                         <div id="box-${p.id}" class="comment-section">
-                            <div class="comment-list">
-                                ${comms ? comms.map(c => `<div class="comment-item"><b>User #${c.user_id.toString().slice(-4)}:</b> ${c.content}</div>`).join('') : ''}
-                            </div>
+                            <div class="comment-list">${comms?comms.map(c=>`<div class="comment-item"><b>User #${c.user_id.toString().slice(-4)}:</b> ${c.content}</div>`).join(''):''}</div>
                             <div class="comment-input-wrap">
-                                <input type="text" id="input-${p.id}" class="comment-input" placeholder="Responder...">
-                                <button onclick="sendComment('${p.id}')" class="btn-pub" style="padding:6px 12px; font-size:11px;">OK</button>
+                                <input type="text" id="input-${p.id}" class="comment-input" placeholder="Comentar...">
+                                <button onclick="sendComment('${p.id}')" class="btn-pub" style="padding:5px 10px; font-size:11px;">OK</button>
                             </div>
                         </div>
                     `;
                     list.appendChild(el);
-                    if((i+1)%3 === 0) {
-                        list.innerHTML += `<div style="text-align:center; color:#ffcc00; font-size:10px; padding:15px; border:1px dashed #333; margin-bottom:20px; border-radius:12px; opacity:0.6;">📢 ANÚNCIO: Pine Social Monetization</div>`;
-                    }
+                    if((i+1)%3===0) list.innerHTML += `<div style="text-align:center; color:#ffcc00; font-size:10px; padding:10px; opacity:0.5;">📢 AD SPACE: CPM 1.00 ACTIVE</div>`;
                 }
             }
         }
 
         async function sendComment(postId) {
-            const input = document.getElementById(`input-${postId}`);
-            if(!input.value) return;
-            const { error } = await client.from('comments').insert([{ post_id: postId, user_id: myId, content: input.value }]);
-            if(!error) {
-                await client.rpc('increment_points', { user_id: myId, amount: 5 });
-                input.value = ''; fetchFeed(); getProfile();
-            }
+            const val = document.getElementById(`input-${postId}`).value;
+            if(!val) return;
+            await client.from('comments').insert([{ post_id: postId, user_id: myId, content: val }]);
+            await client.rpc('increment_points', { user_id: myId, amount: 5 });
+            fetchFeed(); getProfile();
         }
 
         async function addXP(amt, btn) {
             await client.rpc('increment_points', { user_id: myId, amount: amt });
-            if(btn) { 
-                btn.style.color = "#ffcc00"; 
-                let s = btn.querySelector('span'); 
-                if(s) s.innerText = parseInt(s.innerText)+1; 
-            }
+            btn.style.color = "#ffcc00";
             getProfile();
         }
 
         function toggleComments(id) {
             const box = document.getElementById(`box-${id}`);
-            if(box) box.style.display = box.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function shareSocial(id) {
-            const url = `https://pinesocial.app/p/${id}`;
-            if(navigator.share) navigator.share({title: 'Pine Social', url: url});
-            else prompt("Copia o link:", url);
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
         }
 
         async function publish() {
@@ -264,8 +215,8 @@
             let img = null;
             if(file) {
                 const name = `p_${Date.now()}.jpg`;
-                const { data } = await client.storage.from('post-images').upload(name, file);
-                if(data) img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
+                await client.storage.from('post-images').upload(name, file);
+                img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
             }
             await client.from('posts').insert([{ user_id: myId, content: txt, image_url: img }]);
             await client.rpc('increment_points', { user_id: myId, amount: 15 });
@@ -277,29 +228,24 @@
         async function fetchRanking() {
             const { data } = await client.from('profiles').select('id, points').order('points', {ascending: false}).limit(10);
             const list = document.getElementById('rankingList');
-            if(list && data) {
-                list.innerHTML = '';
-                data.forEach((u, i) => list.innerHTML += `<p>#${i+1} User...${u.id.toString().slice(-4)} <span style="float:right; color:#ffcc00; font-weight:bold;">${u.points} XP</span></p>`);
-            }
+            list.innerHTML = '';
+            if(data) data.forEach((u, i) => {
+                const gain = (u.points * userConfig.cpmRate).toFixed(2);
+                list.innerHTML += `<p>#${i+1} User...${u.id.toString().slice(-4)} <span style="float:right; color:#ffcc00;">${gain}${userConfig.symbol}</span></p>`;
+            });
         }
 
         async function fetchAdminData() {
             const { count: u } = await client.from('profiles').select('*', { count: 'exact', head: true });
             const { count: p } = await client.from('posts').select('*', { count: 'exact', head: true });
-            const stats = document.getElementById('admStats');
-            if(stats) stats.innerText = `Utilizadores: ${u} | Posts Totais: ${p}`;
+            document.getElementById('admStats').innerText = `Users: ${u} | Posts: ${p}`;
         }
 
         async function clearAllPosts() {
-            if(confirm("Apagar todos os posts?")) {
-                await client.from('posts').delete().neq('id', 0);
-                fetchFeed();
-            }
+            if(confirm("Reset feed?")) { await client.from('posts').delete().neq('id', 0); fetchFeed(); }
         }
 
-        // INIT
-        getProfile(); 
-        fetchFeed();
+        getProfile(); fetchFeed();
     </script>
 </body>
 </html>
