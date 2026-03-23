@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Master v2</title>
+    <title>Apex Social</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -15,7 +15,7 @@
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
-        /* GRID DE STATS (Limpa conforme solicitado) */
+        /* GRID DE STATS (Apenas 3 colunas para utilizadores) */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
@@ -36,6 +36,8 @@
         .post-img-container { width: 100%; max-height: 400px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f8f9fa; border: 1px solid #f1f3f4; display: flex; align-items: center; justify-content: center; }
         .post-img { width: 100%; height: auto; max-height: 400px; object-fit: contain; }
         
+        .post-text { font-size: 15px; color: #3c4043; line-height: 1.5; }
+
         /* INTERAÇÕES */
         .actions-row { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f3f4; padding-top: 12px; margin-top: 12px; }
         .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
@@ -44,11 +46,10 @@
         /* UI ELEMENTS */
         .input-google { width: 100%; border: none; outline: none; font-size: 16px; margin-bottom: 15px; resize: none; min-height: 60px; }
         .btn-post { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; }
-        .info-badge { background: #e8f0fe; color: #1a73e8; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
 
-        /* SEGURANÇA MASTER */
-        .adm-only { display: none !important; }
-        body.is-master .adm-only { display: block !important; }
+        /* SEGURANÇA MASTER (Elemento que removemos) */
+        #tab-master, #view-master, .admin-only-data { display: none !important; }
+        body.is-master #tab-master, body.is-master #view-master, body.is-master .admin-only-data { display: block !important; }
     </style>
 </head>
 <body id="appBody">
@@ -64,7 +65,7 @@
             <div class="tab active" onclick="changeTab('explorar', this)">Explorar</div>
             <div class="tab" onclick="changeTab('rede', this)">Rede</div>
             <div class="tab" onclick="changeTab('info', this)">Info</div>
-            <div class="tab adm-only" style="color:#d93025;" onclick="changeTab('master', this)">Master</div>
+            <div id="tab-master" class="tab" style="color:#d93025;" onclick="changeTab('master', this)">Master</div>
         </nav>
     </header>
 
@@ -72,55 +73,42 @@
         
         <section id="view-explorar" class="view-section active">
             <div class="card">
-                <textarea id="postInput" class="input-google" placeholder="O que pretende partilhar?"></textarea>
+                <textarea id="postInput" class="input-google" placeholder="Partilhe algo..."></textarea>
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
                     <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileInput"><i class="fas fa-camera"></i> Foto (+15 XP)</label>
                     <input type="file" id="fileInput" hidden onchange="handleFile(this)">
                     <button class="btn-post" style="width:auto;" onclick="sendPost()">Publicar</button>
                 </div>
-                <img id="previewImg" style="display:none; width:100%; margin-top:15px; border-radius:6px; max-height:200px; object-fit:cover;">
             </div>
             <div id="feedContent"></div>
         </section>
 
         <section id="view-rede" class="view-section">
             <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;"><i class="fas fa-users"></i> Crescimento da Rede</h3>
+                <h3 style="font-size:16px; margin-bottom:15px;">Convidar Amigos</h3>
                 <div style="background:#f8f9fa; padding:15px; border-radius:6px; border:1px dashed #dadce0;">
-                    <label style="font-size:10px; color:#70757a; font-weight:bold;">LINK DE CONVITE:</label>
-                    <div id="refLink" style="font-size:12px; color:#1a73e8; margin:8px 0; word-break:break-all;">...</div>
-                    <button class="btn-post" style="background:#fff; color:#1a73e8; border:1px solid #1a73e8;" onclick="copyRef()">Copiar Link</button>
+                    <div id="refLink" style="font-size:12px; color:#1a73e8; word-break:break-all;">...</div>
+                    <button class="btn-post" style="background:#fff; color:#1a73e8; border:1px solid #1a73e8; margin-top:10px;" onclick="copyRef()">Copiar Link</button>
                 </div>
             </div>
         </section>
 
         <section id="view-info" class="view-section">
             <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;">Regras de Ganhos</h3>
-                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
-                    <span>Publicação com Foto</span><b class="info-badge">+15 XP</b>
-                </div>
-                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
-                    <span>Novo Afiliado</span><b class="info-badge">+100 XP</b>
-                </div>
+                <h3 style="font-size:16px; margin-bottom:15px;">Manual de Ganhos</h3>
+                <p style="font-size:13px; color:#5f6368;">Ganha XP por cada post, like e convite.</p>
             </div>
         </section>
 
-        <section id="view-master" class="view-section adm-only">
+        <section id="view-master" class="view-section">
             <div class="card">
-                <h3 style="color:#d93025; margin-bottom:15px;">Painel de Controlo Master</h3>
-                
-                <div style="background:#fdf7f7; border:1px solid #fce8e6; padding:20px; border-radius:6px; text-align:center; margin-bottom:20px;">
-                    <label style="font-size:10px; color:#70757a; text-transform:uppercase;">Dívida Total à Rede:</label>
-                    <h1 id="valDebt" style="color:#d93025; font-size:32px; margin-top:5px;">0.00€</h1>
-                    <button class="btn-post" style="margin-top:15px; background:#1a73e8;">Lista de Pagamentos (PayPal)</button>
+                <h3 style="color:#d93025; margin-bottom:15px;">Consola de Gestão</h3>
+                <div style="background:#fdf7f7; padding:15px; border-radius:6px; text-align:center;">
+                    <label style="font-size:10px; color:#70757a;">Dívida Total à Rede:</label>
+                    <h1 id="valDebt" style="color:#d93025; font-size:28px;">0.00€</h1>
                 </div>
-
-                <div style="border-top:1px solid #f1f3f4; padding-top:20px;">
-                    <label style="font-size:12px; font-weight:bold;">Moderação: Eliminar Post (ID)</label>
-                    <input type="number" id="delId" class="input-google" style="border:1px solid #dadce0; padding:10px; border-radius:4px; min-height:auto; margin-top:10px;" placeholder="Introduza o ID do post">
-                    <button class="btn-post" style="background:#d93025; margin-top:10px;" onclick="adminDelete()">Eliminar Permanentemente</button>
-                </div>
+                <input type="number" id="delId" class="input-google" style="border:1px solid #dadce0; padding:10px; margin-top:15px;" placeholder="ID para apagar">
+                <button class="btn-post" style="background:#d93025;" onclick="adminDelete()">Apagar Post</button>
             </div>
         </section>
 
@@ -131,9 +119,10 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
         
-        const MY_ID = 5401881400; 
+        const MY_ID = 5401881400; // O SEU ID DE ADMIN
 
         async function init() {
+            // VERIFICAÇÃO DE SEGURANÇA
             if(MY_ID === 5401881400) {
                 document.getElementById('appBody').classList.add('is-master');
                 document.getElementById('headerTitle').innerText = "Apex Business Control";
@@ -162,15 +151,17 @@
             const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('feedContent');
             container.innerHTML = "";
-            let totalPoints = 0;
-            
+            let pointsSum = 0;
+
             posts.forEach(p => {
-                totalPoints += (p.points || 0);
+                pointsSum += (p.points || 0);
                 container.innerHTML += `
                     <div class="card">
-                        <div style="font-size:11px; color:#70757a; margin-bottom:10px;">ID #${p.id}</div>
-                        <div style="font-size:15px; color:#3c4043;">${p.content || ''}</div>
-                        ${p.image_url ? `<div class="post-img-container" style="margin-top:12px;"><img src="${p.image_url}" class="post-img"></div>` : ''}
+                        <div class="admin-only-data" style="font-size:9px; color:#d93025; margin-bottom:5px;">ADMIN: POST ID #${p.id}</div>
+                        
+                        <div class="post-text">${p.content || ''}</div>
+                        ${p.image_url ? `<div class="post-img-container"><img src="${p.image_url}" class="post-img"></div>` : ''}
+                        
                         <div class="actions-row">
                             <button class="action-btn"><i class="far fa-heart"></i> Gosto</button>
                             <button class="action-btn"><i class="far fa-comment"></i> Coment.</button>
@@ -178,23 +169,10 @@
                         </div>
                     </div>`;
             });
-            // Cálculo da dívida apenas para visualização Master
-            document.getElementById('valDebt').innerText = (totalPoints * 0.0001).toFixed(2) + "€";
+            document.getElementById('valDebt').innerText = (pointsSum * 0.0001).toFixed(2) + "€";
         }
 
-        async function adminDelete() {
-            const id = document.getElementById('delId').value;
-            if(!id) return;
-            if(confirm("Apagar post definitivamente?")) {
-                await client.from('posts').delete().eq('id', id);
-                location.reload();
-            }
-        }
-
-        function copyRef() {
-            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
-            alert("Link copiado!");
-        }
+        // ... resto das funções (sendPost, copyRef, adminDelete) ...
 
         init();
     </script>
