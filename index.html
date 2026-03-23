@@ -3,48 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Master v4</title>
+    <title>Apex Social - Enterprise Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* CSS RESET & GOOGLE UI */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 175px; }
 
-        /* HEADER GOOGLE STYLE */
+        /* HEADER ESTATUÁRIO */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
-        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; padding: 12px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
         .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
         .stat-item b { font-size: 11px; color: #1a73e8; }
-
+        
+        /* SISTEMA DE ABAS (CORREÇÃO DE MISTURA) */
         .tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; }
         .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; border-bottom: 3px solid transparent; text-transform: uppercase; }
         .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
 
-        /* CONTAINER & SECTIONS */
+        /* CONTENT ENGINE */
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
-        .page-content { display: none; }
-        .page-content.active { display: block !important; }
+        
+        /* BLOQUEIO ABSOLUTO: Garante que apenas 1 aba exista visualmente */
+        .section-page { display: none !important; }
+        .section-page.active { display: block !important; }
 
-        /* CARDS */
+        /* DESIGN DOS CARDS */
         .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        h3 { font-size: 16px; margin-bottom: 15px; color: #3c4043; border-bottom: 1px solid #f1f3f4; padding-bottom: 8px; }
+        h3 { font-size: 15px; margin-bottom: 12px; color: #3c4043; border-bottom: 1px solid #f1f3f4; padding-bottom: 8px; }
 
-        /* LISTS & TABLES */
-        .row-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f3f4; font-size: 14px; }
-        .row-item:last-child { border-bottom: none; }
-        .badge { background: #e8f0fe; color: #1a73e8; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
-
-        /* ADMIN SPECIFIC */
-        .admin-box { background: #fdf7f7; border: 1px solid #fce8e6; border-radius: 8px; padding: 20px; text-align: center; }
-        .btn-google { background: #1a73e8; color: #fff; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; }
-        .btn-red { background: #d93025; margin-top: 10px; }
-
+        /* ADMIN & ECONOMY */
+        .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f3f4; font-size: 13px; }
         .adm-only { display: none !important; }
         body.is-master .adm-only { display: block !important; }
+        
+        .btn-action { background: #1a73e8; color: #fff; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn-del { background: #d93025; }
     </style>
 </head>
 <body id="appBody">
@@ -58,63 +57,63 @@
             <div class="stat-item"><label>Estado</label><b style="color:#1e8e3e;">ONLINE</b></div>
         </div>
         <nav class="tabs">
-            <div class="tab active" data-target="page-explorar" onclick="nav(this)">Explorar</div>
-            <div class="tab" data-target="page-rede" onclick="nav(this)">Rede</div>
-            <div class="tab" data-target="page-info" onclick="nav(this)">Info</div>
-            <div class="tab adm-only" data-target="page-master" onclick="nav(this)" style="color:#d93025;">Master</div>
+            <div class="tab active" data-id="page-feed" onclick="switchTab(this)">Explorar</div>
+            <div class="tab" data-id="page-rede" onclick="switchTab(this)">Rede</div>
+            <div class="tab" data-id="page-info" onclick="switchTab(this)">Info</div>
+            <div class="tab adm-only" data-id="page-master" onclick="switchTab(this)" style="color:#d93025;">Master</div>
         </nav>
     </header>
 
     <main class="container">
         
-        <div id="page-explorar" class="page-content active">
+        <div id="page-feed" class="section-page active">
             <div class="card">
-                <textarea id="postInput" style="width:100%; border:none; outline:none; font-size:16px; min-height:60px;" placeholder="No que está a pensar?"></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
-                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileInput"><i class="fas fa-camera"></i> Foto (+15 XP)</label>
-                    <input type="file" id="fileInput" hidden onchange="handleFile(this)">
-                    <button class="btn-google" style="width:auto; padding:8px 20px;" onclick="sendPost()">Publicar</button>
+                <textarea id="postInput" style="width:100%; border:none; outline:none; font-size:16px; min-height:50px; resize:none;" placeholder="No que está a pensar?"></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px; margin-top:10px;">
+                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileIn"><i class="fas fa-image"></i> Foto (+15 XP)</label>
+                    <input type="file" id="fileIn" hidden onchange="handleFile(this)">
+                    <button class="btn-action" style="width:auto; padding:8px 20px; margin:0;" onclick="sendPost()">Publicar</button>
                 </div>
             </div>
-            <div id="feedContent"></div>
+            <div id="feedList"></div>
         </div>
 
-        <div id="page-rede" class="page-content">
+        <div id="page-rede" class="section-page">
             <div class="card">
                 <h3>Top 10 Ranking</h3>
-                <div id="rankingList"></div>
+                <div id="ranking"></div>
             </div>
             <div class="card">
-                <h3>Link de Convite</h3>
-                <div id="refLink" style="background:#f1f3f4; padding:12px; border-radius:4px; font-size:11px; border:1px dashed #ccc; margin-bottom:10px;"></div>
-                <button class="btn-google" style="background:#fff; color:#1a73e8; border:1px solid #dadce0;" onclick="copyRef()">Copiar Link</button>
+                <h3>O seu Link de Convite</h3>
+                <div id="refLink" style="background:#f1f3f4; padding:12px; border-radius:4px; font-size:11px; border:1px dashed #ccc; margin-bottom:10px; word-break:break-all;"></div>
+                <button class="btn-action" style="background:#fff; color:#1a73e8; border:1px solid #dadce0;" onclick="copyLink()">Copiar Link</button>
             </div>
         </div>
 
-        <div id="page-info" class="page-content">
+        <div id="page-info" class="section-page">
             <div class="card">
                 <h3>Tabela de Ganhos</h3>
-                <div class="row-item"><span>Post com Foto</span><b class="badge">+15 XP</b></div>
-                <div class="row-item"><span>Novo Amigo</span><b class="badge">+100 XP</b></div>
-                <div class="row-item"><span>Like Recebido</span><b class="badge">+2 XP</b></div>
-                <div class="row-item"><span>Check-in Diário</span><b class="badge">+5 XP</b></div>
+                <div class="row"><span>Publicação com Foto</span><b>+15 XP</b></div>
+                <div class="row"><span>Convidar Amigo</span><b>+100 XP</b></div>
+                <div class="row"><span>Receber Like</span><b>+2 XP</b></div>
+                <div class="row"><span>Check-in Diário</span><b>+5 XP</b></div>
                 <div style="margin-top:20px; background:#e8f0fe; padding:15px; border-radius:6px; font-size:12px; color:#1a73e8;">
-                    <b>Economia:</b> 10.000 XP = 1,00€ | Levantamento mín.: 5,00€
+                    <b>Economia:</b> Conversão 4 casas (0.0001€). Levantamento mín. 5.000 XP.
                 </div>
             </div>
         </div>
 
-        <div id="page-master" class="page-content adm-only">
+        <div id="page-master" class="section-page adm-only">
             <div class="card">
-                <h3 style="color:#d93025;">Consola de Gestão Master</h3>
-                <div class="admin-box">
-                    <label style="font-size:10px; color:#70757a; text-transform:uppercase;">Dívida Total à Rede:</label>
-                    <h1 id="admDebt" style="color:#d93025; font-size:32px; margin:10px 0;">0.00€</h1>
-                    <button class="btn-google">Lista de Pagamentos PayPal</button>
+                <h3 style="color:#d93025;">Painel de Controlo Master</h3>
+                <div style="background:#fdf7f7; border:1px solid #fce8e6; border-radius:8px; padding:20px; text-align:center;">
+                    <label style="font-size:10px; color:#70757a;">Dívida Total da Rede:</label>
+                    <h1 id="admDebt" style="color:#d93025; font-size:32px;">0.00€</h1>
                 </div>
                 <div style="margin-top:20px;">
-                    <input type="number" id="delId" style="width:100%; padding:12px; border:1px solid #dadce0; border-radius:4px;" placeholder="ID do post para eliminar">
-                    <button class="btn-google btn-red" onclick="adminDelete()">Eliminar Permanentemente</button>
+                    <label style="font-size:12px; display:block; margin-bottom:5px;">Eliminar Publicação por ID:</label>
+                    <input type="number" id="delId" style="width:100%; padding:12px; border:1px solid #dadce0; border-radius:4px;" placeholder="ID do post">
+                    <button class="btn-action btn-del" onclick="adminDelete()">Eliminar Agora</button>
                 </div>
             </div>
         </div>
@@ -125,6 +124,7 @@
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
+        
         const MASTER_ID = 5401881400; 
 
         async function init() {
@@ -133,16 +133,22 @@
                 document.getElementById('headerTitle').innerText = "Apex Business Control";
             }
             loadProfile();
-            loadPosts();
-            loadRanking();
+            loadFeed();
+            loadRank();
         }
 
-        function nav(el) {
-            const target = el.getAttribute('data-target');
+        // FUNÇÃO DE NAVEGAÇÃO QUE LIMPA O ECRÃ
+        function switchTab(el) {
+            const targetId = el.getAttribute('data-id');
+            
+            // 1. Remove classes de todos
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.section-page').forEach(s => s.classList.remove('active'));
+            
+            // 2. Ativa apenas o selecionado
             el.classList.add('active');
-            document.getElementById(target).classList.add('active');
+            document.getElementById(targetId).classList.add('active');
+            window.scrollTo(0,0);
         }
 
         async function loadProfile() {
@@ -150,38 +156,38 @@
             if(data) {
                 document.getElementById('valXP').innerText = Math.floor(data.points).toLocaleString();
                 document.getElementById('valEUR').innerText = (data.points * 0.0001).toFixed(4) + "€";
-                document.getElementById('refLink').innerText = `https://apexsocial.app/?ref=${MASTER_ID}`;
+                document.getElementById('refLink').innerText = "https://apexsocial.app/?ref=" + MASTER_ID;
             }
         }
 
-        async function loadRanking() {
+        async function loadRank() {
             const { data: users } = await client.from('profiles').select('*').order('points', { ascending: false }).limit(10);
-            let html = ''; let totalXP = 0;
+            let html = ''; let netXP = 0;
             users.forEach((u, i) => {
-                totalXP += u.points;
-                html += `<div class="row-item"><span><b>${i+1}.</b> User ${u.id.toString().substring(0,5)}</span><b>${Math.floor(u.points)} XP</b></div>`;
+                netXP += u.points;
+                html += `<div class="row"><span><b>${i+1}.</b> User ${u.id.toString().substring(0,5)}</span><b>${Math.floor(u.points)} XP</b></div>`;
             });
-            document.getElementById('rankingList').innerHTML = html;
-            const debt = (totalXP * 0.0001).toFixed(2);
+            document.getElementById('ranking').innerHTML = html;
+            const debt = (netXP * 0.0001).toFixed(2);
             document.getElementById('valDebt').innerText = debt + "€";
             document.getElementById('admDebt').innerText = debt + "€";
         }
 
-        async function loadPosts() {
-            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
-            const container = document.getElementById('feedContent');
-            container.innerHTML = "";
-            posts.forEach(p => {
-                container.innerHTML += `
+        async function loadFeed() {
+            const { data } = await client.from('posts').select('*').order('created_at', { ascending: false });
+            const list = document.getElementById('feedList');
+            list.innerHTML = "";
+            data.forEach(p => {
+                list.innerHTML += `
                     <div class="card">
-                        <div style="font-size:10px; color:#70757a; margin-bottom:10px;">POST #${p.id}</div>
-                        <div style="font-size:15px; margin-bottom:12px;">${p.content || ''}</div>
-                        ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:6px;">` : ''}
+                        <small style="color:#70757a;">ID #${p.id}</small>
+                        <div style="margin:10px 0;">${p.content || ''}</div>
+                        ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:6px; max-height:300px; object-fit:contain;">` : ''}
                     </div>`;
             });
         }
 
-        function copyRef() {
+        function copyLink() {
             navigator.clipboard.writeText(document.getElementById('refLink').innerText);
             alert("Copiado!");
         }
@@ -189,7 +195,7 @@
         async function adminDelete() {
             const id = document.getElementById('delId').value;
             if(!id) return;
-            if(confirm("Eliminar post #" + id + "?")) {
+            if(confirm("Deseja eliminar o post #" + id + "?")) {
                 await client.from('posts').delete().eq('id', id);
                 location.reload();
             }
