@@ -3,48 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Master</title>
+    <title>Apex Social - Full Suite</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* RESET & GOOGLE SYSTEM */
+        /* RESET & BASE */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 175px; }
+        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 175px; padding-bottom: 30px; }
 
         /* HEADER FIXO */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
         .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
         .stat-item b { font-size: 11px; color: #1a73e8; }
         
+        /* NAVEGAÇÃO TABS */
         .tabs { display: flex; background: #fff; }
         .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; border-bottom: 3px solid transparent; text-transform: uppercase; }
         .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
 
-        /* FEED E CARDS */
+        /* CONTENT */
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
+        .page { display: none; }
+        .page.active { display: block; }
         .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
-        /* CORREÇÃO DA FOTO NO FEED */
+        /* FEED ELEMENTS */
         .post-img-container { width: 100%; max-height: 350px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f1f3f4; display: flex; align-items: center; justify-content: center; }
-        .post-img { width: 100%; height: 100%; object-fit: contain; display: block; }
-        
-        /* POST INFO */
-        .post-header { font-size: 11px; color: #70757a; margin-bottom: 10px; display: flex; justify-content: space-between; }
-        .post-text { font-size: 15px; line-height: 1.5; color: #3c4043; word-wrap: break-word; }
-
-        /* INTERAÇÕES */
+        .post-img { width: 100%; height: 100%; object-fit: contain; }
         .actions-row { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f3f4; padding-top: 12px; margin-top: 12px; }
-        .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .action-btn i { font-size: 14px; color: #1a73e8; }
+        .action-btn { background: none; border: none; color: #5f6368; font-size: 11px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* UI PUBLISH */
-        .input-google { width: 100%; border: none; outline: none; font-size: 16px; margin-bottom: 15px; resize: none; min-height: 60px; }
-        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 8px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        /* RANKING & LISTS */
+        .rank-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f3f4; font-size: 14px; }
+        .rank-item:last-child { border-bottom: none; }
+        .badge-rank { background: #1a73e8; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-right: 10px; }
+
+        /* ADMIN SECTION */
+        .admin-box { background: #fdf7f7; border: 1px solid #fce8e6; padding: 15px; border-radius: 6px; margin-top: 10px; }
+        .input-google { width: 100%; border: 1px solid #dadce0; padding: 10px; border-radius: 4px; margin-bottom: 10px; outline: none; }
 
         .adm-only { display: none !important; }
         body.is-master .adm-only { display: block !important; }
@@ -61,28 +61,64 @@
             <div class="stat-item"><label>Estado</label><b style="color:#1e8e3e;">ONLINE</b></div>
         </div>
         <nav class="tabs">
-            <div class="tab active">Explorar</div>
-            <div class="tab">Rede</div>
-            <div class="tab">Info</div>
-            <div class="tab adm-only" style="color:#d93025;">Master</div>
+            <div class="tab active" onclick="switchPage('page-feed', this)">Explorar</div>
+            <div class="tab" onclick="switchPage('page-rede', this)">Rede</div>
+            <div class="tab" onclick="switchPage('page-info', this)">Info</div>
+            <div class="tab adm-only" style="color:#d93025;" onclick="switchPage('page-admin', this)">Master</div>
         </nav>
     </header>
 
     <main class="container">
-        <div class="card">
-            <textarea id="postInput" class="input-google" placeholder="O que pretende partilhar?"></textarea>
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
-                <label style="color:#1a73e8; cursor:pointer; font-size:13px; font-weight:500;" for="fileInput">
-                    <i class="fas fa-camera"></i> Foto (+15 XP)
-                </label>
-                <input type="file" id="fileInput" hidden onchange="handleFile(this)">
-                <button class="btn-post" onclick="sendPost()">Publicar</button>
+        <div id="page-feed" class="page active">
+            <div class="card">
+                <textarea id="postInput" class="input-google" style="border:none; min-height:50px;" placeholder="O que pretende partilhar?"></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <label style="color:#1a73e8; cursor:pointer; font-size:12px;" for="fileInput"><i class="fas fa-camera"></i> Foto (+15 XP)</label>
+                    <input type="file" id="fileInput" hidden onchange="handleFile(this)">
+                    <button class="action-btn" style="background:#1a73e8; color:#fff; padding:6px 15px; border-radius:4px;" onclick="sendPost()">Publicar</button>
+                </div>
+                <img id="previewImg" style="display:none; width:100%; margin-top:10px; border-radius:5px; max-height:150px; object-fit:cover;">
             </div>
-            <img id="previewImg" style="display:none; width:100%; margin-top:15px; border-radius:6px; max-height:200px; object-fit:cover;">
+            <div id="feedContent"></div>
         </div>
 
-        <div id="feedContent">
+        <div id="page-rede" class="page">
+            <div class="card">
+                <h3>Top 10 Ranking</h3>
+                <div id="rankingList" style="margin-top:15px;"></div>
             </div>
+            <div class="card" style="text-align:center;">
+                <h4>Convide Amigos</h4>
+                <p id="refLink" style="font-size:11px; background:#f1f3f4; padding:10px; margin:10px 0; border-radius:4px;"></p>
+                <button class="action-btn" style="width:100%; border:1px solid #dadce0; padding:10px;" onclick="copyRef()">Copiar Link de Convite</button>
+            </div>
+        </div>
+
+        <div id="page-info" class="page">
+            <div class="card">
+                <h3>Tabela de Ganhos</h3>
+                <div class="rank-item"><span>Post com Foto</span><b>15 XP</b></div>
+                <div class="rank-item"><span>Like Recebido</span><b>2 XP</b></div>
+                <div class="rank-item"><span>Novo Amigo</span><b>100 XP</b></div>
+                <div class="rank-item"><span>Check-in Diário</span><b>5 XP</b></div>
+                <p style="font-size:11px; color:#70757a; margin-top:15px;">Mínimo de levantamento: 5.000 XP (5€).</p>
+            </div>
+        </div>
+
+        <div id="page-admin" class="page adm-only">
+            <div class="card">
+                <h3 style="color:#d93025;">Consola de Gestão</h3>
+                <div class="admin-box">
+                    <label style="font-size:10px;">Dívida Total da Rede:</label>
+                    <h2 id="admTotalDebt">0.00€</h2>
+                </div>
+                <div style="margin-top:20px;">
+                    <label>Eliminar Post por ID:</label>
+                    <input type="number" id="delId" class="input-google" placeholder="Ex: 125">
+                    <button class="action-btn" style="background:#d93025; color:#fff; width:100%; padding:10px;" onclick="adminDelete()">Eliminar Agora</button>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -100,45 +136,65 @@
             }
             loadProfile();
             loadPosts();
+            loadRanking();
+        }
+
+        function switchPage(pageId, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            el.classList.add('active');
+            window.scrollTo(0,0);
         }
 
         async function loadProfile() {
             const { data } = await client.from('profiles').select('*').eq('id', MY_ID).single();
             if(data) {
-                document.getElementById('valXP').innerText = data.points.toLocaleString();
+                document.getElementById('valXP').innerText = Math.floor(data.points).toLocaleString();
                 document.getElementById('valEUR').innerText = (data.points * 0.0001).toFixed(4) + "€";
+                document.getElementById('refLink').innerText = `https://apexsocial.app/?ref=${MY_ID}`;
             }
+        }
+
+        async function loadRanking() {
+            const { data: users } = await client.from('profiles').select('*').order('points', { ascending: false }).limit(10);
+            let html = '';
+            let totalNetworkXP = 0;
+
+            users.forEach((u, index) => {
+                totalNetworkXP += u.points;
+                html += `<div class="rank-item">
+                    <span><span class="badge-rank">${index + 1}</span> User ${u.id.toString().substring(0,4)}...</span>
+                    <b>${Math.floor(u.points)} XP</b>
+                </div>`;
+            });
+            document.getElementById('rankingList').innerHTML = html;
+            
+            const debt = (totalNetworkXP * 0.0001).toFixed(2);
+            document.getElementById('valDebt').innerText = debt + "€";
+            document.getElementById('admTotalDebt').innerText = debt + "€";
         }
 
         async function loadPosts() {
             const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('feedContent');
             container.innerHTML = "";
-
             posts.forEach(p => {
                 container.innerHTML += `
                     <div class="card">
-                        <div class="post-header">
-                            <span>ID #${p.id}</span>
-                            <span style="color:#1a73e8; font-weight:bold;">${new Date(p.created_at).toLocaleDateString()}</span>
-                        </div>
-                        <div class="post-text">${p.content || ''}</div>
-                        
-                        ${p.image_url ? `
-                        <div class="post-img-container">
-                            <img src="${p.image_url}" class="post-img">
-                        </div>` : ''}
-
+                        <div style="font-size:10px; color:#70757a; margin-bottom:10px;">Post #${p.id}</div>
+                        <div style="font-size:15px; margin-bottom:12px;">${p.content || ''}</div>
+                        ${p.image_url ? `<div class="post-img-container"><img src="${p.image_url}" class="post-img"></div>` : ''}
                         <div class="actions-row">
-                            <button class="action-btn"><i class="far fa-heart"></i> Gosto (${p.likes || 0})</button>
+                            <button class="action-btn"><i class="far fa-heart"></i> Like (${p.likes || 0})</button>
                             <button class="action-btn"><i class="far fa-comment"></i> Comentar</button>
                             <button class="action-btn"><i class="fas fa-share-alt"></i> Redes</button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
+        // Funções de Publicação e Media
         function handleFile(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -154,18 +210,25 @@
         async function sendPost() {
             const text = document.getElementById('postInput').value;
             if(!text && !currentPhoto) return;
-
-            const { error } = await client.from('posts').insert([{ 
-                user_id: MY_ID, 
-                content: text, 
-                image_url: currentPhoto,
-                likes: 0 
-            }]);
-
+            const { error } = await client.from('posts').insert([{ user_id: MY_ID, content: text, image_url: currentPhoto }]);
             if(!error) {
                 await client.rpc('increment_points', { user_id: MY_ID, amount: 15 });
                 location.reload();
             }
+        }
+
+        async function adminDelete() {
+            const id = document.getElementById('delId').value;
+            if(!id) return;
+            if(confirm("Deseja eliminar o post #" + id + "?")) {
+                await client.from('posts').delete().eq('id', id);
+                location.reload();
+            }
+        }
+
+        function copyRef() {
+            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
+            alert("Link copiado!");
         }
 
         init();
