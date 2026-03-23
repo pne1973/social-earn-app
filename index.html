@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pine Social Pro</title>
+    <title>Pine Social Master Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; --card-bg: #1e1e1e; }
@@ -25,10 +24,10 @@
         .nav-item i { font-size: 18px; }
 
         /* CONTEÚDO */
-        .container { padding: 15px; }
+        .container { padding: 15px; display: none; }
+        .container.active { display: block !important; }
         .card { background: var(--card-bg); padding: 18px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
         .btn-main { width: 100%; background: var(--tg-theme-button); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .hidden { display: none; }
         
         input, select, textarea { width: 100%; background: #2a2a2a; border: none; color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; box-sizing: border-box; }
         .val { color: var(--tg-theme-button); font-weight: bold; text-align: right; }
@@ -47,12 +46,11 @@
     <nav class="nav-bottom">
         <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i>Feed</div>
         <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-coins"></i>Ganhos</div>
-        <div class="nav-item" onclick="showTab('rank-tab', this)"><i class="fas fa-trophy"></i>Rank</div>
-        <div class="nav-item" onclick="showTab('invite-tab', this)"><i class="fas fa-users"></i>Amigos</div>
+        <div id="adm-nav" class="nav-item" onclick="showTab('admin-tab', this)"><i class="fas fa-shield-alt"></i>Admin</div>
         <div class="nav-item" onclick="showTab('wallet-tab', this)"><i class="fas fa-wallet"></i>Saque</div>
     </nav>
 
-    <div id="feed-tab" class="container">
+    <div id="feed-tab" class="container active">
         <div class="card">
             <textarea id="postText" placeholder="O que queres partilhar?"></textarea>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
@@ -65,30 +63,34 @@
         <div id="feed">Carregando publicações...</div>
     </div>
 
-    <div id="info-tab" class="container hidden">
+    <div id="info-tab" class="container">
         <div class="card">
             <h2 style="color:var(--tg-theme-button); margin-top:0;">💰 Economia</h2>
             <table style="width:100%; border-collapse:collapse;">
-                <tr><td style="padding:10px 0;">Novo Post</td><td class="val">+15 XP <span class="cash">0.0150€</span></td></tr>
-                <tr><td style="padding:10px 0;">Convite</td><td class="val">+100 XP <span class="cash">0.1000€</span></td></tr>
-                <tr><td style="padding:10px 0;">Receber Like</td><td class="val">+2 XP <span class="cash">0.0020€</span></td></tr>
+                <tr><td style="padding:10px 0;">Postagem</td><td class="val">+15 XP <span class="cash">0.0150€</span></td></tr>
+                <tr><td style="padding:10px 0;">Convite Amigo</td><td class="val">+100 XP <span class="cash">0.1000€</span></td></tr>
+                <tr><td style="padding:10px 0;">Like Recebido</td><td class="val">+2 XP <span class="cash">0.0020€</span></td></tr>
             </table>
-            <p style="font-size:12px; color:#888; margin-top:15px;">* Mínimo 5000 XP para levantamento via PayPal.</p>
+            <p style="font-size:12px; color:#888; margin-top:15px;">* Mínimo 5000 XP para levantamento.</p>
         </div>
     </div>
 
-    <div id="wallet-tab" class="container hidden">
-        <div class="card">
+    <div id="wallet-tab" class="container">
+        <div class="card" style="text-align:center;">
             <h2>Levantamento PayPal</h2>
             <p>Saldo: <b id="walletXP">0</b> XP</p>
-            <p style="color:var(--tg-theme-button); font-weight:bold;">Valor: <span id="euroVal">0.0000</span>€</p>
+            <h1 style="color:var(--tg-theme-button); margin:10px 0;"><span id="euroVal">0.0000</span>€</h1>
             <input type="email" id="paypalEmail" placeholder="Teu e-mail PayPal">
             <button class="btn-main" style="margin-top:15px;" onclick="requestWithdraw()">Levantar Agora</button>
         </div>
     </div>
 
-    <div id="rank-tab" class="container hidden"><div class="card">Ranking em breve...</div></div>
-    <div id="invite-tab" class="container hidden"><div class="card">Convida amigos com o teu ID: 5401881400</div></div>
+    <div id="admin-tab" class="container">
+        <div class="card" style="border: 1px solid var(--g-red);">
+            <h3 style="color:var(--tg-theme-button)">🛠 Painel Admin (5401881400)</h3>
+            <div id="adm-stats">A carregar estatísticas...</div>
+        </div>
+    </div>
 
     <script>
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
@@ -96,27 +98,29 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const userId = 5401881400;
 
-        // --- NAVEGAÇÃO CORRIGIDA ---
+        // NAVEGAÇÃO À PROVA DE ERRO
         function showTab(tabId, el) {
-            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(tabId).classList.remove('hidden');
+            const containers = document.querySelectorAll('.container');
+            for(let i=0; i<containers.length; i++) containers[i].style.display = 'none';
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            for(let i=0; i<navItems.length; i++) navItems[i].classList.remove('active');
+
+            document.getElementById(tabId).style.display = 'block';
             el.classList.add('active');
-            loadProfile(); // Atualiza XP sempre
+            loadProfile();
         }
 
-        // --- CARREGAMENTO DE PERFIL ---
         async function loadProfile() {
-            const { data, error } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
+            const { data } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
             if (data) {
                 const pts = data.points || 0;
                 document.getElementById('userXP').innerText = pts + " XP";
                 document.getElementById('walletXP').innerText = pts;
-                document.getElementById('euroVal').innerText = (pts / 1000).toFixed(4);
+                document.getElementById('euroVal').innerText = (pts * 0.0010).toFixed(4);
             }
         }
 
-        // --- COMPRESSÃO DE IMAGEM (500KB) ---
         async function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -127,13 +131,11 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         let w = img.width, h = img.height;
-                        const max = 1000;
-                        if (w > h && w > max) { h *= max / w; w = max; }
-                        else if (h > max) { w *= max / h; h = max; }
+                        if (w > 1000) { h *= 1000 / w; w = 1000; }
                         canvas.width = w; canvas.height = h;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, w, h);
-                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.6); // 60% qualidade
+                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.6);
                     };
                 };
             });
@@ -151,36 +153,33 @@
             let url = null;
             if(file) {
                 let compressed = await compressImage(file);
-                if(compressed.size > 500 * 1024) { alert("Erro: Foto maior que 500KB mesmo após compressão."); return; }
                 const name = `${Date.now()}.jpg`;
                 await supabaseClient.storage.from('post-images').upload(name, compressed);
                 url = supabaseClient.storage.from('post-images').getPublicUrl(name).data.publicUrl;
             }
 
-            await supabaseClient.from('posts').insert([{ user_id: userId, username: 'pine1971', content: text, image_url: url }]);
+            await supabaseClient.from('posts').insert([{ user_id: userId, content: text, image_url: url }]);
             await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
             location.reload();
         }
 
-        // --- CARREGAR FEED ---
         async function loadFeed() {
             const { data } = await supabaseClient.from('posts').select('*').order('created_at', {ascending: false});
             const feed = document.getElementById('feed');
             feed.innerHTML = data.map(p => `
                 <div class="card">
-                    <b style="color:var(--tg-theme-button)">@${p.username}</b>
+                    <b style="color:var(--tg-theme-button)">User #${p.user_id.toString().slice(-4)}</b>
                     <p>${p.content || ''}</p>
                     ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:10px; margin-top:10px;">` : ''}
                 </div>
             `).join('');
         }
 
-        async function init() {
-            await loadProfile();
-            await loadFeed();
-        }
+        // Bloqueio Admin
+        if(userId !== 5401881400) document.getElementById('adm-nav').style.display = 'none';
 
-        init();
+        loadProfile();
+        loadFeed();
     </script>
 </body>
 </html>
