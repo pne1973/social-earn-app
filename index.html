@@ -22,12 +22,12 @@
         .nav-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; }
         .xp-pill { background: #ffcc00; color: #000; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; box-shadow: 0 2px 8px rgba(255,204,0,0.2); }
 
-        /* TABS */
+        /* TABS NAVIGATION */
         .tabs { display: flex; background: #1a1a1a; border-top: 1px solid #333; }
         .tab-item { flex: 1; padding: 14px; text-align: center; color: #888; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
         .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
 
-        /* CONTENT CARDS */
+        /* LAYOUT */
         .content { padding: 15px; max-width: 500px; margin: 0 auto; }
         .page { display: none; }
         .page.active { display: block; }
@@ -61,7 +61,7 @@
         <div class="ad-top">📢 APEX SOCIAL: Ganhe dinheiro real interagindo!</div>
         <div class="nav-main">
             <h3>APEX <span style="color:#ffcc00">SOCIAL</span></h3>
-            <div id="userXP" class="xp-pill">0 XP</div>
+            <div id="userXP" class="xp-pill">0 XP • 0.00€</div>
         </div>
         <div class="tabs">
             <div class="tab-item active" onclick="openTab('feed-page', this)">Feed</div>
@@ -82,7 +82,7 @@
                     <button class="btn-pub" onclick="publish()">Publicar</button>
                 </div>
             </div>
-            <div id="feed-items">A carregar novidades...</div>
+            <div id="feed-items">Carregando feed...</div>
         </div>
 
         <div id="earn-page" class="page">
@@ -95,21 +95,21 @@
         <div id="wallet-page" class="page">
             <div class="card" style="text-align:center; padding:30px 15px;">
                 <p style="font-size:13px; color:#888;">Ganhos Estimados (CPM 1.00)</p>
-                <h1 id="mainValue" style="color:#ffcc00; font-size:42px; margin:15px 0;">0.0000</h1>
-                <h3 id="currencyLabel" style="color:#aaa; font-weight: normal;">---</h3>
+                <h1 id="mainValue" style="color:#ffcc00; font-size:42px; margin:15px 0;">0.0000<small style="font-size:20px;">€</small></h1>
+                <h3 id="currencyLabel" style="color:#aaa; font-weight:normal;">Euro (EUR)</h3>
                 <p style="font-size:11px; color:#555; margin-top:20px;">Mínimo para saque: 5000 XP</p>
             </div>
             <div class="card">
-                <p style="font-size:12px; margin-bottom:8px;">Seu link de convite:</p>
+                <p style="font-size:12px; margin-bottom:8px;">Seu link de convite único:</p>
                 <code id="invLink" style="font-size:10px; color:#ffcc00; display:block; background:#111; padding:10px; border-radius:5px; border:1px solid #333;">...</code>
             </div>
         </div>
 
         <div id="admin-page" class="page">
             <div class="card" style="border:1px solid #ff4444">
-                <h3 style="color:#ff4444; margin-bottom:15px;">Admin Panel</h3>
+                <h3 style="color:#ff4444; margin-bottom:15px;">Painel Admin</h3>
                 <div id="admStats" style="font-size:13px; margin-bottom:20px;">...</div>
-                <button class="btn-pub" style="background:#ff4444; color:#fff; width:100%;" onclick="clearAllPosts()">RESET FEED</button>
+                <button class="btn-pub" style="background:#ff4444; color:#fff; width:100%;" onclick="clearAllPosts()">RESETAR FEED</button>
             </div>
         </div>
     </main>
@@ -120,12 +120,12 @@
         const client = supabase.createClient(SB_URL, SB_KEY);
         const myId = 5401881400;
 
-        // --- AUTOMAÇÃO DE MOEDA E CPM ---
+        // --- SISTEMA DE MOEDA E CPM 1.00 ---
         const userConfig = {
             isBR: (navigator.language || '').includes('BR'),
             get symbol() { return this.isBR ? 'R$' : '€' },
             get label() { return this.isBR ? 'Real Brasileiro (BRL)' : 'Euro (EUR)' },
-            cpmRate: 0.0010 // 1000 XP = 1.00 Unidade
+            cpmRate: 0.0010 // 1000 XP = 1.00 Moeda
         };
 
         function openTab(id, el) {
@@ -142,11 +142,14 @@
             const { data } = await client.from('profiles').select('points').eq('id', myId).single();
             if (data) {
                 const pts = data.points || 0;
-                document.getElementById('userXP').innerText = pts + " XP";
+                const money = (pts * userConfig.cpmRate).toFixed(2);
                 
-                // Cálculo de Ganho Estimado (CPM 1.00)
-                const estimatedGain = (pts * userConfig.cpmRate).toFixed(4);
-                document.getElementById('mainValue').innerHTML = `${estimatedGain}<small style="font-size:20px; margin-left:5px;">${userConfig.symbol}</small>`;
+                // 1. Atualiza pílula do Topo (Ex: "50 XP • 0.05€")
+                document.getElementById('userXP').innerText = `${pts} XP • ${money}${userConfig.symbol}`;
+                
+                // 2. Atualiza Carteira (Valor principal com 4 decimais para precisão)
+                const preciseMoney = (pts * userConfig.cpmRate).toFixed(4);
+                document.getElementById('mainValue').innerHTML = `${preciseMoney}<small style="font-size:20px; margin-left:5px;">${userConfig.symbol}</small>`;
                 document.getElementById('currencyLabel').innerText = userConfig.label;
                 document.getElementById('invLink').innerText = `https://apexsocial.app/join?ref=${myId}`;
             }
@@ -183,7 +186,7 @@
                         </div>
                     `;
                     list.appendChild(el);
-                    if((i+1)%3===0) list.innerHTML += `<div style="text-align:center; color:#ffcc00; font-size:10px; padding:10px; opacity:0.5;">📢 AD SPACE: CPM 1.00 ACTIVE</div>`;
+                    if((i+1)%3===0) list.innerHTML += `<div style="text-align:center; color:#ffcc00; font-size:10px; padding:10px; opacity:0.4;">📢 PUBLICIDADE: GANHE XP AGORA</div>`;
                 }
             }
         }
@@ -198,7 +201,7 @@
 
         async function addXP(amt, btn) {
             await client.rpc('increment_points', { user_id: myId, amount: amt });
-            btn.style.color = "#ffcc00";
+            if(btn) btn.style.color = "#ffcc00";
             getProfile();
         }
 
@@ -228,11 +231,13 @@
         async function fetchRanking() {
             const { data } = await client.from('profiles').select('id, points').order('points', {ascending: false}).limit(10);
             const list = document.getElementById('rankingList');
-            list.innerHTML = '';
-            if(data) data.forEach((u, i) => {
-                const gain = (u.points * userConfig.cpmRate).toFixed(2);
-                list.innerHTML += `<p>#${i+1} User...${u.id.toString().slice(-4)} <span style="float:right; color:#ffcc00;">${gain}${userConfig.symbol}</span></p>`;
-            });
+            if(list && data) {
+                list.innerHTML = '';
+                data.forEach((u, i) => {
+                    const gain = (u.points * userConfig.cpmRate).toFixed(2);
+                    list.innerHTML += `<p>#${i+1} User...${u.id.toString().slice(-4)} <span style="float:right; color:#ffcc00;">${gain}${userConfig.symbol}</span></p>`;
+                });
+            }
         }
 
         async function fetchAdminData() {
@@ -242,7 +247,7 @@
         }
 
         async function clearAllPosts() {
-            if(confirm("Reset feed?")) { await client.from('posts').delete().neq('id', 0); fetchFeed(); }
+            if(confirm("Deseja apagar todos os posts?")) { await client.from('posts').delete().neq('id', 0); fetchFeed(); }
         }
 
         getProfile(); fetchFeed();
