@@ -3,135 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Master Definitivo</title>
+    <title>Apex Social - Master Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* O DESIGN "EXCELENTE" - GOOGLE EDITION CLEAN */
+        /* DESIGN SYSTEM: DARK GLASSMORPISM (O EXCELENTE) */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
-            background-color: #000000; color: #ffffff; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            padding-top: 160px; padding-bottom: 20px;
+            background: #0a0a0a; color: #fff; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding-top: 155px; padding-bottom: 20px;
         }
 
-        /* HEADER BLACK EDITION */
-        .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #000; border-bottom: 1px solid #222; }
-        .nav-top { display: flex; justify-content: space-between; align-items: center; padding: 15px; }
-        .logo { font-size: 18px; font-weight: 900; letter-spacing: -1px; }
-        .badge-master { background: #ffcc00; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; }
+        /* HEADER COMPACTO E MODERNO */
+        .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #0a0a0a; }
+        
+        .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
+        .logo { font-size: 19px; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+        .logo span { color: #ffcc00; }
 
-        /* BARRA DE ESTATÍSTICAS TRIPLA */
-        .stats-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid #111; border-bottom: 1px solid #111; background: #000; }
-        .stat-item { padding: 12px 5px; text-align: center; border-right: 1px solid #111; }
-        .stat-item:last-child { border-right: none; }
-        .stat-label { font-size: 9px; color: #666; text-transform: uppercase; display: block; }
-        .stat-value { font-size: 13px; font-weight: bold; color: #ffcc00; margin-top: 2px; }
+        /* ABAS POR ÍCONES (NA PARTE SUPERIOR) */
+        .nav-tabs { display: flex; justify-content: space-around; padding: 5px 0; border-bottom: 1px solid #1a1a1a; }
+        .tab-item { color: #555; font-size: 18px; padding: 10px 20px; cursor: pointer; transition: 0.3s; border-bottom: 2px solid transparent; }
+        .tab-item.active { color: #ffcc00; border-bottom-color: #ffcc00; }
 
-        /* NAVEGAÇÃO POR ÍCONES (O QUE ESTAVA NO EXCELENTE) */
-        .nav-tabs { display: flex; background: #000; }
-        .tab-link { flex: 1; padding: 15px; text-align: center; color: #555; font-size: 18px; cursor: pointer; border-bottom: 2px solid transparent; transition: 0.3s; }
-        .tab-link.active { color: #ffcc00; border-bottom-color: #ffcc00; }
-        .tab-label-hidden { display: block; font-size: 9px; text-transform: uppercase; margin-top: 4px; font-weight: bold; }
+        /* CÁPSULA DE ESTATÍSTICAS (GLASS) */
+        .stats-float { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(10px);
+            margin: 10px 15px; border-radius: 15px; 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; 
+            padding: 12px; border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+        .stat-unit { display: flex; flex-direction: column; gap: 2px; }
+        .stat-label { font-size: 9px; color: #777; text-transform: uppercase; font-weight: bold; }
+        .stat-val { font-size: 13px; font-weight: 800; color: #ffcc00; }
 
-        /* PÁGINAS E FEED */
+        /* CONTEÚDO */
         .container { padding: 15px; max-width: 500px; margin: 0 auto; }
         .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.2s ease; }
+        .page.active { display: block; animation: slideUp 0.3s ease; }
+
+        /* POSTS ESTILO FEED PREMIUM */
+        .post-card { background: #111; border: 1px solid #1a1a1a; border-radius: 16px; margin-bottom: 15px; overflow: hidden; }
+        .post-top { padding: 12px 15px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #aaa; }
+        .p-avatar { width: 32px; height: 32px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; border: 1px solid #333; }
+        .post-txt { padding: 5px 15px 15px; font-size: 15px; color: #eee; line-height: 1.4; }
         
-        .card-post { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
-        .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #888; }
-        .avatar { width: 30px; height: 30px; border-radius: 50%; background: #222; border: 1px solid #ffcc00; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; }
-        .post-content { padding: 0 15px 15px 15px; font-size: 15px; line-height: 1.4; }
-        
-        /* INTERAÇÕES COM NÚMEROS */
-        .post-footer { display: flex; justify-content: space-between; padding: 12px 20px; border-top: 1px solid #111; color: #666; font-size: 13px; }
-        .action-unit { display: flex; align-items: center; gap: 6px; cursor: pointer; }
-        .action-unit:active { color: #ffcc00; }
+        /* AÇÕES COM CONTADORES */
+        .post-bot { display: flex; justify-content: space-between; padding: 12px 25px; border-top: 1px solid #1a1a1a; color: #777; font-size: 13px; }
+        .btn-act { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+        .btn-act:active { color: #ffcc00; transform: scale(0.9); }
 
-        .comments-drawer { display: none; background: #050505; padding: 15px; border-top: 1px solid #111; }
-        .input-comm { width: 100%; background: #111; border: 1px solid #222; padding: 10px; border-radius: 20px; color: #fff; outline: none; font-size: 13px; }
+        /* ÁREA DE COMENTÁRIOS */
+        .comm-box { display: none; background: #0d0d0d; padding: 12px; border-top: 1px solid #1a1a1a; }
+        .comm-input { width: 100%; background: #1a1a1a; border: 1px solid #333; border-radius: 20px; padding: 9px 15px; color: #fff; font-size: 13px; outline: none; }
 
-        .btn-post { background: #ffcc00; color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 22px; border-radius: 25px; font-weight: 800; font-size: 13px; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <header class="header-fixed">
-        <div class="nav-top">
-            <div class="logo">APEX <span style="color:#ffcc00">SOCIAL</span></div>
-            <div class="badge-master">MASTER</div>
-        </div>
-
-        <div class="stats-bar">
-            <div class="stat-item">
-                <span class="stat-label">Saldo</span>
-                <span id="vTotal" class="stat-value">0.0000€</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Amigos</span>
-                <span id="vAmigos" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Rede</span>
-                <span id="vRede" class="stat-value">0.0000€</span>
-            </div>
+        <div class="top-nav">
+            <div class="logo">APEX <span>SOCIAL</span></div>
+            <button class="btn-pub" style="padding: 6px 15px; font-size: 11px;">CONVIDAR</button>
         </div>
 
         <nav class="nav-tabs">
-            <div class="tab-link active" onclick="openTab('feed', this)"><i class="fas fa-home"></i><span class="tab-label-hidden">Feed</span></div>
-            <div class="tab-link" onclick="openTab('rank', this)"><i class="fas fa-chart-line"></i><span class="tab-label-hidden">Rank</span></div>
-            <div class="tab-link" onclick="openTab('wallet', this)"><i class="fas fa-wallet"></i><span class="tab-label-hidden">Banca</span></div>
-            <div class="tab-link" onclick="openTab('info', this)"><i class="fas fa-question-circle"></i><span class="tab-label-hidden">Info</span></div>
-            <div id="admLink" class="tab-link" style="display:none;" onclick="openTab('admin', this)"><i class="fas fa-user-shield"></i><span class="tab-label-hidden">Adm</span></div>
+            <div class="tab-item active" onclick="nav('feed', this)"><i class="fas fa-th-large"></i></div>
+            <div class="tab-item" onclick="nav('rank', this)"><i class="fas fa-medal"></i></div>
+            <div class="tab-item" onclick="nav('wallet', this)"><i class="fas fa-wallet"></i></div>
+            <div class="tab-item" onclick="nav('info', this)"><i class="fas fa-circle-info"></i></div>
         </nav>
+
+        <div class="stats-float">
+            <div class="stat-unit">
+                <span class="stat-label">Saldo</span>
+                <span id="sTotal" class="stat-val">0.0000€</span>
+            </div>
+            <div class="stat-unit">
+                <span class="stat-label">Amigos</span>
+                <span id="sAmigos" class="stat-val">0</span>
+            </div>
+            <div class="stat-unit">
+                <span class="stat-label">Rede</span>
+                <span id="sRede" class="stat-val">0.0000€</span>
+            </div>
+        </div>
     </header>
 
     <main class="container">
-        <div id="page-feed" class="page active">
-            <div class="card-post" style="padding:15px;">
-                <textarea id="postTxt" style="width:100%; background:transparent; border:none; color:#fff; outline:none; font-size:15px; resize:none;" placeholder="No que estás a pensar?"></textarea>
+        <div id="p-feed" class="page active">
+            <div class="post-card" style="padding: 15px;">
+                <textarea id="postIn" style="width:100%; background:transparent; border:none; color:#fff; outline:none; font-size:15px; resize:none;" placeholder="No que estás a pensar?"></textarea>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                    <i class="fas fa-image" style="color:#444;"></i>
-                    <button class="btn-post" onclick="doPublish()">Publicar</button>
+                    <i class="fas fa-image" style="color: #333;"></i>
+                    <button class="btn-pub" onclick="publish()">Publicar</button>
                 </div>
             </div>
-            <div id="feedArea">Carregando...</div>
+            <div id="feedDisplay">Carregando feed profissional...</div>
         </div>
 
-        <div id="page-rank" class="page">
-            <div class="card-post" style="padding:15px;">
-                <h4 style="color:#ffcc00; margin-bottom:15px;">TOP 10 GANHADORES</h4>
-                <div id="rankList"></div>
+        <div id="p-rank" class="page"><div class="post-card" style="padding:20px;"><h4>RANKING TOP 10</h4><div id="rankList"></div></div></div>
+        
+        <div id="p-wallet" class="page">
+            <div class="post-card" style="padding:30px; text-align:center;">
+                <span class="stat-label">TOTAL DISPONÍVEL</span>
+                <h1 id="xpBig" style="font-size:42px; color:#ffcc00; margin:10px 0;">0 XP</h1>
+                <p id="brlBig" style="color:#555;">R$ 0.0000</p>
             </div>
+            <button class="btn-pub" style="width:100%;" onclick="copyLink()">COPIAR LINK AFILIADO</button>
         </div>
 
-        <div id="page-wallet" class="page">
-            <div class="card-post" style="padding:25px; text-align:center;">
-                <span class="stat-label">DISPONÍVEL PARA SAQUE</span>
-                <h1 id="xpBig" style="font-size:38px; color:#ffcc00; margin:10px 0;">0 XP</h1>
-                <p id="brlBig" style="color:#444; font-size:14px;">R$ 0.0000</p>
-            </div>
-            <div class="card-post" style="padding:15px;">
-                <p style="font-size:11px; color:#666;">Teu link de convite (Ganha 10%):</p>
-                <div id="myLink" style="background:#000; padding:10px; border-radius:8px; font-size:11px; color:#ffcc00; margin:10px 0; border:1px solid #111;">...</div>
-                <button class="btn-post" style="width:100%; background:#111; color:#fff;" onclick="copyMyLink()">Copiar Link</button>
-            </div>
-        </div>
-
-        <div id="page-info" class="page">
-            <div class="card-post" style="padding:20px;">
-                <h4 style="color:#ffcc00; margin-bottom:15px;">TABELA DE RECOMPENSAS</h4>
-                <div style="font-size:13px; line-height:2.5; color:#aaa;">
-                    • Post (1-5): <b style="color:#fff;">+15 XP</b><br>
-                    • Like: <b style="color:#fff;">+2 XP</b><br>
-                    • Comentário: <b style="color:#fff;">+5 XP</b><br>
-                    • Amigo: <b style="color:#fff;">+100 XP + 10% Mensal</b>
-                </div>
-            </div>
-        </div>
+        <div id="p-info" class="page"><div class="post-card" style="padding:20px;"><h4>REGRAS DE GANHO</h4><p style="font-size:13px; color:#888; margin-top:10px;">Post: +15 XP<br>Like: +2 XP<br>Comentário: +5 XP</p></div></div>
     </main>
 
     <script>
@@ -140,79 +128,70 @@
         const client = supabase.createClient(SB_URL, SB_KEY);
         const myId = 5401881400;
 
-        function openTab(name, el) {
+        function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
-            document.getElementById(`page-${name}`).classList.add('active');
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById(`p-${id}`).classList.add('active');
             el.classList.add('active');
-            if(name === 'rank') fetchRank();
+            if(id === 'rank') loadRank();
         }
 
         async function init() {
-            await fetchUser();
-            await fetchFeed();
+            await loadUser();
+            await loadFeed();
         }
 
-        async function fetchUser() {
+        async function loadUser() {
             const { data: u } = await client.from('profiles').select('*').eq('id', myId).single();
             if(u) {
                 const total = (u.points || 0) + (u.referral_points || 0);
-                document.getElementById('vTotal').innerText = (total * 0.0010).toFixed(4) + "€";
-                document.getElementById('vAmigos').innerText = u.friends_count || 0;
-                document.getElementById('vRede').innerText = (u.referral_points * 0.0010).toFixed(4) + "€";
+                document.getElementById('sTotal').innerText = (total * 0.0010).toFixed(4) + "€";
+                document.getElementById('sAmigos').innerText = u.friends_count || 0;
+                document.getElementById('sRede').innerText = (u.referral_points * 0.0010).toFixed(4) + "€";
                 document.getElementById('xpBig').innerText = total + " XP";
                 document.getElementById('brlBig').innerText = "R$ " + (total * 0.0062).toFixed(4);
-                document.getElementById('myLink').innerText = `https://apex.social/?ref=${myId}`;
-                if(myId === 5401881400) document.getElementById('admLink').style.display = 'block';
             }
         }
 
-        async function fetchFeed() {
+        async function loadFeed() {
             const { data: posts } = await client.from('posts').select('*').order('created_at', {ascending: false});
-            const area = document.getElementById('feedArea');
-            area.innerHTML = '';
+            const display = document.getElementById('feedDisplay');
+            display.innerHTML = '';
             posts.forEach(p => {
-                const div = document.createElement('div');
-                div.className = 'card-post';
-                div.innerHTML = `
-                    <div class="post-header"><div class="avatar">${p.user_id.toString().slice(-1)}</div><span>User...${p.user_id.toString().slice(-4)}</span></div>
-                    <div class="post-content">${p.content}</div>
-                    <div class="post-footer">
-                        <div class="action-unit" onclick="give(2, this)"><i class="far fa-heart"></i> ${p.likes || 0}</div>
-                        <div class="action-unit" onclick="showComm(${p.id})"><i class="far fa-comment"></i> ${p.comments_count || 0}</div>
-                        <div class="action-unit" onclick="share()"><i class="fas fa-share-nodes"></i></div>
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                card.innerHTML = `
+                    <div class="post-top"><div class="p-avatar">${p.user_id.toString().slice(-1)}</div><span>User...${p.user_id.toString().slice(-4)}</span></div>
+                    <div class="post-txt">${p.content}</div>
+                    <div class="post-bot">
+                        <div class="btn-act" onclick="reward(2, this)"><i class="far fa-heart"></i> ${p.likes || 0}</div>
+                        <div class="btn-act" onclick="openComm(${p.id})"><i class="far fa-comment"></i> ${p.comments_count || 0}</div>
+                        <div class="btn-act" onclick="share()"><i class="fas fa-share-nodes"></i></div>
                     </div>
-                    <div id="comm-${p.id}" class="comments-drawer">
-                        <input type="text" class="input-comm" placeholder="Comentar (+5 XP)..." onkeypress="if(event.key==='Enter') sendComm(${p.id}, this)">
-                    </div>
+                    <div id="c-${p.id}" class="comm-box"><input type="text" class="comm-input" placeholder="Responder..." onkeypress="if(event.key==='Enter') sendC(${p.id}, this)"></div>
                 `;
-                area.appendChild(div);
+                display.appendChild(card);
             });
         }
 
-        async function doPublish() {
-            const t = document.getElementById('postTxt').value;
-            if(!t) return;
-            await client.from('posts').insert([{ user_id: myId, content: t }]);
+        async function publish() {
+            const val = document.getElementById('postIn').value;
+            if(!val) return;
+            await client.from('posts').insert([{ user_id: myId, content: val }]);
             await client.rpc('increment_points', { user_id: myId, amount: 15 });
-            document.getElementById('postTxt').value = '';
+            document.getElementById('postIn').value = '';
             init();
         }
 
-        function showComm(id) {
-            const d = document.getElementById(`comm-${id}`);
-            d.style.display = d.style.display === 'block' ? 'none' : 'block';
+        function openComm(id) {
+            const box = document.getElementById(`c-${id}`);
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
         }
 
-        async function give(n, el) {
+        async function reward(pts, el) {
             el.style.color = "#ffcc00";
-            await client.rpc('increment_points', { user_id: myId, amount: n });
-            fetchUser();
-        }
-
-        function copyMyLink() {
-            navigator.clipboard.writeText(document.getElementById('myLink').innerText);
-            alert("Link copiado!");
+            await client.rpc('increment_points', { user_id: myId, amount: pts });
+            loadUser();
         }
 
         init();
