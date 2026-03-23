@@ -44,6 +44,7 @@
         /* UI ELEMENTS */
         .input-google { width: 100%; border: none; outline: none; font-size: 16px; margin-bottom: 15px; resize: none; min-height: 60px; }
         .btn-post { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .info-badge { background: #e8f0fe; color: #1a73e8; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -87,7 +88,12 @@
         <section id="view-info" class="view-section">
             <div class="card">
                 <h3 style="font-size:16px; margin-bottom:15px;">Manual de Ganhos</h3>
-                <p style="font-size:13px; color:#5f6368;">Ganha XP através de publicações reais e interação com a comunidade.</p>
+                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
+                    <span>Novo Afiliado</span><b class="info-badge">+100 XP</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
+                    <span>Publicação com Foto</span><b class="info-badge">+15 XP</b>
+                </div>
             </div>
         </section>
 
