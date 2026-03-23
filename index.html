@@ -212,3 +212,169 @@
     </div>
 
 </div>
+<script>
+// ===============================
+//  SUPABASE CONFIG
+// ===============================
+const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co";
+const SUPABASE_KEY = "INSERE_AQUI_A_TUA_ANON_KEY";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ===============================
+//  NAVEGAÇÃO ENTRE PÁGINAS
+// ===============================
+function showPage(pageId) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(pageId).classList.add("active");
+}
+
+// ===============================
+//  CARREGAR UTILIZADOR
+// ===============================
+let currentUser = null;
+
+async function loadUser() {
+    const { data, error } = await supabaseClient
+        .from("users")
+        .select("*")
+        .eq("id", 1)   // <- Aqui podes mudar para o ID real
+        .single();
+
+    if (error) {
+        console.error("Erro ao carregar utilizador:", error);
+        return;
+    }
+
+    currentUser = data;
+    updateProfileUI();
+    updateWalletUI();
+}
+
+// ===============================
+//  PERFIL
+// ===============================
+function updateProfileUI() {
+    if (!currentUser) return;
+
+    document.getElementById("profile-username").textContent = currentUser.username || "Sem nome";
+    document.getElementById("profile-id").textContent = currentUser.id;
+    document.getElementById("profile-total-xp").textContent = currentUser.xp || 0;
+
+    const inviteLink = `https://t.me/socialearn_bot?start=${currentUser.id}`;
+    document.getElementById("profile-invite-link").textContent = inviteLink;
+}
+
+function copyInviteLink() {
+    const link = document.getElementById("profile-invite-link").textContent;
+    navigator.clipboard.writeText(link);
+    alert("Link copiado!");
+}
+
+// ===============================
+//  CARTEIRA
+// ===============================
+function updateWalletUI() {
+    if (!currentUser) return;
+
+    const xp = currentUser.xp || 0;
+    const eur = (xp * 0.001).toFixed(2);
+    const brl = (xp * 0.006).toFixed(2);
+
+    document.getElementById("wallet-total-xp").textContent = "XP: " + xp;
+    document.getElementById("wallet-total-eur").textContent = "€: " + eur;
+    document.getElementById("wallet-total-brl").textContent = "R$: " + brl;
+
+    // Ganhos pessoais (80%)
+    document.getElementById("wallet-personal-xp").textContent = "XP: " + Math.floor(xp * 0.8);
+    document.getElementById("wallet-personal-eur").textContent = "€: " + (eur * 0.8).toFixed(2);
+    document.getElementById("wallet-personal-brl").textContent = "R$: " + (brl * 0.8).toFixed(2);
+
+    // Ganhos da rede (10%)
+    document.getElementById("wallet-network-xp").textContent = "XP: " + Math.floor(xp * 0.1);
+    document.getElementById("wallet-network-eur").textContent = "€: " + (eur * 0.1).toFixed(2);
+    document.getElementById("wallet-network-brl").textContent = "R$: " + (brl * 0.1).toFixed(2);
+}
+
+// ===============================
+//  FEED — CARREGAR POSTS
+// ===============================
+async function loadFeed() {
+    const { data, error } = await supabaseClient
+        .from("posts")
+        .select("*")
+        .order("id", { ascending: false });
+
+    if (error) {
+        console.error("Erro ao carregar feed:", error);
+        return;
+    }
+
+    const feedList = document.getElementById("feed-list");
+    feedList.innerHTML = "";
+
+    data.forEach(post => {
+        const div = document.createElement("div");
+        div.style = "background:#111827; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #1f2937;";
+
+        div.innerHTML = `
+            <div style="font-weight:bold; margin-bottom:6px;">${post.username || "Utilizador"}</div>
+            <div style="margin-bottom:10px;">${post.content}</div>
+            <button onclick="likePost(${post.id})"
+                    style="padding:8px; background:#1f2937; border:none; border-radius:6px; color:white; cursor:pointer;">
+                ❤️ ${post.likes || 0}
+            </button>
+        `;
+
+        feedList.appendChild(div);
+    });
+}
+
+// ===============================
+//  FEED — CRIAR POST
+// ===============================
+async function createPost() {
+    const content = document.getElementById("post-content").value.trim();
+    if (!content) return alert("Escreve algo!");
+
+    const { error } = await supabaseClient
+        .from("posts")
+        .insert({
+            username: currentUser.username,
+            content: content,
+            likes: 0
+        });
+
+    if (error) {
+        console.error("Erro ao criar post:", error);
+        return;
+    }
+
+    document.getElementById("post-content").value = "";
+    loadFeed();
+}
+
+// ===============================
+//  FEED — LIKE
+// ===============================
+async function likePost(id) {
+    const { data, error } = await supabaseClient
+        .rpc("increment_likes", { post_id: id });
+
+    if (error) {
+        console.error("Erro ao dar like:", error);
+        return;
+    }
+
+    loadFeed();
+}
+
+// ===============================
+//  INICIALIZAÇÃO DA APP
+// ===============================
+async function initApp() {
+    await loadUser();
+    await loadFeed();
+}
+
+initApp();
+</script>
