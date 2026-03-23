@@ -31,42 +31,40 @@
         .page { display: none; }
         .page.active { display: block !important; }
 
-        /* ADMIN CARDS & STATS */
+        /* CARDS & FEED */
+        .card { background: #0a0a0a; border-radius: 16px; padding: 20px; margin-bottom: 15px; border: 1px solid #1a1a1a; }
+        .post-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 12px; margin: 12px 0; border: 1px solid #1a1a1a; }
+        .comments-area { background: #050505; border-radius: 10px; padding: 12px; margin-top: 12px; font-size: 11px; border: 1px solid #111; }
+        
+        /* ADMIN DASHBOARD ELEMENTS */
         .admin-card { background: #0a0a0a; border-radius: 16px; padding: 25px; margin-bottom: 20px; border: 1px solid #1a1a1a; }
         .section-header { margin-bottom: 20px; border-left: 4px solid #ffcc00; padding-left: 12px; }
-        .section-header h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px; color: #fff; }
-        
-        /* GRID DE ESTATÍSTICAS */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .section-header h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .stat-box { background: #111; padding: 18px; border-radius: 12px; border: 1px solid #222; }
         .stat-box small { font-size: 9px; color: #666; text-transform: uppercase; display: block; margin-bottom: 5px; }
         .stat-box b { font-size: 20px; color: #fff; }
-        .stat-box .trend { font-size: 9px; color: #28a745; margin-left: 5px; }
 
-        /* FINANCEIRA */
-        .finance-card { text-align: center; background: #111; padding: 25px; border-radius: 16px; border: 1px solid #222; }
-        .finance-main-val { font-size: 38px; color: #ff4444; font-weight: 800; display: block; margin: 10px 0; }
-        
-        /* TABELAS DE DADOS */
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+        /* TABLES & LISTS */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
         .data-table tr { border-bottom: 1px solid #1a1a1a; }
         .data-table td { padding: 12px 5px; color: #aaa; }
-        .data-table b { color: #fff; }
 
-        /* BUTTONS */
-        .btn-action { background: #ffcc00; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 11px; }
-        .btn-danger { background: #ff4444; color: #fff; margin-top: 10px; }
+        /* INPUTS & BUTTONS */
+        .input-dark { width: 100%; background: #111; border: 1px solid #222; padding: 15px; color: #fff; border-radius: 12px; font-size: 14px; margin-bottom: 10px; outline: none; }
+        .btn-gold { background: #ffcc00; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 12px; }
+        .btn-pay { background: #fff; color: #000; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header-fixed">
-        <div class="ad-banner-top">APEX SOCIAL • ADMIN COMMAND CENTER</div>
+        <div class="ad-banner-top">APEX SOCIAL • ENTERPRISE NETWORK</div>
         <div class="user-stats-bar">
-            <div class="stat-pill"><span>XP Global</span><b id="topXP">0</b></div>
-            <div class="stat-pill"><span>Saldo Total</span><b id="topBalance">0.0000€</b></div>
-            <div class="stat-pill"><span>Saúde</span><b id="topHealth" style="color:#28a745;">ESTÁVEL</b></div>
-            <div class="stat-pill"><span>Modo</span><b style="color:#ff4444;">MASTER</b></div>
+            <div class="stat-pill"><span>XP Total</span><b id="topXP">0</b></div>
+            <div class="stat-pill"><span>Saldo EUR</span><b id="topBalance">0.0000€</b></div>
+            <div class="stat-pill"><span>Bonus</span><b id="topMult">100%</b></div>
+            <div class="stat-pill"><span>Amigos</span><b id="topRefs">0</b></div>
         </div>
         <div class="tabs">
             <div class="tab-item active" onclick="openTab('feed-page', this)">Feed</div>
@@ -77,48 +75,64 @@
     </div>
 
     <main class="content">
-        <div id="feed-page" class="page active"><div id="feed-container">A carregar feed...</div></div>
-        <div id="wallet-page" class="page"></div>
-        <div id="info-page" class="page"></div>
+        <div id="feed-page" class="page active">
+            <div class="card">
+                <textarea id="postText" class="input-dark" style="min-height: 60px; border:none; padding:0;" placeholder="O que queres partilhar?"></textarea>
+                <img id="imagePreview" style="display:none; width:100%; margin-bottom:15px; border-radius:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <label style="font-size:12px; color:#ffcc00; cursor:pointer;" for="fileInput"><i class="fas fa-camera"></i> FOTO (+15 XP)</label>
+                    <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="previewImg(this)">
+                    <button onclick="publish()" class="btn-gold" style="width:auto; padding:8px 20px; border-radius:20px;">POSTAR</button>
+                </div>
+            </div>
+            <div id="feed-container">A carregar conteúdo...</div>
+        </div>
+
+        <div id="wallet-page" class="page">
+            <div class="admin-card" style="text-align:center;">
+                <div class="section-header"><h2>O Teu Link de Convite</h2></div>
+                <p style="font-size:12px; color:#666; margin-bottom:20px;">Ganha 100 XP por cada amigo registado e 10% dos ganhos deles para sempre.</p>
+                <div id="refLink" style="background:#000; padding:20px; border:1px dashed #333; color:#ffcc00; font-size:11px; word-break:break-all; border-radius:12px; margin-bottom:20px;">...</div>
+                <button class="btn-gold" onclick="copyRef()">COPIAR LINK EXCLUSIVO</button>
+            </div>
+        </div>
+
+        <div id="info-page" class="page">
+            <div class="admin-card">
+                <div class="section-header"><h2>Tabela de Ganhos</h2></div>
+                <table class="data-table">
+                    <tr><td>Post com Foto</td><td align="right"><b style="color:#ffcc00;">+15.0 XP</b></td></tr>
+                    <tr><td>Receber Like</td><td align="right"><b style="color:#ffcc00;">+2.0 XP</b></td></tr>
+                    <tr><td>Comentar</td><td align="right"><b style="color:#ffcc00;">+5.0 XP</b></td></tr>
+                    <tr><td>Novo Amigo</td><td align="right"><b style="color:#ffcc00;">+100.0 XP</b></td></tr>
+                </table>
+                <div style="margin-top:20px; padding:15px; background:#000; border-radius:10px; border:1px solid #222;">
+                    <p style="font-size:11px; color:#555; line-height:1.6;">O levantamento mínimo é de <b>5000 XP (5.00€)</b>. Os pagamentos são processados via PayPal num prazo de 24h a 48h úteis.</p>
+                </div>
+            </div>
+        </div>
 
         <div id="admin-page" class="page">
-            
             <section class="admin-card">
-                <div class="section-header"><h2>Métricas de Crescimento</h2></div>
+                <div class="section-header"><h2>Métricas Globais</h2></div>
                 <div class="stats-grid">
-                    <div class="stat-box"><small>Utilizadores</small><b id="admUsers">0</b><span class="trend">↑</span></div>
-                    <div class="stat-box"><small>Novos (24h)</small><b>2</b><span class="trend">↑</span></div>
-                    <div class="stat-box"><small>Posts Totais</small><b id="admPosts">0</b></div>
-                    <div class="stat-box"><small>Engajamento</small><b>84%</b></div>
+                    <div class="stat-box"><small>Users</small><b id="admUsers">0</b></div>
+                    <div class="stat-box"><small>Posts</small><b id="admPosts">0</b></div>
+                    <div class="stat-box"><small>Dívida EUR</small><b id="admBurn" style="color:#ff4444;">0.00€</b></div>
+                    <div class="stat-box"><small>Engage</small><b>88%</b></div>
                 </div>
-            </section>
-
-            <section class="admin-card">
-                <div class="section-header"><h2>Tesouraria Global</h2></div>
-                <div class="finance-card">
-                    <small style="color:#666; text-transform:uppercase; font-size:10px;">Dívida Acumulada (Total Cash-out)</small>
-                    <b class="finance-main-val" id="admBurn">0.0000€</b>
-                    <span id="admDebtXP" style="font-size:12px; color:#444;">0 XP EMITIDOS</span>
-                </div>
-                
-                <h3 style="font-size: 11px; color: #ffcc00; margin-top:25px; text-transform: uppercase;">Top Referrers (Convites)</h3>
-                <table class="data-table" id="refTable">
-                    </table>
             </section>
 
             <section class="admin-card">
                 <div class="section-header"><h2>Pagamentos Pendentes</h2></div>
-                <div id="admPayments" style="min-height: 50px;">
-                    <p style="text-align: center; color: #333; font-size: 11px; padding: 10px;">Sem saques pendentes.</p>
-                </div>
+                <div id="admPayments"><p style="text-align:center; font-size:11px; color:#333;">Vazio.</p></div>
             </section>
 
             <section class="admin-card">
-                <div class="section-header"><h2>Controlo Crítico</h2></div>
-                <input type="number" id="delId" placeholder="ID do Post" style="width:100%; background:#111; border:1px solid #222; padding:15px; color:#fff; border-radius:12px; margin-bottom:10px;">
-                <button onclick="adminDelete()" class="btn-action btn-danger">ELIMINAR POST PERMANENTEMENTE</button>
+                <div class="section-header"><h2>Moderação</h2></div>
+                <input type="number" id="delId" class="input-dark" placeholder="ID do Post">
+                <button onclick="adminDelete()" class="btn-gold" style="background:#ff4444; color:#fff;">ELIMINAR CONTEÚDO</button>
             </section>
-
         </div>
     </main>
 
@@ -137,45 +151,82 @@
             }
         }
 
+        async function getProfile() {
+            const { data } = await client.from('profiles').select('*').eq('id', myId).single();
+            if (data) {
+                document.getElementById('topXP').innerText = Math.floor(data.points || 0).toLocaleString();
+                document.getElementById('topBalance').innerText = (data.points * 0.0001).toFixed(4) + "€";
+                document.getElementById('topRefs').innerText = data.referrals_count || 0;
+                document.getElementById('refLink').innerText = `https://apexsocial.app/?ref=${myId}`;
+            }
+        }
+
+        async function loadFeed() {
+            const { data: posts } = await client.from('posts').select('*, comments(*)').order('created_at', { ascending: false });
+            const container = document.getElementById('feed-container');
+            container.innerHTML = posts.map((p, i) => `
+                <div class="card">
+                    <small style="color:#333; font-size:9px;">ID: ${p.id} • #${p.user_id}</small>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                    <p style="margin:10px 0; font-size:14px; line-height:1.5;">${p.content || ''}</p>
+                    <div style="border-top:1px solid #111; padding-top:10px; display:flex; gap:15px;">
+                        <span onclick="handleLike(${p.id})" style="color:#ffcc00; font-size:12px; cursor:pointer;"><i class="fas fa-heart"></i> ${p.likes || 0}</span>
+                    </div>
+                </div>
+                ${(i+1) % 3 === 0 ? '<div style="text-align:center; font-size:8px; color:#222; margin-bottom:15px;">PUBLICIDADE GERANDO RECEITA</div>' : ''}
+            `).join('');
+        }
+
         async function loadAdminStats() {
             const { data: users } = await client.from('profiles').select('*').order('points', { ascending: false });
             const { count: pCount } = await client.from('posts').select('*', { count: 'exact', head: true });
-            
             const totalXP = users.reduce((acc, curr) => acc + (curr.points || 0), 0);
-            const totalEuro = (totalXP * 0.0001);
 
             document.getElementById('admUsers').innerText = users.length;
             document.getElementById('admPosts').innerText = pCount;
-            document.getElementById('admDebtXP').innerText = Math.floor(totalXP).toLocaleString() + " XP EMITIDOS";
-            document.getElementById('admBurn').innerText = totalEuro.toFixed(4) + "€";
+            document.getElementById('admBurn').innerText = (totalXP * 0.0001).toFixed(2) + "€";
 
-            // Tabela de Referrals
-            let refHtml = '';
-            users.slice(0, 3).forEach(u => {
-                refHtml += `<tr><td>User <b>#${u.id.toString().slice(-4)}</b></td><td align="right"><b>${u.referrals_count || 0}</b> convites</td></tr>`;
-            });
-            document.getElementById('refTable').innerHTML = refHtml;
-
-            // Pagamentos
             let payHtml = '';
-            const eligible = users.filter(u => u.points >= 5000);
-            if(eligible.length > 0) {
-                eligible.forEach(u => {
-                    payHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:#111; border-radius:10px; margin-bottom:10px; border:1px solid #222;">
-                        <span style="font-size:12px;"><b>#${u.id.toString().slice(-4)}</b>: ${(u.points * 0.0001).toFixed(4)}€</span>
-                        <button onclick="alert('PayPal: ${u.paypal_email}')" style="background:#fff; border:none; padding:5px 10px; border-radius:5px; font-size:10px; font-weight:bold;">PAGAR</button>
-                    </div>`;
-                });
-                document.getElementById('admPayments').innerHTML = payHtml;
+            users.filter(u => u.points >= 5000).forEach(u => {
+                payHtml += `<div style="display:flex; justify-content:space-between; align-items:center; background:#111; padding:12px; border-radius:10px; margin-bottom:8px; border:1px solid #222;">
+                    <span style="font-size:11px;">#${u.id.toString().slice(-4)}: <b>${(u.points * 0.0001).toFixed(2)}€</b></span>
+                    <button class="btn-pay" onclick="alert('PayPal: ${u.paypal_email}')">PAGAR</button>
+                </div>`;
+            });
+            if(payHtml) document.getElementById('admPayments').innerHTML = payHtml;
+        }
+
+        async function handleLike(pId) {
+            await client.rpc('increment_post_likes', { post_id: pId });
+            await client.rpc('increment_points', { user_id: myId, amount: 2.0 });
+            getProfile(); loadFeed();
+        }
+
+        let currentImg = null;
+        function previewImg(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentImg = e.target.result;
+                    document.getElementById('imagePreview').src = currentImg;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
             }
+        }
+
+        async function publish() {
+            const txt = document.getElementById('postText').value;
+            if(!txt && !currentImg) return;
+            await client.from('posts').insert([{ user_id: myId, content: txt, image_url: currentImg }]);
+            await client.rpc('increment_points', { user_id: myId, amount: 15.0 });
+            location.reload();
         }
 
         async function adminDelete() {
             const id = document.getElementById('delId').value;
-            if(!id) return alert("Insira o ID");
             await client.from('posts').delete().eq('id', id);
-            alert("Removido.");
-            loadAdminStats();
+            alert("Removido."); loadAdminStats(); loadFeed();
         }
 
         function openTab(id, el) {
@@ -183,20 +234,12 @@
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
+            window.scrollTo(0,0);
         }
 
-        async function getProfile() {
-            const { data } = await client.from('profiles').select('*').eq('id', myId).single();
-            if (data) {
-                document.getElementById('topXP').innerText = Math.floor(data.points || 0).toLocaleString();
-                document.getElementById('topBalance').innerText = (data.points * 0.0001).toFixed(4) + "€";
-            }
-        }
-
-        async function loadFeed() {
-            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
-            const container = document.getElementById('feed-container');
-            container.innerHTML = posts.map(p => `<div style="background:#0a0a0a; padding:15px; border-radius:12px; margin-bottom:10px; border:1px solid #111;"><small style="color:#222;">ID: ${p.id}</small><p>${p.content}</p></div>`).join('');
+        function copyRef() {
+            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
+            alert("Link copiado!");
         }
 
         init();
