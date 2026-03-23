@@ -7,20 +7,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* DESIGN SYSTEM - GOOGLE DARK */
+        /* DESIGN SYSTEM - GOOGLE DARK EDITION */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { background-color: #121212; height: 100%; }
         body { background-color: #121212; color: #ffffff; font-family: -apple-system, sans-serif; padding-top: 185px; padding-bottom: 20px; }
 
-        /* HEADER & BARRA DE STATUS */
+        /* HEADER FIXO */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
         .ad-top { background: #1a1a1a; color: #ffcc00; padding: 8px; text-align: center; font-size: 10px; font-weight: bold; border-bottom: 1px solid #333; }
+        
+        /* BARRA DE STATUS DO UTILIZADOR */
         .user-stats-bar { display: flex; justify-content: space-around; background: #1a1a1a; padding: 12px 5px; border-bottom: 1px solid #252525; }
         .stat-pill { text-align: center; flex: 1; }
         .stat-pill span { display: block; font-size: 9px; color: #888; text-transform: uppercase; margin-bottom: 2px; }
         .stat-pill b { font-size: 14px; color: #ffcc00; }
 
-        /* TABS */
+        /* NAVEGAÇÃO POR ABAS */
         .tabs { display: flex; background: #121212; border-top: 1px solid #333; }
         .tab-item { flex: 1; padding: 14px 5px; text-align: center; color: #888; font-size: 9px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
@@ -31,21 +33,29 @@
         .page.active { display: block; }
         .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
 
-        /* ESTILO DOS POSTS NO FEED */
-        .post-card { background: #1a1a1a; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #252525; animation: fadeIn 0.3s ease; }
-        .post-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11px; color: #666; }
-        .post-content { font-size: 14px; line-height: 1.5; color: #eee; margin-bottom: 12px; word-wrap: break-word; }
-        .post-actions { display: flex; gap: 20px; border-top: 1px solid #222; padding-top: 10px; color: #888; font-size: 12px; }
-        .action-item { cursor: pointer; transition: 0.2s; }
-        .action-item:hover { color: #ffcc00; }
-        .flag-btn { color: #444; font-size: 10px; cursor: pointer; }
-        .flag-btn:hover { color: #ff4444; }
+        /* FEED POSTS */
+        .post-card { background: #1a1a1a; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid #252525; }
+        .post-header { display: flex; justify-content: space-between; font-size: 10px; color: #666; margin-bottom: 10px; }
+        .post-content { font-size: 14px; line-height: 1.5; color: #eee; }
 
-        /* BOTÕES */
+        /* TABELAS DE INFO */
+        .info-table { border: 1px solid #333; border-radius: 8px; overflow: hidden; margin: 15px 0; }
+        .info-row { display: flex; padding: 12px 10px; font-size: 12px; border-bottom: 1px solid #222; background: #1e1e1e; }
+        .info-header { display: flex; background: #1a1a1a; padding: 10px; font-size: 11px; font-weight: bold; color: #ffcc00; border-bottom: 1px solid #333; }
+
+        /* ADMIN DASHBOARD */
+        .admin-stat-row { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 15px; }
+        .admin-stat-card { flex: 1; background: #111; padding: 10px 5px; border-radius: 8px; border: 1px solid #222; text-align: center; }
+        .admin-stat-title { font-size: 9px; color: #666; text-transform: uppercase; }
+        .admin-stat-value { font-size: 16px; font-weight: bold; }
+        .finance-box { background: #1a1a1a; border-radius: 10px; padding: 15px; border: 1px solid #333; }
+        .finance-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+
+        /* BOTÕES E CORES */
         .btn-pub { background: #ffcc00; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-        .btn-pub:disabled { background: #444; color: #888; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .finance-pos { color: #00ff00; }
+        .finance-neg { color: #ff4444; }
+        .admin-link { display: none; }
     </style>
 </head>
 <body>
@@ -67,22 +77,64 @@
 
     <main class="content">
         <div id="feed-page" class="page active">
+            <div id="checkinCard" class="card" style="display:none; border-color:#ffcc00;">
+                <h4 style="color:#ffcc00; font-size:14px;">🎁 Check-in Diário</h4>
+                <button class="btn-pub" onclick="doCheckin()">Receber +2.0 XP</button>
+            </div>
             <div class="card">
-                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; outline:none; font-size:15px; min-height:60px;" placeholder="Partilhe algo com a comunidade..."></textarea>
-                <button id="pubBtn" class="btn-pub" onclick="publish()">Publicar Post</button>
-                <div id="rewardHint" style="font-size:10px; color:#666; margin-top:8px;">A verificar limites diários...</div>
+                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; outline:none; font-size:15px; min-height:60px;" placeholder="Partilhe algo..."></textarea>
+                <button class="btn-pub" onclick="publish()">Publicar Post</button>
+                <div id="rewardHint" style="font-size:10px; color:#666; margin-top:8px;">A calcular ganhos...</div>
             </div>
-
-            <div id="feed-container">
-                <div style="text-align:center; padding:20px; color:#555;">A carregar publicações...</div>
-            </div>
-            
-            <button id="loadMore" class="btn-pub" style="background:#1a1a1a; color:#888; border:1px solid #333;" onclick="loadPosts(true)">Carregar mais</button>
+            <div id="feed-container"></div>
+            <button class="btn-pub" style="background:#1a1a1a; color:#888; border:1px solid #333;" onclick="loadPosts(true)">Carregar mais</button>
         </div>
 
-        <div id="info-page" class="page"> </div>
-        <div id="wallet-page" class="page"> </div>
-        <div id="admin-page" class="page"> </div>
+        <div id="wallet-page" class="page">
+            <div class="card" style="text-align:center;">
+                <h4 style="color:#ffcc00; margin-bottom:10px;">Sistema de Afiliados</h4>
+                <div id="refLink" style="background:#111; padding:12px; margin:15px 0; font-size:11px; border:1px dashed #444; color:#ffcc00; word-break:break-all;">...</div>
+                <button class="btn-pub" onclick="copyRef()">Copiar Link</button>
+                <p style="font-size:11px; color:#666; margin-top:15px;">Ganha 10% sobre tudo o que os teus amigos gerarem!</p>
+            </div>
+        </div>
+
+        <div id="info-page" class="page">
+            <div class="card">
+                <h4 style="color:#ffcc00; margin-bottom:5px;">Tabela de Ganhos Apex</h4>
+                <div class="info-table">
+                    <div class="info-header"><div style="flex:2;">ATIVIDADE</div><div style="flex:1; text-align:center;">RECOMPENSA</div></div>
+                    <div class="info-row"><div style="flex:2;">Check-in Diário</div><div style="flex:1; text-align:center; color:#00ff00;">+2.0 XP</div></div>
+                    <div class="info-row"><div style="flex:2;">Posts (1º ao 5º)</div><div style="flex:1; text-align:center; color:#00ff00;">5.0 XP</div></div>
+                    <div class="info-row"><div style="flex:2;">Posts (6º ao 10º)</div><div style="flex:1; text-align:center; color:#ffcc00;">2.5 XP</div></div>
+                    <div class="info-row" style="border:none;"><div style="flex:2;">Posts (11º+)</div><div style="flex:1; text-align:center; color:#ff4444;">0.5 XP</div></div>
+                </div>
+                <div style="font-size:11px; color:#666; text-align:center;">
+                    Taxa: 1000 XP = 1.00€ | Mínimo: 5.00€
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-page" class="page">
+            <div class="card" style="border:1px solid #ff4444;">
+                <h3 style="color:#ff4444; font-size:14px; margin-bottom:15px;">Monitor de Lucro Apex</h3>
+                <div class="admin-stat-row">
+                    <div class="admin-stat-card"><div class="admin-stat-title">Users</div><div id="admUsers" class="admin-stat-value">0</div></div>
+                    <div class="admin-stat-card"><div class="admin-stat-title">Posts</div><div id="admPosts" class="admin-stat-value">0</div></div>
+                    <div class="admin-stat-card"><div class="admin-stat-title">XP Circulante</div><div id="admXP" class="admin-stat-value">0</div></div>
+                </div>
+                <div class="finance-box">
+                    <div class="finance-row"><span>Dívida Total:</span><b id="admDebt" class="finance-neg">0.0000€</b></div>
+                    <div class="finance-row"><span>Est. Receita:</span><b id="admRev" class="finance-pos">0.0000€</b></div>
+                    <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11px; color:#aaa;">LUCRO LÍQUIDO:</span>
+                        <h2 id="admProfit" class="finance-pos">0.0000€</h2>
+                    </div>
+                </div>
+                <button class="btn-pub" style="background:#ff4444; color:#fff;" onclick="clearFeed()">RESETAR FEED</button>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -90,82 +142,11 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
         const myId = 5401881400; 
-        
         let dailyPosts = 0;
-        let lastPostDate = null;
 
-        // INICIALIZAÇÃO
         async function init() {
             await getProfile();
             await loadPosts();
-        }
-
-        // CARREGAR FEED (Com Infinite Scroll Simples)
-        async function loadPosts(append = false) {
-            const { data, error } = await client
-                .from('posts')
-                .select('*, profiles(id)')
-                .order('created_at', { ascending: false })
-                .limit(10);
-
-            if (error) return;
-
-            const container = document.getElementById('feed-container');
-            if (!append) container.innerHTML = '';
-
-            data.forEach(post => {
-                const postEl = document.createElement('div');
-                postEl.className = 'post-card';
-                postEl.innerHTML = `
-                    <div class="post-header">
-                        <span>ID: ...${post.user_id.toString().slice(-4)}</span>
-                        <span>${new Date(post.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                    </div>
-                    <div class="post-content">${post.content}</div>
-                    <div class="post-actions">
-                        <div class="action-item" onclick="alert('Funcionalidade Like em breve!')"><i class="far fa-heart"></i> Gosto</div>
-                        <div class="flag-btn" onclick="reportPost('${post.id}')"><i class="fas fa-flag"></i> Denunciar</div>
-                    </div>
-                `;
-                container.appendChild(postEl);
-            });
-        }
-
-        // PUBLICAR COM LÓGICA DE RECOMPENSA
-        async function publish() {
-            const btn = document.getElementById('pubBtn');
-            const txt = document.getElementById('postText').value.trim();
-            if (!txt) return;
-
-            btn.disabled = true;
-            btn.innerText = "A processar...";
-
-            // Cálculo da recompensa (Fadiga)
-            let reward = 5.0;
-            if (dailyPosts >= 5) reward = 2.5;
-            if (dailyPosts >= 10) reward = 0.5;
-
-            // Enviar para Supabase
-            const { error } = await client.from('posts').insert([{ user_id: myId, content: txt }]);
-            
-            if (!error) {
-                await client.rpc('increment_points', { user_id: myId, amount: reward });
-                await client.rpc('process_referral_bonus', { user_id: myId, bonus_amount: reward * 0.1 });
-                
-                document.getElementById('postText').value = '';
-                dailyPosts++;
-                await getProfile();
-                await loadPosts();
-                alert(`Publicado! +${reward} XP`);
-            }
-
-            btn.disabled = false;
-            btn.innerText = "Publicar Post";
-        }
-
-        async function reportPost(postId) {
-            alert("Obrigado. O post " + postId + " foi enviado para revisão administrativa.");
-            // Aqui podes criar uma tabela 'reports' no Supabase para o Admin ver
         }
 
         async function getProfile() {
@@ -174,16 +155,50 @@
                 document.getElementById('topBalance').innerText = (data.points * 0.0010).toFixed(4) + "€";
                 document.getElementById('topRefs').innerText = data.referrals_count || 0;
                 document.getElementById('topRefGains').innerText = (data.referral_points * 0.0010).toFixed(4) + "€";
-                
-                // Contagem de hoje para o hint
+                document.getElementById('refLink').innerText = `https://apexsocial.app/?ref=${myId}`;
+
                 const today = new Date().toISOString().split('T')[0];
                 const { count } = await client.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', myId).gte('created_at', today);
                 dailyPosts = count || 0;
-                
                 let next = dailyPosts < 5 ? 5.0 : (dailyPosts < 10 ? 2.5 : 0.5);
-                document.getElementById('rewardHint').innerHTML = `Hoje: <b>${dailyPosts} posts</b> | Próximo vale: <b style="color:#ffcc00">${next} XP</b>`;
+                document.getElementById('rewardHint').innerHTML = `Hoje: <b>${dailyPosts} posts</b> | Próximo: <b>${next} XP</b>`;
+                document.getElementById('checkinCard').style.display = 'block';
             }
             if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
+        }
+
+        async function loadPosts(append = false) {
+            const { data } = await client.from('posts').select('*').order('created_at', { ascending: false }).limit(10);
+            const container = document.getElementById('feed-container');
+            if(!append) container.innerHTML = '';
+            data.forEach(p => {
+                container.innerHTML += `<div class="post-card"><div class="post-header"><span>ID: ...${p.user_id.toString().slice(-4)}</span></div><div class="post-content">${p.content}</div></div>`;
+            });
+        }
+
+        async function publish() {
+            const txt = document.getElementById('postText').value;
+            if(!txt) return;
+            let reward = dailyPosts < 5 ? 5.0 : (dailyPosts < 10 ? 2.5 : 0.5);
+            await client.from('posts').insert([{ user_id: myId, content: txt }]);
+            await client.rpc('increment_points', { user_id: myId, amount: reward });
+            await client.rpc('process_referral_bonus', { user_id: myId, bonus_amount: reward * 0.1 });
+            document.getElementById('postText').value = '';
+            init();
+        }
+
+        async function updateAdmin() {
+            const { data: users, count: uCount } = await client.from('profiles').select('*', { count: 'exact' });
+            const { count: pCount } = await client.from('posts').select('*', { count: 'exact' });
+            let totalXP = 0; users.forEach(u => totalXP += u.points);
+            const debt = totalXP * 0.0010;
+            const rev = pCount * 18 * 0.0010;
+            document.getElementById('admUsers').innerText = uCount;
+            document.getElementById('admPosts').innerText = pCount;
+            document.getElementById('admXP').innerText = totalXP.toFixed(0);
+            document.getElementById('admDebt').innerText = debt.toFixed(4) + "€";
+            document.getElementById('admRev').innerText = rev.toFixed(4) + "€";
+            document.getElementById('admProfit').innerText = (rev-debt).toFixed(4) + "€";
         }
 
         function openTab(id, el) {
@@ -191,6 +206,12 @@
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
+            if(id === 'admin-page') updateAdmin();
+        }
+
+        function copyRef() {
+            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
+            alert("Link copiado!");
         }
 
         init();
