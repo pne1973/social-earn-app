@@ -157,7 +157,21 @@
             }
             if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
         }
+// --- SISTEMA AUTOMÁTICO DE LOCALIZAÇÃO (LINHA 159) ---
+const userConfig = {
+    lang: navigator.language || 'pt-PT',
+    isBR: (navigator.language || '').includes('BR'),
+    get symbol() { return this.isBR ? 'R$' : '€' },
+    get rate() { return this.isBR ? 0.00615 : 0.0010 }, // Taxa XP -> Moeda
+    get label() { return this.isBR ? 'Real (BRL)' : 'Euro (EUR)' }
+};
 
+// Tradução automática de botões baseada na língua
+if (!userConfig.lang.startsWith('pt')) {
+    document.querySelector('.btn-pub').innerText = 'Publish';
+    document.getElementById('postText').placeholder = "What's on your mind?";
+}
+// ------------------------------------
         // FEED & COMENTÁRIOS (FIXED BIGINT RELATION)
         async function fetchFeed() {
             const { data: posts } = await client.from('posts').select('*').order('created_at', {ascending: false}).limit(10);
