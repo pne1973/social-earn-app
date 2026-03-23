@@ -3,112 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Apex Social - Full Restore</title>
+    <title>Apex Social - Ad Engine Ready</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 230px; }
+        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 235px; }
 
-        /* HEADER & MONETIZAÇÃO */
+        /* HEADER & MONETIZAÇÃO FIXA */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 99999; background: #fff; border-bottom: 1px solid #dadce0; }
-        .ad-top { background: #ffd600; color: #000; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid #000; }
+        .ad-top { background: #ffd600; color: #000; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid #000; text-align: center; padding: 0 10px; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
         .stats { display: grid; grid-template-columns: repeat(4, 1fr); padding: 10px 0; text-align: center; border-bottom: 1px solid #f1f3f4; background: #fff; }
         .stats b { display: block; color: #1a73e8; font-size: 11px; }
         .stats label { font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
 
-        .tabs { display: flex; background: #fff; }
+        .tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; }
         .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; text-transform: uppercase; }
         .tab.active { color: #1a73e8; border-bottom: 3px solid #1a73e8; }
+        .tab.admin-tab { color: #d93025; }
 
-        /* CONTENT ENGINE */
+        /* CONTAINER PRINCIPAL */
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
         .view-section { display: none; }
         .view-section.active { display: block; }
-        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
-        /* FOTOS MINIATURA 150PX */
-        .post-img-box { width: 100%; height: 150px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f8f9fa; border: 1px solid #f1f3f4; }
+        /* CARDS E POSTS */
+        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; position: relative; }
+        .post-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid #f1f3f4; padding-bottom: 8px; }
+        .user-info { display: flex; align-items: center; gap: 8px; }
+        .avatar { width: 32px; height: 32px; background: #e8f0fe; border: 2px solid #1a73e8; border-radius: 50%; color: #1a73e8; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
+        .user-name { font-size: 13px; font-weight: bold; color: #1a73e8; }
+        .post-id { font-family: monospace; font-size: 9px; color: #70757a; }
+
+        /* FOTOS 150PX */
+        .post-img-box { width: 100%; height: 150px; overflow: hidden; border-radius: 6px; margin: 10px 0; border: 1px solid #eee; background: #f8f9fa; }
         .post-img-box img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* ABA REDE: LINK DE CONVITE */
-        .invite-box { background: #f8f9fa; border: 1px dashed #1a73e8; padding: 15px; border-radius: 6px; margin-top: 10px; display: flex; align-items: center; justify-content: space-between; }
-        .invite-link { font-size: 11px; color: #1a73e8; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%; }
-        .btn-copy { background: #1a73e8; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        /* BOTÕES DE AÇÃO */
+        .post-actions { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f3f4; padding-top: 12px; margin-top: 10px; }
+        .btn-act { background: none; border: none; font-size: 11px; color: #5f6368; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-act i { color: #1a73e8; font-size: 16px; }
+        .btn-del { color: #d93025 !important; }
 
-        /* ABA INFO: TABELA DE GANHOS */
-        .earnings-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .earnings-table th, .earnings-table td { border: 1px solid #eee; padding: 10px; text-align: left; font-size: 12px; }
-        .earnings-table th { background: #f8f9fa; color: #70757a; font-size: 10px; text-transform: uppercase; }
-        .xp-val { color: #1a73e8; font-weight: bold; }
+        /* ESTILO DOS ANÚNCIOS (EXEMPLO) */
+        .ad-container { background: #fff; border: 1px solid #dadce0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+        .ad-banner-img { width: 100%; height: 120px; background: #e8f0fe; display: flex; align-items: center; justify-content: center; color: #1a73e8; font-weight: bold; border-bottom: 1px solid #dadce0; }
+        .ad-content { padding: 12px; position: relative; }
+        .ad-tag { position: absolute; top: 8px; right: 8px; background: #1a73e8; color: #fff; font-size: 8px; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+        .ad-title { font-size: 13px; font-weight: bold; color: #202124; margin-bottom: 4px; }
+        .ad-desc { font-size: 11px; color: #5f6368; }
 
-        /* ADS INTERNOS */
-        .ad-inner { background: #e7f3ff; border: 2px dashed #1a73e8; padding: 20px; text-align: center; border-radius: 8px; margin: 15px 0; position: relative; }
-        .ad-badge { position: absolute; top: 5px; right: 5px; background: #1a73e8; color: #fff; font-size: 8px; padding: 2px 5px; border-radius: 3px; }
+        /* RANKING E TABELAS */
+        .earn-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .earn-table td { padding: 12px; border: 1px solid #eee; font-size: 12px; }
+        .xp-val { color: #1a73e8; font-weight: bold; text-align: right; }
     </style>
 </head>
 <body>
 
     <header class="header-fixed">
-        <div class="ad-top">▲ ESPAÇO PUBLICITÁRIO TOPO ▲</div>
+        <div class="ad-top">▲ ANUNCIE AQUI: CONTACTE O ADMIN (ID 5401881400) ▲</div>
         <div class="blue-bar">APEX SOCIAL NETWORK</div>
         <div class="stats">
-            <div><label>Meus XP</label><b id="valXP">80</b></div>
-            <div><label>Saldo EUR</label><b id="valEUR">0.0080€</b></div>
+            <div><label>Meus XP</label><b>80</b></div>
+            <div><label>Saldo EUR</label><b>0.0080€</b></div>
             <div><label>Dívida</label><b style="color:#d93025;">0.00€</b></div>
-            <div><label>Estado</label><b style="color:green">Online</b></div>
+            <div><label>Estado</label><b style="color:#1e8e3e;">ONLINE</b></div>
         </div>
         <nav class="tabs">
             <div class="tab active" onclick="showTab('explorar', this)">Explorar</div>
             <div class="tab" onclick="showTab('rede', this)">Rede</div>
             <div class="tab" onclick="showTab('info', this)">Info</div>
-            <div class="tab" onclick="showTab('master', this)" style="color:#d93025">Master</div>
+            <div class="tab admin-tab" onclick="showTab('master', this)">Master</div>
         </nav>
     </header>
 
     <main class="container">
         
         <section id="view-explorar" class="view-section active">
+            <div class="ad-container">
+                <div class="ad-banner-img">IMAGEM PATROCINADA 450x120</div>
+                <div class="ad-content">
+                    <span class="ad-tag">ANÚNCIO</span>
+                    <div class="ad-title">Cursos de Marketing Digital</div>
+                    <div class="ad-desc">Aprenda a escalar o seu negócio online com bónus exclusivos para utilizadores Apex.</div>
+                </div>
+            </div>
+
             <div id="mainFeed"></div>
         </section>
 
         <section id="view-rede" class="view-section">
             <div class="card">
-                <h3 style="font-size:15px; color:#1a73e8;">O seu Link de Convite</h3>
-                <p style="font-size:12px; color:#70757a; margin-top:5px;">Partilhe e ganhe 100 XP por cada amigo que se registe através do seu link.</p>
-                <div class="invite-box">
-                    <span class="invite-link">https://apex-social.com/join?ref=5401881400</span>
-                    <button class="btn-copy">COPIAR</button>
+                <h3>Convide Amigos</h3>
+                <p style="font-size:11px; color:#1a73e8; font-weight:bold; margin:10px 0;">https://apex.social/ref/5401881400</p>
+                <button style="width:100%; background:#1a73e8; color:#fff; border:none; padding:10px; border-radius:6px; font-weight:bold;">COPIAR LINK</button>
+            </div>
+            <div class="ad-container" style="background: #fff8e1; border-color: #ffc107;">
+                <div class="ad-content">
+                    <span class="ad-tag" style="background:#ffc107;">PROMO</span>
+                    <div class="ad-title">Ganhe +500 XP Hoje</div>
+                    <div class="ad-desc">Complete o seu perfil e valide o seu email para receber um bónus imediato.</div>
                 </div>
             </div>
-            <div class="ad-inner"><span class="ad-badge">AD</span><p style="color:#1a73e8; font-weight:bold; font-size:12px;">Destaque o seu Perfil aqui!</p></div>
         </section>
 
         <section id="view-info" class="view-section">
             <div class="card">
-                <h3 style="font-size:15px; color:#1a73e8; margin-bottom:10px;">Como Ganhar XP</h3>
-                <table class="earnings-table">
-                    <tr><th>Ação</th><th>Recompensa</th></tr>
-                    <tr><td>Publicar Post com Foto</td><td class="xp-val">+15 XP</td></tr>
-                    <tr><td>Convidar Novo Amigo</td><td class="xp-val">+100 XP</td></tr>
-                    <tr><td>Receber um Gosto</td><td class="xp-val">+2 XP</td></tr>
-                    <tr><td>Check-in Diário</td><td class="xp-val">+5 XP</td></tr>
-                    <tr><td>Conversão</td><td style="font-size:10px;">10.000 XP = 1.00€</td></tr>
+                <h3>Como Ganhar</h3>
+                <table class="earn-table">
+                    <tr><td>Post Foto</td><td class="xp-val">+15 XP</td></tr>
+                    <tr><td>Cada Like</td><td class="xp-val">+2 XP</td></tr>
                 </table>
             </div>
-            <div class="card">
-                <h3 style="font-size:15px; margin-bottom:5px;">Regras de Levantamento</h3>
-                <p style="font-size:12px; color:#555;">O levantamento mínimo é de **5.000 XP**. Os pagamentos são processados via PayPal para o email registado.</p>
+            <div class="ad-container">
+                <div class="ad-content">
+                    <span class="ad-tag">APEX ADS</span>
+                    <div class="ad-title">Seja um Parceiro</div>
+                    <div class="ad-desc">Quer ver a sua marca aqui? Fale com a nossa equipa de monetização.</div>
+                </div>
             </div>
-            <div class="ad-inner"><span class="ad-badge">AD</span><p style="color:#1a73e8; font-weight:bold; font-size:12px;">Ganhe Bónus com Parceiros</p></div>
         </section>
 
         <section id="view-master" class="view-section">
             <div class="card" style="border:1px solid #d93025;">
-                <h3 style="color:#d93025;">Consola Master</h3>
-                <p style="font-size:12px; margin-top:10px;">Dívida Total à Rede: <b>0.00€</b></p>
+                <h3 style="color:#d93025;">Consola Master (Admin)</h3>
+                <p style="font-size:12px; margin-top:10px;">Dívida Total da Rede: <b>0.00€</b></p>
+                <input type="text" placeholder="ID Post" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; margin-top:10px;">
+                <button style="width:100%; background:#d93025; color:#fff; border:none; padding:10px; border-radius:6px; margin-top:10px; font-weight:bold;">ELIMINAR</button>
             </div>
         </section>
 
@@ -126,26 +150,39 @@
             el.classList.add('active');
         }
 
-        async function renderFeed() {
+        async function loadFeed() {
             const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
             const f = document.getElementById('mainFeed');
             f.innerHTML = "";
             posts?.forEach((p, i) => {
+                // INSERÇÃO DE ANÚNCIO ENTRE POSTS (A CADA 3)
                 if (i > 0 && i % 3 === 0) {
-                    f.innerHTML += `<div class="ad-inner"><span class="ad-badge">AD</span><p style="color:#1a73e8; font-size:12px;">Espaço Publicitário</p></div>`;
+                    f.innerHTML += `
+                        <div class="ad-container">
+                            <div class="ad-content">
+                                <span class="ad-tag">ANÚNCIO</span>
+                                <div class="ad-title">Servidores Apex Cloud</div>
+                                <div class="ad-desc">A melhor performance para as suas aplicações com 99.9% uptime.</div>
+                            </div>
+                        </div>`;
                 }
                 f.innerHTML += `
                     <div class="card">
-                        <div style="display:flex; justify-content:space-between; font-size:10px; color:#777; margin-bottom:10px;">
-                            <span style="font-weight:bold; color:#1a73e8;">Apex Social Network</span>
-                            <span>#${p.id.toString().slice(-4)}</span>
+                        <div class="post-header">
+                            <div class="user-info"><div class="avatar">A</div><span class="user-name">Apex Social Network</span></div>
+                            <span class="post-id">#ID-${p.id.toString().slice(-6)}</span>
                         </div>
                         <p style="font-size:14px;">${p.content || ''}</p>
                         ${p.image_url ? `<div class="post-img-box"><img src="${p.image_url}"></div>` : ''}
+                        <div class="post-actions">
+                            <button class="btn-act"><i class="far fa-heart"></i> Gosto (0)</button>
+                            <button class="btn-act"><i class="far fa-comment"></i> Comentar</button>
+                            <button class="btn-act btn-del"><i class="fas fa-times"></i> Eliminar</button>
+                        </div>
                     </div>`;
             });
         }
-        renderFeed();
+        loadFeed();
     </script>
 </body>
 </html>
