@@ -2,238 +2,75 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Master Edition</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Earn</title>
+
+    <!-- Ícones e fontes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Estilos internos (vamos organizar depois) -->
     <style>
-        /* DESIGN SYSTEM - GOOGLE EDITION */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background-color: #121212; color: #ffffff; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            min-height: 100vh; padding-top: 175px; padding-bottom: 30px;
+        body {
+            margin: 0;
+            padding: 0;
+            background: #050816;
+            color: #fff;
+            font-family: Arial, sans-serif;
         }
 
-        /* HEADER */
-        .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
-        .ad-top { background: #1a1a1a; color: #ffcc00; padding: 12px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
-        .nav-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; }
-        .xp-pill { background: #ffcc00; color: #000; padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 12px; }
+        header {
+            background: #0b1020;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 1px solid #1f2535;
+        }
 
-        /* TABS */
-        .tabs { display: flex; background: #1a1a1a; border-top: 1px solid #333; }
-        .tab-item { flex: 1; padding: 15px 5px; text-align: center; color: #888; font-size: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; }
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0b1020;
+            border-top: 1px solid #1f2535;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
 
-        /* CONTENT */
-        .content { padding: 15px; max-width: 500px; margin: 0 auto; }
-        .page { display: none; }
-        .page.active { display: block; }
-        .card { background: #1e1e1e; border-radius: 12px; padding: 18px; margin-bottom: 15px; border: 1px solid #333; }
-        
-        /* POSTS & INTERACTIONS */
-        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; }
-        .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; border-bottom: 1px solid #252525; }
-        .post-avatar { width: 34px; height: 34px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; border: 1px solid #444; }
-        .post-text { padding: 15px; font-size: 15px; color: #f0f0f0; }
-        .post-img { width: 100%; max-height: 380px; object-fit: cover; display: block; border-top: 1px solid #252525; }
-        
-        /* ACTION BAR */
-        .post-actions { display: flex; padding: 12px 15px; border-top: 1px solid #252525; justify-content: space-between; color: #aaa; font-size: 13px; }
-        .action-item { cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
-        .action-item:hover { color: #ffcc00; }
-        .action-item.active { color: #ffcc00; }
+        nav button {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+        }
 
-        /* COMMENTS SECTION */
-        .comments-box { background: #161616; padding: 12px; border-top: 1px solid #252525; display: none; }
-        .comment-input-group { display: flex; gap: 8px; margin-bottom: 10px; }
-        .comment-input { flex: 1; background: #222; border: 1px solid #333; border-radius: 20px; padding: 8px 15px; color: #fff; font-size: 13px; outline: none; }
-        .comment-item { font-size: 12px; padding: 8px 0; border-bottom: 1px solid #222; }
-        .comment-item b { color: #ffcc00; margin-right: 5px; }
+        .page {
+            display: none;
+            padding: 20px;
+        }
 
-        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .admin-link { display: none; }
+        .active {
+            display: block;
+        }
     </style>
 </head>
+
 <body>
 
-    <div class="header-fixed">
-        <div class="ad-top">📢 APEX SOCIAL: Interaja para aumentar os seus ganhos!</div>
-        <div class="nav-main">
-            <h3>APEX <span style="color:#ffcc00">SOCIAL</span></h3>
-            <div id="userXP" class="xp-pill">0 XP • 0.0000€</div>
-        </div>
-        <div class="tabs">
-            <div class="tab-item active" onclick="openTab('feed-page', this)">Feed</div>
-            <div class="tab-item" onclick="openTab('rank-page', this)">Ranking</div>
-            <div class="tab-item" onclick="openTab('wallet-page', this)">Carteira</div>
-            <div class="tab-item" onclick="openTab('info-page', this)">Ajuda</div>
-            <div id="adm-tab" class="tab-item admin-link" onclick="openTab('admin-page', this)">Admin</div>
-        </div>
-    </div>
+<header>Social Earn</header>
 
-    <main class="content">
-        <div id="feed-page" class="page active">
-            <div class="card">
-                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; outline:none; font-size:15px; min-height:60px;" placeholder="O que está a pensar?"></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; border-top:1px solid #333; padding-top:10px;">
-                    <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer;"><i class="fas fa-image"></i> Foto</button>
-                    <input type="file" id="fileInput" hidden accept="image/*">
-                    <button class="btn-pub" onclick="publish()">Publicar</button>
-                </div>
-            </div>
-            <div id="feed-items">Carregando interações...</div>
-        </div>
+<nav>
+    <button onclick="showPage('home')"><i class="fa-solid fa-house"></i></button>
+    <button onclick="showPage('wallet')"><i class="fa-solid fa-wallet"></i></button>
+    <button onclick="showPage('feed')"><i class="fa-solid fa-newspaper"></i></button>
+    <button onclick="showPage('profile')"><i class="fa-solid fa-user"></i></button>
+</nav>
 
-        <div id="rank-page" class="page"><div class="card"><h3 style="color:#ffcc00">Ranking Top 10</h3><div id="rankingList"></div></div></div>
-        
-        <div id="wallet-page" class="page">
-            <div class="card" style="text-align:center;">
-                <p style="color:#888; font-size:12px;">SALDO ESTIMADO</p>
-                <h1 id="mainValue" style="color:#ffcc00; font-size:42px;">0.0000€</h1>
-                <p id="brlValue" style="color:#aaa;">R$ 0.0000</p>
-                <div style="display:flex; justify-content:space-around; margin-top:20px; border-top:1px solid #333; padding-top:15px;">
-                    <div><small>Pessoal</small><br><b id="pGain">0.00€</b></div>
-                    <div><small>Rede (10%)</small><br><b id="nGain" style="color:#00ff00;">0.00€</b></div>
-                </div>
-            </div>
-            <div class="card">
-                <p style="font-size:12px;">Link de Afiliado:</p>
-                <code id="invLink" style="font-size:11px; color:#ffcc00; display:block; padding:10px; background:#111;">...</code>
-                <button class="btn-pub" style="width:100%; margin-top:10px; background:#333; color:#fff;" onclick="copyLink()">Copiar Link</button>
-            </div>
-        </div>
-
-        <div id="info-page" class="page">
-            <div class="card">
-                <h4 style="color:#ffcc00; margin-bottom:15px;">Tabela de Ganhos</h4>
-                <p>Post: +15/5/1 XP</p>
-                <p>Comentário: +5 XP</p>
-                <p>Like: +2 XP</p>
-                <p>Afiliado: +100 XP + 10% Mensal</p>
-            </div>
-        </div>
-
-        <div id="admin-page" class="page">
-            <div class="card" style="border-color:red;">
-                <h3>Admin Dashboard</h3>
-                <p>Users: <span id="admU">0</span></p>
-                <p>Dívida: <span id="admD">0.00€</span></p>
-                <button class="btn-pub" style="background:red; color:white; width:100%;" onclick="resetFeed()">RESET FEED</button>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const client = supabase.createClient(SB_URL, SB_KEY);
-        const myId = 5401881400;
-
-        async function init() {
-            await getProfile();
-            await fetchFeed();
-        }
-
-        async function getProfile() {
-            const { data } = await client.from('profiles').select('*').eq('id', myId).single();
-            if (data) {
-                const totalXP = (data.points || 0) + (data.referral_points || 0);
-                document.getElementById('userXP').innerText = `${totalXP} XP • ${(totalXP * 0.0010).toFixed(4)}€`;
-                document.getElementById('mainValue').innerText = `${(totalXP * 0.0010).toFixed(4)}€`;
-                document.getElementById('brlValue').innerText = `R$ ${(totalXP * 0.0062).toFixed(4)}`;
-                document.getElementById('pGain').innerText = (data.points * 0.0010).toFixed(2) + "€";
-                document.getElementById('nGain').innerText = (data.referral_points * 0.0010).toFixed(2) + "€";
-                document.getElementById('invLink').innerText = `https://apex.social/?ref=${myId}`;
-                if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
-            }
-        }
-
-        async function fetchFeed() {
-            const { data: posts } = await client.from('posts').select('*').order('created_at', {ascending: false});
-            const container = document.getElementById('feed-items');
-            container.innerHTML = '';
-            
-            posts.forEach(p => {
-                const postEl = document.createElement('div');
-                postEl.className = 'post';
-                postEl.innerHTML = `
-                    <div class="post-header"><div class="post-avatar">${p.user_id.toString().slice(-1)}</div><span>User #${p.user_id.toString().slice(-4)}</span></div>
-                    <div class="post-text">${p.content}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    <div class="post-actions">
-                        <div class="action-item" onclick="handleLike(${p.id}, this)">
-                            <i class="fas fa-heart"></i> <span class="count">${p.likes_count || 0}</span>
-                        </div>
-                        <div class="action-item" onclick="toggleComments(${p.id})">
-                            <i class="fas fa-comment"></i> <span class="count">${p.comments_count || 0}</span>
-                        </div>
-                        <div class="action-item" onclick="sharePost('${p.content}', ${p.id})">
-                            <i class="fas fa-share"></i>
-                        </div>
-                    </div>
-                    <div id="comments-${p.id}" class="comments-box">
-                        <div class="comment-input-group">
-                            <input type="text" id="input-${p.id}" class="comment-input" placeholder="Escreva um comentário...">
-                            <button class="btn-pub" style="padding: 5px 12px; font-size:12px;" onclick="postComment(${p.id})">OK</button>
-                        </div>
-                        <div id="list-${p.id}" class="comments-list">
-                            <p class="comment-item"><b>User...44:</b> Excelente post!</p>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(postEl);
-            });
-        }
-
-        async function handleLike(postId, btn) {
-            const countEl = btn.querySelector('.count');
-            countEl.innerText = parseInt(countEl.innerText) + 1;
-            btn.classList.add('active');
-            await client.rpc('increment_points', { user_id: myId, amount: 2 });
-            getProfile();
-        }
-
-        function toggleComments(postId) {
-            const box = document.getElementById(`comments-${postId}`);
-            box.style.display = box.style.display === 'block' ? 'none' : 'block';
-        }
-
-        async function postComment(postId) {
-            const input = document.getElementById(`input-${postId}`);
-            if(!input.value) return;
-            
-            const list = document.getElementById(`list-${postId}`);
-            list.innerHTML = `<p class="comment-item"><b>Eu:</b> ${input.value}</p>` + list.innerHTML;
-            
-            await client.rpc('increment_points', { user_id: myId, amount: 5 });
-            input.value = '';
-            alert("+5 XP por comentar!");
-            getProfile();
-        }
-
-        async function sharePost(text, id) {
-            const shareData = {
-                title: 'Apex Social',
-                text: text,
-                url: `https://apex.social/post/${id}?ref=${myId}`
-            };
-            if (navigator.share) {
-                await navigator.share(shareData);
-                await client.rpc('increment_points', { user_id: myId, amount: 5 });
-            } else {
-                alert("Link de partilha copiado para o convite!");
-            }
-        }
-
-        // Funções Adicionais (Admin e Cadastro) mantidas como no anterior...
-        function copyLink() {
-            navigator.clipboard.writeText(document.getElementById('invLink').innerText);
-            alert("Link copiado!");
-        }
-
-        init();
-    </script>
-</body>
-</html>
+<!-- CONTÊINER PRINCIPAL DAS PÁGINAS -->
+<div id="home" class="page active"></div>
+<div id="wallet" class="page"></div>
+<div id="feed" class="page"></div>
+<div id="profile" class="page"></div>
