@@ -15,12 +15,14 @@
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
+        /* GRID DE STATS LIMPA */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
         .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
         .stat-item b { font-size: 11px; color: #1a73e8; }
         
+        /* NAVEGAÇÃO APENAS COM 3 ABAS */
         .tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; }
         .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; border-bottom: 3px solid transparent; text-transform: uppercase; }
         .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
@@ -64,12 +66,13 @@
     </header>
 
     <main class="container">
-        
         <section id="view-explorar" class="view-section active">
             <div class="card">
                 <textarea id="postInput" class="input-google" placeholder="O que pretende partilhar?"></textarea>
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
-                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileInput"><i class="fas fa-camera"></i> Foto (+15 XP)</label>
+                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileInput">
+                        <i class="fas fa-camera"></i> Foto (+15 XP)
+                    </label>
                     <input type="file" id="fileInput" hidden onchange="handleFile(this)">
                     <button class="btn-post" style="width:auto; margin:0;" onclick="sendPost()">Publicar</button>
                 </div>
@@ -87,16 +90,15 @@
 
         <section id="view-info" class="view-section">
             <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;">Manual de Ganhos</h3>
-                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
-                    <span>Novo Afiliado</span><b class="info-badge">+100 XP</b>
-                </div>
+                <h3 style="font-size:16px; margin-bottom:15px;">Como ganhar XP</h3>
                 <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
                     <span>Publicação com Foto</span><b class="info-badge">+15 XP</b>
                 </div>
+                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
+                    <span>Novo Afiliado</span><b class="info-badge">+100 XP</b>
+                </div>
             </div>
         </section>
-
     </main>
 
     <script>
@@ -104,8 +106,6 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
         
-        const MY_ID = 5401881400; 
-
         async function init() {
             loadProfile();
             loadPosts();
@@ -119,11 +119,13 @@
         }
 
         async function loadProfile() {
-            const { data } = await client.from('profiles').select('*').eq('id', MY_ID).single();
+            // Utilizando um ID genérico para o exemplo ou recuperando da sessão
+            const userId = 5401881400; 
+            const { data } = await client.from('profiles').select('*').eq('id', userId).single();
             if(data) {
                 document.getElementById('valXP').innerText = data.points.toLocaleString();
                 document.getElementById('valEUR').innerText = (data.points * 0.0001).toFixed(4) + "€";
-                document.getElementById('refLink').innerText = "https://apexsocial.app/?ref=" + MY_ID;
+                document.getElementById('refLink').innerText = "https://apexsocial.app/?ref=" + userId;
             }
         }
 
