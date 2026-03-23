@@ -9,20 +9,19 @@
     <style>
         /* RESET & GOOGLE SYSTEM */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 175px; }
+        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 230px; } /* Ajustado para o banner */
 
-        /* HEADER FIXO */
+        /* HEADER & AD BANNER */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
+        .ad-banner-top { background: #f1f3f4; height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #dadce0; overflow: hidden; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
-        /* GRID DE STATS LIMPA */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
         .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
         .stat-item b { font-size: 11px; color: #1a73e8; }
         
-        /* NAVEGAÇÃO APENAS COM 3 ABAS */
         .tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; }
         .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; border-bottom: 3px solid transparent; text-transform: uppercase; }
         .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
@@ -32,8 +31,11 @@
         .view-section { display: none; }
         .view-section.active { display: block; }
 
-        /* CARDS & FEED */
+        /* CARDS & ADS */
         .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .ad-card { background: #fff7e6; border: 1px solid #ffe58f; position: relative; }
+        .ad-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; background: #fff1b8; color: #874d00; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        
         .post-text { font-size: 15px; line-height: 1.5; color: #3c4043; }
         .post-img-container { width: 100%; max-height: 400px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f8f9fa; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f3f4; }
         .post-img { width: 100%; height: auto; max-height: 400px; object-fit: contain; }
@@ -43,15 +45,15 @@
         .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .action-btn i { font-size: 16px; color: #1a73e8; }
 
-        /* UI ELEMENTS */
-        .input-google { width: 100%; border: none; outline: none; font-size: 16px; margin-bottom: 15px; resize: none; min-height: 60px; }
-        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-        .info-badge { background: #e8f0fe; color: #1a73e8; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <header class="header-fixed">
+        <div class="ad-banner-top" id="topAd">
+            <span style="font-size: 11px; color: #9aa0a6;">Espaço Publicitário de Topo</span>
+        </div>
         <div class="blue-bar">Apex Social</div>
         <div class="stats-grid">
             <div class="stat-item"><label>Meus XP</label><b id="valXP">0</b></div>
@@ -68,36 +70,21 @@
     <main class="container">
         <section id="view-explorar" class="view-section active">
             <div class="card">
-                <textarea id="postInput" class="input-google" placeholder="O que pretende partilhar?"></textarea>
+                <textarea id="postInput" style="width:100%; border:none; outline:none; font-size:16px; min-height:60px; resize:none;" placeholder="O que pretende partilhar?"></textarea>
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
-                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileInput">
-                        <i class="fas fa-camera"></i> Foto (+15 XP)
-                    </label>
-                    <input type="file" id="fileInput" hidden onchange="handleFile(this)">
-                    <button class="btn-post" style="width:auto; margin:0;" onclick="sendPost()">Publicar</button>
+                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;"><i class="fas fa-camera"></i> Foto (+15 XP)</label>
+                    <button class="btn-post" onclick="sendPost()">Publicar</button>
                 </div>
             </div>
             <div id="feedContent"></div>
         </section>
 
         <section id="view-rede" class="view-section">
-            <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;">Convidar Amigos</h3>
-                <div id="refLink" style="font-size:12px; color:#1a73e8; background:#f8f9fa; padding:15px; border-radius:6px; border:1px dashed #dadce0; word-break:break-all;">...</div>
-                <button class="btn-post" style="background:#fff; color:#1a73e8; border:1px solid #1a73e8; margin-top:10px;" onclick="copyRef()">Copiar Convite</button>
-            </div>
+            <div class="card"><h3>Rede de Afiliados</h3></div>
         </section>
 
         <section id="view-info" class="view-section">
-            <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;">Como ganhar XP</h3>
-                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
-                    <span>Publicação com Foto</span><b class="info-badge">+15 XP</b>
-                </div>
-                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
-                    <span>Novo Afiliado</span><b class="info-badge">+100 XP</b>
-                </div>
-            </div>
+            <div class="card"><h3>Informações</h3></div>
         </section>
     </main>
 
@@ -119,13 +106,10 @@
         }
 
         async function loadProfile() {
-            // Utilizando um ID genérico para o exemplo ou recuperando da sessão
-            const userId = 5401881400; 
-            const { data } = await client.from('profiles').select('*').eq('id', userId).single();
+            const { data } = await client.from('profiles').select('*').eq('id', 5401881400).single();
             if(data) {
                 document.getElementById('valXP').innerText = data.points.toLocaleString();
                 document.getElementById('valEUR').innerText = (data.points * 0.0001).toFixed(4) + "€";
-                document.getElementById('refLink').innerText = "https://apexsocial.app/?ref=" + userId;
             }
         }
 
@@ -133,7 +117,19 @@
             const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('feedContent');
             container.innerHTML = "";
-            posts.forEach(p => {
+            
+            posts.forEach((p, index) => {
+                // Inserção automática de anúncio a cada 3 posts
+                if (index > 0 && index % 3 === 0) {
+                    container.innerHTML += `
+                        <div class="card ad-card">
+                            <span class="ad-badge">AD</span>
+                            <div style="height:100px; display:flex; align-items:center; justify-content:center; color:#874d00; font-size:12px; text-align:center;">
+                                Espaço Publicitário<br>O seu anúncio aqui
+                            </div>
+                        </div>`;
+                }
+
                 container.innerHTML += `
                     <div class="card">
                         <div class="post-text">${p.content || ''}</div>
@@ -145,11 +141,6 @@
                         </div>
                     </div>`;
             });
-        }
-
-        function copyRef() {
-            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
-            alert("Link copiado!");
         }
 
         init();
