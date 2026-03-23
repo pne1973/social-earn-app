@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* RESET E FUNDO INFINITO - MANTIDO INTEGRALMENTE */
+        /* RESET E FUNDO INFINITO - MANTIDO */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { background-color: #121212; height: 100%; }
         body { 
@@ -35,27 +35,34 @@
         .page { display: none; }
         .page.active { display: block; }
 
-        /* CARDS E POSTS - MANTIDO */
+        /* CARDS E POSTS - AJUSTE DE TAMANHO DE IMAGEM */
         .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
         .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; }
         .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; border-bottom: 1px solid #252525; }
         .post-avatar { width: 32px; height: 32px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; border: 1px solid #444; }
         .post-text { padding: 15px; font-size: 15px; line-height: 1.5; color: #eee; word-wrap: break-word; }
-        .post-img { width: 100%; height: auto; display: block; border-top: 1px solid #252525; background: #000; max-height: 550px; object-fit: contain; }
+        
+        /* CORREÇÃO DE TAMANHO: Imagem mais discreta no feed */
+        .post-img { 
+            width: 100%; 
+            height: auto; 
+            max-height: 320px; /* Reduzido de 550px para 320px */
+            display: block; 
+            border-top: 1px solid #252525; 
+            background: #000; 
+            object-fit: cover; 
+        }
 
         /* INPUTS - MANTIDO */
         .input-area { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 80px; font-size: 15px; margin-bottom: 10px; outline: none; }
-        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
-        .btn-pub:disabled { opacity: 0.5; }
-
+        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .admin-link { display: none; }
-        .ad-injection { border: 1px dashed #ffcc00; padding: 15px; text-align: center; border-radius: 12px; margin-bottom: 20px; color: #ffcc00; font-size: 11px; font-weight: bold; background: rgba(255,204,0,0.05); }
     </style>
 </head>
 <body>
 
     <div class="header-fixed">
-        <div class="ad-top">📢 CONVITE: Ganha +100 XP por cada amigo convidado!</div>
+        <div class="ad-top">📢 MONETIZAÇÃO: Ganha +100 XP por cada amigo convidado!</div>
         <div class="nav-main">
             <h3 style="letter-spacing:1px;">PINE <span style="color:#ffcc00">SOCIAL</span></h3>
             <div id="userXP" class="xp-pill">0 XP</div>
@@ -75,7 +82,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <input type="file" id="fileInput" hidden accept="image/*">
                     <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
-                    <span id="procStatus" style="display:none; color:#ffcc00; font-size:11px; font-weight:bold;">A processar...</span>
+                    <span id="procStatus" style="display:none; color:#ffcc00; font-size:11px;">Processando...</span>
                     <button class="btn-pub" id="pubBtn" onclick="publish()">Publicar</button>
                 </div>
             </div>
@@ -84,32 +91,42 @@
 
         <div id="earn-page" class="page">
             <div class="card">
-                <h2 style="color:#ffcc00">Top 10 Ranking</h2><br>
-                <div id="rankingList" style="font-size: 14px; line-height: 2;">Carregando ranking...</div>
+                <h3 style="color:#ffcc00; margin-bottom:10px;">Ranking Social</h3>
+                <div id="rankingList" style="font-size:14px;">Carregando...</div>
+            </div>
+            <div class="card">
+                <h4 style="margin-bottom:10px;">Tabela de Ganhos (XP)</h4>
+                <div style="font-size:12px; color:#aaa; line-height:1.8;">
+                    Post: +15 | Amigo: +100 | Like: +2 | Check-in: +5
+                </div>
             </div>
         </div>
 
         <div id="wallet-page" class="page">
             <div class="card" style="text-align:center;">
-                <p>Saldo convertível</p>
+                <p>Saldo convertível (EUR/BRL)</p>
                 <h1 style="color:#ffcc00; font-size:40px; margin:15px 0;"><span id="euroVal">0.0000</span>€</h1>
-                <p style="font-size:12px; color:#666;">Mínimo de 5000 XP para levantamento.</p>
+                <p id="brlVal" style="font-size:14px; color:#888;">0.0000 R$</p>
+                <div style="margin-top:15px; padding:10px; background:#252525; border-radius:8px; font-size:11px;">
+                    Mínimo: 5000 XP | Câmbio: 1000 XP = 1€
+                </div>
+            </div>
+            <div class="card">
+                <h4 style="font-size:12px; margin-bottom:5px;">O TEU CONVITE ÚNICO:</h4>
+                <code id="inviteLink" style="color:#ffcc00; font-size:10px;">https://pinesocial.app/join?ref=5401881400</code>
             </div>
         </div>
 
         <div id="admin-page" class="page">
             <div class="card" style="border:1px solid #ff4444">
-                <h3 style="color:#ff4444">Painel de Controlo</h3>
-                <div id="adminStats" style="margin: 15px 0; font-size: 14px;">Estatísticas: ...</div>
-                
-                <hr style="border:0; border-top:1px solid #333; margin-bottom:15px;">
-                
-                <button class="btn-pub" style="background:#ff4444; color:#fff; width:100%; margin-bottom:15px;" onclick="deleteAllPosts()">
-                    <i class="fas fa-dumpster-fire"></i> APAGAR TODOS OS POSTS
-                </button>
-
-                <input type="text" id="deleteId" class="input-area" style="min-height:45px;" placeholder="Ou ID específico para apagar">
-                <button class="btn-pub" style="background:#555; color:#fff; width:100%;" onclick="adminDelete()">Eliminar por ID</button>
+                <h3 style="color:#ff4444">Painel ADMIN</h3>
+                <div id="adminStats" style="font-size:13px; margin:10px 0;">...</div>
+                <button class="btn-pub" style="background:#ff4444; color:#fff; width:100%;" onclick="deleteAllPosts()">APAGAR TODOS OS POSTS</button>
+                <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
+                <p style="font-size:11px; margin-bottom:5px;">Lista de Pagamentos PayPal:</p>
+                <div style="background:#000; padding:10px; border-radius:5px; font-size:10px; color:#0f0;">
+                    Nenhum pedido pendente. [BOTÃO PAY]
+                </div>
             </div>
         </div>
     </main>
@@ -134,8 +151,11 @@
         async function getProfile() {
             const { data } = await client.from('profiles').select('points').eq('id', myId).single();
             if (data) {
-                document.getElementById('userXP').innerText = data.points + " XP";
-                document.getElementById('euroVal').innerText = (data.points * 0.0010).toFixed(4);
+                const p = data.points || 0;
+                document.getElementById('userXP').innerText = p + " XP";
+                const eur = (p * 0.0010);
+                document.getElementById('euroVal').innerText = eur.toFixed(4);
+                document.getElementById('brlVal').innerText = (eur * 6.15).toFixed(4) + " R$";
             }
             if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
         }
@@ -145,7 +165,6 @@
             const file = document.getElementById('fileInput').files[0];
             const btn = document.getElementById('pubBtn');
             const status = document.getElementById('procStatus');
-            
             if(!txt && !file) return;
             
             btn.disabled = true;
@@ -153,7 +172,7 @@
             let img = null;
 
             if(file) {
-                const name = `pine_${Date.now()}.jpg`;
+                const name = `p_${Date.now()}.jpg`;
                 const { data, error } = await client.storage.from('post-images').upload(name, file);
                 if(!error) img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
             }
@@ -162,7 +181,6 @@
             await client.rpc('increment_points', { user_id: myId, amount: 15 });
             
             document.getElementById('postText').value = '';
-            document.getElementById('fileInput').value = '';
             status.style.display = 'none';
             btn.disabled = false;
             fetchFeed();
@@ -181,16 +199,13 @@
                         <div class="post-header">
                             <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
                             <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
-                            <small style="margin-left:auto; color:#555; font-size:9px;">ID: ${p.id}</small>
                         </div>
                         <div class="post-text">${p.content || ''}</div>
                         ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
                     `;
                     list.appendChild(el);
-
-                    if((index + 1) % 3 === 0) {
-                        list.innerHTML += `<div class="ad-injection">📢 AD: Ganha XP bónus no primeiro Check-in do dia!</div>`;
-                    }
+                    // MONETIZAÇÃO AUTOMÁTICA
+                    if((index+1)%3 === 0) list.innerHTML += `<div style="padding:15px; text-align:center; color:#ffcc00; font-size:10px; border:1px dashed #333; margin-bottom:20px;">📢 ANÚNCIO: Adere ao Pine Pro!</div>`;
                 });
             }
         }
@@ -199,40 +214,21 @@
             const { data } = await client.from('profiles').select('id, points').order('points', {ascending: false}).limit(10);
             const container = document.getElementById('rankingList');
             container.innerHTML = '';
-            if(data) {
-                data.forEach((u, i) => {
-                    container.innerHTML += `<p><b>#${i+1}</b> User ...${u.id.toString().slice(-4)} <span style="float:right; color:#ffcc00;">${u.points} XP</span></p>`;
-                });
-            }
+            if(data) data.forEach((u, i) => {
+                container.innerHTML += `<p>#${i+1} User...${u.id.toString().slice(-4)} - <b>${u.points} XP</b></p>`;
+            });
         }
 
         async function fetchAdminData() {
-            const { count: uCount } = await client.from('profiles').select('*', { count: 'exact', head: true });
-            const { count: pCount } = await client.from('posts').select('*', { count: 'exact', head: true });
-            document.getElementById('adminStats').innerHTML = `Users: <b>${uCount}</b> | Posts: <b>${pCount}</b>`;
+            const { count: u } = await client.from('profiles').select('*', { count: 'exact', head: true });
+            const { count: ps } = await client.from('posts').select('*', { count: 'exact', head: true });
+            document.getElementById('adminStats').innerHTML = `Users: ${u} | Posts: ${ps}`;
         }
 
-        async function adminDelete() {
-            const id = document.getElementById('deleteId').value;
-            if(!id) return;
-            const { error } = await client.from('posts').delete().eq('id', id);
-            if(!error) { alert("Removido!"); fetchFeed(); fetchAdminData(); }
-        }
-
-        // NOVA FUNÇÃO: Apagar tudo (Apenas para Posts)
         async function deleteAllPosts() {
-            if(!confirm("⚠️ ATENÇÃO: Desejas apagar TODOS os posts da base de dados? Esta ação é irreversível.")) return;
-            
-            // No Supabase, para apagar tudo sem filtro, usamos um filtro que apanhe todos os IDs
-            const { error } = await client.from('posts').delete().neq('id', 0); 
-            
-            if(!error) {
-                alert("Limpeza completa concluída com sucesso!");
-                fetchFeed();
-                fetchAdminData();
-            } else {
-                alert("Erro na limpeza: " + error.message);
-            }
+            if(!confirm("Apagar todos os posts de teste?")) return;
+            const { error } = await client.from('posts').delete().neq('id', 0);
+            if(!error) { alert("Limpo!"); fetchFeed(); fetchAdminData(); }
         }
 
         getProfile();
