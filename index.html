@@ -1,138 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* DESIGN SYSTEM - GOOGLE EDITION */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { background-color: #121212; height: 100%; }
-        body { 
-            background-color: #121212; color: #ffffff; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            min-height: 100vh; padding-top: 165px; padding-bottom: 20px;
-        }
-
-        /* HEADER & MONETIZATION */
-        .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
-        .ad-top { background: #1a1a1a; color: #ffcc00; padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; letter-spacing: 0.5px; }
-        .nav-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; }
-        .xp-pill { background: #ffcc00; color: #000; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; box-shadow: 0 2px 8px rgba(255,204,0,0.2); white-space: nowrap; }
-
-        /* TABS NAVIGATION - AJUSTADO PARA NÃO TRANSBORDAR */
-        .tabs { 
-            display: flex; 
-            background: #1a1a1a; 
-            border-top: 1px solid #333; 
-            width: 100%;
-            justify-content: space-around; /* Distribui igualmente no espaço disponível */
-        }
-        .tab-item { 
-            flex: 1; 
-            padding: 14px 5px; /* Reduzi o padding lateral */
-            text-align: center; 
-            color: #888; 
-            font-size: 9px; /* Fonte levemente menor para caber tudo */
-            font-weight: bold; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            transition: 0.3s;
-            white-space: nowrap;
-        }
-        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
-
-        /* LAYOUT */
-        .content { padding: 15px; max-width: 500px; margin: 0 auto; }
-        .page { display: none; }
-        .page.active { display: block; }
-        .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
-        
-        /* INFO PAGE STYLES */
-        .info-section { margin-bottom: 20px; }
-        .info-title { color: #ffcc00; font-size: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .info-text { color: #ccc; font-size: 13px; line-height: 1.6; }
-        .info-list { margin-top: 8px; list-style: none; }
-        .info-list li { margin-bottom: 5px; display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding-bottom: 4px; }
-
-        /* POSTS */
-        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; }
-        .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; }
-        .post-avatar { width: 34px; height: 34px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; }
-        .post-text { padding: 15px; font-size: 15px; line-height: 1.5; color: #f0f0f0; }
-        .post-img { width: 100%; height: 300px; object-fit: cover; display: block; background: #000; }
-        .post-actions { display: flex; padding: 12px 15px; border-top: 1px solid #252525; gap: 25px; color: #aaa; font-size: 14px; }
-        .action-btn { cursor: pointer; display: flex; align-items: center; gap: 8px; }
-
-        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .admin-link { display: none; }
-    </style>
-</head>
-<body>
-
-    <div class="header-fixed">
-        <div class="ad-top">📢 APEX SOCIAL: Ganhe dinheiro real interagindo!</div>
-        <div class="nav-main">
-            <h3 style="font-size: 18px;">APEX <span style="color:#ffcc00">SOCIAL</span></h3>
-            <div id="userXP" class="xp-pill">0 XP • 0.00€</div>
-        </div>
-        <div class="tabs">
-            <div class="tab-item active" onclick="openTab('feed-page', this)">Feed</div>
-            <div class="tab-item" onclick="openTab('earn-page', this)">Ranking</div>
-            <div class="tab-item" onclick="openTab('wallet-page', this)">Carteira</div>
-            <div class="tab-item" onclick="openTab('info-page', this)">Info</div>
-            <div id="adm-tab" class="tab-item admin-link" onclick="openTab('admin-page', this)">Admin</div>
-        </div>
-    </div>
-
-    <main class="content">
-        <div id="feed-page" class="page active">
-            <div class="card">
-                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; resize:none; outline:none; font-size:15px; min-height:60px;" placeholder="O que está a pensar?"></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                    <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer; font-size:14px;"><i class="fas fa-image"></i> Foto</button>
-                    <input type="file" id="fileInput" hidden accept="image/*">
-                    <span id="procStatus" style="display:none; color:#ffcc00; font-size:11px;">Processando...</span>
-                    <button class="btn-pub" onclick="publish()">Publicar</button>
-                </div>
-            </div>
-            <div id="feed-items">Carregando feed...</div>
-        </div>
-
-        <div id="earn-page" class="page">
-            <div class="card">
-                <h3 style="color:#ffcc00; margin-bottom:15px;">Top Ganhadores</h3>
-                <div id="rankingList" style="font-size:14px; line-height:2.2;"></div>
-            </div>
-        </div>
-
-        <div id="wallet-page" class="page">
-            <div class="card" style="text-align:center; padding:30px 15px;">
-                <p style="font-size:13px; color:#888;">Ganhos Estimados (CPM 1.00)</p>
-                <h1 id="mainValue" style="color:#ffcc00; font-size:42px; margin:15px 0;">0.0000<small style="font-size:20px;">€</small></h1>
-                <h3 id="currencyLabel" style="color:#aaa; font-weight:normal;">Euro (EUR)</h3>
-                <p style="font-size:11px; color:#555; margin-top:20px;">Mínimo para saque: 5000 XP</p>
-            </div>
-            <div class="card">
-                <p style="font-size:12px; margin-bottom:8px;">Seu link de convite único:</p>
-                <code id="invLink" style="font-size:10px; color:#ffcc00; display:block; background:#111; padding:10px; border-radius:5px; border:1px solid #333;">...</code>
-            </div>
-        </div>
-
-        <div id="info-page" class="page">
-            <div class="card">
-                <div class="info-section">
-                    <h4 class="info-title"><i class="fas fa-coins"></i> Como Ganhar</h4>
-                    <ul class="info-list info-text">
-                        <li><span>Convidar Amigo</span> <b>+100 XP</b></li>
-                        <li><span>Publicar Post</span> <b>+15 XP</b></li>
-                        <li><span>Comentar Post</span> <b>+5 XP</b></li>
-                        <li><span>Dar Like</span> <b>+2 XP</b></li>
-                        <li><span>Check-in Diário</span> <b>+5 XP</b></li>
-                    </ul>
-                </div>
+</div>
                 <div class="info-section">
                     <h4 class="info-title"><i class="fas fa-shield-halved"></i> Privacidade</h4>
                     <p class="info-text">Os anúncios financiam os pagamentos. Não vendemos os seus dados. Usamos apenas a sua região para ajustar a moeda correta.</p>
@@ -265,5 +131,280 @@
         getProfile(); fetchFeed();
     </script>
 </body>
-</html>
+    <script>
+        /* ============================================================
+           CONFIGURAÇÃO SUPABASE
+           Mantém exatamente como no original, apenas organizado.
+        ============================================================ */
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
 
+        const client = supabase.createClient(SB_URL, SB_KEY);
+
+        /* 
+            ID fixo do utilizador (como no teu original)
+            Mantido sem alterações.
+        */
+        const myId = 5401881400;
+
+
+        /* ============================================================
+           CONFIGURAÇÃO DE MOEDA / REGIÃO
+           Mantém a lógica original, apenas mais clara.
+        ============================================================ */
+        const userConfig = {
+            isBR: (navigator.language || '').includes('BR'),
+
+            get symbol() {
+                return this.isBR ? 'R$' : '€';
+            },
+
+            get label() {
+                return this.isBR ? 'Real Brasileiro (BRL)' : 'Euro (EUR)';
+            },
+
+            cpmRate: 0.0010
+        };
+
+
+        /* ============================================================
+           SISTEMA DE ABAS
+           Mantém o comportamento original, mas mais limpo.
+        ============================================================ */
+        function openTab(id, el) {
+
+            // Esconde todas as páginas
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+            // Remove estado ativo das tabs
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+
+            // Ativa a página clicada
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+
+            // Carregamentos condicionais
+            if (id === 'feed-page') fetchFeed();
+            if (id === 'earn-page') fetchRanking();
+            if (id === 'admin-page') fetchAdminData();
+
+            // Volta ao topo
+            window.scrollTo(0, 0);
+        }
+
+
+        /* ============================================================
+           PERFIL / XP / CARTEIRA
+           Mantém a lógica original, mas mais organizada.
+        ============================================================ */
+        async function getProfile() {
+            const { data } = await client
+                .from('profiles')
+                .select('points')
+                .eq('id', myId)
+                .single();
+
+            if (data) {
+                const pts = data.points || 0;
+                const money = (pts * userConfig.cpmRate).toFixed(2);
+
+                // Atualiza o XP no header
+                document.getElementById('userXP').innerText =
+                    `${pts} XP • ${money}${userConfig.symbol}`;
+
+                // Atualiza o valor principal da carteira
+                const mainVal = document.getElementById('mainValue');
+                if (mainVal) {
+                    mainVal.innerHTML =
+                        `${(pts * userConfig.cpmRate).toFixed(4)}<small style="font-size:20px; margin-left:5px;">${userConfig.symbol}</small>`;
+                }
+
+                // Atualiza o label da moeda
+                const label = document.getElementById('currencyLabel');
+                if (label) label.innerText = userConfig.label;
+
+                // Link de convite
+                document.getElementById('invLink').innerText =
+                    `https://apexsocial.app/join?ref=${myId}`;
+            }
+
+            // Mostra aba admin se for o dono
+            if (myId === 5401881400)
+                document.getElementById('adm-tab').style.display = 'block';
+        }
+        /* ============================================================
+           FEED — CARREGAR POSTS
+           Mantém a lógica original, apenas mais limpa e segura.
+        ============================================================ */
+        async function fetchFeed() {
+            const { data: posts } = await client
+                .from('posts')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(10);
+
+            const list = document.getElementById('feed-items');
+            list.innerHTML = '';
+
+            if (!posts || posts.length === 0) {
+                list.innerHTML = "<p style='text-align:center; color:#777;'>Nenhum post ainda.</p>";
+                return;
+            }
+
+            posts.forEach(p => {
+                const el = document.createElement('div');
+                el.className = 'post';
+
+                el.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
+                        <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
+                    </div>
+
+                    <div class="post-text">${p.content || ''}</div>
+
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+
+                    <div class="post-actions">
+                        <div class="action-btn" onclick="addXP(2, this)">
+                            <i class="far fa-heart"></i> <span>0</span>
+                        </div>
+
+                        <div class="action-btn">
+                            <i class="far fa-comment"></i> <span>0</span>
+                        </div>
+                    </div>
+                `;
+
+                list.appendChild(el);
+            });
+        }
+
+
+        /* ============================================================
+           ADICIONAR XP (LIKE, ETC.)
+           Mantém a função original, apenas mais clara.
+        ============================================================ */
+        async function addXP(amt, btn) {
+            await client.rpc('increment_points', { user_id: myId, amount: amt });
+
+            if (btn) btn.style.color = "#ffcc00";
+
+            getProfile(); // Atualiza XP no topo
+        }
+
+
+        /* ============================================================
+           PUBLICAR POST (TEXTO + IMAGEM)
+           Mantém o comportamento original, mas mais organizado.
+        ============================================================ */
+        async function publish() {
+            const txt = document.getElementById('postText').value.trim();
+            const file = document.getElementById('fileInput').files[0];
+
+            // Não deixa publicar vazio
+            if (!txt && !file) return;
+
+            document.getElementById('procStatus').style.display = 'inline';
+
+            let img = null;
+
+            // Upload da imagem (se existir)
+            if (file) {
+                const name = `p_${Date.now()}.jpg`;
+
+                await client.storage
+                    .from('post-images')
+                    .upload(name, file);
+
+                img = client.storage
+                    .from('post-images')
+                    .getPublicUrl(name).data.publicUrl;
+            }
+
+            // Inserir post
+            await client.from('posts').insert([
+                { user_id: myId, content: txt, image_url: img }
+            ]);
+
+            // XP por publicar
+            await client.rpc('increment_points', { user_id: myId, amount: 15 });
+
+            // Reset
+            document.getElementById('postText').value = '';
+            document.getElementById('procStatus').style.display = 'none';
+
+            // Atualizar UI
+            fetchFeed();
+            getProfile();
+        }
+
+
+        /* ============================================================
+           RANKING — TOP 10
+        ============================================================ */
+        async function fetchRanking() {
+            const { data } = await client
+                .from('profiles')
+                .select('id, points')
+                .order('points', { ascending: false })
+                .limit(10);
+
+            const list = document.getElementById('rankingList');
+
+            if (!list || !data) return;
+
+            list.innerHTML = '';
+
+            data.forEach((u, i) => {
+                const gain = (u.points * userConfig.cpmRate).toFixed(2);
+
+                list.innerHTML += `
+                    <p>
+                        #${i + 1} User...${u.id.toString().slice(-4)}
+                        <span style="float:right; color:#ffcc00;">
+                            ${gain}${userConfig.symbol}
+                        </span>
+                    </p>
+                `;
+            });
+        }
+
+
+        /* ============================================================
+           ADMIN — ESTATÍSTICAS
+        ============================================================ */
+        async function fetchAdminData() {
+            const { count: u } = await client
+                .from('profiles')
+                .select('*', { count: 'exact', head: true });
+
+            const { count: p } = await client
+                .from('posts')
+                .select('*', { count: 'exact', head: true });
+
+            document.getElementById('admStats').innerText =
+                `Users: ${u} | Posts: ${p}`;
+        }
+
+
+        /* ============================================================
+           ADMIN — APAGAR TODOS OS POSTS
+        ============================================================ */
+        async function clearAllPosts() {
+            if (!confirm("Deseja apagar todos os posts?")) return;
+
+            await client.from('posts').delete().neq('id', 0);
+
+            fetchFeed();
+        }
+
+
+        /* ============================================================
+           INICIALIZAÇÃO
+        ============================================================ */
+        getProfile();
+        fetchFeed();
+    </script>
+</body>
+</html>
