@@ -74,3 +74,34 @@
 <div id="wallet" class="page"></div>
 <div id="feed" class="page"></div>
 <div id="profile" class="page"></div>
+<!-- ============================
+     SECÇÃO HOME
+============================= -->
+<div id="home" class="page active">
+
+    <h2>Bem-vindo 👋</h2>
+
+    <p style="margin-top:10px; color:#ccc;">
+        Escolhe uma das opções abaixo para navegar pela app.
+    </p>
+
+    <div style="margin-top:20px; display:flex; flex-direction:column; gap:12px;">
+
+        <button onclick="showPage('wallet')" 
+                style="padding:12px; background:#1f2937; border:none; border-radius:8px; color:white; font-size:16px; cursor:pointer;">
+            💰 Ver Carteira
+        </button>
+
+        <button onclick="showPage('feed')" 
+                style="padding:12px; background:#1f2937; border:none; border-radius:8px; color:white; font-size:16px; cursor:pointer;">
+            📰 Ver Feed
+        </button>
+
+        <button onclick="showPage('profile')" 
+                style="padding:12px; background:#1f2937; border:none; border-radius:8px; color:white; font-size:16px; cursor:pointer;">
+            👤 Ver Perfil
+        </button>
+
+    </div>
+
+</div>
