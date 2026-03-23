@@ -22,26 +22,9 @@
         .nav-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; }
         .xp-pill { background: #ffcc00; color: #000; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; box-shadow: 0 2px 8px rgba(255,204,0,0.2); white-space: nowrap; }
 
-        /* TABS NAVIGATION - AJUSTADO PARA NÃO TRANSBORDAR */
-        .tabs { 
-            display: flex; 
-            background: #1a1a1a; 
-            border-top: 1px solid #333; 
-            width: 100%;
-            justify-content: space-around; /* Distribui igualmente no espaço disponível */
-        }
-        .tab-item { 
-            flex: 1; 
-            padding: 14px 5px; /* Reduzi o padding lateral */
-            text-align: center; 
-            color: #888; 
-            font-size: 9px; /* Fonte levemente menor para caber tudo */
-            font-weight: bold; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            transition: 0.3s;
-            white-space: nowrap;
-        }
+        /* TABS NAVIGATION */
+        .tabs { display: flex; background: #1a1a1a; border-top: 1px solid #333; width: 100%; justify-content: space-around; }
+        .tab-item { flex: 1; padding: 14px 5px; text-align: center; color: #888; font-size: 9px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; white-space: nowrap; }
         .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
 
         /* LAYOUT */
@@ -50,23 +33,19 @@
         .page.active { display: block; }
         .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
         
-        /* INFO PAGE STYLES */
-        .info-section { margin-bottom: 20px; }
-        .info-title { color: #ffcc00; font-size: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .info-text { color: #ccc; font-size: 13px; line-height: 1.6; }
-        .info-list { margin-top: 8px; list-style: none; }
-        .info-list li { margin-bottom: 5px; display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding-bottom: 4px; }
-
         /* POSTS */
         .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; }
         .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; }
         .post-avatar { width: 34px; height: 34px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; }
         .post-text { padding: 15px; font-size: 15px; line-height: 1.5; color: #f0f0f0; }
         .post-img { width: 100%; height: 300px; object-fit: cover; display: block; background: #000; }
-        .post-actions { display: flex; padding: 12px 15px; border-top: 1px solid #252525; gap: 25px; color: #aaa; font-size: 14px; }
-        .action-btn { cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .post-actions { display: flex; padding: 12px 15px; border-top: 1px solid #252525; gap: 20px; color: #aaa; font-size: 13px; }
+        .action-btn { cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .action-btn:hover { color: #ffcc00; }
 
+        /* BUTTONS */
         .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-share-alt { background: #333; color: #fff; border: 1px solid #444; padding: 10px; width: 100%; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .admin-link { display: none; }
     </style>
 </head>
@@ -116,33 +95,22 @@
                 <p style="font-size:11px; color:#555; margin-top:20px;">Mínimo para saque: 5000 XP</p>
             </div>
             <div class="card">
-                <p style="font-size:12px; margin-bottom:8px;">Seu link de convite único:</p>
-                <code id="invLink" style="font-size:10px; color:#ffcc00; display:block; background:#111; padding:10px; border-radius:5px; border:1px solid #333;">...</code>
+                <p style="font-size:12px; margin-bottom:8px;">Seu link de convite:</p>
+                <code id="invLink" style="font-size:10px; color:#ffcc00; display:block; background:#111; padding:10px; border-radius:5px; border:1px solid #333; margin-bottom:10px;">...</code>
+                <button class="btn-share-alt" onclick="shareApp()"><i class="fas fa-user-plus"></i> Convidar Amigos</button>
             </div>
         </div>
 
         <div id="info-page" class="page">
             <div class="card">
-                <div class="info-section">
-                    <h4 class="info-title"><i class="fas fa-coins"></i> Como Ganhar</h4>
-                    <ul class="info-list info-text">
-                        <li><span>Convidar Amigo</span> <b>+100 XP</b></li>
-                        <li><span>Publicar Post</span> <b>+15 XP</b></li>
-                        <li><span>Comentar Post</span> <b>+5 XP</b></li>
-                        <li><span>Dar Like</span> <b>+2 XP</b></li>
-                        <li><span>Check-in Diário</span> <b>+5 XP</b></li>
-                    </ul>
-                </div>
-                <div class="info-section">
-                    <h4 class="info-title"><i class="fas fa-shield-halved"></i> Privacidade</h4>
-                    <p class="info-text">Os anúncios financiam os pagamentos. Não vendemos os seus dados. Usamos apenas a sua região para ajustar a moeda correta.</p>
-                </div>
+                <h4 style="color:#ffcc00; margin-bottom:10px;"><i class="fas fa-coins"></i> Economia Apex</h4>
+                <p style="font-size:13px; color:#ccc; line-height:1.6;">Cada 1000 XP acumulados valem 1,00 na sua moeda. Interaja para ganhar!</p>
             </div>
         </div>
 
         <div id="admin-page" class="page">
             <div class="card" style="border:1px solid #ff4444">
-                <h3 style="color:#ff4444; margin-bottom:15px;">Painel Admin</h3>
+                <h3 style="color:#ff4444; margin-bottom:15px;">Admin</h3>
                 <div id="admStats" style="font-size:13px; margin-bottom:20px;">...</div>
                 <button class="btn-pub" style="background:#ff4444; color:#fff; width:100%;" onclick="clearAllPosts()">RESETAR FEED</button>
             </div>
@@ -199,6 +167,7 @@
                 posts.forEach(p => {
                     const el = document.createElement('div');
                     el.className = 'post';
+                    const postContent = p.content || 'Confira este post no Apex Social!';
                     el.innerHTML = `
                         <div class="post-header">
                             <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
@@ -207,12 +176,34 @@
                         <div class="post-text">${p.content || ''}</div>
                         ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
                         <div class="post-actions">
-                            <div class="action-btn" onclick="addXP(2, this)"><i class="far fa-heart"></i> <span>0</span></div>
-                            <div class="action-btn"><i class="far fa-comment"></i> <span>0</span></div>
+                            <div class="action-btn" onclick="addXP(2, this)"><i class="far fa-heart"></i> <span>Gostar</span></div>
+                            <div class="action-btn" onclick="sharePost('${postContent}')"><i class="fas fa-share-nodes"></i> <span>Partilhar</span></div>
                         </div>
                     `;
                     list.appendChild(el);
                 });
+            }
+        }
+
+        // --- FUNÇÕES DE PARTILHA SOCIAL ---
+        function sharePost(text) {
+            if (navigator.share) {
+                navigator.share({ title: 'Apex Social', text: text, url: window.location.href });
+            } else {
+                alert("Copiado para a área de transferência!");
+            }
+        }
+
+        function shareApp() {
+            const link = document.getElementById('invLink').innerText;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Ganhe dinheiro no Apex Social',
+                    text: 'Junte-se a mim no Apex Social e comece a ganhar dinheiro por interagir!',
+                    url: link
+                });
+            } else {
+                alert("Link de convite copiado!");
             }
         }
 
