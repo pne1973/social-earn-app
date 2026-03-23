@@ -3,159 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pine Social Ads Edition</title>
+    <title>Pine Social</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --bg: #F8F9FA; --txt: #202124; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 110px 0 95px; }
+        :root { 
+            --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853;
+            --bg-light: #F8F9FA; --text-dark: #202124; --card-white: #ffffff;
+        }
+
+        body { font-family: sans-serif; background: var(--bg-light); color: var(--text-dark); margin: 0; padding-top: 110px; padding-bottom: 90px; }
         
-        .header { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 1px solid #dadce0; z-index: 1000; box-sizing: border-box; }
-        .logo { font-weight: bold; font-size: 20px; }
-        .logo span:nth-child(1) { color: var(--g-blue); } .logo span:nth-child(2) { color: var(--g-red); } .logo span:nth-child(3) { color: var(--g-yellow); } .logo span:nth-child(4) { color: var(--g-blue); } .logo span:nth-child(5) { color: var(--g-green); }
-        .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+        /* HEADER */
+        .header { position: fixed; top: 0; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 1px solid #e0e0e0; z-index: 1000; box-sizing: border-box; }
+        .logo-text { font-weight: bold; font-size: 18px; }
+        .logo-text span:nth-child(1) { color: var(--g-blue); }
+        .logo-text span:nth-child(2) { color: var(--g-red); }
+        .logo-text span:nth-child(3) { color: var(--g-yellow); }
+        .logo-text span:nth-child(4) { color: var(--g-blue); }
+        .logo-text span:nth-child(5) { color: var(--g-green); }
+        .xp-badge { background: var(--g-blue); color: #fff; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
 
-        /* ADS STYLING - EXAMPLES */
-        .ad-container { background: #fff; border: 1px solid #dadce0; border-radius: 12px; padding: 15px; margin-bottom: 16px; position: relative; overflow: hidden; }
-        .ad-top-banner { background: linear-gradient(90deg, #fff3cd 0%, #fff 100%); border: 1px dashed var(--g-yellow); margin-bottom: 15px; }
-        .ad-label { font-size: 9px; color: #70757a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px; }
-        .ad-title { font-size: 14px; font-weight: 600; color: var(--g-blue); margin-bottom: 4px; display: block; }
-        .ad-body { font-size: 13px; color: #3c4043; line-height: 1.4; }
-        .ad-cta { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 700; color: var(--g-green); text-decoration: none; }
-
-        /* UI */
-        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid #dadce0; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; cursor: pointer; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        /* NAV */
+        .nav-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid #eee; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; padding: 12px 0; color: #5f6368; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 9px; font-weight: bold; }
         .nav-item.active { color: var(--g-blue); }
-        .container { padding: 15px; max-width: 500px; margin: 0 auto; box-sizing: border-box; }
-        .card { background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(60,64,67,0.1); }
-        .btn { width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
-        .btn-blue { background: var(--g-blue); color: #fff; }
-        textarea { width: 100%; border: 1px solid #f1f3f4; padding: 12px; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: #f8f9fa; }
+
+        /* TUTORIAL OVERLAY */
+        #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 25px; box-sizing: border-box; }
+        .welcome-card { background: #fff; padding: 30px; border-radius: 24px; text-align: center; border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 320px; }
+
+        /* CONTENT */
+        .container { padding: 15px; width: 100%; box-sizing: border-box; }
+        .card { background: var(--card-white); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-main { width: 100%; background: var(--g-blue); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        textarea { width: 100%; border: 1px solid #eee; padding: 10px; border-radius: 8px; font-size: 14px; resize: none; box-sizing: border-box; }
+
+        .post-footer { display: flex; justify-content: space-between; margin-top: 10px; border-top: 1px solid #f8f8f8; padding-top: 8px; }
+        .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; cursor: pointer; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
+    <div id="welcome-overlay">
+        <div class="welcome-card">
+            <div class="logo-text" style="font-size:28px;"><span>P</span><span>i</span><span>n</span><span>e</span><span>!</span></div>
+            <p style="font-size: 14px; color: #555; margin: 15px 0;">Ganhas dinheiro real por interagir!</p>
+            <div style="text-align: left; font-size: 13px; margin-bottom: 20px;">
+                <p>✅ Posts: +15 XP</p>
+                <p>✅ Amigos: +100 XP</p>
+                <p>✅ PayPal: Levantamentos reais</p>
+            </div>
+            <button class="btn-main" style="background:var(--g-green);" onclick="closeWelcome()">Entendido</button>
+        </div>
+    </div>
+
     <div class="header">
-        <div class="logo"><span>P</span><span>i</span><span>n</span><span>e</span> <span>S</span><span>o</span><span>c</span><span>i</span><span>a</span><span>l</span></div>
+        <div class="logo-text"><span>P</span><span>i</span><span>n</span><span>e</span> <span>S</span><span>o</span><span>c</span><span>i</span><span>a</span><span>l</span></div>
         <div id="userXP" class="xp-badge">0 XP</div>
     </div>
 
     <div id="feed-tab" class="container">
-        <div class="ad-container ad-top-banner" onclick="tab('invite-tab', document.querySelectorAll('.nav-item')[3])">
-            <span class="ad-label"><i class="fas fa-bullhorn"></i> Destaque da Semana</span>
-            <span class="ad-title">Multiplica os teus ganhos! 🚀</span>
-            <div class="ad-body">Por cada 3 amigos que convidares, recebes um bónus extra de 300 XP.</div>
-            <div class="ad-cta">CRIAR LINK DE CONVITE ></div>
-        </div>
-
-        <div class="card" style="border-left: 5px solid var(--g-yellow); padding: 12px 16px;">
+        <div class="card" style="border-left: 5px solid var(--g-yellow);">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:13px; font-weight:600;"><i class="fas fa-gift" style="color:var(--g-yellow)"></i> Bónus Diário</span>
-                <button class="btn btn-blue" style="width:auto; padding:6px 14px; font-size:11px; background:var(--g-yellow); color:#202124;" onclick="doCheckin()">Recolher +5 XP</button>
+                <span style="font-size:13px; font-weight:500;">Bónus diário disponível!</span>
+                <button class="btn-main" style="width:auto; padding:5px 12px; font-size:11px; background:var(--g-yellow); color:#000;" onclick="doCheckin()">Recolher</button>
             </div>
         </div>
-
         <div class="card">
-            <textarea id="postText" rows="3" placeholder="O que tens em mente?"></textarea>
-            <div id="upload-status" style="display:none; font-size:11px; color:var(--g-blue); margin:5px 0;">A processar...</div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
-                <button onclick="document.getElementById('fileInput').click()" style="color:var(--g-blue); background:none; border:none; font-size:14px; font-weight:600;"><i class="fas fa-image"></i> Foto</button>
-                <input type="file" id="fileInput" hidden accept="image/*" onchange="handleFile(this)">
-                <button class="btn btn-blue" style="width:auto; padding:8px 28px;" id="pubBtn" onclick="publish()">Publicar</button>
+            <textarea id="postText" rows="3" placeholder="O que tens para partilhar?"></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <button onclick="document.getElementById('fileInput').click()" style="color:var(--g-blue); background:none; border:none; font-size:13px;"><i class="fas fa-image"></i> Foto</button>
+                <input type="file" id="fileInput" hidden accept="image/*">
+                <button class="btn-main" style="width:auto; padding:8px 20px;" onclick="handlePublish()">Publicar</button>
             </div>
         </div>
-
         <div id="feed"></div>
     </div>
 
-    <div id="info-tab" class="container hidden"></div>
-    <div id="rank-tab" class="container hidden"></div>
-    <div id="invite-tab" class="container hidden"></div>
-    <div id="wallet-tab" class="container hidden"></div>
-    <div id="admin-tab" class="container hidden"></div>
+    <div id="info-tab" class="container hidden">
+        <div class="card"><h3>Economia</h3><p>1000 XP = <span id="conv-rate">1.0000€</span></p></div>
+    </div>
 
-    <nav class="nav">
-        <div class="nav-item active" onclick="tab('feed-tab', this)"><i class="fas fa-stream"></i>Feed</div>
-        <div class="nav-item" onclick="tab('info-tab', this)"><i class="fas fa-hand-holding-usd"></i>Ganhos</div>
-        <div class="nav-item" onclick="tab('rank-tab', this)"><i class="fas fa-medal"></i>Rank</div>
-        <div class="nav-item" onclick="tab('invite-tab', this)"><i class="fas fa-users"></i>Amigos</div>
-        <div class="nav-item" onclick="tab('wallet-tab', this)"><i class="fas fa-wallet"></i>Saque</div>
+    <div id="rank-tab" class="container hidden"></div>
+
+    <div id="invite-tab" class="container hidden">
+        <div class="card" style="text-align:center;">
+            <h3>Convites</h3>
+            <input type="text" id="refLink" readonly style="text-align:center; background:#f1f3f4; border:none; margin:10px 0;">
+            <button class="btn-main" style="background:var(--g-green);" onclick="copyRef()">Copiar Link</button>
+        </div>
+    </div>
+
+    <div id="wallet-tab" class="container hidden">
+        <div class="card" style="text-align:center;">
+            <h4>Saldo</h4>
+            <h1 id="localMoney">0.0000€</h1>
+            <input type="email" id="paypalEmail" placeholder="E-mail PayPal">
+            <button class="btn-main" style="margin-top:10px;" onclick="requestWithdraw()">Levantar</button>
+        </div>
+    </div>
+
+    <div id="admin-tab" class="container hidden">
+        <div class="card" style="border-top: 3px solid var(--g-red);">
+            <h3 style="color:var(--g-red);">Admin</h3>
+            <div id="adm-withdraws"></div>
+            <input type="number" id="delId" placeholder="ID do Post" style="margin-top:10px;">
+            <button onclick="adminDel()" class="btn-main" style="background:var(--g-red); margin-top:5px;">Eliminar</button>
+        </div>
+    </div>
+
+    <nav class="nav-bottom">
+        <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i>Feed</div>
+        <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-coins"></i>Ganhos</div>
+        <div class="nav-item" onclick="showTab('rank-tab', this)"><i class="fas fa-trophy"></i>Rank</div>
+        <div class="nav-item" onclick="showTab('invite-tab', this)"><i class="fas fa-users"></i>Convites</div>
+        <div class="nav-item" onclick="showTab('wallet-tab', this)"><i class="fas fa-wallet"></i>Saque</div>
     </nav>
 
     <script>
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const userId = 5401881400;
+        const userId = 5401881400; // ADMIN ID
 
-        let page = 0;
-
-        // EXEMPLOS DE ANÚNCIOS PARA O FEED
-        const feedAds = [
-            {
-                title: "💰 Ganha Dinheiro a Testar Apps",
-                body: "Participa na nossa comunidade de testers e recebe pagamentos via PayPal. Sem investimento.",
-                cta: "SABER MAIS"
-            },
-            {
-                title: "🛡️ VPN Grátis e Ilimitada",
-                body: "Navega com total privacidade e segurança no teu Telegram WebApp. Instala agora.",
-                cta: "INSTALAR"
-            }
-        ];
+        let rate = 1.0; let sym = "€";
 
         async function init() {
+            if(window.navigator.language.includes('BR')) { rate = 6.2; sym = "R$"; }
+            document.getElementById('conv-rate').innerText = (1 * rate).toFixed(4) + sym;
+            document.getElementById('refLink').value = "https://t.me/PineSocialBot?start=" + userId;
+            
+            // Verificação Admin
             if(userId === 5401881400) {
-                const nav = document.querySelector('.nav');
-                const btn = document.createElement('div'); btn.className="nav-item"; btn.innerHTML='<i class="fas fa-shield-alt"></i>Admin';
-                btn.onclick = () => tab('admin-tab', btn); nav.appendChild(btn);
+                const nav = document.querySelector('.nav-bottom');
+                const btn = document.createElement('div'); btn.className="nav-item"; btn.innerHTML='<i class="fas fa-user-shield"></i>Admin';
+                btn.onclick = () => showTab('admin-tab', btn); nav.appendChild(btn);
             }
+
+            // Tutorial
+            if(!localStorage.getItem('pine_tutorial_v2')) {
+                document.getElementById('welcome-overlay').style.display = 'flex';
+            }
+
             loadProfile(); loadFeed(true);
         }
 
-        async function loadFeed(reset=false) {
-            const fDiv = document.getElementById('feed');
-            if(reset) { page = 0; fDiv.innerHTML = ''; }
-            const { data } = await supabaseClient.from('posts').select('*, profiles(username)').order('created_at', {ascending:false}).range(page*10, (page+1)*10-1);
-            
-            data?.forEach((p, idx) => {
-                // INJETAR ANÚNCIO A CADA 3 POSTS (Rodando entre os exemplos)
-                if(idx > 0 && idx % 3 === 0) {
-                    const ad = feedAds[Math.floor(Math.random() * feedAds.length)];
-                    fDiv.innerHTML += `
-                    <div class="ad-container">
-                        <span class="ad-label">Anúncio Patrocinado</span>
-                        <span class="ad-title">${ad.title}</span>
-                        <div class="ad-body">${ad.body}</div>
-                        <a href="#" class="ad-cta">${ad.cta} ></a>
-                    </div>`;
-                }
-
-                fDiv.innerHTML += `
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:10px;">
-                        <b style="color:var(--g-blue)">@${p.profiles?.username || 'user'}</b>
-                        <span style="color:#bdc1c6;">ID: ${p.id}</span>
-                    </div>
-                    <p style="margin:0; font-size:15px; line-height:1.5;">${p.content || ''}</p>
-                    ${p.image_url ? `<img src="${p.image_url}" style="width:calc(100% + 32px); margin:12px -16px 0; border-top:1px solid #f1f3f4;">` : ''}
-                </div>`;
-            });
-            page++;
+        function closeWelcome() {
+            localStorage.setItem('pine_tutorial_v2', 'true');
+            document.getElementById('welcome-overlay').style.display = 'none';
         }
 
-        function tab(id, el) { 
-            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden')); 
+        function showTab(tabId, el) {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(id).classList.remove('hidden'); el.classList.add('active');
+            document.getElementById(tabId).classList.remove('hidden');
+            el.classList.add('active');
+            if(tabId === 'admin-tab') loadAdmin();
+            if(tabId === 'rank-tab') loadRanking();
         }
 
         async function loadProfile() {
             const { data } = await supabaseClient.from('profiles').select('points').eq('id', userId).single();
-            if(data) document.getElementById('userXP').innerText = data.points + " XP";
+            if(data) {
+                document.getElementById('userXP').innerText = data.points + " XP";
+                document.getElementById('localMoney').innerText = (data.points * rate / 1000).toFixed(4) + sym;
+            }
+        }
+
+        async function loadFeed(reset=false) {
+            const feed = document.getElementById('feed'); if(reset) feed.innerHTML = '';
+            const { data } = await supabaseClient.from('posts').select('*, profiles(username)').order('created_at', {ascending:false}).limit(20);
+            data?.forEach(p => {
+                feed.innerHTML += `
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:8px;">
+                        <b style="color:var(--g-blue)">@${p.profiles?.username || 'user'}</b>
+                        <span style="color:#bdc1c6;">ID: ${p.id}</span>
+                    </div>
+                    <p style="margin:0; font-size:14px;">${p.content || ''}</p>
+                    ${p.image_url ? `<img src="${p.image_url}" style="width:calc(100% + 30px); margin-left:-15px; margin-top:10px; border-top:1px solid #eee;">` : ''}
+                    <div class="post-footer">
+                        <button class="action-btn" onclick="toggleLike(${p.id}, this)"><i class="far fa-heart"></i> Like</button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        async function doCheckin() {
+            const day = new Date().toISOString().split('T')[0];
+            const { error } = await supabaseClient.from('checkins').insert([{ user_id: userId, day }]);
+            if(error) alert("Já recolheu hoje!");
+            else { await supabaseClient.rpc('increment_points', { user_id: userId, amount: 5 }); loadProfile(); alert("Ganhou 5 XP!"); }
+        }
+
+        async function toggleLike(postId, btn) {
+            const { error } = await supabaseClient.from('post_likes').insert([{ post_id: postId, user_id: userId }]);
+            if(!error) { 
+                btn.style.color="red"; btn.innerHTML='<i class="fas fa-heart"></i> +2 XP';
+                await supabaseClient.rpc('increment_points', { user_id: userId, amount: 2 });
+                loadProfile();
+            }
+        }
+
+        async function handlePublish() {
+            const txt = document.getElementById('postText').value;
+            if(!txt) return;
+            await supabaseClient.from('posts').insert([{ user_id: userId, content: txt }]);
+            await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
+            location.reload();
+        }
+
+        function copyRef() { 
+            const link = document.getElementById('refLink'); link.select(); 
+            document.execCommand('copy'); alert("Link copiado!"); 
+        }
+
+        async function loadAdmin() {
+            const { data } = await supabaseClient.from('withdrawals').select('*').eq('status','pending');
+            let h = "";
+            data?.forEach(w => h += `<div style="font-size:12px; margin-bottom:10px;">${w.paypal_email} (${w.amount_xp} XP) <button onclick="markPaid(${w.id})" style="background:var(--g-green); color:#fff; border:none; border-radius:4px; padding:2px 5px;">PAGAR</button></div>`);
+            document.getElementById('adm-withdraws').innerHTML = h || "Tudo limpo.";
+        }
+
+        async function adminDel() {
+            const id = document.getElementById('delId').value;
+            if(confirm("Eliminar?")) {
+                await supabaseClient.from('posts').delete().eq('id', id);
+                alert("Feito."); loadFeed(true);
+            }
         }
 
         init();
