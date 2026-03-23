@@ -3,47 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Enterprise Master</title>
+    <title>Apex Social - Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* CSS RESET & GOOGLE UI */
+        /* RESET & GOOGLE SYSTEM */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 175px; }
 
-        /* HEADER ESTATUÁRIO */
+        /* HEADER FIXO */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; padding: 12px 0; border-bottom: 1px solid #f1f3f4; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
         .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
         .stat-item b { font-size: 11px; color: #1a73e8; }
         
-        /* SISTEMA DE ABAS (CORREÇÃO DE MISTURA) */
-        .tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; }
+        .tabs { display: flex; background: #fff; }
         .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; border-bottom: 3px solid transparent; text-transform: uppercase; }
         .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
 
-        /* CONTENT ENGINE */
+        /* FEED E CARDS */
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
-        
-        /* BLOQUEIO ABSOLUTO: Garante que apenas 1 aba exista visualmente */
-        .section-page { display: none !important; }
-        .section-page.active { display: block !important; }
-
-        /* DESIGN DOS CARDS */
         .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        h3 { font-size: 15px; margin-bottom: 12px; color: #3c4043; border-bottom: 1px solid #f1f3f4; padding-bottom: 8px; }
 
-        /* ADMIN & ECONOMY */
-        .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f3f4; font-size: 13px; }
+        /* CORREÇÃO DA FOTO NO FEED */
+        .post-img-container { width: 100%; max-height: 350px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f1f3f4; display: flex; align-items: center; justify-content: center; }
+        .post-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        
+        /* POST INFO */
+        .post-header { font-size: 11px; color: #70757a; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .post-text { font-size: 15px; line-height: 1.5; color: #3c4043; word-wrap: break-word; }
+
+        /* INTERAÇÕES */
+        .actions-row { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f3f4; padding-top: 12px; margin-top: 12px; }
+        .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .action-btn i { font-size: 14px; color: #1a73e8; }
+
+        /* UI PUBLISH */
+        .input-google { width: 100%; border: none; outline: none; font-size: 16px; margin-bottom: 15px; resize: none; min-height: 60px; }
+        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 8px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
         .adm-only { display: none !important; }
         body.is-master .adm-only { display: block !important; }
-        
-        .btn-action { background: #1a73e8; color: #fff; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-        .btn-del { background: #d93025; }
     </style>
 </head>
 <body id="appBody">
@@ -57,67 +61,28 @@
             <div class="stat-item"><label>Estado</label><b style="color:#1e8e3e;">ONLINE</b></div>
         </div>
         <nav class="tabs">
-            <div class="tab active" data-id="page-feed" onclick="switchTab(this)">Explorar</div>
-            <div class="tab" data-id="page-rede" onclick="switchTab(this)">Rede</div>
-            <div class="tab" data-id="page-info" onclick="switchTab(this)">Info</div>
-            <div class="tab adm-only" data-id="page-master" onclick="switchTab(this)" style="color:#d93025;">Master</div>
+            <div class="tab active">Explorar</div>
+            <div class="tab">Rede</div>
+            <div class="tab">Info</div>
+            <div class="tab adm-only" style="color:#d93025;">Master</div>
         </nav>
     </header>
 
     <main class="container">
-        
-        <div id="page-feed" class="section-page active">
-            <div class="card">
-                <textarea id="postInput" style="width:100%; border:none; outline:none; font-size:16px; min-height:50px; resize:none;" placeholder="No que está a pensar?"></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px; margin-top:10px;">
-                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileIn"><i class="fas fa-image"></i> Foto (+15 XP)</label>
-                    <input type="file" id="fileIn" hidden onchange="handleFile(this)">
-                    <button class="btn-action" style="width:auto; padding:8px 20px; margin:0;" onclick="sendPost()">Publicar</button>
-                </div>
+        <div class="card">
+            <textarea id="postInput" class="input-google" placeholder="O que pretende partilhar?"></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
+                <label style="color:#1a73e8; cursor:pointer; font-size:13px; font-weight:500;" for="fileInput">
+                    <i class="fas fa-camera"></i> Foto (+15 XP)
+                </label>
+                <input type="file" id="fileInput" hidden onchange="handleFile(this)">
+                <button class="btn-post" onclick="sendPost()">Publicar</button>
             </div>
-            <div id="feedList"></div>
+            <img id="previewImg" style="display:none; width:100%; margin-top:15px; border-radius:6px; max-height:200px; object-fit:cover;">
         </div>
 
-        <div id="page-rede" class="section-page">
-            <div class="card">
-                <h3>Top 10 Ranking</h3>
-                <div id="ranking"></div>
+        <div id="feedContent">
             </div>
-            <div class="card">
-                <h3>O seu Link de Convite</h3>
-                <div id="refLink" style="background:#f1f3f4; padding:12px; border-radius:4px; font-size:11px; border:1px dashed #ccc; margin-bottom:10px; word-break:break-all;"></div>
-                <button class="btn-action" style="background:#fff; color:#1a73e8; border:1px solid #dadce0;" onclick="copyLink()">Copiar Link</button>
-            </div>
-        </div>
-
-        <div id="page-info" class="section-page">
-            <div class="card">
-                <h3>Tabela de Ganhos</h3>
-                <div class="row"><span>Publicação com Foto</span><b>+15 XP</b></div>
-                <div class="row"><span>Convidar Amigo</span><b>+100 XP</b></div>
-                <div class="row"><span>Receber Like</span><b>+2 XP</b></div>
-                <div class="row"><span>Check-in Diário</span><b>+5 XP</b></div>
-                <div style="margin-top:20px; background:#e8f0fe; padding:15px; border-radius:6px; font-size:12px; color:#1a73e8;">
-                    <b>Economia:</b> Conversão 4 casas (0.0001€). Levantamento mín. 5.000 XP.
-                </div>
-            </div>
-        </div>
-
-        <div id="page-master" class="section-page adm-only">
-            <div class="card">
-                <h3 style="color:#d93025;">Painel de Controlo Master</h3>
-                <div style="background:#fdf7f7; border:1px solid #fce8e6; border-radius:8px; padding:20px; text-align:center;">
-                    <label style="font-size:10px; color:#70757a;">Dívida Total da Rede:</label>
-                    <h1 id="admDebt" style="color:#d93025; font-size:32px;">0.00€</h1>
-                </div>
-                <div style="margin-top:20px;">
-                    <label style="font-size:12px; display:block; margin-bottom:5px;">Eliminar Publicação por ID:</label>
-                    <input type="number" id="delId" style="width:100%; padding:12px; border:1px solid #dadce0; border-radius:4px;" placeholder="ID do post">
-                    <button class="btn-action btn-del" onclick="adminDelete()">Eliminar Agora</button>
-                </div>
-            </div>
-        </div>
-
     </main>
 
     <script>
@@ -125,78 +90,80 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
         
-        const MASTER_ID = 5401881400; 
+        const MY_ID = 5401881400; 
+        let currentPhoto = null;
 
         async function init() {
-            if(MASTER_ID === 5401881400) {
+            if(MY_ID === 5401881400) {
                 document.getElementById('appBody').classList.add('is-master');
                 document.getElementById('headerTitle').innerText = "Apex Business Control";
             }
             loadProfile();
-            loadFeed();
-            loadRank();
-        }
-
-        // FUNÇÃO DE NAVEGAÇÃO QUE LIMPA O ECRÃ
-        function switchTab(el) {
-            const targetId = el.getAttribute('data-id');
-            
-            // 1. Remove classes de todos
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.section-page').forEach(s => s.classList.remove('active'));
-            
-            // 2. Ativa apenas o selecionado
-            el.classList.add('active');
-            document.getElementById(targetId).classList.add('active');
-            window.scrollTo(0,0);
+            loadPosts();
         }
 
         async function loadProfile() {
-            const { data } = await client.from('profiles').select('*').eq('id', MASTER_ID).single();
+            const { data } = await client.from('profiles').select('*').eq('id', MY_ID).single();
             if(data) {
-                document.getElementById('valXP').innerText = Math.floor(data.points).toLocaleString();
+                document.getElementById('valXP').innerText = data.points.toLocaleString();
                 document.getElementById('valEUR').innerText = (data.points * 0.0001).toFixed(4) + "€";
-                document.getElementById('refLink').innerText = "https://apexsocial.app/?ref=" + MASTER_ID;
             }
         }
 
-        async function loadRank() {
-            const { data: users } = await client.from('profiles').select('*').order('points', { ascending: false }).limit(10);
-            let html = ''; let netXP = 0;
-            users.forEach((u, i) => {
-                netXP += u.points;
-                html += `<div class="row"><span><b>${i+1}.</b> User ${u.id.toString().substring(0,5)}</span><b>${Math.floor(u.points)} XP</b></div>`;
-            });
-            document.getElementById('ranking').innerHTML = html;
-            const debt = (netXP * 0.0001).toFixed(2);
-            document.getElementById('valDebt').innerText = debt + "€";
-            document.getElementById('admDebt').innerText = debt + "€";
-        }
+        async function loadPosts() {
+            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
+            const container = document.getElementById('feedContent');
+            container.innerHTML = "";
 
-        async function loadFeed() {
-            const { data } = await client.from('posts').select('*').order('created_at', { ascending: false });
-            const list = document.getElementById('feedList');
-            list.innerHTML = "";
-            data.forEach(p => {
-                list.innerHTML += `
+            posts.forEach(p => {
+                container.innerHTML += `
                     <div class="card">
-                        <small style="color:#70757a;">ID #${p.id}</small>
-                        <div style="margin:10px 0;">${p.content || ''}</div>
-                        ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:6px; max-height:300px; object-fit:contain;">` : ''}
-                    </div>`;
+                        <div class="post-header">
+                            <span>ID #${p.id}</span>
+                            <span style="color:#1a73e8; font-weight:bold;">${new Date(p.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div class="post-text">${p.content || ''}</div>
+                        
+                        ${p.image_url ? `
+                        <div class="post-img-container">
+                            <img src="${p.image_url}" class="post-img">
+                        </div>` : ''}
+
+                        <div class="actions-row">
+                            <button class="action-btn"><i class="far fa-heart"></i> Gosto (${p.likes || 0})</button>
+                            <button class="action-btn"><i class="far fa-comment"></i> Comentar</button>
+                            <button class="action-btn"><i class="fas fa-share-alt"></i> Redes</button>
+                        </div>
+                    </div>
+                `;
             });
         }
 
-        function copyLink() {
-            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
-            alert("Copiado!");
+        function handleFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentPhoto = e.target.result;
+                    document.getElementById('previewImg').src = currentPhoto;
+                    document.getElementById('previewImg').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
-        async function adminDelete() {
-            const id = document.getElementById('delId').value;
-            if(!id) return;
-            if(confirm("Deseja eliminar o post #" + id + "?")) {
-                await client.from('posts').delete().eq('id', id);
+        async function sendPost() {
+            const text = document.getElementById('postInput').value;
+            if(!text && !currentPhoto) return;
+
+            const { error } = await client.from('posts').insert([{ 
+                user_id: MY_ID, 
+                content: text, 
+                image_url: currentPhoto,
+                likes: 0 
+            }]);
+
+            if(!error) {
+                await client.rpc('increment_points', { user_id: MY_ID, amount: 15 });
                 location.reload();
             }
         }
