@@ -3,42 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Master</title>
+    <title>Apex Social - Master v4</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 180px; }
+        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 175px; }
 
-        /* HEADER */
+        /* HEADER GOOGLE STYLE */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
-        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
+        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; padding: 12px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
         .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
         .stat-item b { font-size: 11px; color: #1a73e8; }
-        
+
         .tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; }
         .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; border-bottom: 3px solid transparent; text-transform: uppercase; }
         .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
 
-        /* CONTENT */
+        /* CONTAINER & SECTIONS */
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
         .page-content { display: none; }
-        .page-content.active { display: block; }
+        .page-content.active { display: block !important; }
 
         /* CARDS */
-        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
-        h3 { font-size: 16px; margin-bottom: 15px; color: #3c4043; }
+        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        h3 { font-size: 16px; margin-bottom: 15px; color: #3c4043; border-bottom: 1px solid #f1f3f4; padding-bottom: 8px; }
 
-        /* ADMIN & TABLES */
-        .earnings-table { width: 100%; border-collapse: collapse; }
-        .earnings-table td { padding: 10px 0; border-bottom: 1px solid #f1f3f4; font-size: 13px; }
-        .adm-only { display: none; }
-        body.is-master .adm-only { display: block; }
-        
-        .btn-google { background: #1a73e8; color: #fff; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; }
+        /* LISTS & TABLES */
+        .row-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f3f4; font-size: 14px; }
+        .row-item:last-child { border-bottom: none; }
+        .badge { background: #e8f0fe; color: #1a73e8; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+
+        /* ADMIN SPECIFIC */
+        .admin-box { background: #fdf7f7; border: 1px solid #fce8e6; border-radius: 8px; padding: 20px; text-align: center; }
+        .btn-google { background: #1a73e8; color: #fff; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; }
+        .btn-red { background: #d93025; margin-top: 10px; }
+
+        .adm-only { display: none !important; }
+        body.is-master .adm-only { display: block !important; }
     </style>
 </head>
 <body id="appBody">
@@ -62,30 +68,54 @@
     <main class="container">
         
         <div id="page-explorar" class="page-content active">
+            <div class="card">
+                <textarea id="postInput" style="width:100%; border:none; outline:none; font-size:16px; min-height:60px;" placeholder="No que está a pensar?"></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
+                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileInput"><i class="fas fa-camera"></i> Foto (+15 XP)</label>
+                    <input type="file" id="fileInput" hidden onchange="handleFile(this)">
+                    <button class="btn-google" style="width:auto; padding:8px 20px;" onclick="sendPost()">Publicar</button>
+                </div>
+            </div>
             <div id="feedContent"></div>
         </div>
 
         <div id="page-rede" class="page-content">
             <div class="card">
-                <h3>Ranking</h3>
+                <h3>Top 10 Ranking</h3>
                 <div id="rankingList"></div>
+            </div>
+            <div class="card">
+                <h3>Link de Convite</h3>
+                <div id="refLink" style="background:#f1f3f4; padding:12px; border-radius:4px; font-size:11px; border:1px dashed #ccc; margin-bottom:10px;"></div>
+                <button class="btn-google" style="background:#fff; color:#1a73e8; border:1px solid #dadce0;" onclick="copyRef()">Copiar Link</button>
             </div>
         </div>
 
         <div id="page-info" class="page-content">
             <div class="card">
-                <h3>Ganhos</h3>
-                <table class="earnings-table">
-                    <tr><td>Post Foto</td><td align="right"><b>+15 XP</b></td></tr>
-                    <tr><td>Check-in</td><td align="right"><b>+5 XP</b></td></tr>
-                </table>
+                <h3>Tabela de Ganhos</h3>
+                <div class="row-item"><span>Post com Foto</span><b class="badge">+15 XP</b></div>
+                <div class="row-item"><span>Novo Amigo</span><b class="badge">+100 XP</b></div>
+                <div class="row-item"><span>Like Recebido</span><b class="badge">+2 XP</b></div>
+                <div class="row-item"><span>Check-in Diário</span><b class="badge">+5 XP</b></div>
+                <div style="margin-top:20px; background:#e8f0fe; padding:15px; border-radius:6px; font-size:12px; color:#1a73e8;">
+                    <b>Economia:</b> 10.000 XP = 1,00€ | Levantamento mín.: 5,00€
+                </div>
             </div>
         </div>
 
         <div id="page-master" class="page-content adm-only">
             <div class="card">
-                <h3 style="color:#d93025;">Painel Admin</h3>
-                <div id="adminStats"></div>
+                <h3 style="color:#d93025;">Consola de Gestão Master</h3>
+                <div class="admin-box">
+                    <label style="font-size:10px; color:#70757a; text-transform:uppercase;">Dívida Total à Rede:</label>
+                    <h1 id="admDebt" style="color:#d93025; font-size:32px; margin:10px 0;">0.00€</h1>
+                    <button class="btn-google">Lista de Pagamentos PayPal</button>
+                </div>
+                <div style="margin-top:20px;">
+                    <input type="number" id="delId" style="width:100%; padding:12px; border:1px solid #dadce0; border-radius:4px;" placeholder="ID do post para eliminar">
+                    <button class="btn-google btn-red" onclick="adminDelete()">Eliminar Permanentemente</button>
+                </div>
             </div>
         </div>
 
@@ -98,8 +128,13 @@
         const MASTER_ID = 5401881400; 
 
         async function init() {
-            if(MASTER_ID === 5401881400) document.body.classList.add('is-master');
+            if(MASTER_ID === 5401881400) {
+                document.getElementById('appBody').classList.add('is-master');
+                document.getElementById('headerTitle').innerText = "Apex Business Control";
+            }
+            loadProfile();
             loadPosts();
+            loadRanking();
         }
 
         function nav(el) {
@@ -110,13 +145,54 @@
             document.getElementById(target).classList.add('active');
         }
 
-        async function loadPosts() {
-            const { data } = await client.from('posts').select('*').order('created_at', { ascending: false });
-            const cont = document.getElementById('feedContent');
-            cont.innerHTML = "";
-            data.forEach(p => {
-                cont.innerHTML += `<div class="card"><b>ID #${p.id}</b><p>${p.content || ''}</p></div>`;
+        async function loadProfile() {
+            const { data } = await client.from('profiles').select('*').eq('id', MASTER_ID).single();
+            if(data) {
+                document.getElementById('valXP').innerText = Math.floor(data.points).toLocaleString();
+                document.getElementById('valEUR').innerText = (data.points * 0.0001).toFixed(4) + "€";
+                document.getElementById('refLink').innerText = `https://apexsocial.app/?ref=${MASTER_ID}`;
+            }
+        }
+
+        async function loadRanking() {
+            const { data: users } = await client.from('profiles').select('*').order('points', { ascending: false }).limit(10);
+            let html = ''; let totalXP = 0;
+            users.forEach((u, i) => {
+                totalXP += u.points;
+                html += `<div class="row-item"><span><b>${i+1}.</b> User ${u.id.toString().substring(0,5)}</span><b>${Math.floor(u.points)} XP</b></div>`;
             });
+            document.getElementById('rankingList').innerHTML = html;
+            const debt = (totalXP * 0.0001).toFixed(2);
+            document.getElementById('valDebt').innerText = debt + "€";
+            document.getElementById('admDebt').innerText = debt + "€";
+        }
+
+        async function loadPosts() {
+            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
+            const container = document.getElementById('feedContent');
+            container.innerHTML = "";
+            posts.forEach(p => {
+                container.innerHTML += `
+                    <div class="card">
+                        <div style="font-size:10px; color:#70757a; margin-bottom:10px;">POST #${p.id}</div>
+                        <div style="font-size:15px; margin-bottom:12px;">${p.content || ''}</div>
+                        ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:6px;">` : ''}
+                    </div>`;
+            });
+        }
+
+        function copyRef() {
+            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
+            alert("Copiado!");
+        }
+
+        async function adminDelete() {
+            const id = document.getElementById('delId').value;
+            if(!id) return;
+            if(confirm("Eliminar post #" + id + "?")) {
+                await client.from('posts').delete().eq('id', id);
+                location.reload();
+            }
         }
 
         init();
