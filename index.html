@@ -31,69 +31,74 @@
         .page { display: none; }
         .page.active { display: block; }
 
-        /* CARDS E POSTS - BLINDAGEM DE LAYOUT */
-        .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
-        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; display: block; width: 100%; }
-        
-        .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; border-bottom: 1px solid #252525; }
+        /* POSTS - LAYOUT VERTICAL FIXO */
+        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; display: flex; flex-direction: column; width: 100%; }
+        .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; }
         .post-avatar { width: 35px; height: 35px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; flex-shrink: 0; }
+        .post-body { padding: 15px; font-size: 15px; line-height: 1.5; color: #eee; word-wrap: break-word; }
         
-        /* O corpo do post agora tem largura total forçada */
-        .post-body { padding: 15px; font-size: 15px; line-height: 1.5; color: #eee; word-wrap: break-word; width: 100%; display: block; }
-        
-        /* Contentor da Imagem Corrigido */
-        .post-img-container { width: 100%; background: #000; display: block; border-top: 1px solid #252525; }
-        .post-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; display: block; }
+        /* CONTENTOR DA FOTO (Impede o esmagamento do post) */
+        .img-box { width: 100%; background: #000; border-top: 1px solid #252525; min-height: 200px; display: flex; align-items: center; justify-content: center; }
+        .post-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; }
+
+        /* RANKING TABLE */
+        .rank-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .rank-table td { padding: 10px; border-bottom: 1px solid #333; font-size: 14px; }
+        .rank-pos { color: #ffcc00; font-weight: bold; width: 30px; }
 
         /* ACTIONS */
         .post-actions { display: flex; padding: 12px 15px; gap: 20px; background: #1a1a1a; border-top: 1px solid #252525; }
         .action-btn { background: none; border: none; color: #888; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
         .action-btn.liked { color: #ffcc00; }
 
-        /* INPUTS */
-        .input-area { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 80px; font-size: 15px; margin-bottom: 10px; outline: none; }
         .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header-fixed">
-        <div class="ad-top">✨ Patrocínio: Ganha 500 XP extra ao convidar 5 amigos!</div>
+        <div class="ad-top">📢 CONVITE: Ganha +100 XP por cada amigo!</div>
         <div class="nav-main">
             <h3>PINE <span style="color:#ffcc00">SOCIAL</span></h3>
             <div id="userXP" class="xp-badge">0 XP</div>
         </div>
         <div class="tabs">
             <div class="tab-item active" onclick="switchTab('feed-page', this)">Feed</div>
-            <div class="tab-item" onclick="switchTab('earn-page', this)">Ganhos</div>
+            <div class="tab-item" onclick="switchTab('earn-page', this)">Ranking</div>
             <div class="tab-item" onclick="switchTab('wallet-page', this)">Saque</div>
         </div>
     </div>
 
     <main class="content">
         <div id="feed-page" class="page active">
-            <div class="card">
-                <textarea id="postText" class="input-area" placeholder="O que estás a pensar?"></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="card" style="margin-bottom:20px;">
+                <textarea id="postText" style="width:100%; background:#2a2a2a; border:1px solid #444; color:#fff; padding:12px; border-radius:10px; min-height:80px; outline:none;" placeholder="O que estás a pensar?"></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
                     <input type="file" id="fileInput" hidden accept="image/*">
                     <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
                     <button class="btn-pub" id="pubBtn" onclick="handlePublish()">Publicar</button>
                 </div>
             </div>
-            <div id="feed-items">A carregar publicações...</div>
+            <div id="feed-items">A carregar...</div>
         </div>
 
         <div id="earn-page" class="page">
-            <div class="card"><h2>Ranking de Ganhos</h2><p>Top 10 em breve!</p></div>
+            <div class="card">
+                <h3 style="color:#ffcc00; margin-bottom:15px;"><i class="fas fa-trophy"></i> Top 10 Utilizadores</h3>
+                <table class="rank-table" id="rank-list">
+                    </table>
+            </div>
         </div>
 
         <div id="wallet-page" class="page">
-            <div class="card" style="text-align:center;"><h1 style="color:#ffcc00; font-size:40px;"><span id="euroVal">0.0000</span>€</h1></div>
+            <div class="card" style="text-align:center;">
+                <p>Saldo convertível</p>
+                <h1 style="color:#ffcc00; font-size:40px; margin:10px 0;"><span id="euroVal">0.0000</span>€</h1>
+            </div>
         </div>
     </main>
 
     <script>
-        // CHAVE CORRIGIDA (Com o Q final)
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QQ";
         const client = supabase.createClient(SB_URL, SB_KEY);
@@ -105,44 +110,51 @@
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
             if(id === 'feed-page') fetchFeed();
+            if(id === 'earn-page') fetchRanking();
         }
 
         async function fetchFeed() {
             const list = document.getElementById('feed-items');
-            try {
-                const { data, error } = await client.from('posts').select('*').order('created_at', {ascending: false});
-                
-                if(error) throw error;
+            const { data, error } = await client.from('posts').select('*').order('created_at', {ascending: false});
+            
+            if(error) { list.innerHTML = "Erro de ligação."; return; }
 
-                list.innerHTML = '';
-                data.forEach((p, index) => {
-                    // Ads
-                    if (index > 0 && index % 3 === 0) {
-                        list.innerHTML += `<div class="post" style="padding:20px; text-align:center; background:#1a1a1a; border:1px dashed #ffcc00;"><small style="color:#ffcc00">ANÚNCIO</small><br><b>🚀 Ganha XP infinito com VIP!</b></div>`;
-                    }
+            list.innerHTML = '';
+            data.forEach((p, index) => {
+                if (index > 0 && index % 3 === 0) {
+                    list.innerHTML += `<div class="post" style="padding:20px; text-align:center; background:#1a1a1a; border:1px dashed #ffcc00;"><small style="color:#ffcc00">ANÚNCIO</small><br><b>🚀 Torna-te VIP e ganha bónus!</b></div>`;
+                }
 
-                    const el = document.createElement('div');
-                    el.className = 'post';
-                    el.innerHTML = `
-                        <div class="post-header">
-                            <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
-                            <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
-                        </div>
-                        <div class="post-body">${p.content || ''}</div>
-                        ${p.image_url ? `
-                        <div class="post-img-container">
-                            <img src="${p.image_url}" class="post-img" onerror="this.parentElement.style.display='none'">
-                        </div>` : ''}
-                        <div class="post-actions">
-                            <button class="action-btn" onclick="likePost('${p.id}', this)"><i class="fas fa-heart"></i> <span class="count">${p.likes || 0}</span></button>
-                            <button class="action-btn"><i class="fas fa-comment"></i> Comentar</button>
-                            <button class="action-btn" onclick="share()"><i class="fas fa-share-alt"></i></button>
-                        </div>
-                    `;
-                    list.appendChild(el);
-                });
-            } catch (e) {
-                list.innerHTML = `<div style="text-align:center; padding:20px; color:#ff4444;">Erro na ligação ao servidor.</div>`;
+                const el = document.createElement('div');
+                el.className = 'post';
+                el.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
+                        <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
+                    </div>
+                    <div class="post-body">${p.content || ''}</div>
+                    ${p.image_url ? `<div class="img-box"><img src="${p.image_url}" class="post-img" onerror="this.parentElement.style.display='none'"></div>` : ''}
+                    <div class="post-actions">
+                        <button class="action-btn" onclick="likePost('${p.id}', this)"><i class="fas fa-heart"></i> <span class="count">${p.likes || 0}</span></button>
+                        <button class="action-btn"><i class="fas fa-comment"></i> Comentar</button>
+                        <button class="action-btn" onclick="share()"><i class="fas fa-share-alt"></i></button>
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+        }
+
+        async function fetchRanking() {
+            const list = document.getElementById('rank-list');
+            const { data } = await client.from('profiles').select('id, points').order('points', {ascending: false}).limit(10);
+            if(data) {
+                list.innerHTML = data.map((u, i) => `
+                    <tr>
+                        <td class="rank-pos">#${i+1}</td>
+                        <td>User #${u.id.toString().slice(-4)}</td>
+                        <td style="text-align:right; font-weight:bold;">${u.points} XP</td>
+                    </tr>
+                `).join('');
             }
         }
 
@@ -153,29 +165,21 @@
             if(!txt && !file) return;
             
             btn.disabled = true;
-            btn.innerText = "...";
             let img = null;
 
-            try {
-                if(file) {
-                    const name = `${Date.now()}_${myId}.jpg`;
-                    const { data, error } = await client.storage.from('post-images').upload(name, file);
-                    if(data) img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
-                }
-
-                await client.from('posts').insert([{ user_id: myId, content: txt, image_url: img }]);
-                await client.rpc('increment_points', { user_id: myId, amount: 15 });
-                
-                document.getElementById('postText').value = '';
-                document.getElementById('fileInput').value = '';
-                fetchFeed();
-                updateProfile();
-            } catch (e) {
-                alert("Erro ao publicar.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Publicar";
+            if(file) {
+                const name = `${Date.now()}.jpg`;
+                const { data } = await client.storage.from('post-images').upload(name, file);
+                if(data) img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
             }
+
+            await client.from('posts').insert([{ user_id: myId, content: txt, image_url: img }]);
+            await client.rpc('increment_points', { user_id: myId, amount: 15 });
+            
+            document.getElementById('postText').value = '';
+            btn.disabled = false;
+            fetchFeed();
+            updateProfile();
         }
 
         async function updateProfile() {
