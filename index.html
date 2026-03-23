@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Master Index</title>
+    <title>Apex Social</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -11,10 +11,11 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 175px; }
 
-        /* HEADER FIXO (Apenas 3 colunas para manter limpo em todas as abas) */
+        /* HEADER FIXO */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
+        /* GRID DE STATS (Apenas o essencial) */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
@@ -44,10 +45,6 @@
         /* UI ELEMENTS */
         .input-google { width: 100%; border: none; outline: none; font-size: 16px; margin-bottom: 15px; resize: none; min-height: 60px; }
         .btn-post { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-
-        /* SEGURANÇA: OCULTAR ABA MASTER PARA OUTROS */
-        #tab-master { display: none; }
-        body.is-master #tab-master { display: block; }
     </style>
 </head>
 <body id="appBody">
@@ -63,7 +60,6 @@
             <div class="tab active" onclick="changeTab('explorar', this)">Explorar</div>
             <div class="tab" onclick="changeTab('rede', this)">Rede</div>
             <div class="tab" onclick="changeTab('info', this)">Info</div>
-            <div id="tab-master" class="tab" style="color:#d93025;" onclick="changeTab('master', this)">Master</div>
         </nav>
     </header>
 
@@ -83,35 +79,16 @@
 
         <section id="view-rede" class="view-section">
             <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;">Sistema de Afiliados</h3>
+                <h3 style="font-size:16px; margin-bottom:15px;">Rede de Amigos</h3>
                 <div id="refLink" style="font-size:12px; color:#1a73e8; background:#f8f9fa; padding:15px; border-radius:6px; border:1px dashed #dadce0;">...</div>
-                <button class="btn-post" style="background:#fff; color:#1a73e8; border:1px solid #1a73e8;" onclick="copyRef()">Copiar Convite</button>
+                <button class="btn-post" style="background:#fff; color:#1a73e8; border:1px solid #1a73e8;" onclick="copyRef()">Copiar Link</button>
             </div>
         </section>
 
         <section id="view-info" class="view-section">
             <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;">Tabela de Ganhos</h3>
-                <p style="font-size:13px; color:#5f6368;">Ganha XP por cada interação real na plataforma.</p>
-            </div>
-        </section>
-
-        <section id="view-master" class="view-section">
-            <div class="card" style="border-color:#d93025;">
-                <h3 style="color:#d93025; margin-bottom:20px;">Painel de Controlo Master</h3>
-                
-                <div style="background:#fdf7f7; border:1px solid #fce8e6; padding:20px; border-radius:8px; text-align:center; margin-bottom:25px;">
-                    <label style="font-size:10px; color:#70757a; text-transform:uppercase; font-weight:bold;">Dívida Total à Rede (Euros):</label>
-                    <h1 id="valDebt" style="color:#d93025; font-size:32px; margin-top:5px;">0.00€</h1>
-                </div>
-
-                <div style="border-top:2px solid #f1f3f4; padding-top:20px;">
-                    <label style="font-size:12px; font-weight:bold; color:#202124;">Eliminar Publicação por ID:</label>
-                    <input type="number" id="delId" class="input-google" style="border:1px solid #dadce0; padding:12px; border-radius:4px; min-height:auto; margin-top:8px;" placeholder="Ex: 12345">
-                    <button class="btn-post" style="background:#d93025;" onclick="adminDelete()">Eliminar Permanentemente</button>
-                </div>
-
-                <button class="btn-post" style="background:#fff; color:#5f6368; border:1px solid #dadce0; margin-top:15px;">Ver Listagem de Pagamentos</button>
+                <h3 style="font-size:16px; margin-bottom:15px;">Manual de Ganhos</h3>
+                <p style="font-size:13px; color:#5f6368;">Ganha XP através de publicações e convites.</p>
             </div>
         </section>
 
@@ -125,10 +102,6 @@
         const MY_ID = 5401881400; 
 
         async function init() {
-            if(MY_ID === 5401881400) {
-                document.getElementById('appBody').classList.add('is-master');
-                document.getElementById('headerTitle').innerText = "Apex Business Control";
-            }
             loadProfile();
             loadPosts();
         }
@@ -153,10 +126,7 @@
             const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('feedContent');
             container.innerHTML = "";
-            let totalPoints = 0;
-
             posts.forEach(p => {
-                totalPoints += (p.points || 0);
                 container.innerHTML += `
                     <div class="card">
                         <div class="post-text">${p.content || ''}</div>
@@ -168,18 +138,6 @@
                         </div>
                     </div>`;
             });
-            // O cálculo da dívida é atualizado mas só aparece na aba Master
-            document.getElementById('valDebt').innerText = (totalPoints * 0.0001).toFixed(2) + "€";
-        }
-
-        // Funções de suporte...
-        async function adminDelete() {
-            const id = document.getElementById('delId').value;
-            if(!id) return;
-            if(confirm("Confirmar a eliminação definitiva?")) {
-                await client.from('posts').delete().eq('id', id);
-                location.reload();
-            }
         }
 
         function copyRef() {
