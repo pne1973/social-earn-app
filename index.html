@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Master</title>
+    <title>Apex Social - Master Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -21,17 +21,21 @@
         .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
         .stat-item b { font-size: 11px; color: #1a73e8; }
         
-        .tabs { display: flex; background: #fff; }
+        .tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; }
         .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; border-bottom: 3px solid transparent; text-transform: uppercase; }
         .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
+
+        /* SEÇÕES */
+        .page { display: none; }
+        .page.active { display: block; }
 
         /* FEED E CARDS */
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
         .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
         /* CORREÇÃO DA FOTO NO FEED */
-        .post-img-container { width: 100%; max-height: 350px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f1f3f4; display: flex; align-items: center; justify-content: center; }
-        .post-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .post-img-container { width: 100%; max-height: 400px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f8f9fa; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f3f4; }
+        .post-img { width: 100%; height: auto; max-height: 400px; object-fit: contain; display: block; }
         
         /* POST INFO */
         .post-header { font-size: 11px; color: #70757a; margin-bottom: 10px; display: flex; justify-content: space-between; }
@@ -45,6 +49,9 @@
         /* UI PUBLISH */
         .input-google { width: 100%; border: none; outline: none; font-size: 16px; margin-bottom: 15px; resize: none; min-height: 60px; }
         .btn-post { background: #1a73e8; color: #fff; border: none; padding: 8px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+        /* RANKING & LISTS */
+        .list-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f3f4; font-size: 14px; }
 
         .adm-only { display: none !important; }
         body.is-master .adm-only { display: block !important; }
@@ -61,28 +68,60 @@
             <div class="stat-item"><label>Estado</label><b style="color:#1e8e3e;">ONLINE</b></div>
         </div>
         <nav class="tabs">
-            <div class="tab active">Explorar</div>
-            <div class="tab">Rede</div>
-            <div class="tab">Info</div>
-            <div class="tab adm-only" style="color:#d93025;">Master</div>
+            <div class="tab active" onclick="showTab('explorar', this)">Explorar</div>
+            <div class="tab" onclick="showTab('rede', this)">Rede</div>
+            <div class="tab" onclick="showTab('info', this)">Info</div>
+            <div class="tab adm-only" style="color:#d93025;" onclick="showTab('master', this)">Master</div>
         </nav>
     </header>
 
     <main class="container">
-        <div class="card">
-            <textarea id="postInput" class="input-google" placeholder="O que pretende partilhar?"></textarea>
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
-                <label style="color:#1a73e8; cursor:pointer; font-size:13px; font-weight:500;" for="fileInput">
-                    <i class="fas fa-camera"></i> Foto (+15 XP)
-                </label>
-                <input type="file" id="fileInput" hidden onchange="handleFile(this)">
-                <button class="btn-post" onclick="sendPost()">Publicar</button>
+        
+        <div id="explorar" class="page active">
+            <div class="card">
+                <textarea id="postInput" class="input-google" placeholder="O que pretende partilhar?"></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
+                    <label style="color:#1a73e8; cursor:pointer; font-size:13px; font-weight:500;" for="fileInput">
+                        <i class="fas fa-camera"></i> Foto (+15 XP)
+                    </label>
+                    <input type="file" id="fileInput" hidden onchange="handleFile(this)">
+                    <button class="btn-post" onclick="sendPost()">Publicar</button>
+                </div>
+                <img id="previewImg" style="display:none; width:100%; margin-top:15px; border-radius:6px; max-height:200px; object-fit:cover;">
             </div>
-            <img id="previewImg" style="display:none; width:100%; margin-top:15px; border-radius:6px; max-height:200px; object-fit:cover;">
+            <div id="feedContent"></div>
         </div>
 
-        <div id="feedContent">
+        <div id="rede" class="page">
+            <div class="card">
+                <h3>Top 10 Ranking</h3>
+                <div id="rankingList"></div>
             </div>
+        </div>
+
+        <div id="info" class="page">
+            <div class="card">
+                <h3>Tabela de Ganhos</h3>
+                <div class="list-row"><span>Post com Foto</span><b>+15 XP</b></div>
+                <div class="list-row"><span>Check-in Diário</span><b>+5 XP</b></div>
+                <div class="list-row"><span>Like Recebido</span><b>+2 XP</b></div>
+                <div style="margin-top:15px; font-size:12px; color:#5f6368;">
+                    Câmbio: 10.000 XP = 1,00€ | Mínimo: 5.000 XP
+                </div>
+            </div>
+        </div>
+
+        <div id="master" class="page adm-only">
+            <div class="card">
+                <h3 style="color:#d93025;">Painel de Controlo Master</h3>
+                <div id="adminPanel">
+                    <p style="font-size:12px; margin-bottom:10px;">ID do Post para eliminar:</p>
+                    <input type="number" id="delId" style="width:100%; padding:10px; border:1px solid #dadce0; border-radius:4px; margin-bottom:10px;">
+                    <button class="btn-post" style="background:#d93025; width:100%;" onclick="adminDelete()">Eliminar Permanentemente</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
@@ -100,6 +139,14 @@
             }
             loadProfile();
             loadPosts();
+            loadRanking();
+        }
+
+        function showTab(tabId, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            el.classList.add('active');
         }
 
         async function loadProfile() {
@@ -108,6 +155,17 @@
                 document.getElementById('valXP').innerText = data.points.toLocaleString();
                 document.getElementById('valEUR').innerText = (data.points * 0.0001).toFixed(4) + "€";
             }
+        }
+
+        async function loadRanking() {
+            const { data: users } = await client.from('profiles').select('*').order('points', { ascending: false }).limit(10);
+            let html = ''; let totalXP = 0;
+            users.forEach((u, i) => {
+                totalXP += u.points;
+                html += `<div class="list-row"><span>${i+1}. User ${u.id.toString().substring(0,5)}</span><b>${Math.floor(u.points)} XP</b></div>`;
+            });
+            document.getElementById('rankingList').innerHTML = html;
+            document.getElementById('valDebt').innerText = (totalXP * 0.0001).toFixed(2) + "€";
         }
 
         async function loadPosts() {
@@ -164,6 +222,15 @@
 
             if(!error) {
                 await client.rpc('increment_points', { user_id: MY_ID, amount: 15 });
+                location.reload();
+            }
+        }
+
+        async function adminDelete() {
+            const id = document.getElementById('delId').value;
+            if(!id) return;
+            if(confirm("Confirmar a eliminação definitiva?")) {
+                await client.from('posts').delete().eq('id', id);
                 location.reload();
             }
         }
