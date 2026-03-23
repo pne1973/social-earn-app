@@ -40,7 +40,7 @@
         .post-text { padding: 15px; font-size: 15px; line-height: 1.5; color: #f0f0f0; }
         .post-img { width: 100%; height: 300px; object-fit: cover; display: block; border-top: 1px solid #252525; background: #000; }
 
-        /* SOCIAL ACTIONS & PERSISTENT COMMENTS */
+        /* SOCIAL ACTIONS */
         .post-actions { display: flex; padding: 12px 15px; border-top: 1px solid #252525; gap: 25px; color: #aaa; font-size: 14px; }
         .action-btn { cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .action-btn:hover { color: #ffcc00; }
@@ -52,7 +52,6 @@
         .comment-input-wrap { display: flex; gap: 8px; }
         .comment-input { flex: 1; background: #252525; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; outline: none; }
 
-        /* BUTTONS & UI ELEMENTS */
         .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-pub:active { transform: scale(0.95); opacity: 0.8; }
         .admin-link { display: none; }
@@ -103,7 +102,7 @@
             <div class="card" style="text-align:center; padding:30px 15px;">
                 <p style="font-size:13px; color:#888;">O teu saldo atual</p>
                 <h1 style="color:#ffcc00; font-size:42px; margin:15px 0;"><span id="eurVal">0.0000</span>€</h1>
-                <h3 style="color:#aaa;"><span id="brlVal">0.0000</span> R$</h3>
+                <h3 id="brlVal" style="color:#aaa;">Euro (EUR)</h3>
                 <p style="font-size:11px; color:#555; margin-top:20px;">Levantamento mínimo: 5000 XP</p>
             </div>
             <div class="card">
@@ -117,12 +116,6 @@
                 <h3 style="color:#ff4444; margin-bottom:15px;">Painel de Controlo Admin</h3>
                 <div id="admStats" style="font-size:13px; margin-bottom:20px;">...</div>
                 <button class="btn-pub" style="background:#ff4444; color:#fff; width:100%;" onclick="clearAllPosts()">ELIMINAR TODOS OS POSTS (ID Reset)</button>
-                <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
-                <p style="font-size:11px; margin-bottom:8px;">Pedidos PayPal (Pendentes):</p>
-                <div style="background:#000; padding:12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #222;">
-                    <span style="font-size:10px; color:#666;">Sem novos pedidos de saque.</span>
-                    <button class="btn-pub" style="padding:5px 12px; font-size:10px;">PAY</button>
-                </div>
             </div>
         </div>
     </main>
@@ -132,6 +125,25 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
         const myId = 5401881400;
+
+        // --- SISTEMA AUTOMÁTICO DE LOCALIZAÇÃO ---
+        const userConfig = {
+            lang: navigator.language || 'pt-PT',
+            isBR: (navigator.language || '').includes('BR'),
+            get symbol() { return this.isBR ? 'R$' : '€' },
+            get rate() { return this.isBR ? 0.00615 : 0.0010 },
+            get label() { return this.isBR ? 'Real (BRL)' : 'Euro (EUR)' }
+        };
+
+        // Tradução básica inicial
+        window.onload = () => {
+            if (!userConfig.lang.startsWith('pt')) {
+                const btn = document.querySelector('.btn-pub');
+                if(btn) btn.innerText = 'Publish';
+                const input = document.getElementById('postText');
+                if(input) input.placeholder = "What's on your mind?";
+            }
+        };
 
         // SISTEMA DE NAVEGAÇÃO
         function openTab(id, el) {
@@ -147,55 +159,29 @@
 
         // ECONOMIA E PERFIL
         async function getProfile() {
-          // --- FUNÇÃO GETPROFILE ATUALIZADA (Cálculo Automático) ---
-async function getProfile() {
-    const { data } = await client.from('profiles').select('points').eq('id', myId).single();
-    if (data) {
-        const pts = data.points || 0;
-        
-        // 1. Atualiza o XP no topo
-        document.getElementById('userXP').innerText = pts + " XP";
-        
-        // 2. Cálculo Automático baseado no userConfig (que inseriu acima)
-        const convertedValue = (pts * userConfig.rate).toFixed(4);
-        
-        // 3. Atualiza o display da carteira (Wallet)
-        // O valor principal agora mostra a moeda detetada automaticamente
-        const walletH1 = document.querySelector('#wallet-page h1');
-        if (walletH1) {
-            walletH1.innerHTML = `<span>${convertedValue}</span>${userConfig.symbol}`;
+            const { data } = await client.from('profiles').select('points').eq('id', myId).single();
+            if (data) {
+                const pts = data.points || 0;
+                document.getElementById('userXP').innerText = pts + " XP";
+                
+                const convertedValue = (pts * userConfig.rate).toFixed(4);
+                
+                const valSpan = document.getElementById('eurVal');
+                if (valSpan) valSpan.innerText = convertedValue;
+                
+                const walletH1 = document.querySelector('#wallet-page h1');
+                if (walletH1) walletH1.innerHTML = `<span id="eurVal">${convertedValue}</span>${userConfig.symbol}`;
+                
+                const label = document.getElementById('brlVal');
+                if (label) label.innerText = userConfig.label;
+            }
+            if(myId === 5401881400) {
+                const adm = document.getElementById('adm-tab');
+                if(adm) adm.style.display = 'block';
+            }
         }
-        
-        // 4. Atualiza a legenda (Ex: "Saldo em Real (BRL)")
-        const walletLabel = document.getElementById('brlVal');
-        if (walletLabel) {
-            walletLabel.innerText = userConfig.label;
-        }
- 
-    
-    // Mantém a verificação de Admin
-    if(myId === 5401881400) {
-        const admTab = document.getElementById('adm-tab');
-        if(admTab) admTab.style.display = 'block';
-    }
-}
- }
-// --- SISTEMA AUTOMÁTICO DE LOCALIZAÇÃO (LINHA 159) ---
-const userConfig = {
-    lang: navigator.language || 'pt-PT',
-    isBR: (navigator.language || '').includes('BR'),
-    get symbol() { return this.isBR ? 'R$' : '€' },
-    get rate() { return this.isBR ? 0.00615 : 0.0010 }, // Taxa XP -> Moeda
-    get label() { return this.isBR ? 'Real (BRL)' : 'Euro (EUR)' }
-};
 
-// Tradução automática de botões baseada na língua
-if (!userConfig.lang.startsWith('pt')) {
-    document.querySelector('.btn-pub').innerText = 'Publish';
-    document.getElementById('postText').placeholder = "What's on your mind?";
-}
-// ------------------------------------
-        // FEED & COMENTÁRIOS (FIXED BIGINT RELATION)
+        // FEED & COMENTÁRIOS
         async function fetchFeed() {
             const { data: posts } = await client.from('posts').select('*').order('created_at', {ascending: false}).limit(10);
             const list = document.getElementById('feed-items');
@@ -204,7 +190,6 @@ if (!userConfig.lang.startsWith('pt')) {
             if(posts) {
                 for (let i = 0; i < posts.length; i++) {
                     const p = posts[i];
-                    // Busca comentários reais vinculados ao post (BIGINT)
                     const { data: comms } = await client.from('comments').select('*').eq('post_id', p.id).order('created_at', {ascending: true});
                     
                     const el = document.createElement('div');
@@ -217,13 +202,11 @@ if (!userConfig.lang.startsWith('pt')) {
                         </div>
                         <div class="post-text">${p.content || ''}</div>
                         ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
-                        
                         <div class="post-actions">
                             <div class="action-btn" onclick="addXP(2, this)"><i class="far fa-heart"></i> <span>0</span></div>
                             <div class="action-btn" onclick="toggleComments('${p.id}')"><i class="far fa-comment"></i> <span>${comms ? comms.length : 0}</span></div>
                             <div class="action-btn" onclick="shareSocial('${p.id}')"><i class="fas fa-share-nodes"></i></div>
                         </div>
-                        
                         <div id="box-${p.id}" class="comment-section">
                             <div class="comment-list">
                                 ${comms ? comms.map(c => `<div class="comment-item"><b>User #${c.user_id.toString().slice(-4)}:</b> ${c.content}</div>`).join('') : ''}
@@ -235,7 +218,6 @@ if (!userConfig.lang.startsWith('pt')) {
                         </div>
                     `;
                     list.appendChild(el);
-                    // MONETIZAÇÃO: Injeção automática a cada 3 posts
                     if((i+1)%3 === 0) {
                         list.innerHTML += `<div style="text-align:center; color:#ffcc00; font-size:10px; padding:15px; border:1px dashed #333; margin-bottom:20px; border-radius:12px; opacity:0.6;">📢 ANÚNCIO: Pine Social Monetization</div>`;
                     }
@@ -243,26 +225,29 @@ if (!userConfig.lang.startsWith('pt')) {
             }
         }
 
-        // SOCIAL INTERACTIONS
         async function sendComment(postId) {
             const input = document.getElementById(`input-${postId}`);
             if(!input.value) return;
             const { error } = await client.from('comments').insert([{ post_id: postId, user_id: myId, content: input.value }]);
             if(!error) {
-                await client.rpc('increment_points', { user_id: myId, amount: 5 }); // +5 XP
+                await client.rpc('increment_points', { user_id: myId, amount: 5 });
                 input.value = ''; fetchFeed(); getProfile();
             }
         }
 
         async function addXP(amt, btn) {
             await client.rpc('increment_points', { user_id: myId, amount: amt });
-            if(btn) { btn.style.color = "#ffcc00"; let s = btn.querySelector('span'); s.innerText = parseInt(s.innerText)+1; }
+            if(btn) { 
+                btn.style.color = "#ffcc00"; 
+                let s = btn.querySelector('span'); 
+                if(s) s.innerText = parseInt(s.innerText)+1; 
+            }
             getProfile();
         }
 
         function toggleComments(id) {
             const box = document.getElementById(`box-${id}`);
-            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+            if(box) box.style.display = box.style.display === 'block' ? 'none' : 'block';
         }
 
         function shareSocial(id) {
@@ -271,7 +256,6 @@ if (!userConfig.lang.startsWith('pt')) {
             else prompt("Copia o link:", url);
         }
 
-        // PUBLISH & GAMIFICATION (+15 XP)
         async function publish() {
             const txt = document.getElementById('postText').value;
             const file = document.getElementById('fileInput').files[0];
@@ -281,7 +265,7 @@ if (!userConfig.lang.startsWith('pt')) {
             if(file) {
                 const name = `p_${Date.now()}.jpg`;
                 const { data } = await client.storage.from('post-images').upload(name, file);
-                img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
+                if(data) img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
             }
             await client.from('posts').insert([{ user_id: myId, content: txt, image_url: img }]);
             await client.rpc('increment_points', { user_id: myId, amount: 15 });
@@ -290,29 +274,32 @@ if (!userConfig.lang.startsWith('pt')) {
             fetchFeed(); getProfile();
         }
 
-        // ADMIN & RANKING DATA
         async function fetchRanking() {
             const { data } = await client.from('profiles').select('id, points').order('points', {ascending: false}).limit(10);
             const list = document.getElementById('rankingList');
-            list.innerHTML = '';
-            if(data) data.forEach((u, i) => list.innerHTML += `<p>#${i+1} User...${u.id.toString().slice(-4)} <span style="float:right; color:#ffcc00; font-weight:bold;">${u.points} XP</span></p>`);
+            if(list && data) {
+                list.innerHTML = '';
+                data.forEach((u, i) => list.innerHTML += `<p>#${i+1} User...${u.id.toString().slice(-4)} <span style="float:right; color:#ffcc00; font-weight:bold;">${u.points} XP</span></p>`);
+            }
         }
 
         async function fetchAdminData() {
             const { count: u } = await client.from('profiles').select('*', { count: 'exact', head: true });
             const { count: p } = await client.from('posts').select('*', { count: 'exact', head: true });
-            document.getElementById('admStats').innerText = `Utilizadores: ${u} | Posts Totais: ${p}`;
+            const stats = document.getElementById('admStats');
+            if(stats) stats.innerText = `Utilizadores: ${u} | Posts Totais: ${p}`;
         }
 
         async function clearAllPosts() {
-            if(confirm("Desejas apagar todos os posts da base de dados?")) {
+            if(confirm("Apagar todos os posts?")) {
                 await client.from('posts').delete().neq('id', 0);
                 fetchFeed();
             }
         }
 
         // INIT
-        getProfile(); fetchFeed();
+        getProfile(); 
+        fetchFeed();
     </script>
 </body>
 </html>
