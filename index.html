@@ -3,48 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social</title>
+    <title>Apex Social - Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* RESET & BASE */
+        /* RESET & GOOGLE SYSTEM */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 180px; }
+        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 175px; }
 
-        /* HEADER ESTATUÁRIO (PARA NÃO ENCVALAR) */
+        /* HEADER FIXO */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
-        .stat-item { text-align: center; border-right: 1px solid #f1f3f4; padding: 5px; }
+        .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
         .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
-        .stat-item b { font-size: 11px; color: #1a73e8; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .stat-item b { font-size: 11px; color: #1a73e8; }
         
-        .tabs { display: flex; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; }
+        .tabs { display: flex; background: #fff; }
+        .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; border-bottom: 3px solid transparent; text-transform: uppercase; }
         .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
 
         /* FEED E CARDS */
-        .container { max-width: 500px; margin: 0 auto; padding: 10px; }
-        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 15px; margin-bottom: 12px; }
+        .container { max-width: 500px; margin: 0 auto; padding: 12px; }
+        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        /* CORREÇÃO DA FOTO NO FEED */
+        .post-img-container { width: 100%; max-height: 350px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f1f3f4; display: flex; align-items: center; justify-content: center; }
+        .post-img { width: 100%; height: 100%; object-fit: contain; display: block; }
         
-        /* PUBLISH BOX */
-        .publish-box textarea { width: 100%; border: none; outline: none; resize: none; font-size: 15px; margin-bottom: 15px; min-height: 50px; }
-        .publish-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f3f4; padding-top: 10px; }
-        .btn-photo { color: #1a73e8; font-size: 13px; font-weight: 500; cursor: pointer; }
-        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        /* POST INFO */
+        .post-header { font-size: 11px; color: #70757a; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .post-text { font-size: 15px; line-height: 1.5; color: #3c4043; word-wrap: break-word; }
 
-        /* POST ACTIONS (LIKES, COMMENTS, SHARE) */
-        .post-header { font-size: 11px; color: #70757a; margin-bottom: 10px; border-bottom: 1px solid #f8f9fa; padding-bottom: 5px; }
-        .post-text { font-size: 15px; margin-bottom: 12px; line-height: 1.5; }
-        .post-img { width: 100%; border-radius: 6px; margin-bottom: 12px; }
-        .actions-row { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f3f4; padding-top: 10px; }
-        .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .action-btn i { font-size: 14px; }
-        .action-btn.liked { color: #1a73e8; }
+        /* INTERAÇÕES */
+        .actions-row { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f3f4; padding-top: 12px; margin-top: 12px; }
+        .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .action-btn i { font-size: 14px; color: #1a73e8; }
 
-        /* ADMIN HIDDEN */
+        /* UI PUBLISH */
+        .input-google { width: 100%; border: none; outline: none; font-size: 16px; margin-bottom: 15px; resize: none; min-height: 60px; }
+        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 8px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
         .adm-only { display: none !important; }
         body.is-master .adm-only { display: block !important; }
     </style>
@@ -60,41 +61,40 @@
             <div class="stat-item"><label>Estado</label><b style="color:#1e8e3e;">ONLINE</b></div>
         </div>
         <nav class="tabs">
-            <div class="tab active" onclick="showPage('feed')">Explorar</div>
-            <div class="tab" onclick="showPage('rede')">Rede</div>
-            <div class="tab" onclick="showPage('info')">Info</div>
-            <div class="tab adm-only" style="color:#d93025;" onclick="showPage('admin')">Master</div>
+            <div class="tab active">Explorar</div>
+            <div class="tab">Rede</div>
+            <div class="tab">Info</div>
+            <div class="tab adm-only" style="color:#d93025;">Master</div>
         </nav>
     </header>
 
     <main class="container">
-        <section id="page-feed">
-            <div class="card publish-box">
-                <textarea id="postInput" placeholder="No que está a pensar?"></textarea>
-                <div class="publish-footer">
-                    <label class="btn-photo" for="fileInput"><i class="fas fa-image"></i> Foto (+15 XP)</label>
-                    <input type="file" id="fileInput" hidden onchange="handleFile(this)">
-                    <button class="btn-post" onclick="sendPost()">Publicar</button>
-                </div>
-                <img id="previewImg" style="display:none; width:100%; margin-top:10px; border-radius:5px;">
+        <div class="card">
+            <textarea id="postInput" class="input-google" placeholder="O que pretende partilhar?"></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
+                <label style="color:#1a73e8; cursor:pointer; font-size:13px; font-weight:500;" for="fileInput">
+                    <i class="fas fa-camera"></i> Foto (+15 XP)
+                </label>
+                <input type="file" id="fileInput" hidden onchange="handleFile(this)">
+                <button class="btn-post" onclick="sendPost()">Publicar</button>
             </div>
-            <div id="feedContent"></div>
-        </section>
+            <img id="previewImg" style="display:none; width:100%; margin-top:15px; border-radius:6px; max-height:200px; object-fit:cover;">
+        </div>
 
-        </main>
+        <div id="feedContent">
+            </div>
+    </main>
 
     <script>
-        // CONFIG SUPABASE
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
         
-        const MASTER_ID = 5401881400; 
-        let userPhoto = null;
+        const MY_ID = 5401881400; 
+        let currentPhoto = null;
 
         async function init() {
-            // Verifica se é o Admin Master
-            if(MASTER_ID === 5401881400) {
+            if(MY_ID === 5401881400) {
                 document.getElementById('appBody').classList.add('is-master');
                 document.getElementById('headerTitle').innerText = "Apex Business Control";
             }
@@ -103,7 +103,7 @@
         }
 
         async function loadProfile() {
-            const { data } = await client.from('profiles').select('*').eq('id', MASTER_ID).single();
+            const { data } = await client.from('profiles').select('*').eq('id', MY_ID).single();
             if(data) {
                 document.getElementById('valXP').innerText = data.points.toLocaleString();
                 document.getElementById('valEUR').innerText = (data.points * 0.0001).toFixed(4) + "€";
@@ -115,21 +115,24 @@
             const container = document.getElementById('feedContent');
             container.innerHTML = "";
 
-            posts.forEach((p, index) => {
-                // Injeção de Ad (Simulado para Design)
-                if(index > 0 && index % 3 === 0) {
-                    container.innerHTML += `<div class="card" style="background:#f1f3f4; text-align:center; font-size:10px; color:#70757a;">ANÚNCIO • MONETIZAÇÃO ATIVA</div>`;
-                }
-
+            posts.forEach(p => {
                 container.innerHTML += `
                     <div class="card">
-                        <div class="post-header">Publicação #${p.id}</div>
-                        <div class="post-text">${p.content}</div>
-                        ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                        <div class="post-header">
+                            <span>ID #${p.id}</span>
+                            <span style="color:#1a73e8; font-weight:bold;">${new Date(p.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div class="post-text">${p.content || ''}</div>
+                        
+                        ${p.image_url ? `
+                        <div class="post-img-container">
+                            <img src="${p.image_url}" class="post-img">
+                        </div>` : ''}
+
                         <div class="actions-row">
-                            <button class="action-btn" onclick="likePost(${p.id})"><i class="far fa-heart"></i> Gosto (${p.likes || 0})</button>
-                            <button class="action-btn" onclick="commentPost(${p.id})"><i class="far fa-comment"></i> Comentar</button>
-                            <button class="action-btn" onclick="sharePost(${p.id})"><i class="fas fa-share-alt"></i> Redes</button>
+                            <button class="action-btn"><i class="far fa-heart"></i> Gosto (${p.likes || 0})</button>
+                            <button class="action-btn"><i class="far fa-comment"></i> Comentar</button>
+                            <button class="action-btn"><i class="fas fa-share-alt"></i> Redes</button>
                         </div>
                     </div>
                 `;
@@ -140,8 +143,8 @@
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    userPhoto = e.target.result;
-                    document.getElementById('previewImg').src = userPhoto;
+                    currentPhoto = e.target.result;
+                    document.getElementById('previewImg').src = currentPhoto;
                     document.getElementById('previewImg').style.display = 'block';
                 };
                 reader.readAsDataURL(input.files[0]);
@@ -150,29 +153,19 @@
 
         async function sendPost() {
             const text = document.getElementById('postInput').value;
-            if(!text && !userPhoto) return;
+            if(!text && !currentPhoto) return;
 
             const { error } = await client.from('posts').insert([{ 
-                user_id: MASTER_ID, 
+                user_id: MY_ID, 
                 content: text, 
-                image_url: userPhoto,
+                image_url: currentPhoto,
                 likes: 0 
             }]);
 
             if(!error) {
-                await client.rpc('increment_points', { user_id: MASTER_ID, amount: 15 });
+                await client.rpc('increment_points', { user_id: MY_ID, amount: 15 });
                 location.reload();
             }
-        }
-
-        // Funções de interação (Stubs para expansão)
-        function likePost(id) { alert("Gosto registado no post #" + id); }
-        function commentPost(id) { alert("Abrindo caixa de comentários para #" + id); }
-        function sharePost(id) { alert("Link de partilha copiado!"); }
-
-        function showPage(p) {
-            alert("Navegando para: " + p);
-            // Lógica de troca de página aqui
         }
 
         init();
