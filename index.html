@@ -7,48 +7,56 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* RESET E DESIGN BASE - MANTIDO */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* DESIGN SYSTEM - GOOGLE EDITION */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { background-color: #121212; height: 100%; }
         body { 
             background-color: #121212; color: #ffffff; 
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            min-height: 100vh; padding-top: 165px; -webkit-font-smoothing: antialiased;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh; padding-top: 165px; padding-bottom: 20px;
         }
 
-        /* HEADER E NAVEGAÇÃO */
+        /* HEADER & MONETIZATION (FIXED) */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
-        .ad-top { background: #1a1a1a; color: #ffcc00; padding: 8px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
+        .ad-top { background: #1a1a1a; color: #ffcc00; padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; letter-spacing: 0.5px; }
         .nav-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; }
-        .xp-pill { background: #ffcc00; color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
-        .tabs { display: flex; background: #1a1a1a; border-top: 1px solid #333; }
-        .tab-item { flex: 1; padding: 14px; text-align: center; color: #888; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; }
+        .xp-pill { background: #ffcc00; color: #000; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; box-shadow: 0 2px 8px rgba(255,204,0,0.2); }
 
-        /* CONTENT */
-        .content { padding: 15px; max-width: 550px; margin: 0 auto; }
+        /* TABS NAVIGATION */
+        .tabs { display: flex; background: #1a1a1a; border-top: 1px solid #333; }
+        .tab-item { flex: 1; padding: 14px; text-align: center; color: #888; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
+
+        /* LAYOUT & CARDS */
+        .content { padding: 15px; max-width: 500px; margin: 0 auto; }
         .page { display: none; }
         .page.active { display: block; }
-
-        /* CARDS E POSTS */
         .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
-        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; }
-        .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; }
-        .post-avatar { width: 32px; height: 32px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; }
-        .post-text { padding: 15px; font-size: 15px; line-height: 1.5; color: #eee; }
+        
+        /* POST STYLE & IMAGE BINDING (300px) */
+        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; position: relative; }
+        .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; border-bottom: 1px solid #252525; }
+        .post-avatar { width: 34px; height: 34px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; font-size: 14px; border: 1px solid #444; }
+        .post-text { padding: 15px; font-size: 15px; line-height: 1.5; color: #f0f0f0; }
         .post-img { width: 100%; height: 300px; object-fit: cover; display: block; border-top: 1px solid #252525; background: #000; }
 
-        /* INTERAÇÃO SOCIAL (NOVO) */
-        .post-actions { display: flex; padding: 10px 15px; border-top: 1px solid #252525; gap: 20px; color: #888; font-size: 13px; }
-        .action-btn { cursor: pointer; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+        /* SOCIAL ACTIONS & PERSISTENT COMMENTS */
+        .post-actions { display: flex; padding: 12px 15px; border-top: 1px solid #252525; gap: 25px; color: #aaa; font-size: 14px; }
+        .action-btn { cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .action-btn:hover { color: #ffcc00; }
-        .comment-section { background: #161616; padding: 10px 15px; display: none; border-top: 1px solid #252525; }
-        .comment-input { width: 100%; background: #252525; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 6px; font-size: 13px; margin-top: 5px; outline: none; }
+        
+        .comment-section { background: #161616; padding: 12px; display: none; border-top: 1px solid #252525; }
+        .comment-list { max-height: 180px; overflow-y: auto; margin-bottom: 12px; }
+        .comment-item { font-size: 12px; color: #ccc; padding: 6px 0; border-bottom: 1px solid #222; }
+        .comment-item b { color: #ffcc00; margin-right: 4px; }
+        .comment-input-wrap { display: flex; gap: 8px; }
+        .comment-input { flex: 1; background: #252525; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; outline: none; }
 
-        /* INPUTS E ADMIN */
-        .input-area { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 80px; font-size: 15px; outline: none; }
-        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        /* BUTTONS & UI ELEMENTS */
+        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-pub:active { transform: scale(0.95); opacity: 0.8; }
         .admin-link { display: none; }
+        .flag-icon { margin-left: auto; color: #444; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -70,32 +78,51 @@
     <main class="content">
         <div id="feed-page" class="page active">
             <div class="card">
-                <textarea id="postText" class="input-area" placeholder="O que queres partilhar?"></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
+                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; resize:none; outline:none; font-size:15px; min-height:60px;" placeholder="O que queres partilhar hoje?"></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer; font-size:14px;"><i class="fas fa-image"></i> Adicionar Foto</button>
                     <input type="file" id="fileInput" hidden accept="image/*">
-                    <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
-                    <span id="procStatus" style="display:none; color:#ffcc00; font-size:11px;">A processar...</span>
-                    <button class="btn-pub" id="pubBtn" onclick="publish()">Publicar</button>
+                    <span id="procStatus" style="display:none; color:#ffcc00; font-size:11px;">Processando...</span>
+                    <button class="btn-pub" onclick="publish()">Publicar</button>
                 </div>
             </div>
-            <div id="feed-items">A carregar publicações...</div>
+            <div id="feed-items">Carregando as melhores publicações...</div>
         </div>
 
         <div id="earn-page" class="page">
-            <div class="card"><h3 style="color:#ffcc00">Top 10 Ranking</h3><div id="rankingList">...</div></div>
+            <div class="card">
+                <h3 style="color:#ffcc00; margin-bottom:15px;">Top 10 Utilizadores</h3>
+                <div id="rankingList" style="font-size:14px; line-height:2.2;"></div>
+            </div>
+            <div class="card" style="font-size:12px; color:#888;">
+                <p>Post: +15 XP | Amigo: +100 XP | Like: +2 XP | Check-in: +5 XP</p>
+            </div>
         </div>
 
         <div id="wallet-page" class="page">
-            <div class="card" style="text-align:center;">
-                <p>Saldo (EUR/BRL)</p>
-                <h1 style="color:#ffcc00;"><span id="eurVal">0.0000</span>€</h1>
-                <h3 style="color:#888;"><span id="brlVal">0.0000</span> R$</h3>
+            <div class="card" style="text-align:center; padding:30px 15px;">
+                <p style="font-size:13px; color:#888;">O teu saldo atual</p>
+                <h1 style="color:#ffcc00; font-size:42px; margin:15px 0;"><span id="eurVal">0.0000</span>€</h1>
+                <h3 style="color:#aaa;"><span id="brlVal">0.0000</span> R$</h3>
+                <p style="font-size:11px; color:#555; margin-top:20px;">Levantamento mínimo: 5000 XP</p>
+            </div>
+            <div class="card">
+                <p style="font-size:12px; margin-bottom:8px;">Teu link de convite único:</p>
+                <code id="invLink" style="font-size:10px; color:#ffcc00; display:block; background:#111; padding:10px; border-radius:5px; border:1px solid #333;">https://pinesocial.app/join?ref=5401881400</code>
             </div>
         </div>
 
         <div id="admin-page" class="page">
             <div class="card" style="border:1px solid #ff4444">
-                <button class="btn-pub" style="background:#ff4444; color:#fff; width:100%;" onclick="clearAll()">APAGAR TODOS OS POSTS</button>
+                <h3 style="color:#ff4444; margin-bottom:15px;">Painel de Controlo Admin</h3>
+                <div id="admStats" style="font-size:13px; margin-bottom:20px;">...</div>
+                <button class="btn-pub" style="background:#ff4444; color:#fff; width:100%;" onclick="clearAllPosts()">ELIMINAR TODOS OS POSTS (ID Reset)</button>
+                <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+                <p style="font-size:11px; margin-bottom:8px;">Pedidos PayPal (Pendentes):</p>
+                <div style="background:#000; padding:12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #222;">
+                    <span style="font-size:10px; color:#666;">Sem novos pedidos de saque.</span>
+                    <button class="btn-pub" style="padding:5px 12px; font-size:10px;">PAY</button>
+                </div>
             </div>
         </div>
     </main>
@@ -106,101 +133,148 @@
         const client = supabase.createClient(SB_URL, SB_KEY);
         const myId = 5401881400;
 
+        // SISTEMA DE NAVEGAÇÃO
         function openTab(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
             if(id === 'feed-page') fetchFeed();
+            if(id === 'earn-page') fetchRanking();
+            if(id === 'admin-page') fetchAdminData();
             window.scrollTo(0,0);
         }
 
+        // ECONOMIA E PERFIL
         async function getProfile() {
             const { data } = await client.from('profiles').select('points').eq('id', myId).single();
             if (data) {
-                document.getElementById('userXP').innerText = (data.points || 0) + " XP";
-                document.getElementById('eurVal').innerText = (data.points * 0.0010).toFixed(4);
-                document.getElementById('brlVal').innerText = (data.points * 0.0010 * 6.15).toFixed(4);
+                const pts = data.points || 0;
+                document.getElementById('userXP').innerText = pts + " XP";
+                const eur = pts * 0.0010;
+                document.getElementById('eurVal').innerText = eur.toFixed(4);
+                document.getElementById('brlVal').innerText = (eur * 6.15).toFixed(4);
             }
             if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
         }
 
-        // FUNÇÃO DE LIKES (GAMIFICATION: +2 XP)
-        async function likePost(postId) {
-            await client.rpc('increment_points', { user_id: myId, amount: 2 });
-            alert("Ganhaste +2 XP pelo Like!");
-            getProfile();
-        }
-
-        // ABRIR ESPAÇO DE COMENTÁRIOS
-        function toggleComments(id) {
-            const el = document.getElementById(`box-${id}`);
-            el.style.display = el.style.display === 'block' ? 'none' : 'block';
-        }
-
-        // PARTILHA NAS REDES SOCIAIS
-        function sharePost(id) {
-            const url = `https://pinesocial.app/post/${id}`;
-            if (navigator.share) {
-                navigator.share({ title: 'Pine Social', url: url });
-            } else {
-                prompt("Copia o link para partilhar:", url);
-            }
-        }
-
+        // FEED & COMENTÁRIOS (FIXED BIGINT RELATION)
         async function fetchFeed() {
-            const { data } = await client.from('posts').select('*').order('created_at', {ascending: false}).limit(10);
+            const { data: posts } = await client.from('posts').select('*').order('created_at', {ascending: false}).limit(10);
             const list = document.getElementById('feed-items');
             list.innerHTML = '';
-            if(data) {
-                data.forEach((p, index) => {
+            
+            if(posts) {
+                for (let i = 0; i < posts.length; i++) {
+                    const p = posts[i];
+                    // Busca comentários reais vinculados ao post (BIGINT)
+                    const { data: comms } = await client.from('comments').select('*').eq('post_id', p.id).order('created_at', {ascending: true});
+                    
                     const el = document.createElement('div');
                     el.className = 'post';
                     el.innerHTML = `
                         <div class="post-header">
                             <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
-                            <span style="font-size:13px; font-weight:bold;">User #${p.user_id.toString().slice(-4)}</span>
+                            <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
+                            <div class="flag-icon"><i class="fas fa-flag"></i></div>
                         </div>
                         <div class="post-text">${p.content || ''}</div>
                         ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
                         
                         <div class="post-actions">
-                            <div class="action-btn" onclick="likePost('${p.id}')"><i class="far fa-heart"></i> <span>0</span></div>
-                            <div class="action-btn" onclick="toggleComments('${p.id}')"><i class="far fa-comment"></i> <span>0</span></div>
-                            <div class="action-btn" onclick="sharePost('${p.id}')"><i class="fas fa-share-nodes"></i></div>
+                            <div class="action-btn" onclick="addXP(2, this)"><i class="far fa-heart"></i> <span>0</span></div>
+                            <div class="action-btn" onclick="toggleComments('${p.id}')"><i class="far fa-comment"></i> <span>${comms ? comms.length : 0}</span></div>
+                            <div class="action-btn" onclick="shareSocial('${p.id}')"><i class="fas fa-share-nodes"></i></div>
                         </div>
                         
                         <div id="box-${p.id}" class="comment-section">
-                            <input type="text" class="comment-input" placeholder="Escreve um comentário...">
+                            <div class="comment-list">
+                                ${comms ? comms.map(c => `<div class="comment-item"><b>User #${c.user_id.toString().slice(-4)}:</b> ${c.content}</div>`).join('') : ''}
+                            </div>
+                            <div class="comment-input-wrap">
+                                <input type="text" id="input-${p.id}" class="comment-input" placeholder="Responder...">
+                                <button onclick="sendComment('${p.id}')" class="btn-pub" style="padding:6px 12px; font-size:11px;">OK</button>
+                            </div>
                         </div>
                     `;
                     list.appendChild(el);
-                    if((index+1)%3 === 0) list.innerHTML += `<div class="card" style="text-align:center; color:#ffcc00; font-size:10px; border:1px dashed #444;">📢 ANÚNCIO: Pine Social Pro</div>`;
-                });
+                    // MONETIZAÇÃO: Injeção automática a cada 3 posts
+                    if((i+1)%3 === 0) {
+                        list.innerHTML += `<div style="text-align:center; color:#ffcc00; font-size:10px; padding:15px; border:1px dashed #333; margin-bottom:20px; border-radius:12px; opacity:0.6;">📢 ANÚNCIO: Pine Social Monetization</div>`;
+                    }
+                }
             }
         }
 
+        // SOCIAL INTERACTIONS
+        async function sendComment(postId) {
+            const input = document.getElementById(`input-${postId}`);
+            if(!input.value) return;
+            const { error } = await client.from('comments').insert([{ post_id: postId, user_id: myId, content: input.value }]);
+            if(!error) {
+                await client.rpc('increment_points', { user_id: myId, amount: 5 }); // +5 XP
+                input.value = ''; fetchFeed(); getProfile();
+            }
+        }
+
+        async function addXP(amt, btn) {
+            await client.rpc('increment_points', { user_id: myId, amount: amt });
+            if(btn) { btn.style.color = "#ffcc00"; let s = btn.querySelector('span'); s.innerText = parseInt(s.innerText)+1; }
+            getProfile();
+        }
+
+        function toggleComments(id) {
+            const box = document.getElementById(`box-${id}`);
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function shareSocial(id) {
+            const url = `https://pinesocial.app/p/${id}`;
+            if(navigator.share) navigator.share({title: 'Pine Social', url: url});
+            else prompt("Copia o link:", url);
+        }
+
+        // PUBLISH & GAMIFICATION (+15 XP)
         async function publish() {
             const txt = document.getElementById('postText').value;
             const file = document.getElementById('fileInput').files[0];
             if(!txt && !file) return;
             document.getElementById('procStatus').style.display = 'inline';
-            
             let img = null;
             if(file) {
                 const name = `p_${Date.now()}.jpg`;
                 const { data } = await client.storage.from('post-images').upload(name, file);
                 img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
             }
-
             await client.from('posts').insert([{ user_id: myId, content: txt, image_url: img }]);
             await client.rpc('increment_points', { user_id: myId, amount: 15 });
-            
             document.getElementById('postText').value = '';
             document.getElementById('procStatus').style.display = 'none';
             fetchFeed(); getProfile();
         }
 
+        // ADMIN & RANKING DATA
+        async function fetchRanking() {
+            const { data } = await client.from('profiles').select('id, points').order('points', {ascending: false}).limit(10);
+            const list = document.getElementById('rankingList');
+            list.innerHTML = '';
+            if(data) data.forEach((u, i) => list.innerHTML += `<p>#${i+1} User...${u.id.toString().slice(-4)} <span style="float:right; color:#ffcc00; font-weight:bold;">${u.points} XP</span></p>`);
+        }
+
+        async function fetchAdminData() {
+            const { count: u } = await client.from('profiles').select('*', { count: 'exact', head: true });
+            const { count: p } = await client.from('posts').select('*', { count: 'exact', head: true });
+            document.getElementById('admStats').innerText = `Utilizadores: ${u} | Posts Totais: ${p}`;
+        }
+
+        async function clearAllPosts() {
+            if(confirm("Desejas apagar todos os posts da base de dados?")) {
+                await client.from('posts').delete().neq('id', 0);
+                fetchFeed();
+            }
+        }
+
+        // INIT
         getProfile(); fetchFeed();
     </script>
 </body>
