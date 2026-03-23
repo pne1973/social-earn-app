@@ -3,59 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Master Edition</title>
+    <title>Apex Social - Anti-Abuse Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* DESIGN SYSTEM - BLACK & GOLD */
+        /* DESIGN SYSTEM */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { background-color: #000; height: 100%; }
-        body { background-color: #000; color: #fff; font-family: -apple-system, sans-serif; padding-top: 195px; padding-bottom: 20px; }
+        body { background-color: #000; color: #fff; font-family: -apple-system, sans-serif; padding-top: 200px; padding-bottom: 20px; }
 
-        /* HEADER & ESTATÍSTICAS */
+        /* HEADER */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #000; border-bottom: 1px solid #1a1a1a; }
         .ad-banner-top { background: #080808; height: 55px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #ffcc00; border-bottom: 1px solid #111; font-weight: bold; }
         
-        .user-stats-bar { display: flex; justify-content: space-around; background: #050505; padding: 12px 2px; border-bottom: 1px solid #111; }
+        .user-stats-bar { display: flex; justify-content: space-around; background: #050505; padding: 12px 2px; }
         .stat-pill { text-align: center; flex: 1; border-right: 1px solid #1a1a1a; }
         .stat-pill:last-child { border-right: none; }
         .stat-pill span { display: block; font-size: 7px; color: #555; text-transform: uppercase; margin-bottom: 2px; }
         .stat-pill b { font-size: 10.5px; color: #ffcc00; }
-        .stat-white { color: #ffffff !important; }
         
-        .tabs { display: flex; background: #000; }
-        .tab-item { flex: 1; padding: 15px 5px; text-align: center; color: #444; font-size: 9px; font-weight: 800; cursor: pointer; text-transform: uppercase; border-bottom: 3px solid transparent; }
-        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.03); }
+        .tabs { display: flex; background: #000; border-top: 1px solid #111; }
+        .tab-item { flex: 1; padding: 15px 5px; text-align: center; color: #444; font-size: 9px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; }
 
         /* CONTENT */
         .content { padding: 12px; max-width: 500px; margin: 0 auto; }
         .page { display: none; }
-        .page.active { display: block !important; } /* Forçar exibição */
+        .page.active { display: block; }
         
-        /* CARDS */
         .card { background: #080808; border-radius: 12px; padding: 18px; margin-bottom: 15px; border: 1px solid #151515; }
-        .post-img { width: 100%; max-height: 280px; object-fit: cover; border-radius: 8px; margin: 10px 0; border: 1px solid #1a1a1a; }
         
-        /* INFO & ADMIN STYLES */
-        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #111; font-size: 12px; }
-        .info-row b { color: #28a745; }
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .admin-card { background: #111; padding: 12px; border-radius: 8px; border: 1px solid #222; text-align: center; }
-        .admin-card b { display: block; font-size: 16px; color: #ff4444; }
+        /* INFO STYLES */
+        .info-section { margin-bottom: 20px; border-left: 2px solid #ffcc00; padding-left: 15px; }
+        .info-title { color: #ffcc00; font-size: 14px; margin-bottom: 8px; font-weight: bold; }
+        .info-text { font-size: 11px; color: #aaa; line-height: 1.6; }
+        
+        .multiplier-tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; margin-top: 5px; }
+        .m-high { background: #28a745; color: #fff; }
+        .m-med { background: #ffc107; color: #000; }
+        .m-low { background: #dc3545; color: #fff; }
 
-        .btn-gold { background: #ffcc00; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; font-size: 12px; text-transform: uppercase; }
+        .btn-gold { background: #ffcc00; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; width: 100%; font-size: 12px; }
     </style>
 </head>
 <body>
 
     <div class="header-fixed">
-        <div class="ad-banner-top">⭐ APEX SOCIAL PREMIUM ⭐</div>
+        <div class="ad-banner-top">⭐ APEX SOCIAL - SISTEMA JUSTO ⭐</div>
         
         <div class="user-stats-bar">
-            <div class="stat-pill"><span>XP Total</span><b id="topXP" class="stat-white">0</b></div>
+            <div class="stat-pill"><span>XP Total</span><b id="topXP">0</b></div>
             <div class="stat-pill"><span>Saldo Est.</span><b id="topBalance">0.0000€</b></div>
-            <div class="stat-pill"><span>Amigos</span><b id="topRefs" class="stat-white">0</b></div>
-            <div class="stat-pill"><span>Rede (10%)</span><b id="topRefGains">0.0000€</b></div>
+            <div class="stat-pill"><span>Amigos</span><b id="topRefs">0</b></div>
+            <div class="stat-pill"><span>Multiplicador</span><b id="userMult">100%</b></div>
         </div>
 
         <div class="tabs">
@@ -69,39 +69,47 @@
     <main class="content">
         <div id="feed-page" class="page active">
             <div class="card">
-                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; outline:none; font-size:14px; min-height:45px;" placeholder="Partilha algo..."></textarea>
-                <img id="imagePreview" style="display:none; width:100%; max-height:150px; object-fit:cover; margin-top:10px; border-radius:8px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
-                    <label style="font-size:11px; color:#ffcc00; cursor:pointer;" for="fileInput"><i class="fas fa-camera"></i> FOTO</label>
-                    <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="previewImg(this)">
-                    <button onclick="publish()" style="background:#ffcc00; color:#000; border:none; padding:6px 15px; border-radius:15px; font-weight:bold; font-size:11px;">POSTAR</button>
-                </div>
+                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; outline:none; font-size:14px;" placeholder="Partilha novidades..."></textarea>
+                <button onclick="publish()" class="btn-gold" style="margin-top:10px;">Publicar Post</button>
             </div>
-            <div id="feed-container">A carregar feed...</div>
+            <div id="feed-container">Carregando conteúdo...</div>
         </div>
 
         <div id="wallet-page" class="page">
             <div class="card" style="text-align:center;">
-                <h3 style="color:#ffcc00; margin-bottom:12px;">O Teu Link de Convite</h3>
-                <p style="font-size:11px; color:#666; margin-bottom:20px;">Ganha 100 XP por cada amigo e 10% dos ganhos deles vitalícios.</p>
+                <h3 style="color:#ffcc00;">Convidar Amigos</h3>
+                <p style="font-size:11px; color:#555; margin:10px 0;">O bónus de convite é fixo e não sofre redução por uso excessivo.</p>
                 <div id="refLink" style="background:#000; padding:15px; border:1px dashed #222; color:#ffcc00; font-size:10px; word-break:break-all; margin-bottom:15px;">...</div>
-                <button class="btn-gold" onclick="copyRef()">Copiar Link</button>
+                <button class="btn-gold" onclick="copyRef()">Copiar Convite (+100 XP)</button>
             </div>
         </div>
 
         <div id="info-page" class="page">
             <div class="card">
-                <h3 style="color:#ffcc00; margin-bottom:15px;">Guia da Comunidade</h3>
-                <div class="info-row"><span>Post com Foto</span><b>+15.0 XP</b></div>
-                <div class="info-row"><span>Dar Like</span><b>+2.0 XP</b></div>
-                <div class="info-row"><span>Novo Amigo</span><b>+100 XP</b></div>
+                <h3 style="color:#ffcc00; margin-bottom:15px;">Como Funciona o XP</h3>
                 
-                <div style="margin-top:20px; padding:12px; background:rgba(255,204,0,0.05); border-radius:8px;">
-                    <h4 style="font-size:12px; color:#ffcc00; margin-bottom:8px;">Regras de Pagamento</h4>
-                    <p style="font-size:10px; color:#888; line-height:1.6;">
-                        • Conversão Segura: 1.000 XP = 0,10€<br>
-                        • Mínimo para Saque: 5,00€ (50.000 XP)<br>
-                        • Os valores são estimativas baseadas na receita publicitária gerada pela comunidade.
+                <div class="info-section">
+                    <div class="info-title">Política de Uso Justo</div>
+                    <p class="info-text">
+                        Para manter a sustentabilidade da Apex Social, implementamos um sistema de <b>Degradação de Recompensa</b>. 
+                        Isto previne comportamentos robóticos e garante que o saldo seja distribuído de forma justa.
+                    </p>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-title">Níveis de Multiplicador</div>
+                    <p class="info-text">• <b>100% Ganho:</b> Até as primeiras 10 interações diárias.</p>
+                    <span class="multiplier-tag m-high">ATIVO ATÉ 10 AÇÕES</span>
+                    <p class="info-text" style="margin-top:8px;">• <b>50% Ganho:</b> Entre 11 e 30 interações diárias.</p>
+                    <span class="multiplier-tag m-med">REDUÇÃO MODERADA</span>
+                    <p class="info-text" style="margin-top:8px;">• <b>10% Ganho:</b> Após 30 interações diárias.</p>
+                    <span class="multiplier-tag m-low">REDUÇÃO MÁXIMA (ANTI-SPAM)</span>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-title">Exceção de Amigos</div>
+                    <p class="info-text">
+                        Convidar amigos é a ação mais valiosa. O bónus de <b>100 XP por convidado</b> é sempre pago a 100%, independentemente do seu nível de multiplicador atual.
                     </p>
                 </div>
             </div>
@@ -109,16 +117,8 @@
 
         <div id="admin-page" class="page">
             <div class="card">
-                <h3 style="color:#ff4444; margin-bottom:15px;">Admin Master</h3>
-                <div class="admin-grid">
-                    <div class="admin-card"><span>Membros</span><b id="admUsers">0</b></div>
-                    <div class="admin-card"><span>Dívida (0.10)</span><b id="admDebt">0.00€</b></div>
-                </div>
-                <h4 style="font-size:10px; color:#444; margin-bottom:8px;">ELIMINAR POST POR ID</h4>
-                <div style="display:flex; gap:5px;">
-                    <input type="text" id="delId" placeholder="ID" style="flex:1; background:#000; border:1px solid #222; padding:8px; color:#fff;">
-                    <button onclick="adminDelete()" style="background:#ff4444; border:none; padding:8px; color:#fff; border-radius:4px;">APAGAR</button>
-                </div>
+                <h3 style="color:#ff4444;">Admin Panel</h3>
+                <p id="admStats" style="font-size:11px; margin-top:10px;"></p>
             </div>
         </div>
     </main>
@@ -129,95 +129,82 @@
         const client = supabase.createClient(SB_URL, SB_KEY);
         const myId = 5401881400; 
 
+        // CONTADOR DE SESSÃO PARA ANTI-ABUSO (Ideal seria no DB, mas aqui serve para o frontend imediato)
+        let dailyActions = 0;
+
         async function init() {
             getProfile();
             loadFeed();
-            if(myId === 5401881400) loadAdmin();
         }
 
-        // CORREÇÃO: Função de trocar abas agora garante visibilidade
-        function openTab(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
-            window.scrollTo(0,0);
+        function getMultiplier() {
+            if (dailyActions <= 10) return 1.0;
+            if (dailyActions <= 30) return 0.5;
+            return 0.1;
+        }
+
+        async function givePoints(amount, isRef = false) {
+            let finalAmount = isRef ? amount : (amount * getMultiplier());
+            await client.rpc('increment_points', { user_id: myId, amount: finalAmount });
+            if(!isRef) dailyActions++;
+            getProfile();
         }
 
         async function getProfile() {
             const { data } = await client.from('profiles').select('*').eq('id', myId).single();
             if (data) {
                 document.getElementById('topXP').innerText = Math.floor(data.points || 0);
-                // CONVERSÃO SEGURA: 1000 XP = 0.10€ (0.0001 por ponto)
                 document.getElementById('topBalance').innerText = (data.points * 0.0001).toFixed(4) + "€";
                 document.getElementById('topRefs').innerText = data.referrals_count || 0;
-                document.getElementById('topRefGains').innerText = (data.referral_points * 0.0001).toFixed(4) + "€";
+                
+                const m = getMultiplier() * 100;
+                document.getElementById('userMult').innerText = m + "%";
+                document.getElementById('userMult').style.color = m === 100 ? "#28a745" : (m === 50 ? "#ffc107" : "#dc3545");
+
                 document.getElementById('refLink').innerText = `https://apexsocial.app/?ref=${myId}`;
                 if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
             }
         }
 
-        async function loadAdmin() {
-            const { count } = await client.from('profiles').select('*', { count: 'exact', head: true });
-            const { data: xp } = await client.from('profiles').select('points');
-            const totalXP = xp.reduce((a, b) => a + (b.points || 0), 0);
-            document.getElementById('admUsers').innerText = count;
-            document.getElementById('admDebt').innerText = (totalXP * 0.0001).toFixed(2) + "€";
-        }
-
         async function loadFeed() {
-            const { data: posts } = await client.from('posts').select('*, comments(*)').order('created_at', { ascending: false });
+            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('feed-container');
             let html = '';
-            posts.forEach((p, i) => {
-                if (i > 0 && i % 3 === 0) html += `<div style="padding:15px; text-align:center; color:#333; font-size:9px; border:1px dashed #111; margin-bottom:15px;">ANÚNCIO ATIVO</div>`;
+            posts.forEach(p => {
                 html += `<div class="card">
-                    <div style="font-size:9px; color:#444; margin-bottom:8px;">ID:${p.id} • USER #${p.user_id}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    <div style="font-size:13px; line-height:1.5;">${p.content || ''}</div>
-                    <div style="display:flex; gap:15px; margin-top:12px; border-top:1px solid #111; padding-top:10px;">
-                        <span onclick="handleLike(${p.id}, ${p.user_id})" style="font-size:11px; color:#ffcc00; cursor:pointer;"><i class="fas fa-heart"></i> ${p.likes || 0}</span>
-                    </div>
+                    <div style="font-size:9px; color:#444;">USER #${p.user_id}</div>
+                    <p style="font-size:13px; margin:10px 0;">${p.content || ''}</p>
+                    <span onclick="handleLike(${p.id})" style="color:#ffcc00; cursor:pointer; font-size:11px;"><i class="fas fa-heart"></i> Gostar</span>
                 </div>`;
             });
             container.innerHTML = html;
         }
 
-        let currentImg = null;
-        function previewImg(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    currentImg = e.target.result;
-                    document.getElementById('imagePreview').src = e.target.result;
-                    document.getElementById('imagePreview').style.display = 'block';
-                };
-                reader.readAsDataURL(input.files[0]);
+        async function publish() {
+            const txt = document.getElementById('postText').value;
+            if(!txt) return;
+            const { error } = await client.from('posts').insert([{ user_id: myId, content: txt }]);
+            if(!error) {
+                await givePoints(15.0);
+                location.reload();
             }
         }
 
-        async function publish() {
-            const txt = document.getElementById('postText').value;
-            const { error } = await client.from('posts').insert([{ user_id: myId, content: txt, image_url: currentImg }]);
-            if(!error) { await client.rpc('increment_points', { user_id: myId, amount: 15.0 }); location.reload(); }
+        async function handleLike(pId) {
+            await givePoints(2.0);
+            alert("Gosto registado! Multiplicador atual: " + (getMultiplier()*100) + "%");
         }
 
-        async function handleLike(pId, owner) {
-            await client.rpc('increment_post_likes', { post_id: pId });
-            await client.rpc('increment_points', { user_id: myId, amount: 2.0 });
-            if(myId !== owner) await client.rpc('increment_points', { user_id: owner, amount: 1.0 });
-            loadFeed(); getProfile();
+        function openTab(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
         }
 
         function copyRef() {
             navigator.clipboard.writeText(document.getElementById('refLink').innerText);
             alert("Link copiado!");
-        }
-
-        async function adminDelete() {
-            const id = document.getElementById('delId').value;
-            await client.from('posts').delete().eq('id', id);
-            alert("Apagado!"); loadFeed();
         }
 
         init();
