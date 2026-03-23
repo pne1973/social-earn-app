@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Pine Social Debug</title>
+    <title>Pine Social Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { background-color: #121212; color: #fff; font-family: sans-serif; min-height: 100vh; }
-        body { padding-top: 180px; }
+        body { background-color: #121212; color: #fff; font-family: -apple-system, sans-serif; padding-top: 175px; }
 
-        /* HEADER */
+        /* HEADER FIXO */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
         .ad-top { background: #1a1a1a; color: #ffcc00; padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
         .nav-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; }
@@ -19,7 +18,7 @@
 
         /* TABS */
         .tabs { display: flex; background: #1a1a1a; border-top: 1px solid #333; }
-        .tab-item { flex: 1; padding: 14px; text-align: center; color: #888; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .tab-item { flex: 1; padding: 14px; text-align: center; color: #888; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; }
 
         /* CONTENT */
@@ -27,13 +26,15 @@
         .page { display: none; }
         .page.active { display: block; }
 
-        /* POSTS */
-        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; }
-        .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; }
+        /* POSTS - SOLUÇÃO ANTI-ESMAGAMENTO */
+        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; display: flex; flex-direction: column; width: 100%; overflow: hidden; }
+        .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; }
         .post-avatar { width: 35px; height: 35px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; }
-        .post-body { padding: 15px; font-size: 15px; line-height: 1.5; color: #eee; }
-        .img-box { width: 100%; background: #000; line-height: 0; border-top: 1px solid #252525; }
-        .post-img { width: 100%; height: auto; max-height: 450px; object-fit: contain; }
+        .post-body { padding: 15px; font-size: 15px; color: #eee; word-wrap: break-word; line-height: 1.4; }
+        
+        /* Contentor de imagem que preserva o layout */
+        .img-container { width: 100%; background: #000; display: block; line-height: 0; border-top: 1px solid #252525; }
+        .post-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; display: block; }
 
         .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
@@ -41,10 +42,10 @@
 <body>
 
     <div class="header-fixed">
-        <div class="ad-top">📢 CONVITE: Ganha +100 XP por cada amigo!</div>
+        <div class="ad-top">✨ CONVITE: Ganha +100 XP por cada amigo!</div>
         <div class="nav-main">
             <h3>PINE <span style="color:#ffcc00">SOCIAL</span></h3>
-            <div id="userXP" class="xp-badge">0 XP</div>
+            <div id="userXP" class="xp-badge">-- XP</div>
         </div>
         <div class="tabs">
             <div class="tab-item active" onclick="switchTab('feed-page', this)">Feed</div>
@@ -60,70 +61,79 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
                     <input type="file" id="fileInput" hidden accept="image/*">
                     <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
-                    <button class="btn-pub" onclick="handlePublish()">Publicar</button>
+                    <button class="btn-pub" onclick="handlePublish()" id="pubBtn">Publicar</button>
                 </div>
             </div>
-            <div id="feed-items">A ligar ao servidor...</div>
+            <div id="feed-items">A carregar publicações...</div>
         </div>
 
         <div id="earn-page" class="page">
-            <div style="background:#1e1e1e; padding:15px; border-radius:12px; text-align:center;">Ranking em carregamento...</div>
+            <div id="rank-container" style="background:#1e1e1e; padding:15px; border-radius:12px;">Ranking em atualização...</div>
         </div>
 
         <div id="wallet-page" class="page">
             <div style="background:#1e1e1e; padding:20px; border-radius:12px; text-align:center;">
-                <h1 style="color:#ffcc00;"><span id="euroVal">0.0000</span>€</h1>
+                <p style="color:#888; font-size:12px;">Saldo Convertível</p>
+                <h1 style="color:#ffcc00; margin-top:10px;"><span id="euroVal">0.0000</span>€</h1>
             </div>
         </div>
     </main>
 
     <script>
-        // CONFIGURAÇÃO SUPABASE
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QQ";
+        
         const client = supabase.createClient(SB_URL, SB_KEY);
         const myId = 5401881400;
 
         async function fetchFeed() {
             const list = document.getElementById('feed-items');
-            try {
-                // Tentativa de puxar posts
-                const { data, error, status } = await client.from('posts').select('*').order('created_at', {ascending: false});
-                
-                if(error) {
-                    console.error("Erro Supabase:", error);
-                    list.innerHTML = `<div style="color:#ff4444; text-align:center; padding:20px;">
-                        Erro: ${error.message}<br><small>Status: ${status}</small>
-                    </div>`;
-                    return;
-                }
-
-                if(!data || data.length === 0) {
-                    list.innerHTML = "<div style='text-align:center; color:#888;'>Ainda não há publicações.</div>";
-                    return;
-                }
-
-                list.innerHTML = '';
-                data.forEach(p => {
-                    const el = document.createElement('div');
-                    el.className = 'post';
-                    el.innerHTML = `
-                        <div class="post-header">
-                            <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
-                            <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
-                        </div>
-                        <div class="post-body">${p.content || ''}</div>
-                        ${p.image_url ? `<div class="img-box"><img src="${p.image_url}" class="post-img"></div>` : ''}
-                        <div style="padding:12px; border-top:1px solid #252525; display:flex; gap:15px; color:#888; font-size:12px;">
-                            <span><i class="fas fa-heart"></i> ${p.likes || 0}</span>
-                            <span><i class="fas fa-comment"></i> Comentar</span>
-                        </div>
-                    `;
-                    list.appendChild(el);
-                });
-            } catch (err) {
-                list.innerHTML = "Erro crítico de rede.";
+            const { data, error } = await client.from('posts').select('*').order('created_at', {ascending: false});
+            
+            if(error) {
+                list.innerHTML = `<div style="color:#ff4444; text-align:center;">Erro de ligação: ${error.message}</div>`;
+                return;
             }
+
+            list.innerHTML = '';
+            data.forEach(p => {
+                const el = document.createElement('div');
+                el.className = 'post';
+                el.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
+                        <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
+                    </div>
+                    <div class="post-body">${p.content || ''}</div>
+                    ${p.image_url ? `<div class="img-container"><img src="${p.image_url}" class="post-img"></div>` : ''}
+                    <div style="padding:12px; display:flex; gap:20px; color:#888; font-size:13px; border-top:1px solid #252525;">
+                        <span><i class="fas fa-heart"></i> ${p.likes || 0}</span>
+                        <span onclick="alert('Comentários em breve!')"><i class="fas fa-comment"></i> Comentar</span>
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+        }
+
+        async function handlePublish() {
+            const txt = document.getElementById('postText').value;
+            const file = document.getElementById('fileInput').files[0];
+            if(!txt && !file) return;
+
+            const btn = document.getElementById('pubBtn');
+            btn.innerText = "...";
+            let imgUrl = null;
+
+            if(file) {
+                const name = `${Date.now()}_post.jpg`;
+                const { data } = await client.storage.from('post-images').upload(name, file);
+                if(data) imgUrl = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
+            }
+
+            await client.from('posts').insert([{ user_id: myId, content: txt, image_url: imgUrl }]);
+            document.getElementById('postText').value = '';
+            btn.innerText = "Publicar";
+            fetchFeed();
         }
 
         function switchTab(id, el) {
@@ -134,16 +144,6 @@
             if(id === 'feed-page') fetchFeed();
         }
 
-        async function updateProfile() {
-            const { data } = await client.from('profiles').select('points').eq('id', myId).single();
-            if (data) {
-                document.getElementById('userXP').innerText = data.points + " XP";
-                document.getElementById('euroVal').innerText = (data.points * 0.0010).toFixed(4);
-            }
-        }
-
-        // Iniciar
-        updateProfile();
         fetchFeed();
     </script>
 </body>
