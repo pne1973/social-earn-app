@@ -9,120 +9,115 @@
     <style>
         :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; --card-bg: #1e1e1e; --border: #333; }
         
+        /* CORREÇÃO DO FUNDO: Garantir que o fundo cubra toda a altura do scroll */
+        html { height: 100%; background: var(--tg-theme-bg); }
         body { 
             margin: 0; 
             padding: 0; 
             background: var(--tg-theme-bg); 
             color: var(--tg-theme-text); 
             font-family: sans-serif;
-            padding-top: 170px; /* Espaço para Header + Submenu */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 170px; /* Espaço para o topo fixo */
         }
 
-        /* HEADER FIXO */
-        .header-container {
+        /* HEADER FIXO NO TOPO */
+        .header-fixed {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 5000;
             background: var(--tg-theme-bg);
+            border-bottom: 1px solid var(--border);
         }
 
         .top-ad { height: 50px; background: #1a1a1a; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--tg-theme-button); font-weight: bold; }
-        
-        .main-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border); height: 50px; }
+        .main-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; height: 50px; }
         .xp-badge { background: var(--tg-theme-button); color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
 
-        /* NOVO MENU DE NAVEGAÇÃO (TOP TABS) */
-        .top-nav {
-            display: flex;
-            background: #1a1a1a;
-            border-bottom: 1px solid var(--border);
-            height: 50px;
-        }
-        .nav-item {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            color: #888;
-            cursor: pointer;
-            gap: 8px;
-        }
-        .nav-item.active {
-            color: var(--tg-theme-button);
-            border-bottom: 2px solid var(--tg-theme-button);
-        }
+        /* MENU SUPERIOR (TABS) */
+        .top-nav { display: flex; background: #1a1a1a; height: 50px; border-top: 1px solid var(--border); }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #888; cursor: pointer; gap: 6px; }
+        .nav-item.active { color: var(--tg-theme-button); border-bottom: 3px solid var(--tg-theme-button); }
 
-        /* CONTEÚDO */
-        .container { padding: 15px; display: none; max-width: 500px; margin: 0 auto; }
+        /* CONTENTORES */
+        .container { 
+            padding: 15px; 
+            display: none; 
+            width: 100%; 
+            max-width: 500px; 
+            margin: 0 auto; 
+            box-sizing: border-box;
+            flex-grow: 1; /* Faz o contentor crescer */
+        }
         .container.active { display: block !important; }
         
         .card { background: var(--card-bg); border-radius: 15px; border: 1px solid var(--border); padding: 15px; margin-bottom: 15px; }
-        textarea { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 70px; box-sizing: border-box; }
+        textarea { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 70px; box-sizing: border-box; font-size: 15px; }
 
-        /* POSTS */
-        .post-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border); overflow: hidden; }
+        /* POSTS NO FEED */
+        .post-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--border); overflow: hidden; width: 100%; }
         .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #252525; }
-        .avatar { width: 32px; height: 32px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--tg-theme-button); font-size: 12px; }
-        .post-body { padding: 12px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
-        .post-img { width: 100%; display: block; border-top: 1px solid #252525; }
+        .avatar { width: 35px; height: 35px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--tg-theme-button); font-weight: bold; border: 1px solid #444; }
+        .post-body { padding: 15px; font-size: 15px; line-height: 1.5; color: #eee; word-wrap: break-word; }
+        .post-img { width: 100%; height: auto; display: block; border-top: 1px solid #252525; }
         
-        .btn-main { background: var(--tg-theme-button); color: #000; border: none; padding: 10px 18px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-main { background: var(--tg-theme-button); color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
+    <div class="header-fixed">
         <div class="top-ad">📢 +100 XP por cada amigo convidado!</div>
         <div class="main-header">
-            <h4 style="margin:0;">PINE SOCIAL</h4>
+            <h4 style="margin:0; letter-spacing:1px;">PINE SOCIAL</h4>
             <div id="userXP" class="xp-badge">0 XP</div>
         </div>
         <nav class="top-nav">
             <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i> Feed</div>
             <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-coins"></i> Ganhos</div>
             <div class="nav-item" onclick="showTab('wallet-tab', this)"><i class="fas fa-wallet"></i> Saque</div>
-            <div id="adm-nav" class="nav-item" onclick="showTab('admin-tab', this)"><i class="fas fa-shield-alt"></i> Admin</div>
+            <div id="adm-nav" class="nav-item" onclick="showTab('admin-tab', this)"><i class="fas fa-user-shield"></i> Admin</div>
         </nav>
     </div>
 
     <div id="feed-tab" class="container active">
         <div class="card">
-            <textarea id="postText" placeholder="O que queres partilhar?"></textarea>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <textarea id="postText" placeholder="O que estás a pensar?"></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
                 <input type="file" id="fileInput" hidden accept="image/*">
-                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; font-size:12px; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
+                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; font-size:13px; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
                 <button class="btn-main" id="pubBtn" onclick="handlePublish()">Publicar</button>
             </div>
-            <div id="upStatus" style="font-size:10px; color:var(--tg-theme-button); margin-top:8px; display:none;">Processando...</div>
+            <div id="upStatus" style="font-size:11px; color:var(--tg-theme-button); margin-top:10px; display:none;">A processar...</div>
         </div>
-        <div id="feed">Carregando publicações...</div>
+        <div id="feed">A carregar publicações...</div>
     </div>
 
     <div id="info-tab" class="container">
         <div class="card">
-            <h3 style="color:var(--tg-theme-button); margin-top:0;">Economia Pine</h3>
-            <p>Postagem: +15 XP</p>
-            <p>Convite: +100 XP</p>
-            <p>Câmbio: 1000 XP = 1.0000€</p>
+            <h2 style="color:var(--tg-theme-button); margin-top:0;">💰 Economia</h2>
+            <p>Postagem: 15 XP</p>
+            <p>Convite: 100 XP</p>
+            <p>Levantamento mínimo: 5000 XP</p>
         </div>
     </div>
 
     <div id="wallet-tab" class="container">
         <div class="card" style="text-align:center;">
-            <p>O teu saldo atual</p>
-            <h1 style="color:var(--tg-theme-button); margin:10px 0;"><span id="euroVal">0.0000</span>€</h1>
-            <button class="btn-main" style="width:100%;">Levantar via PayPal</button>
+            <p>O teu saldo</p>
+            <h1 style="color:var(--tg-theme-button); font-size:36px; margin:10px 0;"><span id="euroVal">0.0000</span>€</h1>
+            <p style="font-size:12px; color:#888;">Câmbio: 1000 XP = 1€</p>
         </div>
     </div>
 
     <div id="admin-tab" class="container">
-        <div class="card" style="border:1px solid #ff4444;">
-            <h3 style="color:#ff4444">Painel Admin</h3>
-            <div id="adm-stats">Estatísticas do sistema...</div>
+        <div class="card" style="border: 1px solid #ff4444;">
+            <h3 style="color:#ff4444">Painel de Controlo</h3>
+            <div id="adm-stats">A carregar estatísticas...</div>
         </div>
     </div>
 
@@ -130,13 +125,14 @@
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const userId = 5401881400;
+        const userId = 5401881400; // Admin ID
 
         function showTab(tabId, el) {
             document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(tabId).style.display = 'block';
             el.classList.add('active');
+            window.scrollTo(0,0);
             if(tabId === 'feed-tab') loadFeed();
             loadProfile();
         }
@@ -185,7 +181,7 @@
                 <div class="post-card">
                     <div class="post-header">
                         <div class="avatar">${p.user_id.toString().slice(-1)}</div>
-                        <div style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</div>
+                        <div style="font-weight:bold; font-size:14px;">Utilizador #${p.user_id.toString().slice(-4)}</div>
                     </div>
                     <div class="post-body">${p.content || ''}</div>
                     ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
@@ -194,6 +190,7 @@
         }
 
         if(userId !== 5401881400) document.getElementById('adm-nav').style.display = 'none';
+
         loadProfile();
         loadFeed();
     </script>
