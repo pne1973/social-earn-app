@@ -3,196 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Enterprise Master</title>
+    <title>Apex Social</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* DESIGN SYSTEM - GOOGLE CLEAN */
+        /* RESET & BASE */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { background-color: #f8f9fa; color: #202124; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; height: 100%; }
-        body { padding-top: 175px; padding-bottom: 20px; }
+        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 180px; }
 
-        /* HEADER FIXO (MANTIDO) */
+        /* HEADER ESTATUÁRIO (PARA NÃO ENCVALAR) */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
-        .ad-banner-top { background: #1a73e8; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-        .user-stats-bar { display: flex; justify-content: space-around; background: #fff; padding: 12px 5px; border-bottom: 1px solid #f1f3f4; }
-        .stat-pill { text-align: center; flex: 1; border-right: 1px solid #f1f3f4; }
-        .stat-pill:last-child { border-right: none; }
-        .stat-pill span { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
-        .stat-pill b { font-size: 12px; color: #1a73e8; }
-        .tabs { display: flex; background: #fff; }
-        .tab-item { flex: 1; padding: 15px 5px; text-align: center; color: #5f6368; font-size: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; border-bottom: 3px solid transparent; transition: 0.3s; }
-        .tab-item.active { color: #1a73e8; border-bottom: 3px solid #1a73e8; }
-
-        /* CONTENT AREA */
-        .content { padding: 12px; max-width: 550px; margin: 0 auto; min-height: 100vh; }
-        .page { display: none; }
-        .page.active { display: block !important; }
-
-        /* REFORMULAÇÃO DO FEED CARDS (GOOGLE STYLE) */
-        .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 12px; border: 1px solid #dadce0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .post-header { font-size: 11px; color: #70757a; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f3f4; padding-bottom: 8px; }
-        .post-content { font-size: 15px; color: #3c4043; line-height: 1.6; word-wrap: break-word; }
-        .post-img { width: 100%; border-radius: 6px; margin-top: 12px; border: 1px solid #f1f3f4; }
+        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
-        /* SISTEMA DE AÇÕES ORGANIZADO (Likes, Comentários, Share) */
-        .post-actions { margin-top: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #f1f3f4; padding-top: 12px; }
-        .action-btn { background: #fff; color: #1a73e8; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; padding: 8px; border-radius: 4px; transition: background 0.2s; }
-        .action-btn:hover { background: #f8f9fa; }
-        .count-badge { background: #f1f3f4; color: #1a73e8; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; }
-
-        /* INJEÇÃO DE ADS */
-        .ad-inject { background: #f1f3f4; border: 1px dashed #dadce0; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 12px; font-size: 10px; color: #70757a; font-weight: bold; }
-
-        /* UI ELEMENTS */
-        .input-google { width: 100%; border: 1px solid #dadce0; padding: 14px; border-radius: 4px; font-size: 14px; margin-bottom: 10px; outline: none; background: #fff; }
-        .btn-google { background: #1a73e8; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
+        .stat-item { text-align: center; border-right: 1px solid #f1f3f4; padding: 5px; }
+        .stat-item:last-child { border-right: none; }
+        .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
+        .stat-item b { font-size: 11px; color: #1a73e8; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* ADMIN PROTECTION */
-        .admin-only { display: none !important; }
-        .is-admin .admin-only { display: flex !important; }
-        div.is-admin .admin-only { display: block !important; }
+        .tabs { display: flex; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; }
+        .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
+
+        /* FEED E CARDS */
+        .container { max-width: 500px; margin: 0 auto; padding: 10px; }
+        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 15px; margin-bottom: 12px; }
+        
+        /* PUBLISH BOX */
+        .publish-box textarea { width: 100%; border: none; outline: none; resize: none; font-size: 15px; margin-bottom: 15px; min-height: 50px; }
+        .publish-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f3f4; padding-top: 10px; }
+        .btn-photo { color: #1a73e8; font-size: 13px; font-weight: 500; cursor: pointer; }
+        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+        /* POST ACTIONS (LIKES, COMMENTS, SHARE) */
+        .post-header { font-size: 11px; color: #70757a; margin-bottom: 10px; border-bottom: 1px solid #f8f9fa; padding-bottom: 5px; }
+        .post-text { font-size: 15px; margin-bottom: 12px; line-height: 1.5; }
+        .post-img { width: 100%; border-radius: 6px; margin-bottom: 12px; }
+        .actions-row { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f3f4; padding-top: 10px; }
+        .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .action-btn i { font-size: 14px; }
+        .action-btn.liked { color: #1a73e8; }
+
+        /* ADMIN HIDDEN */
+        .adm-only { display: none !important; }
+        body.is-master .adm-only { display: block !important; }
     </style>
 </head>
-<body id="mainBody">
+<body id="appBody">
 
-    <div class="header-fixed">
-        <div class="ad-banner-top" id="topTag">Apex Social</div>
-        <div class="user-stats-bar">
-            <div class="stat-pill"><span>Meus XP</span><b id="topXP">0</b></div>
-            <div class="stat-pill"><span>Saldo EUR</span><b id="topBalance">0.0000€</b></div>
-            <div class="stat-pill admin-only"><span>Dívida</span><b id="topBurn" style="color:#d93025;">0.00€</b></div>
-            <div class="stat-pill"><span>ESTADO</span><b style="color:#1e8e3e;">ONLINE</b></div>
+    <header class="header-fixed">
+        <div class="blue-bar" id="headerTitle">Apex Social</div>
+        <div class="stats-grid">
+            <div class="stat-item"><label>Meus XP</label><b id="valXP">0</b></div>
+            <div class="stat-item"><label>Saldo</label><b id="valEUR">0.0000€</b></div>
+            <div class="stat-item adm-only"><label>Dívida</label><b id="valDebt" style="color:#d93025;">0.00€</b></div>
+            <div class="stat-item"><label>Estado</label><b style="color:#1e8e3e;">ONLINE</b></div>
         </div>
-        <div class="tabs">
-            <div class="tab-item active" onclick="openTab('feed-page', this)">Explorar</div>
-            <div class="tab-item" onclick="openTab('wallet-page', this)">Minha Rede</div>
-            <div class="tab-item" onclick="openTab('info-page', this)">Info</div>
-            <div id="adm-tab" class="tab-item admin-only" style="color:#d93025;" onclick="openTab('admin-page', this)">MASTER</div>
-        </div>
-    </div>
+        <nav class="tabs">
+            <div class="tab active" onclick="showPage('feed')">Explorar</div>
+            <div class="tab" onclick="showPage('rede')">Rede</div>
+            <div class="tab" onclick="showPage('info')">Info</div>
+            <div class="tab adm-only" style="color:#d93025;" onclick="showPage('admin')">Master</div>
+        </nav>
+    </header>
 
-    <main class="content">
-        <div id="feed-page" class="page active">
-            <div class="card">
-                <textarea id="postText" class="input-google" style="min-height: 60px; border:none; padding:0; resize:none;" placeholder="No que está a pensar?"></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <label class="action-btn" style="color:#1a73e8; background:none; padding:0;" for="fileInput"><i class="fas fa-image"></i> Foto (+15 XP)</label>
-                    <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="previewImg(this)">
-                    <button onclick="publish()" class="btn-google" style="width:auto; padding:8px 20px; font-size:12px;">Publicar</button>
+    <main class="container">
+        <section id="page-feed">
+            <div class="card publish-box">
+                <textarea id="postInput" placeholder="No que está a pensar?"></textarea>
+                <div class="publish-footer">
+                    <label class="btn-photo" for="fileInput"><i class="fas fa-image"></i> Foto (+15 XP)</label>
+                    <input type="file" id="fileInput" hidden onchange="handleFile(this)">
+                    <button class="btn-post" onclick="sendPost()">Publicar</button>
                 </div>
+                <img id="previewImg" style="display:none; width:100%; margin-top:10px; border-radius:5px;">
             </div>
-            
-            <div id="feed-container"></div>
-            <div id="loading-trigger" style="text-align:center; padding:30px; color:#1a73e8; font-size:12px;">
-                <i class="fas fa-spinner fa-spin"></i> A carregar publicações...
-            </div>
-        </div>
-    </main>
+            <div id="feedContent"></div>
+        </section>
+
+        </main>
 
     <script>
+        // CONFIG SUPABASE
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24}iat:1774039158,exp:2089615158}.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
         
-        const myId = 5401881400; 
-        const isAdmin = (myId === 5401881400);
-        let currentPage = 0;
-        let isLoading = false;
+        const MASTER_ID = 5401881400; 
+        let userPhoto = null;
 
         async function init() {
-            if(isAdmin) {
-                document.getElementById('mainBody').classList.add('is-admin');
-                document.getElementById('topTag').innerText = "Apex Business Control";
+            // Verifica se é o Admin Master
+            if(MASTER_ID === 5401881400) {
+                document.getElementById('appBody').classList.add('is-master');
+                document.getElementById('headerTitle').innerText = "Apex Business Control";
             }
-            getProfile();
-            loadFeed(0);
+            loadProfile();
+            loadPosts();
         }
 
-        async function getProfile() {
-            const { data: u } = await client.from('profiles').select('*').eq('id', myId).single();
-            if(u) {
-                document.getElementById('topXP').innerText = Math.floor(u.points).toLocaleString();
-                document.getElementById('topBalance').innerText = (u.points * 0.0001).toFixed(4) + "€";
+        async function loadProfile() {
+            const { data } = await client.from('profiles').select('*').eq('id', MASTER_ID).single();
+            if(data) {
+                document.getElementById('valXP').innerText = data.points.toLocaleString();
+                document.getElementById('valEUR').innerText = (data.points * 0.0001).toFixed(4) + "€";
             }
         }
 
-        async function loadFeed(page = 0) {
-            if (isLoading) return;
-            isLoading = true;
-            
-            const { data: posts } = await client
-                .from('posts')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .range(page * 10, (page + 1) * 10 - 1);
+        async function loadPosts() {
+            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
+            const container = document.getElementById('feedContent');
+            container.innerHTML = "";
 
-            if (posts && posts.length > 0) {
-                const container = document.getElementById('feed-container');
-                let html = '';
-                posts.forEach((p, i) => {
-                    // Injeção de Ad a cada 3 posts
-                    if (i > 0 && i % 3 === 0) html += `<div class="ad-inject">PUBLICIDADE • MONETIZAÇÃO ATIVA</div>`;
-                    
-                    html += `
-                        <div class="card">
-                            <div class="post-header">
-                                <span>Publicação #${p.id}</span>
-                                ${isAdmin ? `<span style="background:#fce8e6; color:#d93025; padding:2px 6px; border-radius:4px;">UID: ${p.user_id}</span>` : ''}
-                            </div>
-                            <div class="post-content">${p.content || ''}</div>
-                            ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
-                            
-                            <div class="post-actions">
-                                <button class="action-btn" onclick="handleLike(${p.id})">
-                                    <i class="fas fa-heart"></i> Gosto <span class="count-badge">${p.likes || 0}</span>
-                                </button>
-                                <button class="action-btn" onclick="alert('Funcionalidade de Comentários em breve!')">
-                                    <i class="fas fa-comment"></i> Comentar
-                                </button>
-                                <button class="action-btn" onclick="alert('Partilhar Link: apexsocial.app/post/${p.id}')">
-                                    <i class="fas fa-share-alt"></i> Partilhar
-                                </button>
-                            </div>
-                        </div>`;
-                });
-                container.innerHTML += html;
-                currentPage++;
-            } else {
-                document.getElementById('loading-trigger').innerText = "Fim das publicações.";
+            posts.forEach((p, index) => {
+                // Injeção de Ad (Simulado para Design)
+                if(index > 0 && index % 3 === 0) {
+                    container.innerHTML += `<div class="card" style="background:#f1f3f4; text-align:center; font-size:10px; color:#70757a;">ANÚNCIO • MONETIZAÇÃO ATIVA</div>`;
+                }
+
+                container.innerHTML += `
+                    <div class="card">
+                        <div class="post-header">Publicação #${p.id}</div>
+                        <div class="post-text">${p.content}</div>
+                        ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                        <div class="actions-row">
+                            <button class="action-btn" onclick="likePost(${p.id})"><i class="far fa-heart"></i> Gosto (${p.likes || 0})</button>
+                            <button class="action-btn" onclick="commentPost(${p.id})"><i class="far fa-comment"></i> Comentar</button>
+                            <button class="action-btn" onclick="sharePost(${p.id})"><i class="fas fa-share-alt"></i> Redes</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function handleFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    userPhoto = e.target.result;
+                    document.getElementById('previewImg').src = userPhoto;
+                    document.getElementById('previewImg').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
             }
-            isLoading = false;
         }
 
-        // Infinite Scroll Observer
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) loadFeed(currentPage);
-        }, { threshold: 0.1 });
-        observer.observe(document.getElementById('loading-trigger'));
+        async function sendPost() {
+            const text = document.getElementById('postInput').value;
+            if(!text && !userPhoto) return;
 
-        // Like & Publish Functions
-        async function handleLike(pId) {
-            await client.rpc('increment_post_likes', { post_id: pId });
-            await client.rpc('increment_points', { user_id: myId, amount: 2.0 });
-            location.reload(); 
-        }
+            const { error } = await client.from('posts').insert([{ 
+                user_id: MASTER_ID, 
+                content: text, 
+                image_url: userPhoto,
+                likes: 0 
+            }]);
 
-        async function publish() {
-            const txt = document.getElementById('postText').value;
-            if(!txt) return;
-            const { error } = await client.from('posts').insert([{ user_id: myId, content: txt }]);
             if(!error) {
-                await client.rpc('increment_points', { user_id: myId, amount: 15.0 });
+                await client.rpc('increment_points', { user_id: MASTER_ID, amount: 15 });
                 location.reload();
             }
         }
 
-        function openTab(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
-            window.scrollTo(0,0);
+        // Funções de interação (Stubs para expansão)
+        function likePost(id) { alert("Gosto registado no post #" + id); }
+        function commentPost(id) { alert("Abrindo caixa de comentários para #" + id); }
+        function sharePost(id) { alert("Link de partilha copiado!"); }
+
+        function showPage(p) {
+            alert("Navegando para: " + p);
+            // Lógica de troca de página aqui
         }
 
         init();
