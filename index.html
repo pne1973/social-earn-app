@@ -9,16 +9,32 @@
     <style>
         :root { --tg-theme-bg: #121212; --tg-theme-text: #ffffff; --tg-theme-button: #ffcc00; --card-bg: #1e1e1e; --border: #333; }
         
-        html, body { height: 100%; margin: 0; padding: 0; background: var(--tg-theme-bg); color: var(--tg-theme-text); font-family: sans-serif; }
-        
-        body { padding-top: 130px; padding-bottom: 80px; box-sizing: border-box; }
+        /* CORREÇÃO DE ESTRUTURA PARA MENU FIXO */
+        html, body { 
+            height: 100%; 
+            margin: 0; 
+            padding: 0; 
+            background: var(--tg-theme-bg); 
+            color: var(--tg-theme-text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+        }
 
-        /* HEADER E ADS FIXOS NO TOPO */
-        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #1a1a1a; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; z-index: 3000; font-size: 11px; color: var(--tg-theme-button); font-weight: bold; }
-        .header { position: fixed; top: 60px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--tg-theme-bg); border-bottom: 1px solid var(--border); z-index: 2900; box-sizing: border-box; }
-        .xp-badge { background: var(--tg-theme-button); color: #000; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+        body { 
+            display: flex;
+            flex-direction: column;
+            padding-top: 130px; /* Espaço para Header + Ad */
+            padding-bottom: 80px; /* Espaço para o Nav não tapar posts */
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
 
-        /* NAV FIXA NO FUNDO - CORREÇÃO CRÍTICA */
+        /* TOPO FIXO */
+        .top-ad { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: #1a1a1a; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; z-index: 3000; font-size: 11px; color: var(--tg-theme-button); font-weight: bold; text-align: center; }
+        .header { position: fixed; top: 60px; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--tg-theme-bg); border-bottom: 1px solid var(--border); z-index: 2900; box-sizing: border-box; height: 50px; }
+        .xp-badge { background: var(--tg-theme-button); color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
+
+        /* MENU INFERIOR - SEMPRE NO FUNDO */
         .nav-bottom { 
             position: fixed; 
             bottom: 0; 
@@ -28,67 +44,80 @@
             background: #1a1a1a; 
             display: flex; 
             border-top: 1px solid var(--border); 
-            z-index: 4000; /* Maior que tudo */
+            z-index: 5000; /* Máxima prioridade */
             padding-bottom: env(safe-area-inset-bottom);
             box-sizing: border-box;
         }
-        .nav-item { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        .nav-item { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; font-size: 10px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
         .nav-item.active { color: var(--tg-theme-button); }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        .nav-item i { font-size: 20px; margin-bottom: 3px; }
 
-        /* CONTEÚDO */
-        .container { padding: 15px; display: none; width: 100%; box-sizing: border-box; }
+        /* FEED E CONTEÚDO */
+        .container { padding: 15px; display: none; width: 100%; box-sizing: border-box; flex: 1; }
         .container.active { display: block !important; }
         
         .publish-card { background: var(--card-bg); border-radius: 15px; border: 1px solid var(--border); padding: 15px; margin-bottom: 20px; }
-        textarea { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 80px; box-sizing: border-box; }
+        textarea { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 80px; box-sizing: border-box; font-size: 15px; }
 
-        /* FEED POSTS */
         .post-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--border); overflow: hidden; width: 100%; }
         .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #252525; }
-        .avatar { width: 35px; height: 35px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--tg-theme-button); font-weight: bold; border: 1px solid #444; }
+        .avatar { width: 35px; height: 35px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--tg-theme-button); font-weight: bold; }
         .post-body { padding: 15px; font-size: 15px; line-height: 1.5; color: #eee; word-wrap: break-word; }
-        .post-img { width: 100%; height: auto; max-height: 400px; object-fit: cover; border-top: 1px solid #252525; }
+        .post-img { width: 100%; height: auto; max-height: 450px; object-fit: cover; display: block; border-top: 1px solid #252525; }
         
-        .btn-main { background: var(--tg-theme-button); color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; }
+        .btn-main { background: var(--tg-theme-button); color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="top-ad">📢 ANÚNCIO: Partilha fotos e ganha XP!</div>
+    <div class="top-ad">📢 ANÚNCIO: Partilha a tua foto e ganha +15 XP!</div>
 
     <div class="header">
-        <h4 style="margin:0;">PINE SOCIAL</h4>
+        <h4 style="margin:0; letter-spacing:1px;">PINE SOCIAL</h4>
         <div id="userXP" class="xp-badge">0 XP</div>
     </div>
 
     <div id="feed-tab" class="container active">
         <div class="publish-card">
             <textarea id="postText" placeholder="O que estás a pensar?"></textarea>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
                 <input type="file" id="fileInput" hidden accept="image/*">
-                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; font-size:13px;"><i class="fas fa-camera"></i> Foto</button>
+                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; font-size:13px; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
                 <button class="btn-main" id="pubBtn" onclick="handlePublish()">Publicar</button>
             </div>
-            <div id="upStatus" style="font-size:11px; color:var(--tg-theme-button); margin-top:10px; display:none;">A processar...</div>
+            <div id="upStatus" style="font-size:11px; color:var(--tg-theme-button); margin-top:10px; display:none;"><i class="fas fa-spinner fa-spin"></i> A processar...</div>
         </div>
         <div id="feed">Carregando feed...</div>
     </div>
 
     <div id="info-tab" class="container">
-        <div class="publish-card"><h2>💰 Ganhos</h2><p>Post: 15 XP | Convite: 100 XP</p></div>
+        <div class="publish-card">
+            <h2 style="color:var(--tg-theme-button)">💰 Economia</h2>
+            <p>Postagem: +15 XP</p>
+            <p>Convite Amigo: +100 XP</p>
+            <p>Câmbio: 1000 XP = 1.0000€</p>
+        </div>
     </div>
 
     <div id="wallet-tab" class="container">
         <div class="publish-card" style="text-align:center;">
-            <p>Saldo (4 decimais)</p>
-            <h1 style="color:var(--tg-theme-button)"><span id="euroVal">0.0000</span>€</h1>
+            <p>Saldo para Levantamento</p>
+            <h1 style="color:var(--tg-theme-button); font-size:36px;"><span id="euroVal">0.0000</span>€</h1>
+            <p style="font-size:12px; color:#888;">Mínimo de 5000 XP (5.00€)</p>
+        </div>
+    </div>
+
+    <div id="admin-tab" class="container">
+        <div class="publish-card" style="border: 1px solid #EA4335;">
+            <h3 style="color:#EA4335">🛠 Admin (5401881400)</h3>
+            <div id="adm-stats">A carregar estatísticas...</div>
         </div>
     </div>
 
     <nav class="nav-bottom">
         <div class="nav-item active" onclick="showTab('feed-tab', this)"><i class="fas fa-home"></i>Feed</div>
         <div class="nav-item" onclick="showTab('info-tab', this)"><i class="fas fa-coins"></i>Ganhos</div>
+        <div id="adm-nav" class="nav-item" onclick="showTab('admin-tab', this)"><i class="fas fa-user-shield"></i>Admin</div>
         <div class="nav-item" onclick="showTab('wallet-tab', this)"><i class="fas fa-wallet"></i>Saque</div>
     </nav>
 
@@ -96,14 +125,15 @@
         const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const userId = 5401881400;
+        const userId = 5401881400; // O teu ID Admin
 
         function showTab(tabId, el) {
             document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(tabId).style.display = 'block';
             el.classList.add('active');
-            window.scrollTo(0,0); // Volta ao topo ao trocar aba
+            window.scrollTo(0,0);
+            if(tabId === 'feed-tab') loadFeed();
             loadProfile();
         }
 
@@ -134,7 +164,14 @@
 
             await supabaseClient.from('posts').insert([{ user_id: userId, content: text, image_url: url }]);
             await supabaseClient.rpc('increment_points', { user_id: userId, amount: 15 });
-            location.reload();
+            
+            // Recarregar feed sem recarregar a página inteira para evitar que o layout salte
+            document.getElementById('postText').value = '';
+            document.getElementById('fileInput').value = '';
+            btn.disabled = false;
+            status.style.display = 'none';
+            loadFeed();
+            loadProfile();
         }
 
         async function loadFeed() {
@@ -150,10 +187,13 @@
                         <div style="font-weight:bold; font-size:14px;">Utilizador #${p.user_id.toString().slice(-4)}</div>
                     </div>
                     <div class="post-body">${p.content || ''}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
                 </div>`;
             });
         }
+
+        // Segurança Admin
+        if(userId !== 5401881400) document.getElementById('adm-nav').style.display = 'none';
 
         loadProfile();
         loadFeed();
