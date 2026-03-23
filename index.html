@@ -172,3 +172,43 @@
     </div>
 
 </div>
+<!-- ============================
+     SECÇÃO PROFILE (PERFIL)
+============================= -->
+<div id="profile" class="page">
+
+    <h2>Perfil 👤</h2>
+
+    <p style="margin-top:10px; color:#ccc;">
+        Aqui podes ver as tuas informações pessoais e o teu link de convite.
+    </p>
+
+    <!-- INFORMAÇÕES DO UTILIZADOR -->
+    <div style="margin-top:20px; background:#111827; padding:15px; border-radius:10px; border:1px solid #1f2937;">
+        <h3 style="margin:0 0 10px 0;">Informações</h3>
+
+        <div style="margin-top:6px;">Nome: <span id="profile-username">...</span></div>
+        <div style="margin-top:6px;">ID: <span id="profile-id">...</span></div>
+        <div style="margin-top:6px;">XP Total: <span id="profile-total-xp">0</span></div>
+    </div>
+
+    <!-- LINK DE CONVITE -->
+    <div style="margin-top:20px; background:#111827; padding:15px; border-radius:10px; border:1px solid #1f2937;">
+        <h3 style="margin:0 0 10px 0;">Link de Convite</h3>
+
+        <p style="color:#ccc; margin-bottom:8px;">
+            Partilha este link para convidar novos utilizadores.
+        </p>
+
+        <div id="profile-invite-link" 
+             style="word-break:break-all; background:#0b1020; padding:10px; border-radius:8px; border:1px solid #374151;">
+            ...
+        </div>
+
+        <button onclick="copyInviteLink()" 
+                style="margin-top:10px; width:100%; padding:12px; background:#1f2937; border:none; border-radius:8px; color:white; font-size:16px; cursor:pointer;">
+            Copiar Link
+        </button>
+    </div>
+
+</div>
