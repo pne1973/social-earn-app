@@ -34,7 +34,7 @@
         /* CARDS */
         .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
         .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; }
-        .ad-post { background: #252525; border: 1px dashed #ffcc00; }
+        .ad-post { background: #1a1a1a; border: 1px dashed #ffcc00; padding: 20px; text-align: center; }
 
         /* POST ELEMENTS */
         .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; }
@@ -42,11 +42,18 @@
         .post-text { padding: 15px; font-size: 15px; color: #eee; }
         .post-img { width: 100%; height: auto; display: block; border-top: 1px solid #252525; }
 
-        /* FOOTER ACTIONS */
+        /* ACTIONS */
         .post-actions { display: flex; padding: 10px 15px; border-top: 1px solid #252525; gap: 20px; }
         .action-btn { background: none; border: none; color: #888; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .action-btn i { font-size: 18px; }
         .action-btn.liked { color: #ffcc00; }
+
+        /* SEÇÃO DE COMENTÁRIOS */
+        .comment-section { display: none; padding: 10px 15px; background: #161616; border-top: 1px solid #252525; }
+        .comment-input-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .comment-input { flex: 1; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 8px 12px; border-radius: 20px; font-size: 13px; outline: none; }
+        .comment-btn { background: #ffcc00; color: #000; border: none; padding: 5px 12px; border-radius: 15px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        .comment-list { font-size: 13px; color: #bbb; max-height: 150px; overflow-y: auto; }
+        .comment-item { margin-bottom: 5px; padding: 5px 0; border-bottom: 1px solid #222; }
 
         .input-area { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 10px; resize: none; min-height: 80px; font-size: 15px; margin-bottom: 10px; outline: none; }
         .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; }
@@ -81,14 +88,11 @@
         </div>
 
         <div id="earn-page" class="page">
-            <div class="card"><h2>Tabela de Ganhos</h2><p>Post: 15 XP | Like: 2 XP | Convite: 100 XP</p></div>
+            <div class="card"><h2>Missões</h2><p>Interagir com a comunidade rende XP!</p></div>
         </div>
 
         <div id="wallet-page" class="page">
-            <div class="card" style="text-align:center;">
-                <p>Saldo convertível</p>
-                <h1 style="color:#ffcc00; font-size:40px; margin:10px 0;"><span id="euroVal">0.0000</span>€</h1>
-            </div>
+            <div class="card" style="text-align:center;"><h1><span id="euroVal">0.0000</span>€</h1></div>
         </div>
     </main>
 
@@ -113,13 +117,9 @@
             
             if(data) {
                 data.forEach((p, index) => {
-                    // Inserção de Ad a cada 3 posts
+                    // Ad a cada 3 posts
                     if (index > 0 && index % 3 === 0) {
-                        list.innerHTML += `
-                            <div class="post ad-post">
-                                <div class="post-header"><span style="color:#ffcc00; font-size:10px;">ANÚNCIO PATROCINADO</span></div>
-                                <div class="post-text"><b>🚀 Queres ganhar mais XP?</b><br>Completa as missões diárias e multiplica os teus ganhos!</div>
-                            </div>`;
+                        list.innerHTML += `<div class="post ad-post"><small style="color:#ffcc00">ANÚNCIO</small><br><b>Ganhe +1000 XP no Plano VIP!</b></div>`;
                     }
 
                     const el = document.createElement('div');
@@ -133,8 +133,15 @@
                         ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
                         <div class="post-actions">
                             <button class="action-btn" onclick="likePost('${p.id}', this)"><i class="fas fa-heart"></i> <span class="count">${p.likes || 0}</span></button>
-                            <button class="action-btn"><i class="fas fa-comment"></i> <span>0</span></button>
+                            <button class="action-btn" onclick="toggleComments('${p.id}')"><i class="fas fa-comment"></i> Comentar</button>
                             <button class="action-btn" onclick="share()"><i class="fas fa-share-alt"></i></button>
+                        </div>
+                        <div id="comments-${p.id}" class="comment-section">
+                            <div class="comment-input-row">
+                                <input type="text" id="input-${p.id}" class="comment-input" placeholder="Escreve um comentário...">
+                                <button class="comment-btn" onclick="addComment('${p.id}')">Enviar</button>
+                            </div>
+                            <div id="list-${p.id}" class="comment-list"></div>
                         </div>
                     `;
                     list.appendChild(el);
@@ -142,34 +149,47 @@
             }
         }
 
+        function toggleComments(id) {
+            const section = document.getElementById(`comments-${id}`);
+            section.style.display = section.style.display === 'block' ? 'none' : 'block';
+        }
+
+        async function addComment(id) {
+            const input = document.getElementById(`input-${id}`);
+            if(!input.value) return;
+            
+            // Simulação de adição visual imediata
+            const list = document.getElementById(`list-${id}`);
+            const item = document.createElement('div');
+            item.className = 'comment-item';
+            item.innerHTML = `<b>Tu:</b> ${input.value}`;
+            list.prepend(item);
+            
+            input.value = '';
+            // Aqui poderias salvar na tabela de comentários do Supabase se existisse
+        }
+
         async function likePost(id, btn) {
             const countEl = btn.querySelector('.count');
-            let current = parseInt(countEl.innerText);
-            countEl.innerText = current + 1;
+            countEl.innerText = parseInt(countEl.innerText) + 1;
             btn.classList.add('liked');
             await client.rpc('increment_likes', { post_id: id });
             await client.rpc('increment_points', { user_id: myId, amount: 2 });
             getProfile();
         }
 
-        function share() {
-            if (navigator.share) {
-                navigator.share({ title: 'Pine Social', text: 'Vê este post no Pine Social!', url: window.location.href });
-            }
-        }
+        function share() { if (navigator.share) navigator.share({ title: 'Pine Social', url: window.location.href }); }
 
         async function publish() {
             const txt = document.getElementById('postText').value;
             const file = document.getElementById('fileInput').files[0];
             if(!txt && !file) return;
-            
             let img = null;
             if(file) {
                 const name = `${Date.now()}.jpg`;
                 const { data } = await client.storage.from('post-images').upload(name, file);
                 img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
             }
-
             await client.from('posts').insert([{ user_id: myId, content: txt, image_url: img }]);
             await client.rpc('increment_points', { user_id: myId, amount: 15 });
             document.getElementById('postText').value = '';
