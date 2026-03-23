@@ -15,7 +15,7 @@
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
-        /* GRID DE STATS CORRIGIDA (Removida a Dívida) */
+        /* GRID DE STATS (Limpa conforme solicitado) */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
@@ -33,26 +33,20 @@
 
         /* CARDS & FEED */
         .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .post-img-container { width: 100%; max-height: 400px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f8f9fa; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f3f4; }
-        .post-img { width: 100%; height: auto; max-height: 400px; object-fit: contain; display: block; }
+        .post-img-container { width: 100%; max-height: 400px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f8f9fa; border: 1px solid #f1f3f4; display: flex; align-items: center; justify-content: center; }
+        .post-img { width: 100%; height: auto; max-height: 400px; object-fit: contain; }
         
-        .post-header { font-size: 11px; color: #70757a; margin-bottom: 10px; display: flex; justify-content: space-between; }
-        .post-text { font-size: 15px; line-height: 1.5; color: #3c4043; word-wrap: break-word; }
-
         /* INTERAÇÕES */
         .actions-row { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f3f4; padding-top: 12px; margin-top: 12px; }
-        .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 0; }
+        .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .action-btn i { font-size: 16px; color: #1a73e8; }
 
         /* UI ELEMENTS */
         .input-google { width: 100%; border: none; outline: none; font-size: 16px; margin-bottom: 15px; resize: none; min-height: 60px; }
-        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-        .list-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f3f4; font-size: 13px; }
-        
-        .warning-box { background: #fff7e6; border: 1px solid #ffe58f; padding: 12px; border-radius: 6px; margin-top: 15px; font-size: 12px; color: #856404; line-height: 1.4; }
+        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; }
         .info-badge { background: #e8f0fe; color: #1a73e8; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
 
-        /* SEGURANÇA: MASTER ONLY */
+        /* SEGURANÇA MASTER */
         .adm-only { display: none !important; }
         body.is-master .adm-only { display: block !important; }
     </style>
@@ -80,11 +74,9 @@
             <div class="card">
                 <textarea id="postInput" class="input-google" placeholder="O que pretende partilhar?"></textarea>
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
-                    <label style="color:#1a73e8; cursor:pointer; font-size:13px; font-weight:500;" for="fileInput">
-                        <i class="fas fa-camera"></i> Foto (+15 XP)
-                    </label>
+                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileInput"><i class="fas fa-camera"></i> Foto (+15 XP)</label>
                     <input type="file" id="fileInput" hidden onchange="handleFile(this)">
-                    <button class="btn-post" style="width:auto; margin:0;" onclick="sendPost()">Publicar</button>
+                    <button class="btn-post" style="width:auto;" onclick="sendPost()">Publicar</button>
                 </div>
                 <img id="previewImg" style="display:none; width:100%; margin-top:15px; border-radius:6px; max-height:200px; object-fit:cover;">
             </div>
@@ -95,40 +87,40 @@
             <div class="card">
                 <h3 style="font-size:16px; margin-bottom:15px;"><i class="fas fa-users"></i> Crescimento da Rede</h3>
                 <div style="background:#f8f9fa; padding:15px; border-radius:6px; border:1px dashed #dadce0;">
-                    <label style="font-size:10px; color:#70757a; text-transform:uppercase; font-weight:bold;">O Seu Link Único:</label>
-                    <div id="refLink" style="font-size:12px; color:#1a73e8; margin:8px 0; word-break:break-all; font-weight:500;">...</div>
-                    <button class="btn-post" style="background:#fff; color:#1a73e8; border:1px solid #1a73e8; margin-top:5px;" onclick="copyRef()">Copiar Link</button>
-                </div>
-                <div class="warning-box" style="background:#e8f0fe; border-color:#d2e3fc; color:#1967d2;">
-                    <i class="fas fa-percent"></i> <b>Bónus Vitalício:</b> Ganha 10% de comissão sobre todos os XP ganhos pelos seus afiliados.
+                    <label style="font-size:10px; color:#70757a; font-weight:bold;">LINK DE CONVITE:</label>
+                    <div id="refLink" style="font-size:12px; color:#1a73e8; margin:8px 0; word-break:break-all;">...</div>
+                    <button class="btn-post" style="background:#fff; color:#1a73e8; border:1px solid #1a73e8;" onclick="copyRef()">Copiar Link</button>
                 </div>
             </div>
         </section>
 
         <section id="view-info" class="view-section">
             <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;">Regras e Ganhos</h3>
-                <div class="list-item"><span>Nova Publicação com Foto</span><b class="info-badge">+15 XP</b></div>
-                <div class="list-item"><span>Like Recebido</span><b class="info-badge">+2 XP</b></div>
-                <div class="list-item"><span>Check-in Diário</span><b class="info-badge">+5 XP</b></div>
-                <div class="list-item"><span>Novo Afiliado</span><b class="info-badge">+100 XP</b></div>
-                <div class="warning-box">
-                    <i class="fas fa-exclamation-triangle"></i> <b>Uso Justo:</b> O abuso de interações resultará na desvalorização dos ganhos.
+                <h3 style="font-size:16px; margin-bottom:15px;">Regras de Ganhos</h3>
+                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
+                    <span>Publicação com Foto</span><b class="info-badge">+15 XP</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
+                    <span>Novo Afiliado</span><b class="info-badge">+100 XP</b>
                 </div>
             </div>
         </section>
 
         <section id="view-master" class="view-section adm-only">
             <div class="card">
-                <h3 style="color:#d93025; margin-bottom:15px;">Consola Master</h3>
+                <h3 style="color:#d93025; margin-bottom:15px;">Painel de Controlo Master</h3>
                 
-                <div style="background:#fdf7f7; border:1px solid #fce8e6; padding:15px; border-radius:6px; text-align:center; margin-bottom:20px;">
-                    <label style="font-size:10px; color:#70757a;">Dívida Total à Rede:</label>
-                    <h1 id="valDebt" style="color:#d93025; font-size:28px;">0.00€</h1>
+                <div style="background:#fdf7f7; border:1px solid #fce8e6; padding:20px; border-radius:6px; text-align:center; margin-bottom:20px;">
+                    <label style="font-size:10px; color:#70757a; text-transform:uppercase;">Dívida Total à Rede:</label>
+                    <h1 id="valDebt" style="color:#d93025; font-size:32px; margin-top:5px;">0.00€</h1>
+                    <button class="btn-post" style="margin-top:15px; background:#1a73e8;">Lista de Pagamentos (PayPal)</button>
                 </div>
 
-                <input type="number" id="delId" class="input-google" style="border:1px solid #dadce0; padding:10px; border-radius:4px; min-height:auto;" placeholder="ID do Post para apagar">
-                <button class="btn-post" style="background:#d93025;" onclick="adminDelete()">Eliminar Permanentemente</button>
+                <div style="border-top:1px solid #f1f3f4; padding-top:20px;">
+                    <label style="font-size:12px; font-weight:bold;">Moderação: Eliminar Post (ID)</label>
+                    <input type="number" id="delId" class="input-google" style="border:1px solid #dadce0; padding:10px; border-radius:4px; min-height:auto; margin-top:10px;" placeholder="Introduza o ID do post">
+                    <button class="btn-post" style="background:#d93025; margin-top:10px;" onclick="adminDelete()">Eliminar Permanentemente</button>
+                </div>
             </div>
         </section>
 
@@ -140,7 +132,6 @@
         const client = supabase.createClient(SB_URL, SB_KEY);
         
         const MY_ID = 5401881400; 
-        let currentPhoto = null;
 
         async function init() {
             if(MY_ID === 5401881400) {
@@ -171,14 +162,15 @@
             const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('feedContent');
             container.innerHTML = "";
-            let totalNetXP = 0;
+            let totalPoints = 0;
+            
             posts.forEach(p => {
-                totalNetXP += (p.points || 0);
+                totalPoints += (p.points || 0);
                 container.innerHTML += `
                     <div class="card">
-                        <div class="post-header"><span>ID #${p.id}</span><span>${new Date(p.created_at).toLocaleDateString()}</span></div>
-                        <div class="post-text">${p.content || ''}</div>
-                        ${p.image_url ? `<div class="post-img-container"><img src="${p.image_url}" class="post-img"></div>` : ''}
+                        <div style="font-size:11px; color:#70757a; margin-bottom:10px;">ID #${p.id}</div>
+                        <div style="font-size:15px; color:#3c4043;">${p.content || ''}</div>
+                        ${p.image_url ? `<div class="post-img-container" style="margin-top:12px;"><img src="${p.image_url}" class="post-img"></div>` : ''}
                         <div class="actions-row">
                             <button class="action-btn"><i class="far fa-heart"></i> Gosto</button>
                             <button class="action-btn"><i class="far fa-comment"></i> Coment.</button>
@@ -186,44 +178,22 @@
                         </div>
                     </div>`;
             });
-            // Atualiza a dívida apenas na aba Master
-            document.getElementById('valDebt').innerText = (totalNetXP * 0.0001).toFixed(2) + "€";
-        }
-
-        async function sendPost() {
-            const text = document.getElementById('postInput').value;
-            if(!text && !currentPhoto) return;
-            const { error } = await client.from('posts').insert([{ user_id: MY_ID, content: text, image_url: currentPhoto, likes: 0 }]);
-            if(!error) {
-                await client.rpc('increment_points', { user_id: MY_ID, amount: 15 });
-                location.reload();
-            }
-        }
-
-        function handleFile(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    currentPhoto = e.target.result;
-                    document.getElementById('previewImg').src = currentPhoto;
-                    document.getElementById('previewImg').style.display = 'block';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function copyRef() {
-            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
-            alert("Link de convite copiado!");
+            // Cálculo da dívida apenas para visualização Master
+            document.getElementById('valDebt').innerText = (totalPoints * 0.0001).toFixed(2) + "€";
         }
 
         async function adminDelete() {
             const id = document.getElementById('delId').value;
             if(!id) return;
-            if(confirm("Confirmar a eliminação definitiva?")) {
+            if(confirm("Apagar post definitivamente?")) {
                 await client.from('posts').delete().eq('id', id);
                 location.reload();
             }
+        }
+
+        function copyRef() {
+            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
+            alert("Link copiado!");
         }
 
         init();
