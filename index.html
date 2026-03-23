@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social</title>
+    <title>Apex Social - Master Index</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -11,11 +11,10 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 175px; }
 
-        /* HEADER FIXO */
+        /* HEADER FIXO (Apenas 3 colunas para manter limpo em todas as abas) */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
-        /* GRID DE STATS (Apenas 3 colunas para utilizadores) */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
@@ -33,10 +32,9 @@
 
         /* CARDS & FEED */
         .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .post-img-container { width: 100%; max-height: 400px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f8f9fa; border: 1px solid #f1f3f4; display: flex; align-items: center; justify-content: center; }
+        .post-text { font-size: 15px; line-height: 1.5; color: #3c4043; }
+        .post-img-container { width: 100%; max-height: 400px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f8f9fa; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f3f4; }
         .post-img { width: 100%; height: auto; max-height: 400px; object-fit: contain; }
-        
-        .post-text { font-size: 15px; color: #3c4043; line-height: 1.5; }
 
         /* INTERAÇÕES */
         .actions-row { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f3f4; padding-top: 12px; margin-top: 12px; }
@@ -45,11 +43,11 @@
 
         /* UI ELEMENTS */
         .input-google { width: 100%; border: none; outline: none; font-size: 16px; margin-bottom: 15px; resize: none; min-height: 60px; }
-        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
 
-        /* SEGURANÇA MASTER (Elemento que removemos) */
-        #tab-master, #view-master, .admin-only-data { display: none !important; }
-        body.is-master #tab-master, body.is-master #view-master, body.is-master .admin-only-data { display: block !important; }
+        /* SEGURANÇA: OCULTAR ABA MASTER PARA OUTROS */
+        #tab-master { display: none; }
+        body.is-master #tab-master { display: block; }
     </style>
 </head>
 <body id="appBody">
@@ -73,11 +71,11 @@
         
         <section id="view-explorar" class="view-section active">
             <div class="card">
-                <textarea id="postInput" class="input-google" placeholder="Partilhe algo..."></textarea>
+                <textarea id="postInput" class="input-google" placeholder="O que pretende partilhar?"></textarea>
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
                     <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileInput"><i class="fas fa-camera"></i> Foto (+15 XP)</label>
                     <input type="file" id="fileInput" hidden onchange="handleFile(this)">
-                    <button class="btn-post" style="width:auto;" onclick="sendPost()">Publicar</button>
+                    <button class="btn-post" style="width:auto; margin:0;" onclick="sendPost()">Publicar</button>
                 </div>
             </div>
             <div id="feedContent"></div>
@@ -85,30 +83,35 @@
 
         <section id="view-rede" class="view-section">
             <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;">Convidar Amigos</h3>
-                <div style="background:#f8f9fa; padding:15px; border-radius:6px; border:1px dashed #dadce0;">
-                    <div id="refLink" style="font-size:12px; color:#1a73e8; word-break:break-all;">...</div>
-                    <button class="btn-post" style="background:#fff; color:#1a73e8; border:1px solid #1a73e8; margin-top:10px;" onclick="copyRef()">Copiar Link</button>
-                </div>
+                <h3 style="font-size:16px; margin-bottom:15px;">Sistema de Afiliados</h3>
+                <div id="refLink" style="font-size:12px; color:#1a73e8; background:#f8f9fa; padding:15px; border-radius:6px; border:1px dashed #dadce0;">...</div>
+                <button class="btn-post" style="background:#fff; color:#1a73e8; border:1px solid #1a73e8;" onclick="copyRef()">Copiar Convite</button>
             </div>
         </section>
 
         <section id="view-info" class="view-section">
             <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;">Manual de Ganhos</h3>
-                <p style="font-size:13px; color:#5f6368;">Ganha XP por cada post, like e convite.</p>
+                <h3 style="font-size:16px; margin-bottom:15px;">Tabela de Ganhos</h3>
+                <p style="font-size:13px; color:#5f6368;">Ganha XP por cada interação real na plataforma.</p>
             </div>
         </section>
 
         <section id="view-master" class="view-section">
-            <div class="card">
-                <h3 style="color:#d93025; margin-bottom:15px;">Consola de Gestão</h3>
-                <div style="background:#fdf7f7; padding:15px; border-radius:6px; text-align:center;">
-                    <label style="font-size:10px; color:#70757a;">Dívida Total à Rede:</label>
-                    <h1 id="valDebt" style="color:#d93025; font-size:28px;">0.00€</h1>
+            <div class="card" style="border-color:#d93025;">
+                <h3 style="color:#d93025; margin-bottom:20px;">Painel de Controlo Master</h3>
+                
+                <div style="background:#fdf7f7; border:1px solid #fce8e6; padding:20px; border-radius:8px; text-align:center; margin-bottom:25px;">
+                    <label style="font-size:10px; color:#70757a; text-transform:uppercase; font-weight:bold;">Dívida Total à Rede (Euros):</label>
+                    <h1 id="valDebt" style="color:#d93025; font-size:32px; margin-top:5px;">0.00€</h1>
                 </div>
-                <input type="number" id="delId" class="input-google" style="border:1px solid #dadce0; padding:10px; margin-top:15px;" placeholder="ID para apagar">
-                <button class="btn-post" style="background:#d93025;" onclick="adminDelete()">Apagar Post</button>
+
+                <div style="border-top:2px solid #f1f3f4; padding-top:20px;">
+                    <label style="font-size:12px; font-weight:bold; color:#202124;">Eliminar Publicação por ID:</label>
+                    <input type="number" id="delId" class="input-google" style="border:1px solid #dadce0; padding:12px; border-radius:4px; min-height:auto; margin-top:8px;" placeholder="Ex: 12345">
+                    <button class="btn-post" style="background:#d93025;" onclick="adminDelete()">Eliminar Permanentemente</button>
+                </div>
+
+                <button class="btn-post" style="background:#fff; color:#5f6368; border:1px solid #dadce0; margin-top:15px;">Ver Listagem de Pagamentos</button>
             </div>
         </section>
 
@@ -119,10 +122,9 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
         
-        const MY_ID = 5401881400; // O SEU ID DE ADMIN
+        const MY_ID = 5401881400; 
 
         async function init() {
-            // VERIFICAÇÃO DE SEGURANÇA
             if(MY_ID === 5401881400) {
                 document.getElementById('appBody').classList.add('is-master');
                 document.getElementById('headerTitle').innerText = "Apex Business Control";
@@ -151,17 +153,14 @@
             const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('feedContent');
             container.innerHTML = "";
-            let pointsSum = 0;
+            let totalPoints = 0;
 
             posts.forEach(p => {
-                pointsSum += (p.points || 0);
+                totalPoints += (p.points || 0);
                 container.innerHTML += `
                     <div class="card">
-                        <div class="admin-only-data" style="font-size:9px; color:#d93025; margin-bottom:5px;">ADMIN: POST ID #${p.id}</div>
-                        
                         <div class="post-text">${p.content || ''}</div>
                         ${p.image_url ? `<div class="post-img-container"><img src="${p.image_url}" class="post-img"></div>` : ''}
-                        
                         <div class="actions-row">
                             <button class="action-btn"><i class="far fa-heart"></i> Gosto</button>
                             <button class="action-btn"><i class="far fa-comment"></i> Coment.</button>
@@ -169,10 +168,24 @@
                         </div>
                     </div>`;
             });
-            document.getElementById('valDebt').innerText = (pointsSum * 0.0001).toFixed(2) + "€";
+            // O cálculo da dívida é atualizado mas só aparece na aba Master
+            document.getElementById('valDebt').innerText = (totalPoints * 0.0001).toFixed(2) + "€";
         }
 
-        // ... resto das funções (sendPost, copyRef, adminDelete) ...
+        // Funções de suporte...
+        async function adminDelete() {
+            const id = document.getElementById('delId').value;
+            if(!id) return;
+            if(confirm("Confirmar a eliminação definitiva?")) {
+                await client.from('posts').delete().eq('id', id);
+                location.reload();
+            }
+        }
+
+        function copyRef() {
+            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
+            alert("Link copiado!");
+        }
 
         init();
     </script>
