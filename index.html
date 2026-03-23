@@ -147,16 +147,39 @@
 
         // ECONOMIA E PERFIL
         async function getProfile() {
-            const { data } = await client.from('profiles').select('points').eq('id', myId).single();
-            if (data) {
-                const pts = data.points || 0;
-                document.getElementById('userXP').innerText = pts + " XP";
-                const eur = pts * 0.0010;
-                document.getElementById('eurVal').innerText = eur.toFixed(4);
-                document.getElementById('brlVal').innerText = (eur * 6.15).toFixed(4);
-            }
-            if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
+          // --- FUNÇÃO GETPROFILE ATUALIZADA (Cálculo Automático) ---
+async function getProfile() {
+    const { data } = await client.from('profiles').select('points').eq('id', myId).single();
+    if (data) {
+        const pts = data.points || 0;
+        
+        // 1. Atualiza o XP no topo
+        document.getElementById('userXP').innerText = pts + " XP";
+        
+        // 2. Cálculo Automático baseado no userConfig (que inseriu acima)
+        const convertedValue = (pts * userConfig.rate).toFixed(4);
+        
+        // 3. Atualiza o display da carteira (Wallet)
+        // O valor principal agora mostra a moeda detetada automaticamente
+        const walletH1 = document.querySelector('#wallet-page h1');
+        if (walletH1) {
+            walletH1.innerHTML = `<span>${convertedValue}</span>${userConfig.symbol}`;
         }
+        
+        // 4. Atualiza a legenda (Ex: "Saldo em Real (BRL)")
+        const walletLabel = document.getElementById('brlVal');
+        if (walletLabel) {
+            walletLabel.innerText = userConfig.label;
+        }
+ 
+    
+    // Mantém a verificação de Admin
+    if(myId === 5401881400) {
+        const admTab = document.getElementById('adm-tab');
+        if(admTab) admTab.style.display = 'block';
+    }
+}
+ }
 // --- SISTEMA AUTOMÁTICO DE LOCALIZAÇÃO (LINHA 159) ---
 const userConfig = {
     lang: navigator.language || 'pt-PT',
