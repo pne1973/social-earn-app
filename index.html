@@ -1,47 +1,49 @@
         <div id="admin-page" class="page">
-            <div class="card" style="border-left: 4px solid #ff4444;">
-                <h3 style="color:#ff4444; font-size:12px; display:flex; align-items:center; gap:10px;">
-                    <i class="fas fa-satellite-dish"></i> LIVE NETWORK MONITOR
-                </h3>
-                <div class="admin-grid" style="grid-template-columns: repeat(2, 1fr); margin-top:15px;">
-                    <div class="admin-metric"><span>Utilizadores</span><b id="admUsers">0</b></div>
-                    <div class="admin-metric"><span>Posts Ativos</span><b id="admPosts">0</b></div>
-                    <div class="admin-metric"><span>XP Emitido</span><b id="admDebtXP">0</b></div>
-                    <div class="admin-metric"><span>Engagement</span><b id="admEngage">0.0%</b></div>
+            
+            <div class="card" style="border-top: 4px solid #ffcc00; background: #0c0c0c;">
+                <h2 style="font-size: 14px; color: #ffcc00; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">
+                    <i class="fas fa-chart-line"></i> Performance de Rede
+                </h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div style="background: #000; padding: 20px; border-radius: 12px; border: 1px solid #222; text-align: center;">
+                        <span style="font-size: 10px; color: #777; display: block; margin-bottom: 8px; text-transform: uppercase;">Membros</span>
+                        <b id="admUsers" style="font-size: 24px; color: #fff;">0</b>
+                    </div>
+                    <div style="background: #000; padding: 20px; border-radius: 12px; border: 1px solid #222; text-align: center;">
+                        <span style="font-size: 10px; color: #777; display: block; margin-bottom: 8px; text-transform: uppercase;">Posts</span>
+                        <b id="admPosts" style="font-size: 24px; color: #fff;">0</b>
+                    </div>
                 </div>
             </div>
 
-            <div class="card" style="background: linear-gradient(145deg, #0a0a0a, #050505);">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h3 style="color:#28a745; font-size:11px; text-transform:uppercase;">Tesouraria e Burn Rate</h3>
-                    <span id="admHealth" style="font-size:8px; padding:3px 8px; border-radius:10px; background:#112211; color:#28a745;">ESTÁVEL</span>
+            <div class="card" style="background: #111; border: 1px solid #333;">
+                <h2 style="font-size: 14px; color: #ff4444; text-transform: uppercase; margin-bottom: 20px;">
+                    <i class="fas fa-wallet"></i> Tesouraria e Pagamentos
+                </h2>
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 11px; color: #aaa; display: block;">DÍVIDA TOTAL DA REDE (CASH-OUT):</span>
+                    <b id="admBurn" style="font-size: 32px; color: #ff4444; display: block; margin: 10px 0;">0.0000€</b>
+                    <small id="admDebtXP" style="font-size: 12px; color: #555;">0 XP EMITIDOS</small>
                 </div>
-                <div class="admin-grid">
-                    <div class="admin-metric"><span>Dívida Total (€)</span><b id="admBurn" class="metric-red">0.0000€</b></div>
-                    <div class="admin-metric"><span>CPM Médio Est.</span><b>1.20€</b></div>
-                </div>
-                <div style="margin-top:15px; background:#000; height:4px; border-radius:2px; overflow:hidden;">
-                    <div id="profitBar" style="width: 70%; height:100%; background:#28a745;"></div>
-                </div>
-                <p style="font-size:8px; color:#444; margin-top:8px;">Margem de Lucro Estimada: <span id="admMargin">70%</span></p>
-            </div>
-
-            <div class="card">
-                <h3 style="color:#ffcc00; font-size:11px; text-transform:uppercase; margin-bottom:12px;">Pendentes de Pagamento (>5000 XP)</h3>
-                <div id="admPayments" style="max-height:200px; overflow-y:auto; border: 1px solid #111; border-radius:8px; padding:5px;">
-                    <p style="font-size:10px; color:#333; text-align:center; padding:20px;">Nenhum levantamento solicitado.</p>
+                
+                <hr style="border: 0; border-top: 1px solid #222; margin: 20px 0;">
+                
+                <h3 style="font-size: 12px; color: #28a745; margin-bottom: 15px; text-transform: uppercase;">Aprovação de Saques (>5000 XP)</h3>
+                <div id="admPayments" style="background: #000; border-radius: 10px; padding: 5px; min-height: 100px;">
+                    <p style="font-size: 12px; color: #444; text-align: center; padding: 40px 0;">Nenhum pedido de saque pendente.</p>
                 </div>
             </div>
 
-            <div class="card">
-                <h3 style="color:#555; font-size:11px; text-transform:uppercase; margin-bottom:15px;">Consola de Moderação</h3>
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <input type="text" id="delId" placeholder="ID do Post" style="flex:1; background:#000; border:1px solid #222; padding:12px; color:#fff; border-radius:8px; font-size:12px;">
-                    <button onclick="adminDelete()" style="background:#ff4444; color:#fff; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer;">BAN</button>
-                </div>
-                <div id="adminLogs" style="font-family:monospace; font-size:9px; color:#28a745; background:#000; padding:10px; border-radius:5px; height:80px; overflow-y:auto; border:1px solid #111;">
-                    > System initializing...<br>
-                    > Database connection secure...
+            <div class="card" style="border-bottom: 4px solid #555;">
+                <h2 style="font-size: 14px; color: #fff; text-transform: uppercase; margin-bottom: 20px;">
+                    <i class="fas fa-shield-alt"></i> Controlo de Segurança
+                </h2>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <label style="font-size: 11px; color: #777;">ELIMINAR POST POR ID (IRREVERSÍVEL):</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="delId" placeholder="Ex: 125" style="flex: 1; background: #000; border: 2px solid #333; padding: 15px; color: #fff; border-radius: 8px; font-size: 16px; font-weight: bold; outline: none;">
+                        <button onclick="adminDelete()" style="background: #ff4444; color: #fff; border: none; padding: 0 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px;">BANIR</button>
+                    </div>
                 </div>
             </div>
         </div>
