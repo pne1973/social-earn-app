@@ -9,45 +9,48 @@
     <style>
         /* DESIGN SYSTEM - GOOGLE DARK */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { background-color: #121212; }
+        html { background-color: #121212; height: 100%; }
         body { background-color: #121212; color: #ffffff; font-family: -apple-system, sans-serif; padding-top: 200px; padding-bottom: 20px; }
 
         /* HEADER & STATS BAR */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
         .ad-banner-top { background: #1a1a1a; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #ffcc00; border-bottom: 1px solid #333; font-weight: bold; }
         
-        /* BARRA DE STATUS - ORDEM SOLICITADA */
         .user-stats-bar { display: flex; justify-content: space-around; background: #1a1a1a; padding: 12px 2px; border-bottom: 1px solid #252525; }
         .stat-pill { text-align: center; flex: 1; border-right: 1px solid #252525; padding: 0 2px; }
         .stat-pill:last-child { border-right: none; }
-        .stat-pill span { display: block; font-size: 7px; color: #888; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; }
+        .stat-pill span { display: block; font-size: 7px; color: #888; text-transform: uppercase; margin-bottom: 2px; }
         .stat-pill b { font-size: 10.5px; color: #ffcc00; display: block; }
         .stat-white { color: #ffffff !important; }
         
         .tabs { display: flex; background: #121212; }
-        .tab-item { flex: 1; padding: 14px 5px; text-align: center; color: #888; font-size: 9px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .tab-item { flex: 1; padding: 14px 5px; text-align: center; color: #888; font-size: 9px; font-weight: bold; cursor: pointer; text-transform: uppercase; border-bottom: 3px solid transparent; }
         .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
 
         /* CONTENT */
-        .content { padding: 12px; max-width: 500px; margin: 0 auto; }
+        .content { padding: 12px; max-width: 500px; margin: 0 auto; min-height: 100vh; }
         .page { display: none; }
         .page.active { display: block; }
         
-        /* POST CARDS */
+        /* POSTS & CARDS */
         .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
         .post-img { width: 100%; max-height: 280px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; border: 1px solid #252525; }
         #imagePreview { width: 100%; max-height: 150px; object-fit: cover; border-radius: 8px; margin-top: 10px; display: none; }
-
+        
         /* COMMENTS */
         .comments-feed { background: #161616; border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 11px; max-height: 120px; overflow-y: auto; }
         .comment-item { padding: 5px 0; border-bottom: 1px solid #222; color: #ddd; }
         .comment-user { color: #ffcc00; font-weight: bold; margin-right: 5px; font-size: 9px; }
 
-        /* ADS */
-        .ad-feed-box { background: #1a1a1a; border-radius: 8px; padding: 15px; margin: 15px 0; text-align: center; font-size: 9px; color: #444; border: 1px dashed #333; }
+        /* ADMIN SPECIFIC */
+        .admin-stat-box { display: flex; gap: 10px; margin-bottom: 15px; }
+        .admin-stat-box div { flex: 1; background: #252525; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #444; }
+        .admin-stat-box b { display: block; font-size: 18px; color: #ff4444; }
+        .withdrawal-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #111; border-radius: 8px; margin-bottom: 8px; font-size: 11px; }
 
         .btn-gold { background: #ffcc00; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; font-size: 13px; }
-        .admin-link { display: none; color: #ff4444 !important; }
+        .btn-pay { background: #28a745; color: white; padding: 5px 10px; border-radius: 4px; border: none; font-size: 10px; }
+        .admin-only { display: none; }
     </style>
 </head>
 <body>
@@ -66,7 +69,7 @@
             <div class="tab-item active" onclick="openTab('feed-page', this)">Feed</div>
             <div class="tab-item" onclick="openTab('wallet-page', this)">Rede</div>
             <div class="tab-item" onclick="openTab('info-page', this)">Info</div>
-            <div id="adm-tab" class="tab-item admin-link" onclick="openTab('admin-page', this)">Admin</div>
+            <div id="adm-tab" class="tab-item admin-only" onclick="openTab('admin-page', this)">Admin</div>
         </div>
     </div>
 
@@ -80,16 +83,64 @@
                     <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="previewImg(this)">
                     <span id="statusTxt" style="font-size:9px; color:#555;">Pronto</span>
                 </div>
-                <button class="btn-gold" id="btnPublish" onclick="publish()">Publicar (+15 XP)</button>
+                <button class="btn-gold" onclick="publish()">Publicar (+15 XP)</button>
             </div>
             <div id="feed-container">A carregar publicações...</div>
         </div>
 
         <div id="wallet-page" class="page">
             <div class="card" style="text-align:center;">
-                <h4 style="color:#ffcc00;">O Teu Link de Convite</h4>
-                <div id="refLink" style="background:#111; padding:12px; margin:15px 0; font-size:10px; border:1px dashed #444; color:#ffcc00; word-break:break-all;">...</div>
-                <button class="btn-gold" onclick="copyRef()">Copiar Link</button>
+                <h3 style="color:#ffcc00; margin-bottom:15px;">A Tua Rede Apex</h3>
+                <p style="font-size:12px; color:#aaa; margin-bottom:15px;">Ganha 100 XP por cada amigo e 10% de tudo o que eles ganharem para sempre.</p>
+                <div id="refLink" style="background:#111; padding:15px; border:1px dashed #444; color:#ffcc00; font-size:11px; word-break:break-all;">...</div>
+                <button class="btn-gold" onclick="copyRef()">COPIAR MEU LINK</button>
+            </div>
+        </div>
+
+        <div id="info-page" class="page">
+            <div class="card">
+                <h3 style="color:#ffcc00; margin-bottom:15px;"><i class="fas fa-info-circle"></i> Guia de Ganhos</h3>
+                <div style="font-size:13px; line-height:1.8;">
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:8px 0;">
+                        <span>Post com Foto</span> <b style="color:#28a745;">+15.0 XP</b>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:8px 0;">
+                        <span>Dar um Like</span> <b style="color:#28a745;">+2.0 XP</b>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:8px 0;">
+                        <span>Receber Like</span> <b style="color:#28a745;">+1.0 XP</b>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:8px 0;">
+                        <span>Comentar</span> <b style="color:#28a745;">+5.0 XP</b>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:8px 0;">
+                        <span>Novo Amigo</span> <b style="color:#28a745;">+100.0 XP</b>
+                    </div>
+                    <div style="margin-top:15px; background:rgba(255,204,0,0.1); padding:10px; border-radius:8px;">
+                        <p style="font-size:11px;"><b>Economia:</b> A conversão é de <b>1000 XP = 1.0000€</b>. O levantamento mínimo é de <b>5000 XP</b> via PayPal.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-page" class="page">
+            <div class="card">
+                <h3 style="color:#ff4444; margin-bottom:15px;"><i class="fas fa-user-shield"></i> Painel Admin</h3>
+                <div class="admin-stat-box">
+                    <div><span>Total Users</span><b id="admUsers">-</b></div>
+                    <div><span>Total Posts</span><b id="admPosts">-</b></div>
+                </div>
+                
+                <h4 style="font-size:12px; margin-bottom:10px; color:#888;">LISTA DE SAQUES (PAYPAL)</h4>
+                <div id="withdrawal-list">
+                    <p style="font-size:10px; color:#555;">Nenhum pedido pendente.</p>
+                </div>
+
+                <h4 style="font-size:12px; margin-top:20px; margin-bottom:10px; color:#888;">MODERAÇÃO RÁPIDA</h4>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="delPostId" placeholder="ID do Post" style="flex:1; background:#111; border:1px solid #333; padding:10px; color:#fff; border-radius:5px;">
+                    <button onclick="adminDeletePost()" style="background:#ff4444; border:none; color:#fff; padding:10px; border-radius:5px;">Eliminar</button>
+                </div>
             </div>
         </div>
     </main>
@@ -98,12 +149,22 @@
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
-        const myId = 5401881400; 
-        let currentImgBase64 = null;
+        const myId = 5401881400; // SEU ID ADMIN
 
         async function init() {
             getProfile();
             loadFeed();
+            if(myId === 5401881400) loadAdminStats();
+        }
+
+        // NAVEGAÇÃO ENTRE ABAS (CORRIGIDO)
+        function openTab(pageId, element) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            element.classList.add('active');
+            window.scrollTo(0, 0);
         }
 
         async function getProfile() {
@@ -114,8 +175,21 @@
                 document.getElementById('topRefs').innerText = data.referrals_count || 0;
                 document.getElementById('topRefGains').innerText = (data.referral_points * 0.0010).toFixed(4) + "€";
                 document.getElementById('refLink').innerText = `https://apexsocial.app/?ref=${myId}`;
-                if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
+                
+                // MOSTRAR ABA ADMIN SE FOR O DONO
+                if(myId === 5401881400) {
+                    document.getElementById('adm-tab').classList.remove('admin-only');
+                    document.getElementById('adm-tab').style.display = 'block';
+                }
             }
+        }
+
+        // CARREGAR ESTATÍSTICAS ADMIN
+        async function loadAdminStats() {
+            const { count: uCount } = await client.from('profiles').select('*', { count: 'exact', head: true });
+            const { count: pCount } = await client.from('posts').select('*', { count: 'exact', head: true });
+            document.getElementById('admUsers').innerText = uCount || 0;
+            document.getElementById('admPosts').innerText = pCount || 0;
         }
 
         async function loadFeed() {
@@ -125,26 +199,17 @@
 
             posts.forEach((p, index) => {
                 if (index > 0 && index % 3 === 0) {
-                    html += `<div class="ad-feed-box">ANÚNCIO INTERMEDIÁRIO<br>Publicidade Ativa</div>`;
+                    html += `<div class="ad-feed-box">ANÚNCIO APEX<br><small>1000 XP = 1.00€</small></div>`;
                 }
-
-                const commentsHtml = p.comments ? p.comments.map(c => `
-                    <div class="comment-item"><span class="comment-user">USER#${c.user_id.toString().slice(-3)}:</span>${c.content}</div>
-                `).join('') : '';
-
-                html += `
-                <div class="card">
-                    <div style="font-size:9px; color:#ffcc00; margin-bottom:8px;"><b>USER #${p.user_id.toString().slice(-4)}</b></div>
+                const commentsHtml = p.comments ? p.comments.map(c => `<div class="comment-item"><span class="comment-user">USER#${c.user_id.toString().slice(-3)}:</span>${c.content}</div>`).join('') : '';
+                html += `<div class="card">
+                    <div style="font-size:9px; color:#ffcc00; margin-bottom:8px;"><b>USER #${p.user_id}</b> <small style="color:#444;">ID:${p.id}</small></div>
                     ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    <div style="font-size:13px; line-height:1.4; color:#eee;">${p.content || ''}</div>
-                    
+                    <div style="font-size:13px; color:#eee;">${p.content || ''}</div>
                     <div style="display:flex; gap:15px; margin-top:10px; border-top:1px solid #252525; padding-top:10px;">
                         <span onclick="handleLike(${p.id}, ${p.user_id})" style="font-size:11px; color:#888; cursor:pointer;"><i class="fas fa-heart"></i> ${p.likes || 0}</span>
-                        <span onclick="sharePost('${p.content}')" style="font-size:11px; color:#888; cursor:pointer;"><i class="fas fa-share"></i></span>
                     </div>
-
                     <div class="comments-feed">${commentsHtml || '<span style="color:#333; font-size:9px;">Sem comentários...</span>'}</div>
-
                     <div style="display:flex; gap:5px; margin-top:8px;">
                         <input type="text" id="in-${p.id}" placeholder="Comenta..." style="flex:1; background:#111; border:1px solid #333; border-radius:15px; padding:5px 10px; color:#fff; font-size:10px; outline:none;">
                         <button onclick="sendComment(${p.id})" style="background:none; border:none; color:#ffcc00; font-size:10px; font-weight:bold;">ENVIAR</button>
@@ -154,22 +219,23 @@
             container.innerHTML = html;
         }
 
+        // SISTEMA DE DELETE ADMIN
+        async function adminDeletePost() {
+            const id = document.getElementById('delPostId').value;
+            if(!id) return;
+            const { error } = await client.from('posts').delete().eq('id', id);
+            if(!error) { alert('Post removido!'); loadFeed(); }
+        }
+
+        // OUTRAS FUNÇÕES AUXILIARES
+        let currentImgBase64 = null;
         function previewImg(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height;
-                        if(w > 600) { h *= 600/w; w = 600; }
-                        canvas.width = w; canvas.height = h;
-                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        currentImgBase64 = canvas.toDataURL('image/jpeg', 0.6);
-                        document.getElementById('imagePreview').src = currentImgBase64;
-                        document.getElementById('imagePreview').style.display = 'block';
-                    };
+                    currentImgBase64 = e.target.result;
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -177,12 +243,8 @@
 
         async function publish() {
             const txt = document.getElementById('postText').value;
-            if(!txt && !currentImgBase64) return;
             const { error } = await client.from('posts').insert([{ user_id: myId, content: txt, image_url: currentImgBase64 }]);
-            if(!error) {
-                await client.rpc('increment_points', { user_id: myId, amount: 15.0 });
-                location.reload();
-            }
+            if(!error) { await client.rpc('increment_points', { user_id: myId, amount: 15.0 }); location.reload(); }
         }
 
         async function sendComment(postId) {
@@ -198,12 +260,6 @@
             await client.rpc('increment_points', { user_id: myId, amount: 2.0 });
             if(myId !== owner) await client.rpc('increment_points', { user_id: owner, amount: 1.0 });
             loadFeed(); getProfile();
-        }
-
-        function openTab(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            document.getElementById(id).classList.add('active'); el.classList.add('active');
         }
 
         function copyRef() {
