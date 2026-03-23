@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Master</title>
+    <title>Apex Social - Master v2</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -15,7 +15,8 @@
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
+        /* GRID DE STATS CORRIGIDA (Removida a Dívida) */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
         .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
@@ -38,10 +39,9 @@
         .post-header { font-size: 11px; color: #70757a; margin-bottom: 10px; display: flex; justify-content: space-between; }
         .post-text { font-size: 15px; line-height: 1.5; color: #3c4043; word-wrap: break-word; }
 
-        /* INTERAÇÕES - FEED */
+        /* INTERAÇÕES */
         .actions-row { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f3f4; padding-top: 12px; margin-top: 12px; }
-        .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 0; transition: background 0.2s; border-radius: 4px; }
-        .action-btn:active { background: #f1f3f4; }
+        .action-btn { background: none; border: none; color: #5f6368; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 0; }
         .action-btn i { font-size: 16px; color: #1a73e8; }
 
         /* UI ELEMENTS */
@@ -52,6 +52,7 @@
         .warning-box { background: #fff7e6; border: 1px solid #ffe58f; padding: 12px; border-radius: 6px; margin-top: 15px; font-size: 12px; color: #856404; line-height: 1.4; }
         .info-badge { background: #e8f0fe; color: #1a73e8; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
 
+        /* SEGURANÇA: MASTER ONLY */
         .adm-only { display: none !important; }
         body.is-master .adm-only { display: block !important; }
     </style>
@@ -63,7 +64,6 @@
         <div class="stats-grid">
             <div class="stat-item"><label>Meus XP</label><b id="valXP">0</b></div>
             <div class="stat-item"><label>Saldo</label><b id="valEUR">0.0000€</b></div>
-            <div class="stat-item adm-only"><label>Dívida</label><b id="valDebt" style="color:#d93025;">0.00€</b></div>
             <div class="stat-item"><label>Estado</label><b style="color:#1e8e3e;">ONLINE</b></div>
         </div>
         <nav class="tabs">
@@ -113,7 +113,7 @@
                 <div class="list-item"><span>Check-in Diário</span><b class="info-badge">+5 XP</b></div>
                 <div class="list-item"><span>Novo Afiliado</span><b class="info-badge">+100 XP</b></div>
                 <div class="warning-box">
-                    <i class="fas fa-exclamation-triangle"></i> <b>Uso Justo:</b> O abuso de interações resultará na desvalorização dos ganhos. Apenas convites reais mantêm o valor integral.
+                    <i class="fas fa-exclamation-triangle"></i> <b>Uso Justo:</b> O abuso de interações resultará na desvalorização dos ganhos.
                 </div>
             </div>
         </section>
@@ -121,6 +121,12 @@
         <section id="view-master" class="view-section adm-only">
             <div class="card">
                 <h3 style="color:#d93025; margin-bottom:15px;">Consola Master</h3>
+                
+                <div style="background:#fdf7f7; border:1px solid #fce8e6; padding:15px; border-radius:6px; text-align:center; margin-bottom:20px;">
+                    <label style="font-size:10px; color:#70757a;">Dívida Total à Rede:</label>
+                    <h1 id="valDebt" style="color:#d93025; font-size:28px;">0.00€</h1>
+                </div>
+
                 <input type="number" id="delId" class="input-google" style="border:1px solid #dadce0; padding:10px; border-radius:4px; min-height:auto;" placeholder="ID do Post para apagar">
                 <button class="btn-post" style="background:#d93025;" onclick="adminDelete()">Eliminar Permanentemente</button>
             </div>
@@ -165,48 +171,23 @@
             const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('feedContent');
             container.innerHTML = "";
+            let totalNetXP = 0;
             posts.forEach(p => {
+                totalNetXP += (p.points || 0);
                 container.innerHTML += `
                     <div class="card">
-                        <div class="post-header">
-                            <span>ID #${p.id}</span>
-                            <span>${new Date(p.created_at).toLocaleDateString()}</span>
-                        </div>
+                        <div class="post-header"><span>ID #${p.id}</span><span>${new Date(p.created_at).toLocaleDateString()}</span></div>
                         <div class="post-text">${p.content || ''}</div>
                         ${p.image_url ? `<div class="post-img-container"><img src="${p.image_url}" class="post-img"></div>` : ''}
-                        
                         <div class="actions-row">
-                            <button class="action-btn" onclick="giveLike(${p.id}, ${p.user_id})">
-                                <i class="far fa-heart"></i> Gosto (${p.likes || 0})
-                            </button>
-                            <button class="action-btn" onclick="alert('Comentários em breve!')">
-                                <i class="far fa-comment"></i> Comentar
-                            </button>
-                            <button class="action-btn" onclick="sharePost(${p.id})">
-                                <i class="fas fa-share-alt"></i> Partilhar
-                            </button>
+                            <button class="action-btn"><i class="far fa-heart"></i> Gosto</button>
+                            <button class="action-btn"><i class="far fa-comment"></i> Coment.</button>
+                            <button class="action-btn"><i class="fas fa-share-alt"></i> Partilhar</button>
                         </div>
                     </div>`;
             });
-        }
-
-        async function giveLike(postId, ownerId) {
-            // 1. Aumentar likes no post
-            await client.rpc('increment_likes', { post_id: postId });
-            // 2. Dar +2 XP ao dono do post
-            await client.rpc('increment_points', { user_id: ownerId, amount: 2 });
-            // 3. Notificar sucesso e recarregar
-            location.reload();
-        }
-
-        function sharePost(id) {
-            const url = `https://apexsocial.app/post?id=${id}`;
-            if (navigator.share) {
-                navigator.share({ title: 'Apex Social', text: 'Vê este post!', url: url });
-            } else {
-                navigator.clipboard.writeText(url);
-                alert("Link do post copiado!");
-            }
+            // Atualiza a dívida apenas na aba Master
+            document.getElementById('valDebt').innerText = (totalNetXP * 0.0001).toFixed(2) + "€";
         }
 
         async function sendPost() {
