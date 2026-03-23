@@ -3,46 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social - Master v3</title>
+    <title>Apex Business Control</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* RESET & GOOGLE UI */
+        /* RESET & GOOGLE UI STANDARDS */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 180px; }
+        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 170px; }
 
         /* HEADER FIXO */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
-        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
+        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; padding: 12px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
         .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
         .stat-item b { font-size: 11px; color: #1a73e8; }
-        
-        /* NAVEGAÇÃO TABS */
+        .stat-item b.red { color: #d93025; }
+
+        /* NAVEGAÇÃO */
         .tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; }
         .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; border-bottom: 3px solid transparent; text-transform: uppercase; }
         .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
+        .tab.master-btn { color: #d93025; }
 
-        /* CONTENT ENGINE (CORREÇÃO DE MISTURA) */
+        /* CONTENT ENGINE */
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
-        .page { display: none; width: 100%; }
-        .page.active { display: block !important; }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
 
         /* CARDS */
-        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
-        
-        /* ELEMENTOS DE LISTA */
-        .row-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f3f4; font-size: 14px; align-items: center; }
-        .row-item:last-child { border-bottom: none; }
-        .badge-num { background: #e8f0fe; color: #1a73e8; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; margin-right: 8px; }
+        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .card h3 { font-size: 16px; margin-bottom: 15px; color: #202124; }
 
-        /* ADMIN PANEL */
-        .admin-box { background: #fdf7f7; border: 1px solid #fce8e6; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px; }
-        .btn-main { background: #1a73e8; color: #fff; border: none; padding: 12px; border-radius: 4px; width: 100%; font-weight: bold; cursor: pointer; }
-        .btn-del { background: #d93025; margin-top: 10px; }
+        /* LISTS */
+        .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f3f4; font-size: 14px; align-items: center; }
+        .row:last-child { border-bottom: none; }
 
+        /* ADMIN SPECIFIC */
+        .admin-box { background: #fdf7f7; border: 1px solid #fce8e6; border-radius: 8px; padding: 20px; text-align: center; }
+        .btn { border: none; padding: 12px; border-radius: 4px; width: 100%; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .btn-blue { background: #1a73e8; color: #fff; }
+        .btn-red { background: #d93025; color: #fff; margin-top: 10px; }
+
+        /* UTILS */
         .adm-only { display: none !important; }
         body.is-master .adm-only { display: block !important; }
     </style>
@@ -50,162 +55,164 @@
 <body id="appBody">
 
     <header class="header-fixed">
-        <div class="blue-bar" id="headerTitle">Apex Social</div>
+        <div class="blue-bar">Apex Business Control • Monitorização Ativa</div>
         <div class="stats-grid">
             <div class="stat-item"><label>Meus XP</label><b id="valXP">0</b></div>
-            <div class="stat-item"><label>Saldo</label><b id="valEUR">0.0000€</b></div>
-            <div class="stat-item adm-only"><label>Dívida</label><b id="valDebt" style="color:#d93025;">0.00€</b></div>
+            <div class="stat-item"><label>Saldo EUR</label><b id="valEUR">0.0000€</b></div>
+            <div class="stat-item"><label>Dívida</label><b id="valDebt" class="red">0.00€</b></div>
             <div class="stat-item"><label>Estado</label><b style="color:#1e8e3e;">ONLINE</b></div>
         </div>
         <nav class="tabs">
-            <div class="tab active" onclick="nav('explorar', this)">Explorar</div>
-            <div class="tab" onclick="nav('rede', this)">Rede</div>
-            <div class="tab" onclick="nav('info', this)">Info</div>
-            <div class="tab adm-only" style="color:#d93025;" onclick="nav('master', this)">Master</div>
+            <div class="tab active" onclick="showPage('explorar', this)">Explorar</div>
+            <div class="tab" onclick="showPage('rede', this)">Rede</div>
+            <div class="tab" onclick="showPage('info', this)">Info</div>
+            <div class="tab master-btn adm-only" onclick="showPage('master', this)">Master</div>
         </nav>
     </header>
 
     <main class="container">
         
-        <div id="page-explorar" class="page active">
+        <section id="view-explorar" class="view-section active">
             <div class="card">
-                <textarea id="postInput" style="width:100%; border:none; outline:none; font-size:16px; min-height:60px;" placeholder="O que pretende partilhar?"></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
-                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileInput"><i class="fas fa-camera"></i> Foto (+15 XP)</label>
-                    <input type="file" id="fileInput" hidden onchange="handleFile(this)">
-                    <button class="btn-main" style="width:auto; padding:8px 20px;" onclick="sendPost()">Publicar</button>
+                <textarea id="postText" style="width:100%; border:none; outline:none; font-size:16px; min-height:60px; resize:none;" placeholder="No que está a pensar?"></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px; margin-top:10px;">
+                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileIn"><i class="fas fa-image"></i> Foto (+15 XP)</label>
+                    <input type="file" id="fileIn" hidden onchange="preview(this)">
+                    <button class="btn-blue" style="width:auto; padding:8px 25px;" onclick="sendPost()">Publicar</button>
                 </div>
-                <img id="previewImg" style="display:none; width:100%; margin-top:10px; border-radius:6px; max-height:150px; object-fit:cover;">
             </div>
-            <div id="feedContent"></div>
-        </div>
+            <div id="feed"></div>
+        </section>
 
-        <div id="page-rede" class="page">
+        <section id="view-rede" class="view-section">
             <div class="card">
-                <h3 style="margin-bottom:15px; font-size:16px;">Top 10 Ranking</h3>
-                <div id="rankingList"></div>
+                <h3>Top 10 Ranking</h3>
+                <div id="rankList"></div>
             </div>
             <div class="card">
-                <h3 style="margin-bottom:10px; font-size:16px;">Convite</h3>
-                <p style="font-size:12px; color:#5f6368; margin-bottom:10px;">Partilhe o seu link e ganhe 100 XP por amigo.</p>
-                <div id="refLink" style="background:#f1f3f4; padding:12px; border-radius:4px; font-size:11px; border:1px dashed #ccc; margin-bottom:10px;"></div>
-                <button class="btn-main" style="background:#fff; color:#1a73e8; border:1px solid #dadce0;" onclick="copyRef()">Copiar Link</button>
+                <h3>Convite</h3>
+                <p style="font-size:12px; color:#5f6368; margin-bottom:12px;">Partilhe o seu link e ganhe 100 XP por cada amigo.</p>
+                <div id="linkRef" style="background:#f1f3f4; padding:12px; border-radius:4px; font-size:11px; border:1px dashed #ccc; margin-bottom:10px; word-break: break-all;"></div>
+                <button class="btn" style="background:#fff; color:#1a73e8; border:1px solid #dadce0;" onclick="copy()">Copiar Link Único</button>
             </div>
-        </div>
+        </section>
 
-        <div id="page-info" class="page">
+        <section id="view-info" class="view-section">
             <div class="card">
-                <h3 style="margin-bottom:15px; font-size:16px;">Tabela de Ganhos</h3>
-                <div class="row-item"><span>Publicar com Foto</span><b>+15 XP</b></div>
-                <div class="row-item"><span>Novo Amigo</span><b>+100 XP</b></div>
-                <div class="row-item"><span>Like Recebido</span><b>+2 XP</b></div>
-                <div class="row-item"><span>Check-in Diário</span><b>+5 XP</b></div>
+                <h3>Tabela de Ganhos</h3>
+                <div class="row"><span>Publicar com Foto</span><b>+15 XP</b></div>
+                <div class="row"><span>Cada Novo Amigo</span><b>+100 XP</b></div>
+                <div class="row"><span>Like Recebido</span><b>+2 XP</b></div>
+                <div class="row"><span>Check-in Diário</span><b>+5 XP</b></div>
                 <div style="margin-top:20px; background:#e8f0fe; padding:15px; border-radius:6px; font-size:12px;">
                     <p><b>Conversão:</b> 10.000 XP = 1,00€</p>
-                    <p style="margin-top:5px; color:#1a73e8;">Mínimo de levantamento: 5.000 XP (5€).</p>
+                    <p style="margin-top:5px; color:#1a73e8;">Levantamento mínimo: 5.000 XP (5,00€) via PayPal.</p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div id="page-master" class="page adm-only">
+        <section id="view-master" class="view-section adm-only">
             <div class="card">
-                <h3 style="color:#d93025; margin-bottom:15px;">Painel de Controlo Master</h3>
+                <h3 style="color:#d93025; text-align:center;">Painel de Controlo Master</h3>
                 <div class="admin-box">
                     <label style="font-size:10px; color:#70757a; text-transform:uppercase;">Dívida Total da Rede:</label>
-                    <h1 id="admDebtDisplay" style="color:#d93025; font-size:32px; margin:5px 0;">0.00€</h1>
-                    <button class="btn-main" style="font-size:12px;">Lista de Pagamentos PayPal</button>
+                    <h1 id="totalDebtDisplay" style="color:#d93025; font-size:32px; margin:5px 0;">0.00€</h1>
+                    <button class="btn btn-blue" style="margin-top:10px;">Ver Lista de Pagamentos (PayPal)</button>
                 </div>
-                <div style="margin-top:20px;">
-                    <label style="font-size:12px; display:block; margin-bottom:5px;">Moderação: Eliminar Post (ID)</label>
-                    <input type="number" id="delId" style="width:100%; padding:12px; border:1px solid #dadce0; border-radius:4px;" placeholder="Introduza o ID do post">
-                    <button class="btn-main btn-del" onclick="adminDelete()">Eliminar Permanentemente</button>
+                <div style="margin-top:20px; border-top: 1px solid #f1f3f4; padding-top: 20px;">
+                    <label style="font-size:12px; display:block; margin-bottom:8px; font-weight:bold;">Moderação de Conteúdo</label>
+                    <input type="number" id="delInput" style="width:100%; padding:12px; border:1px solid #dadce0; border-radius:4px; margin-bottom:10px;" placeholder="Introduza o ID do post">
+                    <button class="btn btn-red" onclick="adminDel()">Eliminar Permanentemente</button>
                 </div>
             </div>
-        </div>
+        </section>
 
     </main>
 
     <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const client = supabase.createClient(SB_URL, SB_KEY);
+        const URL = "https://fickstyevektwbgimapy.supabase.co"; 
+        const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const sb = supabase.createClient(URL, KEY);
         
         const MASTER_ID = 5401881400; 
 
         async function init() {
             if(MASTER_ID === 5401881400) {
                 document.getElementById('appBody').classList.add('is-master');
-                document.getElementById('headerTitle').innerText = "Apex Business Control";
             }
-            loadProfile();
+            loadData();
             loadPosts();
-            loadRanking();
+            loadRank();
         }
 
-        // SISTEMA DE NAVEGAÇÃO À PROVA DE ERROS
-        function nav(pageName, el) {
-            // Esconde todas as abas
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // Remove destaque de todos os botões
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        // FUNÇÃO DE NAVEGAÇÃO SEGURA (BLOQUEIA MISTURA DE CONTEÚDO)
+        function showPage(id, el) {
+            // 1. Esconde TODAS as secções com classe view-section
+            const sections = document.querySelectorAll('.view-section');
+            sections.forEach(s => s.classList.remove('active'));
             
-            // Ativa a aba e o botão corretos
-            document.getElementById('page-' + pageName).classList.add('active');
+            // 2. Remove estado ativo de todos os botões da tab
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            // 3. Ativa apenas o pretendido
+            document.getElementById('view-' + id).classList.add('active');
             el.classList.add('active');
+            
             window.scrollTo(0,0);
         }
 
-        async function loadProfile() {
-            const { data } = await client.from('profiles').select('*').eq('id', MASTER_ID).single();
+        async function loadData() {
+            const { data } = await sb.from('profiles').select('*').eq('id', MASTER_ID).single();
             if(data) {
                 document.getElementById('valXP').innerText = Math.floor(data.points).toLocaleString();
                 document.getElementById('valEUR').innerText = (data.points * 0.0001).toFixed(4) + "€";
-                document.getElementById('refLink').innerText = `https://apexsocial.app/?ref=${MASTER_ID}`;
+                document.getElementById('linkRef').innerText = `https://apexsocial.app/?ref=${MASTER_ID}`;
             }
         }
 
-        async function loadRanking() {
-            const { data: users } = await client.from('profiles').select('*').order('points', { ascending: false }).limit(10);
+        async function loadRank() {
+            const { data: users } = await sb.from('profiles').select('*').order('points', { ascending: false }).limit(10);
             let html = '';
-            let totalXP = 0;
+            let total = 0;
             users.forEach((u, i) => {
-                totalXP += u.points;
-                html += `<div class="row-item">
-                    <span><span class="badge-num">${i+1}</span> User ${u.id.toString().substring(0,5)}...</span>
+                total += u.points;
+                html += `<div class="row">
+                    <span><b style="color:#1a73e8; margin-right:8px;">${i+1}</b> User ${u.id.toString().substring(0,6)}...</span>
                     <b>${Math.floor(u.points)} XP</b>
                 </div>`;
             });
-            document.getElementById('rankingList').innerHTML = html;
-            const debt = (totalXP * 0.0001).toFixed(2);
+            document.getElementById('rankList').innerHTML = html;
+            const debt = (total * 0.0001).toFixed(2);
             document.getElementById('valDebt').innerText = debt + "€";
-            document.getElementById('admDebtDisplay').innerText = debt + "€";
+            document.getElementById('totalDebtDisplay').innerText = debt + "€";
         }
 
         async function loadPosts() {
-            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
-            const container = document.getElementById('feedContent');
-            container.innerHTML = "";
+            const { data: posts } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+            const feed = document.getElementById('feed');
+            feed.innerHTML = "";
             posts.forEach(p => {
-                container.innerHTML += `
+                feed.innerHTML += `
                     <div class="card">
-                        <div style="font-size:10px; color:#70757a; margin-bottom:10px;">ID #${p.id}</div>
-                        <div style="font-size:15px; margin-bottom:12px;">${p.content || ''}</div>
-                        ${p.image_url ? `<div style="max-height:300px; overflow:hidden; border-radius:6px;"><img src="${p.image_url}" style="width:100%; object-fit:contain;"></div>` : ''}
+                        <div style="font-size:10px; color:#70757a; margin-bottom:8px;">PUBLICAÇÃO #${p.id}</div>
+                        <div style="font-size:15px; margin-bottom:12px; line-height:1.4;">${p.content || ''}</div>
+                        ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:6px; max-height:350px; object-fit:contain; background:#f8f9fa;">` : ''}
                     </div>`;
             });
         }
 
-        function copyRef() {
-            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
-            alert("Copiado!");
+        function copy() {
+            navigator.clipboard.writeText(document.getElementById('linkRef').innerText);
+            alert("Link de convite copiado!");
         }
 
-        async function adminDelete() {
-            const id = document.getElementById('delId').value;
+        async function adminDel() {
+            const id = document.getElementById('delInput').value;
             if(!id) return;
-            if(confirm("Deseja apagar o post #" + id + "?")) {
-                await client.from('posts').delete().eq('id', id);
-                location.reload();
+            if(confirm("Confirmar a eliminação definitiva do post #" + id + "?")) {
+                const { error } = await sb.from('posts').delete().eq('id', id);
+                if(!error) location.reload();
             }
         }
 
