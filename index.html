@@ -9,83 +9,71 @@
     <style>
         /* RESET & GOOGLE SYSTEM */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 210px; }
+        body { background-color: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 220px; }
 
-        /* HEADER & MONETIZAÇÃO FIXA */
+        /* HEADER & ADS FIXOS */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
         
-        /* Espaço Publicitário de Topo */
-        .ad-top-container { background: #e8f0fe; height: 50px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #1a73e8; }
-        .ad-top-content { font-size: 11px; color: #1a73e8; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        /* 1. ESPAÇO PUBLICITÁRIO TOPO (BANNER) */
+        .ad-banner-top { background: #fff7e6; height: 50px; display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #ffe58f; color: #874d00; font-weight: bold; font-size: 11px; text-transform: uppercase; }
 
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
-        .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; margin-bottom: 2px; }
+        .stat-item label { display: block; font-size: 8px; color: #70757a; text-transform: uppercase; }
         .stat-item b { font-size: 11px; color: #1a73e8; }
         
         .tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; }
-        .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; border-bottom: 3px solid transparent; text-transform: uppercase; }
-        .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
+        .tab { flex: 1; padding: 15px 0; text-align: center; font-size: 10px; font-weight: bold; color: #5f6368; cursor: pointer; text-transform: uppercase; }
+        .tab.active { color: #1a73e8; border-bottom: 3px solid #1a73e8; }
 
-        /* CONTENT */
+        /* CONTAINER */
         .container { max-width: 500px; margin: 0 auto; padding: 12px; }
-        .view-section { display: none; }
-        .view-section.active { display: block; }
 
-        /* CARDS & ADS NO FEED */
-        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); position: relative; }
-        .ad-feed-card { background: #fff7e6; border: 1px solid #ffe58f; text-align: center; padding: 20px; }
-        .ad-label { position: absolute; top: 8px; right: 8px; background: #ffe58f; color: #874d00; font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
-
-        /* FOTOS REDUZIDAS */
-        .post-img-container { width: 100%; height: 250px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #f1f3f4; border: 1px solid #dadce0; }
-        .post-img { width: 100%; height: 100%; object-fit: cover; } /* "cover" para preencher o espaço menor com estética */
+        /* CARDS DO FEED */
+        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
         
-        .post-text { font-size: 14px; line-height: 1.4; color: #3c4043; }
+        /* 2. ESPAÇO PUBLICITÁRIO NO FEED */
+        .ad-feed-card { background: #f8f9fa; border: 1px dashed #1a73e8; text-align: center; padding: 30px 15px; margin-bottom: 12px; border-radius: 8px; }
+        .ad-tag { color: #1a73e8; font-size: 10px; font-weight: bold; border: 1px solid #1a73e8; padding: 2px 6px; border-radius: 3px; }
 
-        /* UI */
-        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        /* 3. FOTOS REDUZIDAS */
+        .post-img-container { width: 100%; height: 180px; overflow: hidden; border-radius: 6px; margin: 12px 0; background: #eee; }
+        .post-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .post-text { font-size: 14px; color: #3c4043; line-height: 1.4; }
+        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <header class="header-fixed">
-        <div class="ad-top-container">
-            <div class="ad-top-content">Publicidade • Ganhe XP Visualizando</div>
-        </div>
-
+        <div class="ad-banner-top">ANÚNCIO: Promoções Apex Social</div>
         <div class="blue-bar">Apex Social</div>
-        
         <div class="stats-grid">
             <div class="stat-item"><label>Meus XP</label><b id="valXP">0</b></div>
             <div class="stat-item"><label>Saldo</label><b id="valEUR">0.0000€</b></div>
             <div class="stat-item"><label>Estado</label><b style="color:#1e8e3e;">ONLINE</b></div>
         </div>
-
         <nav class="tabs">
-            <div class="tab active" onclick="changeTab('explorar', this)">Explorar</div>
-            <div class="tab" onclick="changeTab('rede', this)">Rede</div>
-            <div class="tab" onclick="changeTab('info', this)">Info</div>
+            <div class="tab active">Explorar</div>
+            <div class="tab">Rede</div>
+            <div class="tab">Info</div>
         </nav>
     </header>
 
     <main class="container">
-        <section id="view-explorar" class="view-section active">
-            <div class="card">
-                <textarea id="postInput" style="width:100%; border:none; outline:none; font-size:15px; min-height:50px; resize:none;" placeholder="No que está a pensar?"></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:10px;">
-                    <label style="color:#1a73e8; cursor:pointer; font-size:12px;"><i class="fas fa-image"></i> Foto (+15 XP)</label>
-                    <button class="btn-post" onclick="sendPost()">Publicar</button>
-                </div>
+        <div class="card">
+            <textarea id="postInput" style="width:100%; border:none; outline:none; font-size:15px; resize:none;" placeholder="Escreva algo..."></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <span style="color:#1a73e8; font-size:12px;"><i class="fas fa-camera"></i> Foto</span>
+                <button class="btn-post">Publicar</button>
             </div>
-            <div id="feedContent"></div>
-        </section>
+        </div>
 
-        <section id="view-rede" class="view-section"><div class="card"><h3>Rede</h3></div></section>
-        <section id="view-info" class="view-section"><div class="card"><h3>Info</h3></div></section>
+        <div id="feedContent"></div>
     </main>
 
     <script>
@@ -93,42 +81,18 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
         
-        async function init() {
-            loadProfile();
-            loadPosts();
-        }
-
-        function changeTab(target, el) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('view-' + target).classList.add('active');
-            el.classList.add('active');
-        }
-
-        async function loadProfile() {
-            const { data } = await client.from('profiles').select('*').eq('id', 5401881400).single();
-            if(data) {
-                document.getElementById('valXP').innerText = data.points.toLocaleString();
-                document.getElementById('valEUR').innerText = (data.points * 0.0001).toFixed(4) + "€";
-            }
-        }
-
         async function loadPosts() {
             const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('feedContent');
             container.innerHTML = "";
             
             posts.forEach((p, index) => {
-                // Lógica: Injeta anúncio a cada 3 posts (Ex: após o 3º, 6º, 9º...)
-                if (index > 0 && index % 3 === 0) {
+                // INSERÇÃO DE ANÚNCIO: Logo após o primeiro post e depois a cada 3
+                if (index === 1 || (index > 1 && index % 3 === 0)) {
                     container.innerHTML += `
-                        <div class="card ad-feed-card">
-                            <span class="ad-label">ANÚNCIO</span>
-                            <div style="font-size:12px; color:#874d00;">
-                                <b>Patrocinado</b><br>
-                                Invista na sua marca aqui.<br>
-                                <button style="margin-top:10px; padding:5px 10px; font-size:10px; background:#874d00; color:#fff; border:none; border-radius:3px;">Saiba Mais</button>
-                            </div>
+                        <div class="ad-feed-card">
+                            <span class="ad-tag">PUBLICIDADE</span>
+                            <p style="margin-top:10px; font-size:12px; color:#5f6368;">Espaço disponível para anunciantes.</p>
                         </div>`;
                 }
 
@@ -136,15 +100,11 @@
                     <div class="card">
                         <div class="post-text">${p.content || ''}</div>
                         ${p.image_url ? `<div class="post-img-container"><img src="${p.image_url}" class="post-img"></div>` : ''}
-                        <div style="display:flex; justify-content:space-around; border-top:1px solid #f1f3f4; padding-top:10px; margin-top:10px;">
-                            <button style="background:none; border:none; color:#5f6368; font-size:12px;"><i class="far fa-heart"></i> Gosto</button>
-                            <button style="background:none; border:none; color:#5f6368; font-size:12px;"><i class="far fa-comment"></i> Comentar</button>
-                        </div>
                     </div>`;
             });
         }
-
-        init();
+        
+        loadPosts();
     </script>
 </body>
 </html>
