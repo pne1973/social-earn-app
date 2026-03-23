@@ -15,7 +15,7 @@
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
-        /* GRID DE STATS (Apenas o essencial) */
+        /* GRID DE STATS LIMPA */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
         .stat-item { text-align: center; border-right: 1px solid #f1f3f4; }
         .stat-item:last-child { border-right: none; }
@@ -45,12 +45,13 @@
         /* UI ELEMENTS */
         .input-google { width: 100%; border: none; outline: none; font-size: 16px; margin-bottom: 15px; resize: none; min-height: 60px; }
         .btn-post { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .info-badge { background: #e8f0fe; color: #1a73e8; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
     </style>
 </head>
-<body id="appBody">
+<body>
 
     <header class="header-fixed">
-        <div class="blue-bar" id="headerTitle">Apex Social</div>
+        <div class="blue-bar">Apex Social</div>
         <div class="stats-grid">
             <div class="stat-item"><label>Meus XP</label><b id="valXP">0</b></div>
             <div class="stat-item"><label>Saldo</label><b id="valEUR">0.0000€</b></div>
@@ -69,7 +70,9 @@
             <div class="card">
                 <textarea id="postInput" class="input-google" placeholder="O que pretende partilhar?"></textarea>
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f3f4; padding-top:12px;">
-                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileInput"><i class="fas fa-camera"></i> Foto (+15 XP)</label>
+                    <label style="color:#1a73e8; cursor:pointer; font-size:13px;" for="fileInput">
+                        <i class="fas fa-camera"></i> Foto (+15 XP)
+                    </label>
                     <input type="file" id="fileInput" hidden onchange="handleFile(this)">
                     <button class="btn-post" style="width:auto; margin:0;" onclick="sendPost()">Publicar</button>
                 </div>
@@ -79,16 +82,25 @@
 
         <section id="view-rede" class="view-section">
             <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;">Rede de Amigos</h3>
-                <div id="refLink" style="font-size:12px; color:#1a73e8; background:#f8f9fa; padding:15px; border-radius:6px; border:1px dashed #dadce0;">...</div>
-                <button class="btn-post" style="background:#fff; color:#1a73e8; border:1px solid #1a73e8;" onclick="copyRef()">Copiar Link</button>
+                <h3 style="font-size:16px; margin-bottom:15px;">Convidar Amigos</h3>
+                <p style="font-size:13px; color:#5f6368; margin-bottom:15px;">Partilhe o seu link e ganhe bónus por cada novo membro.</p>
+                <div id="refLink" style="font-size:12px; color:#1a73e8; background:#f8f9fa; padding:15px; border-radius:6px; border:1px dashed #dadce0; word-break:break-all;">...</div>
+                <button class="btn-post" style="background:#fff; color:#1a73e8; border:1px solid #1a73e8;" onclick="copyRef()">Copiar Convite</button>
             </div>
         </section>
 
         <section id="view-info" class="view-section">
             <div class="card">
-                <h3 style="font-size:16px; margin-bottom:15px;">Manual de Ganhos</h3>
-                <p style="font-size:13px; color:#5f6368;">Ganha XP através de publicações e convites.</p>
+                <h3 style="font-size:16px; margin-bottom:15px;">Manual de Recompensas</h3>
+                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
+                    <span>Publicação com Foto</span><b class="info-badge">+15 XP</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
+                    <span>Gosto Recebido</span><b class="info-badge">+2 XP</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f1f3f4;">
+                    <span>Novo Afiliado</span><b class="info-badge">+100 XP</b>
+                </div>
             </div>
         </section>
 
@@ -133,7 +145,7 @@
                         ${p.image_url ? `<div class="post-img-container"><img src="${p.image_url}" class="post-img"></div>` : ''}
                         <div class="actions-row">
                             <button class="action-btn"><i class="far fa-heart"></i> Gosto</button>
-                            <button class="action-btn"><i class="far fa-comment"></i> Coment.</button>
+                            <button class="action-btn"><i class="far fa-comment"></i> Comentar</button>
                             <button class="action-btn"><i class="fas fa-share-alt"></i> Partilhar</button>
                         </div>
                     </div>`;
