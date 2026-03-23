@@ -3,67 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Apex Social - Final</title>
+    <title>Apex Social - Monetização Total</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
-        body { background-color: #f0f2f5; padding-top: 215px; }
+        body { background-color: #f0f2f5; padding-top: 225px; }
 
-        /* HEADER & ADS */
-        .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 999; background: #fff; border-bottom: 1px solid #ddd; }
+        /* HEADER FIXO */
+        .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 99999; background: #fff; border-bottom: 1px solid #ddd; }
         
-        /* ESPAÇO PUBLICITÁRIO TOPO */
-        .ad-top { background: #fff3cd; color: #856404; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; border-bottom: 2px solid #ffeeba; text-transform: uppercase; }
+        /* BANNER TOPO (MONETIZAÇÃO 1) */
+        .ad-top { background: #ffd600; color: #000; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid #000; }
 
-        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 200; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 10px 0; text-align: center; border-bottom: 1px solid #eee; }
+        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); padding: 10px 0; text-align: center; border-bottom: 1px solid #eee; background: #fff; }
         .stats b { display: block; color: #1a73e8; font-size: 12px; }
         .stats label { font-size: 8px; color: #777; text-transform: uppercase; }
 
-        .tabs { display: flex; }
+        .tabs { display: flex; background: #fff; }
         .tab { flex: 1; padding: 15px; text-align: center; font-size: 11px; font-weight: bold; color: #5f6368; cursor: pointer; }
         .tab.active { color: #1a73e8; border-bottom: 3px solid #1a73e8; }
 
-        /* FEED & POSTS */
-        .container { max-width: 500px; margin: 0 auto; padding: 10px; }
-        .card { background: #fff; border-radius: 8px; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; }
+        /* CONTENT */
+        .container { max-width: 500px; margin: 0 auto; padding: 12px; }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* CARDS & ADS */
+        .card { background: #fff; border-radius: 8px; padding: 15px; margin-bottom: 12px; border: 1px solid #ddd; position: relative; }
         
-        /* FOTOS MINIATURA (O QUE PEDIU) */
-        .post-img-box { width: 100%; height: 150px; overflow: hidden; border-radius: 6px; margin: 10px 0; background: #f8f9fa; border: 1px solid #eee; }
+        /* FOTOS MINIATURA (150PX) */
+        .post-img-box { width: 100%; height: 150px; overflow: hidden; border-radius: 6px; margin: 10px 0; background: #f0f0f0; border: 1px solid #eee; }
         .post-img-box img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* ESPAÇO PUBLICITÁRIO FEED */
-        .ad-feed { background: #e7f3ff; border: 1px dashed #1877f2; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 10px; }
-        .ad-feed span { background: #1877f2; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 3px; font-weight: bold; }
+        /* BANNER PUBLICITÁRIO INTERNO (MONETIZAÇÃO 2) */
+        .ad-inner-box { background: #e7f3ff; border: 2px dashed #1a73e8; padding: 20px; text-align: center; border-radius: 8px; margin: 15px 0; position: relative; }
+        .ad-badge { position: absolute; top: 5px; right: 5px; background: #1a73e8; color: #fff; font-size: 8px; padding: 2px 5px; border-radius: 3px; font-weight: bold; }
 
-        .btn-send { background: #1a73e8; color: #fff; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; float: right; }
+        .btn-post { background: #1a73e8; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <header class="header-fixed">
-        <div class="ad-top">Anúncio: Aproveite 20% de bónus em XP hoje!</div>
+        <div class="ad-top">▲ ESPAÇO PUBLICITÁRIO TOPO ▲</div>
         <div class="blue-bar">APEX SOCIAL NETWORK</div>
         <div class="stats">
             <div><label>Meus XP</label><b id="valXP">0</b></div>
             <div><label>Saldo EUR</label><b id="valEUR">0.0000€</b></div>
-            <div><label>Rede</label><b style="color:green">Ativa</b></div>
+            <div><label>Estado</label><b style="color:green">Online</b></div>
         </div>
         <nav class="tabs">
-            <div class="tab active">EXPLORAR</div>
-            <div class="tab">REDE</div>
-            <div class="tab">INFO</div>
+            <div class="tab active" onclick="showTab('explorar', this)">Explorar</div>
+            <div class="tab" onclick="showTab('rede', this)">Rede</div>
+            <div class="tab" onclick="showTab('info', this)">Info</div>
         </nav>
     </header>
 
     <main class="container">
-        <div class="card" style="overflow: hidden;">
-            <textarea id="txt" style="width:100%; border:none; outline:none; font-size:14px; height:40px;" placeholder="Partilhe algo..."></textarea>
-            <button class="btn-send">Publicar</button>
-        </div>
+        
+        <section id="view-explorar" class="view-section active">
+            <div class="card">
+                <textarea id="postTxt" style="width:100%; border:none; outline:none; font-size:14px; min-height:45px; resize:none;" placeholder="No que está a pensar?"></textarea>
+                <div style="text-align: right; margin-top: 10px;"><button class="btn-post">Publicar</button></div>
+            </div>
+            <div id="mainFeed"></div>
+        </section>
 
-        <div id="feed"></div>
+        <section id="view-rede" class="view-section">
+            <div class="card">
+                <h3 style="font-size:15px; margin-bottom:10px;">A Minha Rede</h3>
+                <p style="font-size:12px; color:#666;">Convide amigos e ganhe 100 XP por cada registo.</p>
+            </div>
+            <div class="ad-inner-box">
+                <span class="ad-badge">AD</span>
+                <p style="color:#1a73e8; font-weight:bold; font-size:12px;">Destaque o seu Perfil</p>
+                <p style="font-size:11px; color:#555;">Apareça no topo das recomendações.</p>
+            </div>
+            <div class="card"><p style="font-size:13px; text-align:center; color:#999;">Sem novos membros hoje.</p></div>
+        </section>
+
+        <section id="view-info" class="view-section">
+            <div class="card">
+                <h3 style="font-size:15px; margin-bottom:10px;">Tabela de Recompensas</h3>
+                <p style="font-size:12px; color:#444;">• Post com foto: +15 XP<br>• Gosto: +2 XP<br>• Check-in: +5 XP</p>
+            </div>
+            <div class="ad-inner-box">
+                <span class="ad-badge">AD</span>
+                <p style="color:#1a73e8; font-weight:bold; font-size:12px;">Ganhe XP Extra</p>
+                <p style="font-size:11px; color:#555;">Visite os nossos parceiros para bónus diários.</p>
+            </div>
+            <div class="card">
+                <h3 style="font-size:15px; margin-bottom:10px;">Suporte</h3>
+                <p style="font-size:12px; color:#1a73e8;">Precisa de ajuda? Contacte o suporte técnico.</p>
+            </div>
+        </section>
+
     </main>
 
     <script>
@@ -71,29 +107,40 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
 
-        async function load() {
-            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
-            const f = document.getElementById('feed');
-            f.innerHTML = "";
+        function showTab(tabId, el) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('view-' + tabId).classList.add('active');
+            el.classList.add('active');
+        }
 
-            posts.forEach((p, i) => {
-                // INSERÇÃO DE PUBLICIDADE NO FEED
-                if (i === 2 || (i > 2 && i % 3 === 0)) {
-                    f.innerHTML += `
-                        <div class="ad-feed">
-                            <span>AD</span>
-                            <p style="font-size:12px; margin-top:5px; color:#1877f2;">Espaço Publicitário Apex</p>
+        async function renderFeed() {
+            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
+            const feedDiv = document.getElementById('mainFeed');
+            feedDiv.innerHTML = "";
+
+            if(!posts) return;
+
+            posts.forEach((post, index) => {
+                // ANÚNCIO NO FEED (MONETIZAÇÃO DINÂMICA)
+                if (index > 0 && index % 3 === 0) {
+                    feedDiv.innerHTML += `
+                        <div class="ad-inner-box">
+                            <span class="ad-badge">ANÚNCIO</span>
+                            <p style="color:#1a73e8; font-weight:bold; font-size:12px;">Seu Anúncio no Feed</p>
+                            <button style="margin-top:8px; border:none; background:#1a73e8; color:#fff; font-size:10px; padding:4px 10px; border-radius:3px;">Saber Mais</button>
                         </div>`;
                 }
 
-                f.innerHTML += `
+                feedDiv.innerHTML += `
                     <div class="card">
-                        <p style="font-size:14px;">${p.content || ''}</p>
-                        ${p.image_url ? `<div class="post-img-box"><img src="${p.image_url}"></div>` : ''}
+                        <p style="font-size:14px; color:#333;">${post.content || ''}</p>
+                        ${post.image_url ? `<div class="post-img-box"><img src="${post.image_url}"></div>` : ''}
                     </div>`;
             });
         }
-        load();
+        
+        renderFeed();
     </script>
 </body>
 </html>
