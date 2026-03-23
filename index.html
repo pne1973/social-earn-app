@@ -3,53 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Pine Social Gold</title>
+    <title>Pine Social Debug</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { background-color: #121212; height: 100%; }
-        body { 
-            background-color: #121212; color: #fff; 
-            font-family: -apple-system, system-ui, sans-serif;
-            min-height: 100vh; padding-top: 175px; 
-        }
+        html, body { background-color: #121212; color: #fff; font-family: sans-serif; min-height: 100vh; }
+        body { padding-top: 180px; }
 
-        /* HEADER FIXO */
+        /* HEADER */
         .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
-        .ad-top { background: linear-gradient(90deg, #1a1a1a, #252525); color: #ffcc00; padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
+        .ad-top { background: #1a1a1a; color: #ffcc00; padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
         .nav-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; }
         .xp-badge { background: #ffcc00; color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
         /* TABS */
         .tabs { display: flex; background: #1a1a1a; border-top: 1px solid #333; }
-        .tab-item { flex: 1; padding: 14px; text-align: center; color: #888; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .tab-item { flex: 1; padding: 14px; text-align: center; color: #888; font-size: 11px; font-weight: bold; cursor: pointer; }
         .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; }
 
         /* CONTENT */
-        .content { padding: 15px; max-width: 550px; margin: 0 auto; }
+        .content { padding: 15px; max-width: 500px; margin: 0 auto; }
         .page { display: none; }
         .page.active { display: block; }
 
-        /* POSTS - LAYOUT VERTICAL FIXO */
-        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; display: flex; flex-direction: column; width: 100%; }
+        /* POSTS */
+        .post { background: #1e1e1e; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; overflow: hidden; }
         .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; background: #1a1a1a; }
-        .post-avatar { width: 35px; height: 35px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; flex-shrink: 0; }
-        .post-body { padding: 15px; font-size: 15px; line-height: 1.5; color: #eee; word-wrap: break-word; }
-        
-        /* CONTENTOR DA FOTO (Impede o esmagamento do post) */
-        .img-box { width: 100%; background: #000; border-top: 1px solid #252525; min-height: 200px; display: flex; align-items: center; justify-content: center; }
-        .post-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; }
-
-        /* RANKING TABLE */
-        .rank-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .rank-table td { padding: 10px; border-bottom: 1px solid #333; font-size: 14px; }
-        .rank-pos { color: #ffcc00; font-weight: bold; width: 30px; }
-
-        /* ACTIONS */
-        .post-actions { display: flex; padding: 12px 15px; gap: 20px; background: #1a1a1a; border-top: 1px solid #252525; }
-        .action-btn { background: none; border: none; color: #888; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .action-btn.liked { color: #ffcc00; }
+        .post-avatar { width: 35px; height: 35px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffcc00; font-weight: bold; }
+        .post-body { padding: 15px; font-size: 15px; line-height: 1.5; color: #eee; }
+        .img-box { width: 100%; background: #000; line-height: 0; border-top: 1px solid #252525; }
+        .post-img { width: 100%; height: auto; max-height: 450px; object-fit: contain; }
 
         .btn-pub { background: #ffcc00; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
@@ -71,38 +55,76 @@
 
     <main class="content">
         <div id="feed-page" class="page active">
-            <div class="card" style="margin-bottom:20px;">
+            <div style="background:#1e1e1e; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #333;">
                 <textarea id="postText" style="width:100%; background:#2a2a2a; border:1px solid #444; color:#fff; padding:12px; border-radius:10px; min-height:80px; outline:none;" placeholder="O que estás a pensar?"></textarea>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
                     <input type="file" id="fileInput" hidden accept="image/*">
                     <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; color:#888; cursor:pointer;"><i class="fas fa-camera"></i> Foto</button>
-                    <button class="btn-pub" id="pubBtn" onclick="handlePublish()">Publicar</button>
+                    <button class="btn-pub" onclick="handlePublish()">Publicar</button>
                 </div>
             </div>
-            <div id="feed-items">A carregar...</div>
+            <div id="feed-items">A ligar ao servidor...</div>
         </div>
 
         <div id="earn-page" class="page">
-            <div class="card">
-                <h3 style="color:#ffcc00; margin-bottom:15px;"><i class="fas fa-trophy"></i> Top 10 Utilizadores</h3>
-                <table class="rank-table" id="rank-list">
-                    </table>
-            </div>
+            <div style="background:#1e1e1e; padding:15px; border-radius:12px; text-align:center;">Ranking em carregamento...</div>
         </div>
 
         <div id="wallet-page" class="page">
-            <div class="card" style="text-align:center;">
-                <p>Saldo convertível</p>
-                <h1 style="color:#ffcc00; font-size:40px; margin:10px 0;"><span id="euroVal">0.0000</span>€</h1>
+            <div style="background:#1e1e1e; padding:20px; border-radius:12px; text-align:center;">
+                <h1 style="color:#ffcc00;"><span id="euroVal">0.0000</span>€</h1>
             </div>
         </div>
     </main>
 
     <script>
+        // CONFIGURAÇÃO SUPABASE
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QQ";
         const client = supabase.createClient(SB_URL, SB_KEY);
         const myId = 5401881400;
+
+        async function fetchFeed() {
+            const list = document.getElementById('feed-items');
+            try {
+                // Tentativa de puxar posts
+                const { data, error, status } = await client.from('posts').select('*').order('created_at', {ascending: false});
+                
+                if(error) {
+                    console.error("Erro Supabase:", error);
+                    list.innerHTML = `<div style="color:#ff4444; text-align:center; padding:20px;">
+                        Erro: ${error.message}<br><small>Status: ${status}</small>
+                    </div>`;
+                    return;
+                }
+
+                if(!data || data.length === 0) {
+                    list.innerHTML = "<div style='text-align:center; color:#888;'>Ainda não há publicações.</div>";
+                    return;
+                }
+
+                list.innerHTML = '';
+                data.forEach(p => {
+                    const el = document.createElement('div');
+                    el.className = 'post';
+                    el.innerHTML = `
+                        <div class="post-header">
+                            <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
+                            <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
+                        </div>
+                        <div class="post-body">${p.content || ''}</div>
+                        ${p.image_url ? `<div class="img-box"><img src="${p.image_url}" class="post-img"></div>` : ''}
+                        <div style="padding:12px; border-top:1px solid #252525; display:flex; gap:15px; color:#888; font-size:12px;">
+                            <span><i class="fas fa-heart"></i> ${p.likes || 0}</span>
+                            <span><i class="fas fa-comment"></i> Comentar</span>
+                        </div>
+                    `;
+                    list.appendChild(el);
+                });
+            } catch (err) {
+                list.innerHTML = "Erro crítico de rede.";
+            }
+        }
 
         function switchTab(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -110,76 +132,6 @@
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
             if(id === 'feed-page') fetchFeed();
-            if(id === 'earn-page') fetchRanking();
-        }
-
-        async function fetchFeed() {
-            const list = document.getElementById('feed-items');
-            const { data, error } = await client.from('posts').select('*').order('created_at', {ascending: false});
-            
-            if(error) { list.innerHTML = "Erro de ligação."; return; }
-
-            list.innerHTML = '';
-            data.forEach((p, index) => {
-                if (index > 0 && index % 3 === 0) {
-                    list.innerHTML += `<div class="post" style="padding:20px; text-align:center; background:#1a1a1a; border:1px dashed #ffcc00;"><small style="color:#ffcc00">ANÚNCIO</small><br><b>🚀 Torna-te VIP e ganha bónus!</b></div>`;
-                }
-
-                const el = document.createElement('div');
-                el.className = 'post';
-                el.innerHTML = `
-                    <div class="post-header">
-                        <div class="post-avatar">${p.user_id.toString().slice(-1)}</div>
-                        <span style="font-weight:bold; font-size:13px;">User #${p.user_id.toString().slice(-4)}</span>
-                    </div>
-                    <div class="post-body">${p.content || ''}</div>
-                    ${p.image_url ? `<div class="img-box"><img src="${p.image_url}" class="post-img" onerror="this.parentElement.style.display='none'"></div>` : ''}
-                    <div class="post-actions">
-                        <button class="action-btn" onclick="likePost('${p.id}', this)"><i class="fas fa-heart"></i> <span class="count">${p.likes || 0}</span></button>
-                        <button class="action-btn"><i class="fas fa-comment"></i> Comentar</button>
-                        <button class="action-btn" onclick="share()"><i class="fas fa-share-alt"></i></button>
-                    </div>
-                `;
-                list.appendChild(el);
-            });
-        }
-
-        async function fetchRanking() {
-            const list = document.getElementById('rank-list');
-            const { data } = await client.from('profiles').select('id, points').order('points', {ascending: false}).limit(10);
-            if(data) {
-                list.innerHTML = data.map((u, i) => `
-                    <tr>
-                        <td class="rank-pos">#${i+1}</td>
-                        <td>User #${u.id.toString().slice(-4)}</td>
-                        <td style="text-align:right; font-weight:bold;">${u.points} XP</td>
-                    </tr>
-                `).join('');
-            }
-        }
-
-        async function handlePublish() {
-            const txt = document.getElementById('postText').value;
-            const file = document.getElementById('fileInput').files[0];
-            const btn = document.getElementById('pubBtn');
-            if(!txt && !file) return;
-            
-            btn.disabled = true;
-            let img = null;
-
-            if(file) {
-                const name = `${Date.now()}.jpg`;
-                const { data } = await client.storage.from('post-images').upload(name, file);
-                if(data) img = client.storage.from('post-images').getPublicUrl(name).data.publicUrl;
-            }
-
-            await client.from('posts').insert([{ user_id: myId, content: txt, image_url: img }]);
-            await client.rpc('increment_points', { user_id: myId, amount: 15 });
-            
-            document.getElementById('postText').value = '';
-            btn.disabled = false;
-            fetchFeed();
-            updateProfile();
         }
 
         async function updateProfile() {
@@ -190,17 +142,7 @@
             }
         }
 
-        function share() { if (navigator.share) navigator.share({ title: 'Pine Social', url: window.location.href }); }
-        
-        async function likePost(id, btn) {
-            const countEl = btn.querySelector('.count');
-            countEl.innerText = parseInt(countEl.innerText) + 1;
-            btn.classList.add('liked');
-            await client.rpc('increment_likes', { post_id: id });
-            await client.rpc('increment_points', { user_id: myId, amount: 2 });
-            updateProfile();
-        }
-
+        // Iniciar
         updateProfile();
         fetchFeed();
     </script>
