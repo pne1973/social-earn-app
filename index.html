@@ -5,12 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Social Earn</title>
 
-    <!-- Ícones e fontes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <!-- Estilos internos (vamos organizar depois) -->
-    <style>
-     <style>
+<style>
 /* ============================
    ESTILO GLOBAL
 ============================= */
@@ -82,7 +79,7 @@ nav button:hover {
 .page {
     display: none;
     padding: 20px;
-    padding-bottom: 80px; /* espaço para a navbar */
+    padding-bottom: 80px;
 }
 
 .page.active {
@@ -167,8 +164,6 @@ textarea {
     background: #374151;
 }
 </style>
-
-    </style>
 </head>
 
 <body>
@@ -182,159 +177,98 @@ textarea {
     <button onclick="showPage('profile')"><i class="fa-solid fa-user"></i></button>
 </nav>
 
-<!-- CONTÊINER PRINCIPAL DAS PÁGINAS -->
-<div id="home" class="page active"></div>
-<div id="wallet" class="page"></div>
-<div id="feed" class="page"></div>
-<div id="profile" class="page"></div>
 <!-- ============================
-     SECÇÃO HOME
+     HOME
 ============================= -->
 <div id="home" class="page active">
-
     <h2>Bem-vindo 👋</h2>
-
-    <p style="margin-top:10px; color:#ccc;">
-        Escolhe uma das opções abaixo para navegar pela app.
-    </p>
+    <p style="margin-top:10px; color:#ccc;">Escolhe uma das opções abaixo para navegar pela app.</p>
 
     <div style="margin-top:20px; display:flex; flex-direction:column; gap:12px;">
-
-        <button onclick="showPage('wallet')" 
-                style="padding:12px; background:#1f2937; border:none; border-radius:8px; color:white; font-size:16px; cursor:pointer;">
-            💰 Ver Carteira
-        </button>
-
-        <button onclick="showPage('feed')" 
-                style="padding:12px; background:#1f2937; border:none; border-radius:8px; color:white; font-size:16px; cursor:pointer;">
-            📰 Ver Feed
-        </button>
-
-        <button onclick="showPage('profile')" 
-                style="padding:12px; background:#1f2937; border:none; border-radius:8px; color:white; font-size:16px; cursor:pointer;">
-            👤 Ver Perfil
-        </button>
-
+        <button class="btn" onclick="showPage('wallet')">💰 Ver Carteira</button>
+        <button class="btn" onclick="showPage('feed')">📰 Ver Feed</button>
+        <button class="btn" onclick="showPage('profile')">👤 Ver Perfil</button>
     </div>
-
 </div>
+
 <!-- ============================
-     SECÇÃO WALLET (CARTEIRA)
+     WALLET
 ============================= -->
 <div id="wallet" class="page">
-
     <h2>Carteira 💰</h2>
 
-    <p style="margin-top:10px; color:#ccc;">
-        Aqui podes ver o teu saldo total, ganhos pessoais e ganhos da tua rede.
-    </p>
-
-    <!-- SALDO TOTAL -->
-    <div style="margin-top:20px; background:#111827; padding:15px; border-radius:10px; border:1px solid #1f2937;">
-        <h3 style="margin:0 0 10px 0;">Saldo Total</h3>
-        <div id="wallet-total-xp" style="margin-top:6px;">XP: 0</div>
-        <div id="wallet-total-eur" style="margin-top:6px;">€: 0.00</div>
-        <div id="wallet-total-brl" style="margin-top:6px;">R$: 0.00</div>
+    <div class="card">
+        <h3>Saldo Total</h3>
+        <div id="wallet-total-xp">XP: 0</div>
+        <div id="wallet-total-eur">€: 0.00</div>
+        <div id="wallet-total-brl">R$: 0.00</div>
     </div>
 
-    <!-- GANHOS PESSOAIS -->
-    <div style="margin-top:20px; background:#111827; padding:15px; border-radius:10px; border:1px solid #1f2937;">
-        <h3 style="margin:0 0 10px 0;">Ganhos Pessoais</h3>
-        <div id="wallet-personal-xp" style="margin-top:6px;">XP: 0</div>
-        <div id="wallet-personal-eur" style="margin-top:6px;">€: 0.00</div>
-        <div id="wallet-personal-brl" style="margin-top:6px;">R$: 0.00</div>
+    <div class="card">
+        <h3>Ganhos Pessoais</h3>
+        <div id="wallet-personal-xp">XP: 0</div>
+        <div id="wallet-personal-eur">€: 0.00</div>
+        <div id="wallet-personal-brl">R$: 0.00</div>
     </div>
 
-    <!-- GANHOS DA REDE -->
-    <div style="margin-top:20px; background:#111827; padding:15px; border-radius:10px; border:1px solid #1f2937;">
-        <h3 style="margin:0 0 10px 0;">Ganhos da Rede (10%)</h3>
-        <div id="wallet-network-xp" style="margin-top:6px;">XP: 0</div>
-        <div id="wallet-network-eur" style="margin-top:6px;">€: 0.00</div>
-        <div id="wallet-network-brl" style="margin-top:6px;">R$: 0.00</div>
+    <div class="card">
+        <h3>Ganhos da Rede (10%)</h3>
+        <div id="wallet-network-xp">XP: 0</div>
+        <div id="wallet-network-eur">€: 0.00</div>
+        <div id="wallet-network-brl">R$: 0.00</div>
     </div>
-
 </div>
+
 <!-- ============================
-     SECÇÃO FEED
+     FEED
 ============================= -->
 <div id="feed" class="page">
-
     <h2>Feed 📰</h2>
 
-    <p style="margin-top:10px; color:#ccc;">
-        Aqui podes ver os posts mais recentes da comunidade.
-    </p>
-
-    <!-- FORMULÁRIO PARA CRIAR POST -->
-    <div style="margin-top:20px; background:#111827; padding:15px; border-radius:10px; border:1px solid #1f2937;">
-        <h3 style="margin:0 0 10px 0;">Criar Post</h3>
-
-        <textarea id="post-content" 
-                  placeholder="Escreve algo..." 
-                  style="width:100%; height:80px; padding:10px; border-radius:8px; border:1px solid #374151; background:#0b1020; color:white;"></textarea>
-
-        <button onclick="createPost()" 
-                style="margin-top:10px; width:100%; padding:12px; background:#1f2937; border:none; border-radius:8px; color:white; font-size:16px; cursor:pointer;">
-            Publicar
-        </button>
+    <div class="card">
+        <h3>Criar Post</h3>
+        <textarea id="post-content" placeholder="Escreve algo..."></textarea>
+        <button class="btn" onclick="createPost()">Publicar</button>
     </div>
 
-    <!-- LISTA DE POSTS -->
-    <div id="feed-list" style="margin-top:20px;">
-        <!-- Os posts serão carregados aqui via JavaScript -->
-    </div>
-
+    <div id="feed-list" style="margin-top:20px;"></div>
 </div>
+
 <!-- ============================
-     SECÇÃO PROFILE (PERFIL)
+     PROFILE
 ============================= -->
 <div id="profile" class="page">
-
     <h2>Perfil 👤</h2>
 
-    <p style="margin-top:10px; color:#ccc;">
-        Aqui podes ver as tuas informações pessoais e o teu link de convite.
-    </p>
-
-    <!-- INFORMAÇÕES DO UTILIZADOR -->
-    <div style="margin-top:20px; background:#111827; padding:15px; border-radius:10px; border:1px solid #1f2937;">
-        <h3 style="margin:0 0 10px 0;">Informações</h3>
-
-        <div style="margin-top:6px;">Nome: <span id="profile-username">...</span></div>
-        <div style="margin-top:6px;">ID: <span id="profile-id">...</span></div>
-        <div style="margin-top:6px;">XP Total: <span id="profile-total-xp">0</span></div>
+    <div class="card">
+        <h3>Informações</h3>
+        <div>Nome: <span id="profile-username">...</span></div>
+        <div>ID: <span id="profile-id">...</span></div>
+        <div>XP Total: <span id="profile-total-xp">0</span></div>
     </div>
 
-    <!-- LINK DE CONVITE -->
-    <div style="margin-top:20px; background:#111827; padding:15px; border-radius:10px; border:1px solid #1f2937;">
-        <h3 style="margin:0 0 10px 0;">Link de Convite</h3>
-
-        <p style="color:#ccc; margin-bottom:8px;">
-            Partilha este link para convidar novos utilizadores.
-        </p>
-
-        <div id="profile-invite-link" 
-             style="word-break:break-all; background:#0b1020; padding:10px; border-radius:8px; border:1px solid #374151;">
-            ...
-        </div>
-
-        <button onclick="copyInviteLink()" 
-                style="margin-top:10px; width:100%; padding:12px; background:#1f2937; border:none; border-radius:8px; color:white; font-size:16px; cursor:pointer;">
-            Copiar Link
-        </button>
+    <div class="card">
+        <h3>Link de Convite</h3>
+        <div id="profile-invite-link" style="word-break:break-all; background:#0b1020; padding:10px; border-radius:8px; border:1px solid #374151;">...</div>
+        <button class="btn" onclick="copyInviteLink()">Copiar Link</button>
     </div>
-
 </div>
+
+<!-- ============================
+     JAVASCRIPT COMPLETO
+============================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
 <script>
 // ===============================
 //  SUPABASE CONFIG
 // ===============================
 const SUPABASE_URL = "https://fickstyevektwbgimapy.supabase.co";
-const SUPABASE_KEY = "INSERE_AQUI_A_TUA_ANON_KEY";
+const SUPABASE_KEY = "AQUI_A_TUA_ANON_KEY";  // <-- SUBSTITUI AQUI
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ===============================
-//  NAVEGAÇÃO ENTRE PÁGINAS
+//  NAVEGAÇÃO
 // ===============================
 function showPage(pageId) {
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -342,7 +276,7 @@ function showPage(pageId) {
 }
 
 // ===============================
-//  CARREGAR UTILIZADOR
+//  UTILIZADOR
 // ===============================
 let currentUser = null;
 
@@ -350,13 +284,10 @@ async function loadUser() {
     const { data, error } = await supabaseClient
         .from("users")
         .select("*")
-        .eq("id", 1)   // <- Aqui podes mudar para o ID real
+        .eq("id", 1)
         .single();
 
-    if (error) {
-        console.error("Erro ao carregar utilizador:", error);
-        return;
-    }
+    if (error) return console.error(error);
 
     currentUser = data;
     updateProfileUI();
@@ -369,9 +300,9 @@ async function loadUser() {
 function updateProfileUI() {
     if (!currentUser) return;
 
-    document.getElementById("profile-username").textContent = currentUser.username || "Sem nome";
+    document.getElementById("profile-username").textContent = currentUser.username;
     document.getElementById("profile-id").textContent = currentUser.id;
-    document.getElementById("profile-total-xp").textContent = currentUser.xp || 0;
+    document.getElementById("profile-total-xp").textContent = currentUser.xp;
 
     const inviteLink = `https://t.me/socialearn_bot?start=${currentUser.id}`;
     document.getElementById("profile-invite-link").textContent = inviteLink;
@@ -389,7 +320,7 @@ function copyInviteLink() {
 function updateWalletUI() {
     if (!currentUser) return;
 
-    const xp = currentUser.xp || 0;
+    const xp = currentUser.xp;
     const eur = (xp * 0.001).toFixed(2);
     const brl = (xp * 0.006).toFixed(2);
 
@@ -397,19 +328,17 @@ function updateWalletUI() {
     document.getElementById("wallet-total-eur").textContent = "€: " + eur;
     document.getElementById("wallet-total-brl").textContent = "R$: " + brl;
 
-    // Ganhos pessoais (80%)
     document.getElementById("wallet-personal-xp").textContent = "XP: " + Math.floor(xp * 0.8);
     document.getElementById("wallet-personal-eur").textContent = "€: " + (eur * 0.8).toFixed(2);
     document.getElementById("wallet-personal-brl").textContent = "R$: " + (brl * 0.8).toFixed(2);
 
-    // Ganhos da rede (10%)
     document.getElementById("wallet-network-xp").textContent = "XP: " + Math.floor(xp * 0.1);
     document.getElementById("wallet-network-eur").textContent = "€: " + (eur * 0.1).toFixed(2);
     document.getElementById("wallet-network-brl").textContent = "R$: " + (brl * 0.1).toFixed(2);
 }
 
 // ===============================
-//  FEED — CARREGAR POSTS
+//  FEED
 // ===============================
 async function loadFeed() {
     const { data, error } = await supabaseClient
@@ -417,72 +346,46 @@ async function loadFeed() {
         .select("*")
         .order("id", { ascending: false });
 
-    if (error) {
-        console.error("Erro ao carregar feed:", error);
-        return;
-    }
+    if (error) return console.error(error);
 
     const feedList = document.getElementById("feed-list");
     feedList.innerHTML = "";
 
     data.forEach(post => {
         const div = document.createElement("div");
-        div.style = "background:#111827; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #1f2937;";
+        div.className = "post";
 
         div.innerHTML = `
-            <div style="font-weight:bold; margin-bottom:6px;">${post.username || "Utilizador"}</div>
-            <div style="margin-bottom:10px;">${post.content}</div>
-            <button onclick="likePost(${post.id})"
-                    style="padding:8px; background:#1f2937; border:none; border-radius:6px; color:white; cursor:pointer;">
-                ❤️ ${post.likes || 0}
-            </button>
+            <div class="post-username">${post.username}</div>
+            <div class="post-content">${post.content}</div>
+            <button class="like-btn" onclick="likePost(${post.id})">❤️ ${post.likes}</button>
         `;
 
         feedList.appendChild(div);
     });
 }
 
-// ===============================
-//  FEED — CRIAR POST
-// ===============================
 async function createPost() {
     const content = document.getElementById("post-content").value.trim();
     if (!content) return alert("Escreve algo!");
 
-    const { error } = await supabaseClient
-        .from("posts")
-        .insert({
-            username: currentUser.username,
-            content: content,
-            likes: 0
-        });
-
-    if (error) {
-        console.error("Erro ao criar post:", error);
-        return;
-    }
+    await supabaseClient.from("posts").insert({
+        username: currentUser.username,
+        content: content,
+        likes: 0
+    });
 
     document.getElementById("post-content").value = "";
     loadFeed();
 }
 
-// ===============================
-//  FEED — LIKE
-// ===============================
 async function likePost(id) {
-    const { data, error } = await supabaseClient
-        .rpc("increment_likes", { post_id: id });
-
-    if (error) {
-        console.error("Erro ao dar like:", error);
-        return;
-    }
-
+    await supabaseClient.rpc("increment_likes", { post_id: id });
     loadFeed();
 }
 
 // ===============================
-//  INICIALIZAÇÃO DA APP
+//  INICIAR APP
 // ===============================
 async function initApp() {
     await loadUser();
@@ -491,3 +394,6 @@ async function initApp() {
 
 initApp();
 </script>
+
+</body>
+</html>
