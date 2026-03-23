@@ -1,228 +1,52 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Apex Social Master</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* DESIGN SYSTEM - GOOGLE DARK EDITION */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { background-color: #121212; height: 100%; }
-        body { background-color: #121212; color: #ffffff; font-family: -apple-system, sans-serif; min-height: 100vh; padding-top: 185px; padding-bottom: 20px; }
-
-        /* HEADER FIXO COM STATUS */
-        .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #121212; border-bottom: 1px solid #333; }
-        .ad-top { background: #1a1a1a; color: #ffcc00; padding: 8px; text-align: center; font-size: 10px; font-weight: bold; border-bottom: 1px solid #333; }
+<div id="info-page" class="page">
+    <div class="card">
+        <h4 style="color:#ffcc00; margin-bottom:15px;"><i class="fas fa-chart-line"></i> Tabela de Ganhos Apex</h4>
+        <p style="font-size:12px; color:#888; margin-bottom:15px;">A nossa economia é baseada em interação orgânica. Quanto mais a comunidade cresce, mais você ganha.</p>
         
-        .user-stats-bar { display: flex; justify-content: space-around; background: #1a1a1a; padding: 12px 5px; border-bottom: 1px solid #252525; }
-        .stat-pill { text-align: center; flex: 1; }
-        .stat-pill span { display: block; font-size: 9px; color: #888; text-transform: uppercase; margin-bottom: 2px; }
-        .stat-pill b { font-size: 14px; color: #ffcc00; }
-
-        .tabs { display: flex; background: #121212; border-top: 1px solid #333; }
-        .tab-item { flex: 1; padding: 14px 5px; text-align: center; color: #888; font-size: 9px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .tab-item.active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255,204,0,0.05); }
-
-        /* CONTENT */
-        .content { padding: 15px; max-width: 500px; margin: 0 auto; }
-        .page { display: none; }
-        .page.active { display: block; }
-        .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
-
-        /* ADMIN STYLE (RECUPERADO DO ANTERIOR) */
-        .admin-stat-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
-        .admin-stat-card { flex: 1; background: #111; padding: 12px 5px; border-radius: 8px; border: 1px solid #222; text-align: center; }
-        .admin-stat-title { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 5px; }
-        .admin-stat-value { font-size: 18px; font-weight: bold; }
-        
-        .finance-box { background: #1a1a1a; border-radius: 10px; padding: 15px; border: 1px solid #333; margin-top: 10px; }
-        .finance-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; }
-        
-        .admin-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
-        .admin-table th { text-align: left; color: #666; padding: 8px; border-bottom: 1px solid #333; }
-        .admin-table td { padding: 8px; border-bottom: 1px solid #222; }
-
-        .btn-pub { background: #ffcc00; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-        .finance-pos { color: #00ff00; }
-        .finance-neg { color: #ff4444; }
-        .admin-link { display: none; }
-    </style>
-</head>
-<body>
-
-    <div class="header-fixed">
-        <div class="ad-top">📢 APEX SOCIAL: Ganhe 10% dos amigos + Bónus de Check-in!</div>
-        
-        <div class="user-stats-bar">
-            <div class="stat-pill"><span>Saldo Total</span><b id="topBalance">0.0000€</b></div>
-            <div class="stat-pill"><span>Amigos</span><b id="topRefs">0</b></div>
-            <div class="stat-pill"><span>Renda Rede</span><b id="topRefGains">0.0000€</b></div>
+        <div style="border: 1px solid #333; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+            <div style="display: flex; background: #1a1a1a; padding: 10px; font-size: 11px; font-weight: bold; color: #ffcc00; border-bottom: 1px solid #333;">
+                <div style="flex: 2;">ATIVIDADE</div>
+                <div style="flex: 1; text-align: center;">RECOMPENSA</div>
+            </div>
+            <div class="info-row-table">
+                <div style="flex: 2;">Check-in Diário</div>
+                <div style="flex: 1; text-align: center; color: #00ff00;">+2.0 XP</div>
+            </div>
+            <div class="info-row-table">
+                <div style="flex: 2;">Posts (1º ao 5º)</div>
+                <div style="flex: 1; text-align: center; color: #00ff00;">5.0 XP</div>
+            </div>
+            <div class="info-row-table">
+                <div style="flex: 2;">Posts (6º ao 10º)</div>
+                <div style="flex: 1; text-align: center; color: #ffcc00;">2.5 XP</div>
+            </div>
+            <div class="info-row-table" style="border:none;">
+                <div style="flex: 2;">Posts (11º em diante)</div>
+                <div style="flex: 1; text-align: center; color: #ff4444;">0.5 XP</div>
+            </div>
         </div>
 
-        <div class="tabs">
-            <div class="tab-item active" onclick="openTab('feed-page', this)">Feed</div>
-            <div class="tab-item" onclick="openTab('wallet-page', this)">Rede</div>
-            <div class="tab-item" onclick="openTab('info-page', this)">Info</div>
-            <div id="adm-tab" class="tab-item admin-link" onclick="openTab('admin-page', this)">Admin</div>
+        <div style="background: linear-gradient(135deg, #1e1e1e 0%, #111 100%); padding: 15px; border-radius: 10px; border-left: 4px solid #ffcc00;">
+            <h5 style="color:#ffcc00; margin-bottom:8px;"><i class="fas fa-users"></i> Bónus de Rede (10%)</h5>
+            <p style="font-size:11px; color:#ccc; line-height:1.5;">
+                Convide amigos usando o seu link exclusivo. Você recebe automaticamente <b>10% de todo o XP</b> que eles gerarem, sem limite de tempo ou de amigos!
+            </p>
+        </div>
+
+        <div style="margin-top: 20px; font-size: 11px; color: #666; text-align: center;">
+            <p><i class="fas fa-coins"></i> Taxa de Câmbio: 1000 XP = 1.00€</p>
+            <p style="margin-top: 5px;"><i class="fas fa-wallet"></i> Levantamento mínimo: 5.00€ (5000 XP)</p>
         </div>
     </div>
+</div>
 
-    <main class="content">
-        <div id="feed-page" class="page active">
-            <div id="checkinCard" class="card" style="display:none; border: 1px solid #ffcc00; background: rgba(255,204,0,0.05);">
-                <h4 style="color:#ffcc00; font-size: 14px;">🎁 Bónus de hoje disponível!</h4>
-                <button class="btn-pub" onclick="doCheckin()">Receber +2.0 XP</button>
-            </div>
-            <div class="card">
-                <textarea id="postText" style="width:100%; background:transparent; border:none; color:#fff; resize:none; outline:none; font-size:15px; min-height:60px;" placeholder="O que está a pensar?"></textarea>
-                <button class="btn-pub" onclick="publish()">Publicar Post</button>
-                <div id="rewardHint" style="font-size:10px; color:#666; margin-top:8px;">A calcular recompensas...</div>
-            </div>
-            <div id="feed-items">Carregando feed...</div>
-        </div>
-
-        <div id="wallet-page" class="page">
-            <div class="card" style="text-align:center;">
-                <h4 style="color:#ffcc00;">Sistema de Afiliados</h4>
-                <p style="font-size:12px; color:#888; margin:10px 0;">Copia o link e ganha 10% de comissão vitalícia sobre os teus amigos!</p>
-                <div id="refLink" style="background:#111; padding:12px; margin-bottom:15px; font-size:11px; border:1px dashed #444; color:#ffcc00; word-break: break-all;">...</div>
-                <button class="btn-pub" onclick="copyRef()"><i class="fas fa-copy"></i> Copiar Link</button>
-            </div>
-        </div>
-
-        <div id="info-page" class="page">
-            <div class="card">
-                <h4 style="color:#ffcc00; margin-bottom:10px;">Regras de Ganhos</h4>
-                <div style="font-size:13px; line-height:1.8;">
-                    • <b>Check-in Diário:</b> +2.0 XP<br>
-                    • <b>Posts 1-5:</b> 5.0 XP cada<br>
-                    • <b>Posts 6-10:</b> 2.5 XP cada<br>
-                    • <b>Posts 11+:</b> 0.5 XP cada<br>
-                    • <b>Rede:</b> 10% de bónus sobre convidados
-                </div>
-            </div>
-        </div>
-
-        <div id="admin-page" class="page">
-            <div class="card" style="border: 1px solid #ff4444;">
-                <h3 style="color:#ff4444; margin-bottom:15px;"><i class="fas fa-chart-line"></i> Dashboard Financeira Apex</h3>
-                
-                <div class="admin-stat-row">
-                    <div class="admin-stat-card"><div class="admin-stat-title">Utilizadores</div><div id="admUsers" class="admin-stat-value">0</div></div>
-                    <div class="admin-stat-card"><div class="admin-stat-title">Posts Totais</div><div id="admPosts" class="admin-stat-value">0</div></div>
-                    <div class="admin-stat-card"><div class="admin-stat-title">XP Circulante</div><div id="admXP" class="admin-stat-value">0</div></div>
-                </div>
-
-                <div class="finance-box">
-                    <div class="finance-row"><span>Dívida Acumulada:</span><b id="admDebt" class="finance-neg">0.0000€</b></div>
-                    <div class="finance-row"><span>Receita Est. (Adsterra):</span><b id="admRev" class="finance-pos">0.0000€</b></div>
-                    <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:11px; color:#aaa;">LUCRO LÍQUIDO:</span>
-                        <h2 id="admProfit" class="finance-pos">0.0000€</h2>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h4 style="color:#ffcc00; margin-bottom:10px;"><i class="fas fa-users"></i> Ranking de Afiliadores</h4>
-                <table class="admin-table">
-                    <thead><tr><th>ID (Fim)</th><th>Amigos</th><th>Comissão (€)</th></tr></thead>
-                    <tbody id="admRefTable"></tbody>
-                </table>
-            </div>
-            
-            <button class="btn-pub" style="background:#ff4444; color:#fff;" onclick="clearFeed()">Resetar Feed</button>
-        </div>
-    </main>
-
-    <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const client = supabase.createClient(SB_URL, SB_KEY);
-        const myId = 5401881400; 
-        let dailyPosts = 0;
-
-        async function getProfile() {
-            const { data } = await client.from('profiles').select('*').eq('id', myId).single();
-            if (data) {
-                document.getElementById('topBalance').innerText = (data.points * 0.0010).toFixed(4) + "€";
-                document.getElementById('topRefs').innerText = data.referrals_count || 0;
-                document.getElementById('topRefGains').innerText = (data.referral_points * 0.0010).toFixed(4) + "€";
-                document.getElementById('refLink').innerText = `https://apexsocial.app/?ref=${myId}`;
-
-                const today = new Date().toISOString().split('T')[0];
-                const { count } = await client.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', myId).gte('created_at', today);
-                dailyPosts = count || 0;
-                
-                let next = dailyPosts < 5 ? 5.0 : (dailyPosts < 10 ? 2.5 : 0.5);
-                document.getElementById('rewardHint').innerHTML = `Hoje: <b>${dailyPosts} posts</b> | Próximo: <b>${next} XP</b>`;
-                document.getElementById('checkinCard').style.display = 'block'; 
-            }
-            if(myId === 5401881400) document.getElementById('adm-tab').style.display = 'block';
-        }
-
-        async function publish() {
-            const txt = document.getElementById('postText').value;
-            if(!txt) return;
-            let reward = dailyPosts < 5 ? 5.0 : (dailyPosts < 10 ? 2.5 : 0.5);
-            await client.from('posts').insert([{ user_id: myId, content: txt }]);
-            await client.rpc('increment_points', { user_id: myId, amount: reward });
-            await client.rpc('process_referral_bonus', { user_id: myId, bonus_amount: reward * 0.1 });
-            document.getElementById('postText').value = '';
-            getProfile();
-        }
-
-        async function doCheckin() {
-            await client.rpc('increment_points', { user_id: myId, amount: 2.0 });
-            document.getElementById('checkinCard').style.display = 'none';
-            getProfile();
-            alert("Check-in realizado: +2.0 XP!");
-        }
-
-        async function updateAdmin() {
-            const { data: users, count: uCount } = await client.from('profiles').select('*', { count: 'exact' });
-            const { count: pCount } = await client.from('posts').select('*', { count: 'exact' });
-            
-            let totalXP = 0;
-            let tableHTML = '';
-            users.forEach(u => {
-                totalXP += (u.points || 0);
-                tableHTML += `<tr><td>...${u.id.toString().slice(-4)}</td><td>${u.referrals_count || 0}</td><td class="finance-pos">${(u.referral_points * 0.0010).toFixed(4)}€</td></tr>`;
-            });
-
-            const debt = totalXP * 0.0010;
-            const rev = (pCount * 18 * 0.0010); // Base: 18 views por post
-            const profit = rev - debt;
-
-            document.getElementById('admUsers').innerText = uCount;
-            document.getElementById('admPosts').innerText = pCount;
-            document.getElementById('admXP').innerText = totalXP.toFixed(0);
-            document.getElementById('admDebt').innerText = debt.toFixed(4) + "€";
-            document.getElementById('admRev').innerText = rev.toFixed(4) + "€";
-            
-            const pEl = document.getElementById('admProfit');
-            pEl.innerText = profit.toFixed(4) + "€";
-            pEl.className = profit >= 0 ? 'finance-pos' : 'finance-neg';
-            document.getElementById('admRefTable').innerHTML = tableHTML;
-        }
-
-        function openTab(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
-            if(id === 'admin-page') updateAdmin();
-        }
-
-        function copyRef() {
-            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
-            alert("Link copiado!");
-        }
-
-        getProfile();
-    </script>
-</body>
-</html>
+<style>
+    /* CSS ADICIONAL PARA A TABELA DE INFO */
+    .info-row-table {
+        display: flex;
+        padding: 12px 10px;
+        font-size: 12px;
+        border-bottom: 1px solid #222;
+        background: #1e1e1e;
+    }
+</style>
