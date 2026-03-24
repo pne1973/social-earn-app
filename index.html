@@ -3,41 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Apex Social - Feed Final</title>
+    <title>Apex Social - Stable v5</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: #f8f9fa; color: #202124; font-family: 'Roboto', sans-serif; padding-top: 160px; }
-
-        /* HEADER */
-        .header-fixed { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; background: #fff; border-bottom: 1px solid #dadce0; }
-        .blue-bar { background: #1a73e8; color: #fff; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; padding: 15px 0; text-align: center; border-bottom: 1px solid #f1f3f4; }
-        .stats b { display: block; color: #1a73e8; font-size: 16px; font-weight: 900; }
-        .stats label { font-size: 9px; color: #70757a; text-transform: uppercase; font-weight: bold; }
-
-        /* CONTENT */
-        .container { max-width: 500px; margin: 0 auto; padding: 12px; }
-        .card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-
-        /* INPUT AREA */
-        #postTxt { width: 100%; border: 1px solid #eee; outline: none; font-size: 15px; min-height: 60px; resize: none; padding: 10px; border-radius: 6px; }
-        .post-tools { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-        .btn-img { color: #1a73e8; font-size: 22px; cursor: pointer; }
-        .btn-publish { background: #1a73e8; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        body { background: #f0f2f5; color: #1c1e21; font-family: -apple-system, sans-serif; padding-top: 150px; }
         
-        /* FEED STYLES */
-        .post-img { width: 100%; border-radius: 8px; margin: 10px 0; display: block; max-height: 350px; object-fit: cover; }
-        .post-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid #f1f3f4; margin-top: 12px; padding-top: 10px; }
-        .btn-act { background: none; border: none; font-size: 12px; color: #5f6368; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn-act i { color: #1a73e8; font-size: 16px; }
+        /* HEADER */
+        .header-fixed { position: fixed; top: 0; width: 100%; z-index: 1000; background: #fff; border-bottom: 1px solid #ddd; }
+        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
+        .stats { display: flex; justify-content: space-around; padding: 15px 0; text-align: center; }
+        .stats b { display: block; color: #1a73e8; font-size: 15px; }
+        .stats label { font-size: 9px; color: #65676b; text-transform: uppercase; font-weight: bold; }
 
-        /* COMMENTS SECTION */
-        .comment-section { background: #f8f9fa; margin-top: 10px; padding: 10px; border-radius: 6px; display: none; }
-        .comment-item { font-size: 12px; padding: 5px 0; border-bottom: 1px solid #eee; color: #3c4043; }
-        .comment-item b { color: #1a73e8; }
-        .comment-input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; margin-top: 8px; outline: none; }
+        /* FEED */
+        .container { max-width: 500px; margin: 0 auto; padding: 10px; }
+        .card { background: #fff; border-radius: 8px; padding: 15px; margin-bottom: 12px; border: 1px solid #ddd; }
+        
+        textarea { width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 10px; min-height: 60px; resize: none; font-size: 15px; outline: none; background: #f5f6f7; }
+        .post-actions { display: flex; justify-content: space-between; border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px; }
+        .btn-act { background: none; border: none; color: #65676b; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .btn-act i { color: #1a73e8; }
+        
+        .img-preview { width: 100%; border-radius: 8px; margin-top: 10px; display: none; border: 1px solid #eee; }
+        .post-img-result { width: 100%; border-radius: 8px; margin: 10px 0; }
+        
+        /* COMMENTS */
+        .comm-box { display: none; background: #f0f2f5; padding: 10px; border-radius: 6px; margin-top: 10px; }
+        .comm-item { font-size: 12px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid #ddd; }
+        .comm-input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; outline: none; }
     </style>
 </head>
 <body>
@@ -45,22 +40,20 @@
     <header class="header-fixed">
         <div class="blue-bar">APEX SOCIAL NETWORK</div>
         <div class="stats">
-            <div><label>MEU SALDO</label><b id="stEUR">0.0000€</b></div>
-            <div><label>DÍVIDA REDE</label><b id="stDebt" style="color:#d93025;">0.0000€</b></div>
+            <div><label>SALDO</label><b id="stEUR">0.0000€</b></div>
+            <div><label>REDE</label><b id="stDebt" style="color:#d93025;">0.0000€</b></div>
         </div>
     </header>
 
     <main class="container">
         <div class="card">
-            <textarea id="postTxt" placeholder="O que vais partilhar hoje?"></textarea>
-            <div id="preview" style="display:none; margin-top:10px;"><img id="imgPre" src="" style="width:100%; border-radius:8px;"></div>
-            <div class="post-tools">
-                <label for="fileIn" class="btn-img"><i class="fas fa-camera"></i></label>
-                <input type="file" id="fileIn" accept="image/*" style="display:none;" onchange="compressAndPreview(this)">
-                <button onclick="sendPost()" id="btnSend" class="btn-publish">Publicar (+0.0015€)</button>
+            <textarea id="postTxt" placeholder="No que estás a pensar?"></textarea>
+            <img id="imgPre" class="img-preview">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <label style="cursor:pointer; color:#1a73e8; font-size:20px;"><i class="fas fa-camera"></i><input type="file" id="fileIn" accept="image/*" style="display:none;" onchange="preImg(this)"></label>
+                <button onclick="send()" id="btnSend" style="background:#1a73e8; color:#fff; border:none; padding:8px 20px; border-radius:6px; font-weight:bold;">Publicar</button>
             </div>
         </div>
-
         <div id="feed"></div>
     </main>
 
@@ -70,115 +63,19 @@
         const client = supabase.createClient(SB_URL, SB_KEY);
 
         let saldo = 0.0080;
-        let selectedImg = null;
+        let imgData = null;
 
         function updateUI() {
-            const val = saldo.toFixed(4) + "€";
-            document.getElementById('stEUR').innerText = val;
-            document.getElementById('stDebt').innerText = val;
+            const v = saldo.toFixed(4) + "€";
+            document.getElementById('stEUR').innerText = v;
+            document.getElementById('stDebt').innerText = v;
         }
 
-        function compressAndPreview(input) {
+        function preImg(input) {
             const file = input.files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    canvas.width = 600; canvas.height = (img.height / img.width) * 600;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    selectedImg = canvas.toDataURL('image/jpeg', 0.6);
-                    document.getElementById('imgPre').src = selectedImg;
-                    document.getElementById('preview').style.display = 'block';
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        async function sendPost() {
-            const content = document.getElementById('postTxt').value;
-            if(!content && !selectedImg) return;
-            
-            const { error } = await client.from('posts').insert([{ 
-                content, image_url: selectedImg, likes: 0, comments_count: 0, comments_data: [] 
-            }]);
-
-            if(!error) {
-                saldo += 0.0015;
-                document.getElementById('postTxt').value = "";
-                document.getElementById('preview').style.display = 'none';
-                selectedImg = null;
-                updateUI();
-                loadFeed();
-            }
-        }
-
-        async function loadFeed() {
-            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
-            const feed = document.getElementById('feed');
-            feed.innerHTML = "";
-            
-            posts?.forEach(p => {
-                const commentsList = (p.comments_data || []).map(c => `<div class="comment-item"><b>User:</b> ${c}</div>`).join('');
-                
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.innerHTML = `
-                    <div style="font-size:11px; font-weight:bold; color:#1a73e8; margin-bottom:8px;">Utilizador Apex <span style="color:#999;">#${p.id}</span></div>
-                    <p style="font-size:14px;">${p.content || ''}</p>
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    
-                    <div class="post-actions">
-                        <button class="btn-act" onclick="handleLike(${p.id}, ${p.likes || 0})"><i class="far fa-heart"></i> ${p.likes || 0}</button>
-                        <button class="btn-act" onclick="document.getElementById('sec-${p.id}').style.display='block'"><i class="far fa-comment"></i> ${p.comments_count || 0}</button>
-                        <button class="btn-act btn-del" onclick="deletePost(${p.id})"><i class="fas fa-trash"></i></button>
-                    </div>
-
-                    <div id="sec-${p.id}" class="comment-section">
-                        <div id="list-${p.id}">${commentsList}</div>
-                        <input type="text" class="comment-input" placeholder="Escreve e prime Enter..." onkeypress="if(event.key==='Enter') saveComment(this, ${p.id})">
-                    </div>
-                `;
-                feed.appendChild(div);
-            });
-        }
-
-        async function handleLike(id, current) {
-            const { error } = await client.from('posts').update({ likes: current + 1 }).eq('id', id);
-            if(!error) {
-                saldo += 0.0002;
-                updateUI();
-                loadFeed();
-            }
-        }
-
-        async function saveComment(input, id) {
-            const text = input.value;
-            if(!text) return;
-
-            const { data } = await client.from('posts').select('comments_data, comments_count').eq('id', id).single();
-            let list = data.comments_data || [];
-            list.push(text);
-
-            const { error } = await client.from('posts').update({ 
-                comments_data: list, 
-                comments_count: list.length 
-            }).eq('id', id);
-
-            if(!error) {
-                input.value = "";
-                loadFeed();
-            }
-        }
-
-        async function deletePost(id) {
-            if(confirm("Apagar?")) { await client.from('posts').delete().eq('id', id); loadFeed(); }
-        }
-
-        updateUI();
-        loadFeed();
-    </script>
-</body>
-</html>
+                    canvas.width = 500; canvas.height = (img.height/
