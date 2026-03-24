@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Apex Social - Fixed v6</title>
+    <title>Apex Social - Full Feed v7</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -22,12 +22,13 @@
         textarea { width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 10px; min-height: 50px; resize: none; font-size: 14px; outline: none; background: #f5f6f7; }
         .post-img-result { width: 100%; border-radius: 8px; margin: 10px 0; display: block; }
         
-        .post-actions { display: flex; justify-content: space-between; border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px; }
-        .btn-act { background: none; border: none; color: #65676b; font-weight: bold; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .post-actions { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #f1f3f4; margin-top: 10px; padding-top: 10px; }
+        .btn-act { background: none; border: none; color: #65676b; font-weight: bold; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .btn-act i { font-size: 16px; color: #1a73e8; }
         
-        .comm-box { background: #f0f2f5; padding: 10px; border-radius: 6px; margin-top: 10px; display: none; }
-        .comm-input { width: 100%; padding: 6px 12px; border: 1px solid #ddd; border-radius: 15px; font-size: 13px; outline: none; margin-top: 5px; }
-        .comm-text { font-size: 12px; padding: 4px 0; border-bottom: 1px dashed #ccc; }
+        .comm-box { background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 10px; display: none; border: 1px solid #eee; }
+        .comm-input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 12px; outline: none; margin-top: 8px; }
+        .comm-text { font-size: 12px; padding: 6px; border-bottom: 1px solid #eee; color: #333; background: #fff; border-radius: 4px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -43,10 +44,10 @@
     <main class="container">
         <div class="card">
             <textarea id="postTxt" placeholder="No que estás a pensar?"></textarea>
-            <div id="preDiv" style="display:none; margin-top:10px;"><img id="imgPre" style="width:100%; border-radius:8px; border:1px solid #ddd;"></div>
+            <div id="preDiv" style="display:none; margin-top:10px;"><img id="imgPre" style="width:100%; border-radius:8px;"></div>
             <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                <label style="cursor:pointer; color:#1a73e8; font-size:20px;"><i class="fas fa-camera"></i><input type="file" id="fileIn" accept="image/*" style="display:none;" onchange="handleFile(this)"></label>
-                <button onclick="send()" id="btnSend" style="background:#1a73e8; color:#fff; border:none; padding:7px 18px; border-radius:6px; font-weight:bold; cursor:pointer;">Publicar</button>
+                <label style="cursor:pointer; color:#1a73e8; font-size:22px;"><i class="fas fa-camera"></i><input type="file" id="fileIn" accept="image/*" style="display:none;" onchange="handleFile(this)"></label>
+                <button onclick="send()" id="btnSend" style="background:#1a73e8; color:#fff; border:none; padding:8px 20px; border-radius:6px; font-weight:bold;">Publicar</button>
             </div>
         </div>
         <div id="feed"></div>
@@ -73,9 +74,9 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    canvas.width = 500; canvas.height = (img.height/img.width)*500;
-                    canvas.getContext('2d').drawImage(img,0,0,500,canvas.height);
-                    imgBase64 = canvas.toDataURL('image/jpeg', 0.5);
+                    canvas.width = 600; canvas.height = (img.height/img.width)*600;
+                    canvas.getContext('2d').drawImage(img,0,0,600,canvas.height);
+                    imgBase64 = canvas.toDataURL('image/jpeg', 0.6);
                     document.getElementById('imgPre').src = imgBase64;
                     document.getElementById('preDiv').style.display = 'block';
                 };
@@ -87,27 +88,24 @@
         async function send() {
             const txt = document.getElementById('postTxt').value;
             if(!txt && !imgBase64) return;
-            document.getElementById('btnSend').innerText = "...";
+            document.getElementById('btnSend').innerText = "A enviar...";
 
             const { error } = await client.from('posts').insert([{ 
                 content: txt, image_url: imgBase64, likes: 0, comments_data: [] 
             }]);
 
-            if(error) {
-                alert("Erro ao publicar: " + error.message);
-                document.getElementById('btnSend').innerText = "Publicar";
-            } else {
+            if(!error) {
                 saldo += 0.0015;
                 location.reload();
+            } else {
+                alert("Erro: " + error.message);
+                document.getElementById('btnSend').innerText = "Publicar";
             }
         }
 
         async function loadFeed() {
             const { data: posts, error } = await client.from('posts').select('*').order('created_at', { ascending: false });
-            if(error) {
-                document.getElementById('feed').innerHTML = "<p>Erro ao carregar posts.</p>";
-                return;
-            }
+            if(error) return;
 
             const feed = document.getElementById('feed');
             feed.innerHTML = "";
@@ -115,46 +113,76 @@
             posts.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'card';
-                // Segurança contra dados nulos
                 const likes = p.likes || 0;
                 const comms = p.comments_data || [];
                 
                 div.innerHTML = `
-                    <p style="font-size:14px;">${p.content || ''}</p>
+                    <div style="font-size:10px; color:#999; margin-bottom:5px;">Post #${p.id}</div>
+                    <p style="font-size:14px; line-height:1.4;">${p.content || ''}</p>
                     ${p.image_url ? `<img src="${p.image_url}" class="post-img-result">` : ''}
+                    
                     <div class="post-actions">
-                        <button class="btn-act" onclick="like(${p.id}, ${likes})"><i class="fas fa-heart" style="color:#e0245e"></i> ${likes}</button>
-                        <button class="btn-act" onclick="document.getElementById('cb-${p.id}').style.display='block'"><i class="fas fa-comment"></i> ${comms.length}</button>
-                        <button class="btn-act" onclick="del(${p.id})" style="color:#999"><i class="fas fa-trash"></i></button>
+                        <button class="btn-act" onclick="likePost(${p.id}, ${likes})"><i class="fas fa-heart" style="color:#e0245e"></i> ${likes}</button>
+                        <button class="btn-act" onclick="toggleComm(${p.id})"><i class="fas fa-comment"></i> ${comms.length}</button>
+                        <button class="btn-act" onclick="sharePost('${p.content}', ${p.id})"><i class="fas fa-share"></i> Partilhar</button>
+                        <button class="btn-act" onclick="del(${p.id})" style="color:#ccc"><i class="fas fa-trash"></i></button>
                     </div>
+
                     <div id="cb-${p.id}" class="comm-box">
                         <div id="cl-${p.id}">${comms.map(c => `<div class="comm-text">${c}</div>`).join('')}</div>
-                        <input type="text" class="comm-input" placeholder="Comentar..." onkeypress="if(event.key==='Enter') addC(this, ${p.id})">
+                        <input type="text" class="comm-input" placeholder="Escreve e prime Enter..." onkeypress="if(event.key==='Enter') addC(this, ${p.id})">
                     </div>
                 `;
                 feed.appendChild(div);
             });
         }
 
-        async function like(id, cur) {
-            await client.from('posts').update({ likes: cur + 1 }).eq('id', id);
-            saldo += 0.0002;
-            updateUI();
-            loadFeed();
+        async function likePost(id, cur) {
+            const { error } = await client.from('posts').update({ likes: cur + 1 }).eq('id', id);
+            if(!error) {
+                saldo += 0.0002;
+                updateUI();
+                loadFeed(); // Atualiza o balão no ecrã
+            }
+        }
+
+        function toggleComm(id) {
+            const el = document.getElementById('cb-'+id);
+            el.style.display = el.style.display === 'block' ? 'none' : 'block';
         }
 
         async function addC(input, id) {
             const val = input.value;
             if(!val) return;
+            
+            // Buscar lista atual primeiro
             const { data } = await client.from('posts').select('comments_data').eq('id', id).single();
-            let list = data.comments_data || [];
+            let list = Array.isArray(data.comments_data) ? data.comments_data : [];
             list.push(val);
-            await client.from('posts').update({ comments_data: list }).eq('id', id);
-            loadFeed();
+            
+            const { error } = await client.from('posts').update({ comments_data: list }).eq('id', id);
+            if(!error) {
+                input.value = "";
+                loadFeed(); // Atualiza o feed para mostrar o comentário novo
+            }
+        }
+
+        function sharePost(text, id) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Apex Social',
+                    text: text || 'Vejam este post na Apex!',
+                    url: window.location.href
+                }).then(() => {
+                    alert("Obrigado por partilhar!");
+                }).catch(console.error);
+            } else {
+                alert("Partilha não suportada neste navegador. Copia o link!");
+            }
         }
 
         async function del(id) {
-            if(confirm("Apagar?")) { await client.from('posts').delete().eq('id', id); loadFeed(); }
+            if(confirm("Apagar post?")) { await client.from('posts').delete().eq('id', id); loadFeed(); }
         }
 
         updateUI();
