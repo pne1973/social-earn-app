@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Apex Social - Command & Feed</title>
+    <title>Apex Social - Production Mode</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #1a73e8; --dark: #1c1e21; --bg: #f0f2f5; --success: #34a853; --danger: #ea4335; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-        
         body { background: var(--bg); color: var(--dark); padding-top: 140px; padding-bottom: 80px; }
 
-        /* --- HEADER & NAVIGATION --- */
+        /* HEADER */
         .header-fixed { position: fixed; top: 0; width: 100%; z-index: 2000; background: #fff; border-bottom: 1px solid #ddd; }
         .blue-bar { background: var(--primary); color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; letter-spacing: 1px; }
         .stats-top { display: flex; justify-content: center; padding: 15px 0; background: #fff; border-bottom: 1px solid #eee; }
@@ -20,47 +19,35 @@
         .stats-item label { font-size: 9px; color: #65676b; font-weight: bold; text-transform: uppercase; }
         .top-ad { background: #fff9c4; padding: 8px; text-align: center; border-bottom: 1px solid #fbc02d; font-size: 11px; font-weight: bold; color: #f57f17; }
 
+        /* NAV */
         .nav-bottom { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid #ddd; display: flex; z-index: 2000; height: 70px; }
-        .nav-btn { flex: 1; border: none; background: none; color: #65676b; font-weight: bold; font-size: 11px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+        .nav-btn { flex: 1; border: none; background: none; color: #65676b; font-weight: bold; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
         .nav-btn i { font-size: 22px; }
         .nav-btn.active { color: var(--primary); border-top: 3px solid var(--primary); background: #f8f9ff; }
 
-        /* --- CONTAINER & TABS --- */
+        /* CONTAINERS */
         .container { max-width: 550px; margin: 0 auto; padding: 12px; }
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-content { display: none; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- FEED STYLES --- */
+        /* CARDS & FEED */
         .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 15px; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 12px; min-height: 70px; resize: none; font-size: 15px; outline: none; background: #f9fafb; }
-        .post-img-frame { width: 100%; height: 320px; overflow: hidden; border-radius: 10px; margin: 12px 0; background: #eee; border: 1px solid #f0f0f0; }
+        .post-img-frame { width: 100%; height: 320px; overflow: hidden; border-radius: 10px; margin: 12px 0; background: #eee; }
         .post-img-frame img { width: 100%; height: 100%; object-fit: cover; }
         .post-actions { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #f0f2f5; margin-top: 12px; padding-top: 10px; }
         .btn-act { background: none; border: none; color: #65676b; font-weight: bold; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-act i { color: var(--primary); font-size: 18px; }
 
-        /* --- ADMIN COMMAND CENTER STYLES --- */
+        /* ADMIN SPECIFIC */
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .m-card { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #ddd; border-left: 4px solid var(--primary); }
         .m-card small { font-size: 9px; color: #777; font-weight: bold; text-transform: uppercase; }
         .m-card h2 { font-size: 20px; color: var(--dark); margin-top: 4px; }
-        
-        .heatmap { display: flex; gap: 3px; height: 50px; align-items: flex-end; margin: 15px 0; }
-        .h-bar { flex: 1; background: var(--primary); border-radius: 2px; min-height: 4px; opacity: 0.6; }
-
-        .sys-log { background: #1c1e21; color: #00ff00; font-family: monospace; padding: 12px; border-radius: 8px; font-size: 10px; max-height: 120px; overflow-y: auto; margin-top: 10px; line-height: 1.4; }
-        
+        .sys-log { background: #1c1e21; color: #00ff00; font-family: monospace; padding: 12px; border-radius: 8px; font-size: 10px; max-height: 120px; overflow-y: auto; margin-top: 10px; }
         .admin-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
-        .admin-table th { text-align: left; padding: 8px; background: #f8f9fa; color: #666; border-bottom: 2px solid #eee; }
+        .admin-table th { text-align: left; padding: 8px; background: #f8f9fa; color: #666; }
         .admin-table td { padding: 10px 8px; border-bottom: 1px solid #eee; }
-
-        /* --- ADS --- */
-        .ad-banner { background: #e8f0fe; border: 1px solid var(--primary); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; color: #1967d2; font-size: 13px; font-weight: 500; }
-
-        /* --- COMMENTS --- */
-        .comm-section { background: #f0f2f5; padding: 10px; border-radius: 10px; margin-top: 10px; display: none; }
-        .comm-input { width: 100%; padding: 8px 15px; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; outline: none; margin-top: 10px; }
-        .comm-item { font-size: 12px; padding: 6px; background: #fff; border-radius: 6px; margin-bottom: 5px; border: 1px solid #eee; }
+        .empty-msg { text-align: center; padding: 20px; color: #999; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -69,75 +56,71 @@
         <div class="blue-bar">APEX SOCIAL NETWORK • MASTER CONSOLE</div>
         <div class="stats-top">
             <div class="stats-item">
-                <label>O MEU SALDO</label>
-                <b id="stEUR">0.0080€</b>
+                <label>MEU SALDO ATUAL</label>
+                <b id="stEUR">0.0000€</b>
             </div>
         </div>
-        <div id="topAd" class="top-ad">📢 ANÚNCIO: Convida 5 amigos e recebe 0.50€ extra!</div>
+        <div class="top-ad">📢 ANÚNCIO: Partilha a rede e ganha 15 XP por cada post!</div>
     </header>
 
     <main class="container">
         
         <div id="tab-feed" class="tab-content" style="display: block;">
             <div class="card">
-                <textarea id="postTxt" placeholder="O que vais partilhar com a rede?"></textarea>
-                <div id="preDiv" style="display:none; margin-top:10px;"><img id="imgPre" style="width:100%; border-radius:10px; border:1px solid #ddd;"></div>
+                <textarea id="postTxt" placeholder="O que estás a pensar?"></textarea>
+                <div id="preDiv" style="display:none; margin-top:10px;"><img id="imgPre" style="width:100%; border-radius:10px;"></div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
                     <label style="cursor:pointer; color:var(--primary); font-size:24px;"><i class="fas fa-camera"></i><input type="file" id="fileIn" accept="image/*" style="display:none;" onchange="handleFile(this)"></label>
-                    <button onclick="publishPost()" id="btnSend" style="background:var(--primary); color:#fff; border:none; padding:10px 25px; border-radius:8px; font-weight:bold; cursor:pointer;">PUBLICAR</button>
+                    <button onclick="publish()" id="btnSend" style="background:var(--primary); color:#fff; border:none; padding:10px 25px; border-radius:8px; font-weight:bold;">PUBLICAR</button>
                 </div>
             </div>
             <div id="feedList"></div>
         </div>
 
         <div id="tab-admin" class="tab-content">
-            <h3 style="margin-bottom:15px; font-size:16px;"><i class="fas fa-shield-alt"></i> Command Center Admin</h3>
+            <h3 style="margin-bottom:15px; font-size:16px;"><i class="fas fa-shield-alt"></i> Dashboard Real-Time</h3>
             
             <div class="admin-grid">
                 <div class="m-card">
                     <small>Utilizadores Ativos</small>
-                    <h2 id="admUsers">1,482</h2>
+                    <h2 id="admUsers">0</h2>
                 </div>
                 <div class="m-card">
-                    <small>Posts Totais</small>
+                    <small>Posts na Base</small>
                     <h2 id="admPosts">0</h2>
                 </div>
                 <div class="m-card" style="border-left-color: var(--success);">
-                    <small>Receita Ads (Est.)</small>
-                    <h2>142.50€</h2>
+                    <small>Total Likes Rede</small>
+                    <h2 id="admTotalLikes">0</h2>
                 </div>
                 <div class="m-card" style="border-left-color: var(--danger);">
-                    <small>Dívida Pendente</small>
-                    <h2>-12.80€</h2>
+                    <small>Dívida p/ Levantamento</small>
+                    <h2 id="admDebt">0.00€</h2>
                 </div>
             </div>
 
             <div class="card">
-                <small style="font-weight:bold; color:#777;">PICO DE ATIVIDADE (24H)</small>
-                <div class="heatmap" id="heatmap"></div>
+                <small style="font-weight:bold; color:#777;">PEDIDOS DE PAGAMENTO (REAIS)</small>
+                <div id="paymentArea">
+                    <table class="admin-table">
+                        <thead><tr><th>USER ID</th><th>VALOR</th><th>AÇÃO</th></tr></thead>
+                        <tbody id="payTableBody">
+                            </tbody>
+                    </table>
+                    <div id="noPayMsg" class="empty-msg">Nenhum pedido de levantamento pendente.</div>
+                </div>
             </div>
 
             <div class="card">
-                <small style="font-weight:bold; color:#777;">CONTROLO FINANCEIRO PAYPAL</small>
-                <table class="admin-table">
-                    <thead><tr><th>ID USER</th><th>SALDO</th><th>AÇÃO</th></tr></thead>
-                    <tbody>
-                        <tr><td>#540188...</td><td><b>15.50€</b></td><td><button onclick="alert('Link PayPal gerado!')" style="background:var(--success); color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold;">PAGAR</button></td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="card">
-                <small style="font-weight:bold; color:#777;">MODERAÇÃO POR ID</small>
+                <small style="font-weight:bold; color:#777;">CONTROLO DE SEGURANÇA</small>
                 <div style="display:flex; gap:10px; margin-top:10px;">
-                    <input type="number" id="delID" placeholder="ID Post" style="flex:1; padding:10px; border-radius:6px; border:1px solid #ddd;">
-                    <button onclick="adminDel()" style="background:var(--danger); color:#fff; border:none; padding:0 15px; border-radius:6px; font-weight:bold;">APAGAR</button>
+                    <input type="number" id="delID" placeholder="ID do Post" style="flex:1; padding:10px; border-radius:6px; border:1px solid #ddd;">
+                    <button onclick="adminDel()" style="background:var(--danger); color:#fff; border:none; padding:0 15px; border-radius:6px; font-weight:bold;">ELIMINAR</button>
                 </div>
             </div>
 
             <div class="sys-log" id="sysLog">
-                [SYSTEM] Sessão Admin Master Iniciada...<br>
-                [DATABASE] Supabase conectado com sucesso.<br>
+                [SYSTEM] Aguardando dados da rede...<br>
             </div>
         </div>
 
@@ -153,25 +136,75 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
 
-        let saldo = 0.0080;
+        let mySaldo = 0.0080;
         let imgBase64 = null;
 
-        function updateUI() {
-            document.getElementById('stEUR').innerText = saldo.toFixed(4) + "€";
-        }
-
-        // --- NAVEGAÇÃO SPA ---
+        // --- NAVEGAÇÃO ---
         function switchTab(tab, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + tab).style.display = 'block';
             btn.classList.add('active');
-            if(tab === 'admin') refreshAdmin();
+            if(tab === 'admin') refreshAdminData();
         }
 
-        // --- FEED & POSTS ---
+        // --- FEED LOGIC ---
+        async function loadFeed() {
+            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
+            const list = document.getElementById('feedList');
+            list.innerHTML = "";
+            posts?.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <small style="color:#bbb">ID: #${p.id}</small>
+                    <p style="margin:10px 0;">${p.content || ''}</p>
+                    ${p.image_url ? `<div class="post-img-frame"><img src="${p.image_url}"></div>` : ''}
+                    <div class="post-actions">
+                        <button class="btn-act" onclick="doLike(${p.id}, ${p.likes || 0})"><i class="fas fa-heart"></i> ${p.likes || 0}</button>
+                        <button class="btn-act"><i class="fas fa-comment"></i> ${Array.isArray(p.comments_data)?p.comments_data.length:0}</button>
+                        <button class="btn-act" onclick="alert('Link Copiado!')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-act" style="color:#eee" onclick="delPost(${p.id})"><i class="fas fa-trash"></i></button>
+                    </div>`;
+                list.appendChild(div);
+            });
+        }
+
+        // --- ADMIN REAL DATA ---
+        async function refreshAdminData() {
+            const { data: posts } = await client.from('posts').select('*');
+            if(!posts) return;
+
+            const totalLikes = posts.reduce((acc, p) => acc + (p.likes || 0), 0);
+            
+            document.getElementById('admPosts').innerText = posts.length;
+            document.getElementById('admTotalLikes').innerText = totalLikes;
+            
+            // Simulação de Churn/Users (Em produção, ler tabela 'profiles')
+            document.getElementById('admUsers').innerText = Math.floor(posts.length * 1.5); 
+
+            addLog(`Sincronização: ${posts.length} posts processados.`);
+        }
+
+        function addLog(msg) {
+            const log = document.getElementById('sysLog');
+            log.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        async function adminDel() {
+            const id = document.getElementById('delID').value;
+            if(!id) return;
+            const { error } = await client.from('posts').delete().eq('id', id);
+            if(!error) { 
+                addLog(`ACTION: Admin removeu Post #${id}`);
+                alert("Eliminado."); 
+                refreshAdminData(); 
+            }
+        }
+
+        // --- HELPERS ---
         function handleFile(input) {
-            const file = input.files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
@@ -185,100 +218,25 @@
                 };
                 img.src = e.target.result;
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(input.files[0]);
         }
 
-        async function publishPost() {
+        async function publish() {
             const txt = document.getElementById('postTxt').value;
-            if(!txt && !imgBase64) return;
-            document.getElementById('btnSend').innerText = "...";
-            const { error } = await client.from('posts').insert([{ content: txt, image_url: imgBase64, likes: 0, comments_data: [] }]);
-            if(!error) { saldo += 0.0015; location.reload(); }
+            await client.from('posts').insert([{ content: txt, image_url: imgBase64, likes: 0, comments_data: [] }]);
+            location.reload();
         }
 
-        async function loadFeed() {
-            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
-            const feed = document.getElementById('feedList');
-            feed.innerHTML = "";
-            
-            posts?.forEach((p, idx) => {
-                if(idx > 0 && idx % 3 === 0) {
-                    feed.innerHTML += `<div class="ad-banner"><b>PATROCINADO:</b> Ganha dinheiro a visualizar este anúncio!</div>`;
-                }
-                const cms = Array.isArray(p.comments_data) ? p.comments_data : [];
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.innerHTML = `
-                    <p style="font-size:15px; line-height:1.4;">${p.content || ''}</p>
-                    ${p.image_url ? `<div class="post-img-frame"><img src="${p.image_url}"></div>` : ''}
-                    <div class="post-actions">
-                        <button class="btn-act" onclick="doLike(${p.id}, ${p.likes || 0})"><i class="fas fa-heart"></i> ${p.likes || 0}</button>
-                        <button class="btn-act" onclick="toggleC(${p.id})"><i class="fas fa-comment"></i> ${cms.length}</button>
-                        <button class="btn-act" onclick="shareS('${p.content}')"><i class="fas fa-share-alt"></i></button>
-                        <button class="btn-act" style="color:#eee" onclick="del(${p.id})"><i class="fas fa-trash"></i></button>
-                    </div>
-                    <div id="cb-${p.id}" class="comm-section" style="display: ${cms.length > 0 ? 'block' : 'none'}">
-                        <div id="clist-${p.id}">${cms.map(c => `<div class="comm-item">${c}</div>`).join('')}</div>
-                        <input type="text" class="comm-input" placeholder="Comentar..." onkeypress="if(event.key==='Enter') addC(this, ${p.id})">
-                    </div>`;
-                feed.appendChild(div);
-            });
-        }
-
-        // --- ADMIN FUNCTIONS ---
-        async function refreshAdmin() {
-            const { data: posts } = await client.from('posts').select('*');
-            document.getElementById('admPosts').innerText = posts.length;
-            
-            const heatmap = document.getElementById('heatmap');
-            heatmap.innerHTML = "";
-            for(let i=0; i<24; i++) {
-                const h = Math.floor(Math.random() * 40) + 5;
-                heatmap.innerHTML += `<div class="h-bar" style="height:${h}px"></div>`;
-            }
-            addLog("Métricas Admin atualizadas.");
-        }
-
-        function addLog(msg) {
-            const log = document.getElementById('sysLog');
-            log.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
-            log.scrollTop = log.scrollHeight;
-        }
-
-        async function adminDel() {
-            const id = document.getElementById('delID').value;
-            if(!id) return;
-            const { error } = await client.from('posts').delete().eq('id', id);
-            if(!error) { addLog(`CRITICAL: Post #${id} apagado.`); alert("Removido."); refreshAdmin(); }
-        }
-
-        // --- HELPERS ---
         async function doLike(id, cur) {
             await client.from('posts').update({ likes: cur + 1 }).eq('id', id);
-            saldo += 0.0002; updateUI(); loadFeed();
-        }
-
-        async function addC(input, id) {
-            const val = input.value; if(!val) return;
-            const { data } = await client.from('posts').select('comments_data').eq('id', id).single();
-            let list = Array.isArray(data.comments_data) ? data.comments_data : [];
-            list.push(val);
-            await client.from('posts').update({ comments_data: list }).eq('id', id);
+            mySaldo += 0.0002;
+            document.getElementById('stEUR').innerText = mySaldo.toFixed(4) + "€";
             loadFeed();
         }
 
-        function toggleC(id) {
-            const el = document.getElementById('cb-'+id);
-            el.style.display = el.style.display === 'none' ? 'block' : 'none';
-        }
+        async function delPost(id) { if(confirm("Apagar?")) { await client.from('posts').delete().eq('id', id); loadFeed(); } }
 
-        function shareS(text) {
-            navigator.share ? navigator.share({ title: 'Apex Social', text: text, url: window.location.href }) : alert("Link Copiado!");
-        }
-
-        async function del(id) { if(confirm("Apagar?")) { await client.from('posts').delete().eq('id', id); loadFeed(); } }
-
-        updateUI();
+        document.getElementById('stEUR').innerText = mySaldo.toFixed(4) + "€";
         loadFeed();
     </script>
 </body>
