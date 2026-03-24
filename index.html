@@ -3,58 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Apex Social - v18 Fix</title>
+    <title>Apex Social - Business v23</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1a73e8; --dark: #1c1e21; --bg: #f0f2f5; --success: #34a853; --danger: #ea4335; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--dark); padding-top: 140px; padding-bottom: 80px; }
+        :root { --primary: #1a73e8; --success: #34a853; --dark: #202124; --bg: #f8f9fa; --affiliate: #9333ea; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background: var(--bg); padding-top: 110px; padding-bottom: 90px; }
 
-        /* HEADER & NAV */
-        .header-fixed { position: fixed; top: 0; width: 100%; z-index: 2000; background: #fff; border-bottom: 1px solid #ddd; }
-        .blue-bar { background: var(--primary); color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; letter-spacing: 1px; }
-        .stats-top { display: flex; justify-content: center; padding: 15px 0; background: #fff; border-bottom: 1px solid #eee; }
-        .stats-item b { display: block; color: var(--primary); font-size: 20px; font-weight: 800; text-align: center; }
-        .stats-item label { font-size: 9px; color: #65676b; font-weight: bold; text-transform: uppercase; }
+        /* HEADER */
+        .header-fixed { position: fixed; top: 0; width: 100%; z-index: 2000; background: #fff; border-bottom: 1px solid #e0e0e0; }
+        .top-bar { background: var(--dark); color: #fff; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
+        .balance-container { display: flex; justify-content: space-around; padding: 12px; background: #fff; }
+        .balance-box { text-align: center; }
+        .balance-box small { display: block; font-size: 8px; color: #70757a; font-weight: bold; }
+        .balance-box b { font-size: 22px; color: var(--success); font-weight: 800; }
+        .balance-box.net b { color: var(--affiliate); }
 
-        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid #ddd; display: flex; z-index: 2000; height: 70px; }
-        .nav-btn { flex: 1; border: none; background: none; color: #65676b; font-weight: bold; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
-        .nav-btn.active { color: var(--primary); border-top: 3px solid var(--primary); background: #f8f9ff; }
+        .container { max-width: 500px; margin: 0 auto; padding: 10px; }
 
-        /* CONTENT */
-        .container { max-width: 550px; margin: 0 auto; padding: 12px; }
-        .tab-content { display: none; animation: fadeIn 0.2s ease; }
-        .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 15px; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        /* TABELA DE GANHOS */
+        .earn-card { background: #fff; border: 1px solid #dadce0; border-radius: 16px; padding: 16px; margin-bottom: 15px; }
+        .earn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .earn-item { background: #f1f3f4; padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 600; }
+        .earn-item span { display: block; color: var(--primary); font-size: 12px; }
+
+        .affiliate-info { background: #f3e8ff; border: 1px solid #d8b4fe; padding: 12px; border-radius: 12px; margin-top: 10px; }
+        .affiliate-info h5 { color: #6b21a8; font-size: 12px; margin-bottom: 5px; }
+        .ref-link { font-size: 9px; color: #6b21a8; font-weight: bold; word-break: break-all; display: block; background: #fff; padding: 5px; border-radius: 4px; margin-top: 5px; }
+
+        /* FEED & CARDS */
+        .card { background: #fff; border: 1px solid #dadce0; border-radius: 16px; padding: 16px; margin-bottom: 15px; }
+        textarea { width: 100%; border: none; outline: none; font-size: 16px; min-height: 50px; resize: none; }
+        .post-img { width: 100%; border-radius: 12px; margin: 10px 0; }
         
-        /* FEED ELEMENTS */
-        textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 12px; min-height: 70px; resize: none; font-size: 15px; outline: none; background: #f9fafb; }
-        .post-img-frame { width: 100%; height: 320px; overflow: hidden; border-radius: 10px; margin: 12px 0; background: #eee; }
-        .post-img-frame img { width: 100%; height: 100%; object-fit: cover; }
-        .post-actions { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #f0f2f5; margin-top: 12px; padding-top: 10px; }
-        .btn-act { background: none; border: none; color: #65676b; font-weight: bold; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-act i { color: var(--primary); font-size: 18px; }
+        .actions { display: flex; justify-content: space-between; border-top: 1px solid #f1f3f4; padding-top: 12px; }
+        .act-btn { background: none; border: none; color: #5f6368; font-weight: 600; font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+        .act-btn i { font-size: 16px; color: var(--primary); }
 
-        /* COMENTÁRIOS CORRIGIDOS */
-        .comm-section { background: #f0f2f5; padding: 12px; border-radius: 10px; margin-top: 10px; border: 1px solid #e0e0e0; }
-        .comm-input { width: 100%; padding: 10px 15px; border: 1px solid #ccc; border-radius: 20px; font-size: 13px; outline: none; margin-top: 10px; background: #fff; }
-        .comm-item { font-size: 12px; padding: 8px; background: #fff; border-radius: 8px; margin-bottom: 6px; border: 1px solid #eee; color: #333; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,0.03); }
+        /* NAV */
+        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid #e0e0e0; display: flex; height: 70px; z-index: 2000; }
+        .nav-item { flex: 1; border: none; background: none; color: #5f6368; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
+        .nav-item.active { color: var(--primary); }
 
-        /* ADMIN */
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .m-card { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #ddd; border-left: 4px solid var(--primary); }
-        .m-card h2 { font-size: 20px; margin-top: 4px; }
-        .sys-log { background: #1c1e21; color: #00ff00; font-family: monospace; padding: 12px; border-radius: 8px; font-size: 10px; max-height: 120px; overflow-y: auto; margin-top: 10px; }
+        .tab-content { display: none; }
     </style>
 </head>
 <body>
 
     <header class="header-fixed">
-        <div class="blue-bar">APEX SOCIAL NETWORK • MASTER CONSOLE</div>
-        <div class="stats-top">
-            <div class="stats-item">
-                <label>MEU SALDO ATUAL</label>
-                <b id="stEUR">0.0000€</b>
+        <div class="top-bar">APEX NETWORK: CPM OPTIMIZED (1,00€)</div>
+        <div class="balance-container">
+            <div class="balance-box">
+                <small>GANHOS PRÓPRIOS</small>
+                <b id="myCash">0.0000€</b>
+            </div>
+            <div class="balance-box net">
+                <small>COMISSÕES DE REDE (10%)</small>
+                <b id="netCash">0.0000€</b>
             </div>
         </div>
     </header>
@@ -62,38 +68,48 @@
     <main class="container">
         
         <div id="tab-feed" class="tab-content" style="display: block;">
-            <div class="card">
-                <textarea id="postTxt" placeholder="O que estás a pensar?"></textarea>
-                <div id="preDiv" style="display:none; margin-top:10px;"><img id="imgPre" style="width:100%; border-radius:10px;"></div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                    <label style="cursor:pointer; color:var(--primary); font-size:24px;"><i class="fas fa-camera"></i><input type="file" id="fileIn" accept="image/*" style="display:none;" onchange="handleFile(this)"></label>
-                    <button onclick="publish()" id="btnSend" style="background:var(--primary); color:#fff; border:none; padding:10px 25px; border-radius:8px; font-weight:bold;">PUBLICAR</button>
+            
+            <div class="earn-card">
+                <h4 style="font-size:13px;"><i class="fas fa-coins" style="color:#fbbf24"></i> Rendimentos Diretos</h4>
+                <div class="earn-grid">
+                    <div class="earn-item">Novo Post <span>+0.0005€</span></div>
+                    <div class="earn-item">Like Dado <span>+0.0001€</span></div>
+                    <div class="earn-item">Comentário <span>+0.0002€</span></div>
+                    <div class="earn-item">Rede <span>10% s/ Amigos</span></div>
+                </div>
+                
+                <div class="affiliate-info">
+                    <h5><i class="fas fa-users"></i> Afiliados Lifetime</h5>
+                    <p style="font-size:10px; color:#6b21a8;">Ganha 10% de comissão sobre cada ação que os teus convidados fizerem na rede, para sempre.</p>
+                    <span id="refLink" class="ref-link">https://apex.social/join?ref=U540188</span>
+                    <button onclick="copyRef()" style="margin-top:8px; border:none; background:#9333ea; color:#fff; padding:6px 12px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">COPIAR MEU LINK</button>
                 </div>
             </div>
+
+            <div class="card">
+                <textarea id="postTxt" placeholder="Partilha algo novo..."></textarea>
+                <div id="preDiv" style="display:none; margin-top:10px;"><img id="imgPre" style="width:100%; border-radius:12px;"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <label style="cursor:pointer; color:var(--primary); font-size:24px;"><i class="fas fa-camera"></i><input type="file" id="fileIn" style="display:none;" onchange="handleFile(this)"></label>
+                    <button onclick="publish()" style="background:var(--primary); color:#fff; border:none; padding:8px 20px; border-radius:10px; font-weight:bold; cursor:pointer;">POSTAR</button>
+                </div>
+            </div>
+
             <div id="feedList"></div>
         </div>
 
         <div id="tab-admin" class="tab-content">
-            <h3 style="margin-bottom:15px; font-size:16px;"><i class="fas fa-shield-alt"></i> Dashboard Real-Time</h3>
-            <div class="admin-grid">
-                <div class="m-card"><small>Posts na Base</small><h2 id="admPosts">0</h2></div>
-                <div class="m-card" style="border-left-color: var(--success);"><small>Total Likes</small><h2 id="admTotalLikes">0</h2></div>
-            </div>
             <div class="card">
-                <small style="font-weight:bold; color:#777;">MODERAÇÃO</small>
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <input type="number" id="delID" placeholder="ID Post" style="flex:1; padding:10px; border-radius:6px; border:1px solid #ddd;">
-                    <button onclick="adminDel()" style="background:var(--danger); color:#fff; border:none; padding:0 15px; border-radius:6px; font-weight:bold;">APAGAR</button>
-                </div>
+                <h3>Admin Control</h3>
+                <p id="admStat" style="font-family:monospace; font-size:12px; margin-top:10px;">Monitorizando tráfego CPM 1,00€...</p>
             </div>
-            <div class="sys-log" id="sysLog"></div>
         </div>
 
     </main>
 
     <nav class="nav-bottom">
-        <button class="nav-btn active" onclick="switchTab('feed', this)"><i class="fas fa-home"></i>FEED</button>
-        <button class="nav-btn" onclick="switchTab('admin', this)"><i class="fas fa-user-shield"></i>ADMIN</button>
+        <button class="nav-item active" onclick="nav('feed', this)"><i class="fas fa-home" style="font-size:20px;"></i>FEED</button>
+        <button class="nav-item" onclick="nav('admin', this)"><i class="fas fa-shield-alt" style="font-size:20px;"></i>ADMIN</button>
     </nav>
 
     <script>
@@ -101,82 +117,50 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
 
-        let mySaldo = 0.0080;
+        let myCash = 0.0000;
+        let netCash = 0.0000;
         let imgBase64 = null;
 
-        function switchTab(tab, btn) {
-            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + tab).style.display = 'block';
-            btn.classList.add('active');
-            if(tab === 'admin') refreshAdmin();
+        function updateUI() {
+            document.getElementById('myCash').innerText = myCash.toFixed(4) + "€";
+            document.getElementById('netCash').innerText = netCash.toFixed(4) + "€";
         }
 
         async function loadFeed() {
-            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
+            const { data } = await client.from('posts').select('*').order('created_at', { ascending: false });
             const list = document.getElementById('feedList');
             list.innerHTML = "";
-            posts?.forEach(p => {
-                const cms = Array.isArray(p.comments_data) ? p.comments_data : [];
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.innerHTML = `
-                    <small style="color:#bbb">ID: #${p.id}</small>
-                    <p style="margin:10px 0;">${p.content || ''}</p>
-                    ${p.image_url ? `<div class="post-img-frame"><img src="${p.image_url}"></div>` : ''}
-                    <div class="post-actions">
-                        <button class="btn-act" onclick="doLike(${p.id}, ${p.likes || 0})"><i class="fas fa-heart"></i> ${p.likes || 0}</button>
-                        <button class="btn-act" onclick="toggleComments(${p.id})"><i class="fas fa-comment"></i> ${cms.length}</button>
-                        <button class="btn-act" onclick="alert('Link Copiado!')"><i class="fas fa-share-alt"></i></button>
-                        <button class="btn-act" style="color:#eee" onclick="delPost(${p.id})"><i class="fas fa-trash"></i></button>
+            data?.forEach(p => {
+                list.innerHTML += `
+                <div class="card">
+                    <p style="margin-bottom:10px;">${p.content || ''}</p>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                    <div class="actions">
+                        <button class="act-btn" onclick="reward(0.0001, ${p.id}, ${p.likes || 0})"><i class="fas fa-heart"></i> ${p.likes || 0}</button>
+                        <button class="act-btn" onclick="reward(0.0002)"><i class="fas fa-comment"></i> ${p.comments_data?.length || 0}</button>
+                        <button class="act-btn" onclick="copyRef()"><i class="fas fa-share-alt"></i> Convite</button>
+                        <button class="act-btn" style="color:#eee" onclick="del(${p.id})"><i class="fas fa-trash"></i></button>
                     </div>
-                    <div id="cb-${p.id}" class="comm-section" style="display: ${cms.length > 0 ? 'block' : 'none'}">
-                        <div id="clist-${p.id}">${cms.map(c => `<div class="comm-item">${c}</div>`).join('')}</div>
-                        <input type="text" class="comm-input" placeholder="Escreve um comentário..." onkeypress="if(event.key==='Enter') saveComment(this, ${p.id})">
-                    </div>`;
-                list.appendChild(div);
+                </div>`;
             });
         }
 
-        async function saveComment(input, id) {
-            const val = input.value.trim();
-            if(!val) return;
-            input.disabled = true;
-
-            const { data: post } = await client.from('posts').select('comments_data').eq('id', id).single();
-            let currentComments = Array.isArray(post.comments_data) ? post.comments_data : [];
-            currentComments.push(val);
-
-            const { error } = await client.from('posts').update({ comments_data: currentComments }).eq('id', id);
-            
-            if(!error) {
-                mySaldo += 0.0005; // Bónus por comentar
-                updateBalance();
-                loadFeed();
-            } else {
-                alert("Erro ao comentar.");
-                input.disabled = false;
-            }
-        }
-
-        function toggleComments(id) {
-            const el = document.getElementById('cb-' + id);
-            el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
-        }
-
-        async function doLike(id, cur) {
-            await client.from('posts').update({ likes: cur + 1 }).eq('id', id);
-            mySaldo += 0.0002; updateBalance(); loadFeed();
+        function reward(val, pid, currentLikes) {
+            myCash += val;
+            netCash += (val * 0.10); // Comissão passiva simulada
+            updateUI();
+            if(pid) client.from('posts').update({ likes: currentLikes + 1 }).eq('id', pid).then(() => loadFeed());
         }
 
         async function publish() {
             const txt = document.getElementById('postTxt').value;
-            await client.from('posts').insert([{ content: txt, image_url: imgBase64, likes: 0, comments_data: [] }]);
-            location.reload();
-        }
-
-        function updateBalance() {
-            document.getElementById('stEUR').innerText = mySaldo.toFixed(4) + "€";
+            const { error } = await client.from('posts').insert([{ content: txt, image_url: imgBase64, likes: 0, comments_data: [] }]);
+            if(!error) {
+                myCash += 0.0005; // Valor recalibrado p/ CPM 1,00€
+                netCash += (0.0005 * 0.10);
+                updateUI();
+                location.reload();
+            }
         }
 
         function handleFile(input) {
@@ -196,17 +180,21 @@
             reader.readAsDataURL(input.files[0]);
         }
 
-        async function delPost(id) { if(confirm("Apagar?")) { await client.from('posts').delete().eq('id', id); loadFeed(); } }
-
-        async function refreshAdmin() {
-            const { data: posts } = await client.from('posts').select('*');
-            document.getElementById('admPosts').innerText = posts?.length || 0;
-            const totalLikes = posts?.reduce((acc, p) => acc + (p.likes || 0), 0);
-            document.getElementById('admTotalLikes').innerText = totalLikes || 0;
-            document.getElementById('sysLog').innerHTML = `[${new Date().toLocaleTimeString()}] Rede sincronizada.`;
+        function copyRef() {
+            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
+            alert("Link copiado! Ganha 10% do que os teus amigos gerarem.");
         }
 
-        updateBalance();
+        function nav(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + id).style.display = 'block';
+            btn.classList.add('active');
+        }
+
+        async function del(id) { if(confirm("Apagar?")) { await client.from('posts').delete().eq('id', id); loadFeed(); } }
+
+        updateUI();
         loadFeed();
     </script>
 </body>
