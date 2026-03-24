@@ -3,42 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Apex Social - v9 Final Feed</title>
+    <title>Apex Social - v11 Clean</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: #f0f2f5; color: #1c1e21; font-family: sans-serif; padding-top: 190px; }
+        body { background: #f0f2f5; color: #1c1e21; font-family: -apple-system, sans-serif; padding-top: 140px; }
         
-        /* HEADERS */
+        /* HEADER SIMPLIFICADO */
         .header-fixed { position: fixed; top: 0; width: 100%; z-index: 1000; background: #fff; border-bottom: 1px solid #ddd; }
-        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
-        .stats { display: flex; justify-content: space-around; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .stats b { display: block; color: #1a73e8; font-size: 14px; }
-        .stats label { font-size: 9px; color: #65676b; text-transform: uppercase; font-weight: bold; }
+        .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .stats { display: flex; justify-content: center; padding: 15px 0; border-bottom: 1px solid #eee; background: #fff; }
+        .stats-item { text-align: center; }
+        .stats-item b { display: block; color: #1a73e8; font-size: 18px; font-weight: 800; }
+        .stats-item label { font-size: 10px; color: #65676b; text-transform: uppercase; font-weight: bold; }
 
-        /* NOVO: ANÚNCIO FIXO NO TOPO */
+        /* ANÚNCIO DE TOPO */
         .top-ad { background: #fff9c4; padding: 10px; text-align: center; border-bottom: 1px solid #fbc02d; font-size: 12px; font-weight: bold; color: #f57f17; }
 
-        /* CONTENT */
+        /* FEED */
         .container { max-width: 500px; margin: 0 auto; padding: 10px; }
-        .card { background: #fff; border-radius: 8px; padding: 15px; margin-bottom: 12px; border: 1px solid #ddd; }
+        .card { background: #fff; border-radius: 8px; padding: 15px; margin-bottom: 12px; border: 1px solid #ddd; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         
-        textarea { width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 10px; min-height: 50px; resize: none; font-size: 14px; outline: none; background: #f5f6f7; }
-        .post-img-res { width: 100%; border-radius: 8px; margin: 10px 0; display: block; border: 1px solid #eee; }
+        textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 12px; min-height: 60px; resize: none; font-size: 15px; outline: none; background: #f5f6f7; margin-bottom: 10px; }
+        .post-img-res { width: 100%; border-radius: 8px; margin: 12px 0; display: block; max-height: 450px; object-fit: cover; border: 1px solid #eee; }
         
-        .post-actions { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px; }
+        /* ACTIONS */
+        .post-actions { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #f0f2f5; margin-top: 10px; padding-top: 10px; }
         .btn-act { background: none; border: none; color: #65676b; font-weight: bold; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-act i { color: #1a73e8; font-size: 16px; }
+        .btn-act i { color: #1a73e8; font-size: 17px; }
         
-        /* ANÚNCIOS NO FEED */
-        .ad-feed { background: #e8f0fe; border: 1px solid #1a73e8; padding: 15px; border-radius: 8px; margin-bottom: 12px; text-align: center; font-size: 13px; color: #1967d2; }
+        /* ADS NO FEED */
+        .ad-feed { background: #e8f0fe; border: 1px solid #1a73e8; padding: 15px; border-radius: 8px; margin-bottom: 12px; text-align: center; font-size: 13px; color: #1967d2; font-weight: 500; }
 
-        /* COMENTÁRIOS */
-        .comm-box { background: #f0f2f5; padding: 10px; border-radius: 8px; margin-top: 10px; display: none; }
-        .comm-input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; outline: none; margin-top: 8px; }
+        /* COMENTÁRIOS CORRIGIDOS */
+        .comm-box { background: #f0f2f5; padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid #e0e0e0; }
+        .comm-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; outline: none; margin-top: 10px; }
         .comm-list { margin-bottom: 5px; }
-        .comm-item { font-size: 12px; padding: 6px; background: #fff; border-radius: 5px; margin-bottom: 4px; border: 1px solid #eee; color: #333; }
+        .comm-item { font-size: 12px; padding: 8px; background: #fff; border-radius: 6px; margin-bottom: 6px; border: 1px solid #eee; box-shadow: 0 1px 1px rgba(0,0,0,0.05); color: #333; }
     </style>
 </head>
 <body>
@@ -46,16 +48,134 @@
     <header class="header-fixed">
         <div class="blue-bar">APEX SOCIAL NETWORK</div>
         <div class="stats">
-            <div><label>MEU SALDO</label><b id="stEUR">0.0000€</b></div>
-            <div><label>DÍVIDA REDE</label><b id="stDebt" style="color:#d93025;">0.0000€</b></div>
+            <div class="stats-item">
+                <label>O MEU SALDO</label>
+                <b id="stEUR">0.0000€</b>
+            </div>
         </div>
-        <div class="top-ad">📢 ANÚNCIO: Adere ao Apex Pro e duplica os teus ganhos!</div>
+        <div class="top-ad">📢 ANÚNCIO: Convida 5 amigos e recebe um bónus de 0.50€!</div>
     </header>
 
     <main class="container">
         <div class="card">
-            <textarea id="postTxt" placeholder="O que vais partilhar?"></textarea>
-            <div id="preDiv" style="display:none; margin-top:10px;"><img id="imgPre" style="width:100%; border-radius:8px;"></div>
-            <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                <label style="cursor:pointer; color:#1a73e8; font-size:22px;"><i class="fas fa-camera"></i><input type="file" id="fileIn" accept="image/*" style="display:none;" onchange="handleFile(this)"></label>
-                <button onclick="send()" id="btnSend" style="background:#1
+            <textarea id="postTxt" placeholder="O que queres partilhar?"></textarea>
+            <div id="preDiv" style="display:none; margin-bottom:10px;"><img id="imgPre" style="width:100%; border-radius:8px;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="cursor:pointer; color:#1a73e8; font-size:24px;"><i class="fas fa-camera"></i><input type="file" id="fileIn" accept="image/*" style="display:none;" onchange="handleFile(this)"></label>
+                <button onclick="send()" id="btnSend" style="background:#1a73e8; color:#fff; border:none; padding:10px 25px; border-radius:6px; font-weight:bold; cursor:pointer;">PUBLICAR</button>
+            </div>
+        </div>
+
+        <div id="feed"></div>
+    </main>
+
+    <script>
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const client = supabase.createClient(SB_URL, SB_KEY);
+
+        let saldo = 0.0080;
+        let imgBase64 = null;
+
+        function updateUI() {
+            document.getElementById('stEUR').innerText = saldo.toFixed(4) + "€";
+        }
+
+        function handleFile(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 600; canvas.height = (img.height/img.width)*600;
+                    canvas.getContext('2d').drawImage(img,0,0,600,canvas.height);
+                    imgBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    document.getElementById('imgPre').src = imgBase64;
+                    document.getElementById('preDiv').style.display = 'block';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function send() {
+            const txt = document.getElementById('postTxt').value;
+            if(!txt && !imgBase64) return;
+            document.getElementById('btnSend').innerText = "...";
+            const { error } = await client.from('posts').insert([{ 
+                content: txt, image_url: imgBase64, likes: 0, comments_data: [] 
+            }]);
+            if(!error) { saldo += 0.0015; location.reload(); }
+            else { alert("Erro: " + error.message); }
+        }
+
+        async function loadFeed() {
+            const { data: posts, error } = await client.from('posts').select('*').order('created_at', { ascending: false });
+            if(error) return;
+            const feed = document.getElementById('feed');
+            feed.innerHTML = "";
+            
+            posts.forEach((p, idx) => {
+                if(idx > 0 && idx % 3 === 0) {
+                    feed.innerHTML += `<div class="ad-feed"><b>ESTA SEMANA:</b> Completa o Check-in diário e ganha pontos extra!</div>`;
+                }
+
+                const lks = p.likes || 0;
+                const cms = Array.isArray(p.comments_data) ? p.comments_data : [];
+                
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <p style="font-size:15px; line-height:1.5; color:#1c1e21;">${p.content || ''}</p>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img-res">` : ''}
+                    <div class="post-actions">
+                        <button class="btn-act" onclick="doLike(${p.id}, ${lks})"><i class="fas fa-heart"></i> ${lks}</button>
+                        <button class="btn-act" onclick="toggleC(${p.id})"><i class="fas fa-comment"></i> ${cms.length}</button>
+                        <button class="btn-act" onclick="shareSocial('${p.content}')"><i class="fas fa-share-alt"></i> Partilhar</button>
+                        <button class="btn-act" onclick="delPost(${p.id})" style="color:#eee"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div id="cb-${p.id}" class="comm-box" style="display: ${cms.length > 0 ? 'block' : 'none'}">
+                        <div class="comm-list">
+                            ${cms.map(c => `<div class="comm-item">${c}</div>`).join('')}
+                        </div>
+                        <input type="text" class="comm-input" placeholder="Escreve um comentário..." onkeypress="if(event.key==='Enter') saveC(this, ${p.id})">
+                    </div>`;
+                feed.appendChild(div);
+            });
+        }
+
+        async function doLike(id, cur) {
+            await client.from('posts').update({ likes: cur + 1 }).eq('id', id);
+            saldo += 0.0002; updateUI(); loadFeed();
+        }
+
+        async function saveC(input, id) {
+            const val = input.value; if(!val) return;
+            const { data } = await client.from('posts').select('comments_data').eq('id', id).single();
+            let list = Array.isArray(data.comments_data) ? data.comments_data : [];
+            list.push(val);
+            await client.from('posts').update({ comments_data: list }).eq('id', id);
+            input.value = ""; loadFeed();
+        }
+
+        function toggleC(id) {
+            const box = document.getElementById('cb-'+id);
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function shareSocial(text) {
+            if (navigator.share) {
+                navigator.share({ title: 'Apex Social', text: text, url: window.location.href });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert("Link copiado!");
+            }
+        }
+
+        async function delPost(id) { if(confirm("Eliminar?")) { await client.from('posts').delete().eq('id', id); loadFeed(); } }
+
+        updateUI(); loadFeed();
+    </script>
+</body>
+</html>
