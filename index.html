@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Apex Social - v11 Clean</title>
+    <title>Apex Social - v12 Uniform</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -26,17 +26,22 @@
         .card { background: #fff; border-radius: 8px; padding: 15px; margin-bottom: 12px; border: 1px solid #ddd; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         
         textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 12px; min-height: 60px; resize: none; font-size: 15px; outline: none; background: #f5f6f7; margin-bottom: 10px; }
-        .post-img-res { width: 100%; border-radius: 8px; margin: 12px 0; display: block; max-height: 450px; object-fit: cover; border: 1px solid #eee; }
+        
+        /* CORREÇÃO: FOTOS UNIFORMES */
+        .post-img-container { width: 100%; height: 300px; /* Altura fixa para todas */ overflow: hidden; border-radius: 8px; margin: 12px 0; border: 1px solid #eee; background: #f8f9fa; }
+        .post-img-res { width: 100%; height: 100%; object-fit: cover; /* Preenche sem distorcer, cortando se necessário */ display: block; }
         
         /* ACTIONS */
         .post-actions { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #f0f2f5; margin-top: 10px; padding-top: 10px; }
         .btn-act { background: none; border: none; color: #65676b; font-weight: bold; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-act i { color: #1a73e8; font-size: 17px; }
         
-        /* ADS NO FEED */
-        .ad-feed { background: #e8f0fe; border: 1px solid #1a73e8; padding: 15px; border-radius: 8px; margin-bottom: 12px; text-align: center; font-size: 13px; color: #1967d2; font-weight: 500; }
+        /* ADS NO FEED MELHORADOS */
+        .ad-feed { background: #fff; border: 1px solid #fbc02d; padding: 15px; border-radius: 8px; margin-bottom: 12px; text-align: center; position: relative; }
+        .ad-feed::before { content: "PATROCINADO"; position: absolute; top: -8px; left: 10px; background: #fbc02d; color: #fff; font-size: 8px; font-weight: bold; padding: 2px 6px; border-radius: 10px; }
+        .ad-feed-text { font-size: 13px; color: #444; font-weight: 500; }
 
-        /* COMENTÁRIOS CORRIGIDOS */
+        /* COMENTÁRIOS */
         .comm-box { background: #f0f2f5; padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid #e0e0e0; }
         .comm-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; outline: none; margin-top: 10px; }
         .comm-list { margin-bottom: 5px; }
@@ -118,7 +123,7 @@
             
             posts.forEach((p, idx) => {
                 if(idx > 0 && idx % 3 === 0) {
-                    feed.innerHTML += `<div class="ad-feed"><b>ESTA SEMANA:</b> Completa o Check-in diário e ganha pontos extra!</div>`;
+                    feed.innerHTML += `<div class="ad-feed"><p class="ad-feed-text">Completa o Check-in diário e ganha pontos extra!</p></div>`;
                 }
 
                 const lks = p.likes || 0;
@@ -127,8 +132,8 @@
                 const div = document.createElement('div');
                 div.className = 'card';
                 div.innerHTML = `
-                    <p style="font-size:15px; line-height:1.5; color:#1c1e21;">${p.content || ''}</p>
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img-res">` : ''}
+                    <p style="font-size:15px; line-height:1.5; color:#1c1e21; margin-bottom:8px;">${p.content || ''}</p>
+                    ${p.image_url ? `<div class="post-img-container"><img src="${p.image_url}" class="post-img-res"></div>` : ''}
                     <div class="post-actions">
                         <button class="btn-act" onclick="doLike(${p.id}, ${lks})"><i class="fas fa-heart"></i> ${lks}</button>
                         <button class="btn-act" onclick="toggleC(${p.id})"><i class="fas fa-comment"></i> ${cms.length}</button>
