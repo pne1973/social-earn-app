@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v65 - Oficial</title>
+    <title>Apex Social v71 - Production</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
@@ -12,9 +12,8 @@
         .google-blue { color: #4285F4; }
         .google-bg-blue { background-color: #4285F4; }
         .nav-active { color: #4285F4 !important; border-top: 3px solid #4285F4; font-weight: 900; }
-        .card { background: white; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; }
+        .card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         #loader { display: none; position: fixed; inset: 0; background: white; z-index: 10000; align-items: center; justify-content: center; }
-        .ad-box { background: #fdfdfd; border: 1px dashed #ccc; border-radius: 8px; min-height: 60px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; text-transform: uppercase; }
     </style>
 </head>
 <body class="pb-24">
@@ -25,101 +24,84 @@
 
     <header class="sticky top-0 bg-white border-b z-50 px-4 py-3 flex justify-between items-center shadow-sm">
         <div>
-            <h1 class="text-xl font-black google-blue tracking-tighter">Apex Social</h1>
-            <p class="text-[9px] font-bold text-gray-400 uppercase">v65 • No-XP Profit Engine</p>
+            <h1 class="text-xl font-black google-blue tracking-tighter uppercase">Apex Social</h1>
+            <p class="text-[9px] font-bold text-gray-400 uppercase">v71 • Sincronizado</p>
         </div>
-        <div class="bg-green-50 px-4 py-1.5 rounded-full border border-green-200 shadow-inner">
+        <div class="bg-green-50 px-4 py-1.5 rounded-full border border-green-200">
             <span id="main-balance" class="font-black text-green-700 text-lg">0,0000€</span>
         </div>
     </header>
 
-    <main id="app-content" class="p-4 max-w-md mx-auto min-h-screen">
-        </main>
+    <main id="app-content" class="p-4 max-w-md mx-auto min-h-screen"></main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-50 shadow-lg">
-        <button onclick="switchTab('feed')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-feed">
-            <span class="text-[10px] uppercase font-black">Feed</span>
-        </button>
-        <button onclick="switchTab('wallet')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-wallet">
-            <span class="text-[10px] uppercase font-black">Carteira</span>
-        </button>
-        <button onclick="switchTab('friends')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-friends">
-            <span class="text-[10px] uppercase font-black">Rede</span>
-        </button>
-        <button onclick="switchTab('profile')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-profile">
-            <span class="text-[10px] uppercase font-black">Perfil</span>
-        </button>
-        <button onclick="switchTab('admin')" class="flex flex-col items-center p-2 text-red-300 nav-btn" id="btn-admin" style="display:none;">
-            <span class="text-[10px] uppercase font-black">Admin</span>
-        </button>
+        <button onclick="switchTab('feed')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-feed"><span class="text-[10px] font-black uppercase tracking-tighter">Feed</span></button>
+        <button onclick="switchTab('wallet')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-wallet"><span class="text-[10px] font-black uppercase tracking-tighter">Carteira</span></button>
+        <button onclick="switchTab('friends')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-friends"><span class="text-[10px] font-black uppercase tracking-tighter">Rede</span></button>
+        <button onclick="switchTab('profile')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-profile"><span class="text-[10px] font-black uppercase tracking-tighter">Perfil</span></button>
+        <button onclick="switchTab('admin')" class="flex flex-col items-center p-2 text-red-300 nav-btn" id="btn-admin" style="display:none;"><span class="text-[10px] font-black uppercase tracking-tighter">Admin</span></button>
     </nav>
 
     <script>
-        // --- CONFIGURAÇÃO SUPABASE ---
-        const SB_URL = "https://kswlmdgghhpsbmmjgyxm.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; // Chave Anon do Supabase
-        
-        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+        // --- CONFIGURAÇÃO (O RENDER SUBSTITUI ESTES TEXTOS) ---
+        // As chaves no Render Environment devem ter os nomes: SUPABASE_URL e SUPABASE_KEY
+        const SB_URL = "SUPABASE_URL_PLACEHOLDER"; 
+        const SB_KEY = "SUPABASE_KEY_PLACEHOLDER"; 
 
-        const USER_ID = "5401881400"; // Teu ID Admin
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+        const USER_ID = "5401881400";
+        
         let state = { saldo_eur: 0, bonus_restante: 0, is_turbo: false };
         let currentTab = 'feed';
 
-        const TAXAS = { LIKE: 0.0015, POST: 0.0150, NORMAL: 0.3 };
-
-        // --- INICIALIZAÇÃO ---
+        // --- MOTOR DE INICIALIZAÇÃO ---
         async function init() {
             showLoader(true);
             try {
                 let { data, error } = await supabaseClient.from('perfis').select('*').eq('id', USER_ID).single();
-                if (data) { state = data; } 
-                else {
+                if (data) {
+                    state = data;
+                } else {
                     const { data: newUser } = await supabaseClient.from('perfis').insert([{ id: USER_ID }]).select().single();
                     if (newUser) state = newUser;
                 }
-            } catch (e) { console.error("Erro na ligação SQL:", e); }
+            } catch (e) {
+                console.error("Erro de conexão. Verifique as chaves no Render.");
+            }
 
             if (USER_ID === "5401881400") document.getElementById('btn-admin').style.display = 'flex';
             showLoader(false);
-            switchTab('feed'); 
+            switchTab('feed');
         }
 
-        // --- LÓGICA DE GANHOS ---
-        async function doAction(type) {
-            let ganho = TAXAS[type];
-            if (!state.is_turbo) ganho *= TAXAS.NORMAL;
-
+        // --- AÇÕES ---
+        async function doAction() {
+            let ganho = state.is_turbo ? 0.0015 : 0.0004;
             state.saldo_eur = parseFloat(state.saldo_eur) + ganho;
-
+            
             if (state.is_turbo) {
                 state.bonus_restante--;
                 if (state.bonus_restante <= 0) state.is_turbo = false;
             }
 
-            // Atualização Otimista UI
             document.getElementById('main-balance').innerText = state.saldo_eur.toFixed(4) + '€';
-            
-            // Gravação SQL
-            await supabaseClient.from('perfis').update({
-                saldo_eur: state.saldo_eur,
-                bonus_restante: state.bonus_restante,
-                is_turbo: state.is_turbo
-            }).eq('id', USER_ID);
+            await supabaseClient.from('perfis').update(state).eq('id', USER_ID);
         }
 
         async function startSync() {
             showLoader(true);
+            // Simulação de delay de vídeo/adsterra
             setTimeout(async () => {
                 state.is_turbo = true;
                 state.bonus_restante = 20;
-                await supabaseClient.from('perfis').update({ is_turbo: true, bonus_restante: 20 }).eq('id', USER_ID);
+                await supabaseClient.from('perfis').update({is_turbo:true, bonus_restante:20}).eq('id', USER_ID);
                 showLoader(false);
-                switchTab(currentTab);
-                alert("Sincronização Adsterra OK! 20 Cliques Turbo libertados.");
+                render();
+                alert("🔥 Sincronização Concluída! 20 Bónus Turbo ativos.");
             }, 3000);
         }
 
-        // --- MOTOR DAS ABAS ---
+        // --- NAVEGAÇÃO E UI ---
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
@@ -133,60 +115,36 @@
 
             if (currentTab === 'feed') {
                 container.innerHTML = `
-                    <div class="card p-4 mb-4 border-l-4 border-blue-500 bg-blue-50 flex justify-between items-center">
+                    <div class="card p-4 mb-4 bg-blue-50 flex justify-between items-center shadow-sm">
                         <div>
                             <p class="text-[10px] font-black text-blue-600 uppercase">Status</p>
-                            <p class="text-xs font-bold">${state.is_turbo ? '🔥 TURBO ('+state.bonus_restante+')' : '❄️ MODO NORMAL'}</p>
+                            <p class="text-xs font-bold">${state.is_turbo ? '🔥 TURBO ('+state.bonus_restante+')' : '❄️ NORMAL'}</p>
                         </div>
-                        <button onclick="startSync()" class="google-bg-blue text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase">Sincronizar</button>
+                        <button onclick="startSync()" class="google-bg-blue text-white px-5 py-2 rounded-lg text-[10px] font-black uppercase">Sincronizar</button>
                     </div>
-
-                    <div class="card p-4 mb-4">
-                        <p class="text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Post Sugerido</p>
-                        <p class="text-sm text-gray-700 leading-tight mb-4">Aproveita a v65. Partilha o teu link e ganha comissões reais por cada amigo.</p>
-                        <div class="flex gap-4 pt-3 border-t">
-                            <button onclick="doAction('LIKE')" class="text-[10px] font-black google-blue uppercase">Gostar (+${state.is_turbo ? TAXAS.LIKE : (TAXAS.LIKE*TAXAS.NORMAL).toFixed(4)}€)</button>
-                        </div>
+                    <div class="card p-4">
+                        <p class="text-sm text-gray-700 mb-4 tracking-tight">Post oficial: Ganhe agora interagindo abaixo.</p>
+                        <button onclick="doAction()" class="google-blue font-black text-[10px] uppercase tracking-widest">Gostar (+${state.is_turbo ? '0,0015' : '0,0004'}€)</button>
                     </div>
-
-                    <div class="ad-box opacity-50 my-6">Placeholder: Anúncio Adsterra Native</div>
                 `;
             } else if (currentTab === 'wallet') {
                 container.innerHTML = `
-                    <div class="card p-8 text-center">
-                        <p class="text-xs text-gray-400 uppercase font-black mb-2">Carteira</p>
-                        <h1 class="text-4xl font-black mb-8 google-blue">${parseFloat(state.saldo_eur).toFixed(4)}€</h1>
-                        <button class="w-full google-bg-blue text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg">Levantar via PayPal</button>
+                    <div class="card p-10 text-center">
+                        <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Disponível</p>
+                        <h1 class="text-5xl font-black google-blue mb-8">${state.saldo_eur.toFixed(4)}€</h1>
+                        <button class="w-full google-bg-blue text-white py-4 rounded-xl font-black text-xs uppercase shadow-md active:scale-95 transition">Levantar Saldo</button>
                     </div>
                 `;
             } else if (currentTab === 'friends') {
-                container.innerHTML = `
-                    <div class="card p-6">
-                        <h3 class="font-black text-xs uppercase mb-1">Link de Convite</h3>
-                        <div class="bg-gray-50 p-3 rounded border text-[10px] font-mono mb-4 truncate text-blue-500">apex.social/ref/${USER_ID}</div>
-                        <button onclick="startSync()" class="w-full border-2 border-blue-500 text-blue-500 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">🚀 Impulso de Rede (Vídeo)</button>
-                    </div>
-                `;
+                container.innerHTML = `<div class="card p-6"><h3 class="font-black text-xs uppercase mb-1">Rede de Afiliados</h3><p class="text-[10px] font-mono text-blue-500 truncate">ref/${USER_ID}</p></div>`;
             } else if (currentTab === 'profile') {
-                container.innerHTML = `
-                    <div class="card p-4 text-center">
-                        <div class="w-12 h-12 bg-gray-100 rounded-full mx-auto mb-3 flex items-center justify-center font-black google-blue">A</div>
-                        <p class="font-black text-xs uppercase mb-6">ID: ${USER_ID}</p>
-                        <button onclick="startSync()" class="w-full bg-black text-white py-3 rounded-xl text-[10px] font-black uppercase mb-3">Agendar Autopost (v57)</button>
-                    </div>
-                `;
+                container.innerHTML = `<div class="card p-6 text-center"><p class="font-black text-xs text-gray-400 uppercase tracking-widest">Utilizador: ${USER_ID}</p></div>`;
             } else if (currentTab === 'admin') {
-                container.innerHTML = `
-                    <div class="card p-4 border-red-500 border-2">
-                        <h2 class="text-red-600 font-black uppercase text-xs mb-4">Admin Panel</h2>
-                        <button class="w-full bg-red-600 text-white py-3 rounded-lg text-[10px] font-black uppercase">Pagar Saques Pendentes</button>
-                    </div>
-                `;
+                container.innerHTML = `<div class="card p-4 border-red-500 border-2 bg-red-50 text-center"><p class="text-red-600 font-black text-xs uppercase">Acesso Administrativo Ativo</p></div>`;
             }
         }
 
-        function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
-
+        function showLoader(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
         window.onload = init;
     </script>
 </body>
