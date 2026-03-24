@@ -3,44 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social - v64 Production</title>
+    <title>Apex Social v65 - Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; color: #202124; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; -webkit-tap-highlight-color: transparent; }
         .google-blue { color: #4285F4; }
         .google-bg-blue { background-color: #4285F4; }
-        .nav-active { color: #4285F4; border-top: 3px solid #4285F4; font-weight: 900; }
+        .nav-active { color: #4285F4 !important; border-top: 3px solid #4285F4; font-weight: 900; }
         .card { background: white; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; }
-        .ad-placeholder { background: repeating-linear-gradient(45deg, #fafafa, #fafafa 10px, #ffffff 10px, #ffffff 20px); border: 1px dashed #ddd; }
-        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10000; align-items: center; justify-content: center; }
-        .balance-pill { background: #e6f4ea; border: 1px solid #ceead6; color: #137333; }
+        #loader { display: none; position: fixed; inset: 0; background: white; z-index: 10000; align-items: center; justify-content: center; }
+        .ad-box { background: #fdfdfd; border: 1px dashed #ccc; border-radius: 8px; min-height: 60px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; text-transform: uppercase; }
     </style>
 </head>
 <body class="pb-24">
 
     <div id="loader">
-        <div class="flex flex-col items-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></div>
-            <p class="mt-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Sincronizando Banco de Dados...</p>
-        </div>
+        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500"></div>
     </div>
 
-    <header class="sticky top-0 bg-white border-b z-50 px-4 py-3 flex justify-between items-center">
+    <header class="sticky top-0 bg-white border-b z-50 px-4 py-3 flex justify-between items-center shadow-sm">
         <div>
-            <h1 class="text-xl font-black google-blue leading-none">Apex Social</h1>
-            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Versão Final 1.0 • No-XP</p>
+            <h1 class="text-xl font-black google-blue tracking-tighter">Apex Social</h1>
+            <p class="text-[9px] font-bold text-gray-400 uppercase">v65 • No-XP Profit Engine</p>
         </div>
-        <div class="balance-pill px-4 py-1.5 rounded-full shadow-sm">
-            <span id="main-balance" class="font-black text-lg">0,0000€</span>
+        <div class="bg-green-50 px-4 py-1.5 rounded-full border border-green-200 shadow-inner">
+            <span id="main-balance" class="font-black text-green-700 text-lg">0,0000€</span>
         </div>
     </header>
 
     <main id="app-content" class="p-4 max-w-md mx-auto min-h-screen">
         </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-50 shadow-2xl">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-50 shadow-lg">
         <button onclick="switchTab('feed')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-feed">
             <span class="text-[10px] uppercase font-black">Feed</span>
         </button>
@@ -53,87 +49,77 @@
         <button onclick="switchTab('profile')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-profile">
             <span class="text-[10px] uppercase font-black">Perfil</span>
         </button>
-        <button onclick="switchTab('admin')" class="flex flex-col items-center p-2 text-red-400 nav-btn" id="btn-admin" style="display:none;">
+        <button onclick="switchTab('admin')" class="flex flex-col items-center p-2 text-red-300 nav-btn" id="btn-admin" style="display:none;">
             <span class="text-[10px] uppercase font-black">Admin</span>
         </button>
     </nav>
 
     <script>
-        // --- CREDENCIAIS (ALINHADAS COM RENDER ENVIRONMENT) ---
-        const SUPABASE_URL = "https://kswlmdgghhpsbmmjgyxm.supabase.co";
-        // O Render injeta via window.env se usares um adapter, ou podes colar aqui para teste imediato:
-        const SUPABASE_KEY = window.env?.SUPABASE_KEY || "SUA_ANON_KEY_AQUI"; 
+        // --- CONFIGURAÇÃO SUPABASE ---
+        const SB_URL = "https://kswlmdgghhpsbmmjgyxm.supabase.co";
+        const SB_KEY = "COLA_AQUI_A_TUA_ANON_KEY"; // Chave Anon do Supabase
         
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-        const ADMIN_ID = "5401881400";
-        let user = { id: ADMIN_ID, saldo_eur: 0, bonus_restante: 0, is_turbo: false };
-
-        const TAXAS = { 
-            LIKE: 0.0015, 
-            POST: 0.0150, 
-            CHECKIN: 0.0500,
-            REDUCAO_NORMAL: 0.3 // 30% do valor sem sincronização Turbo
-        };
-
-        // --- MOTOR DE DADOS ---
-        async function syncUser() {
-            showLoader(true);
-            let { data, error } = await _supabase.from('perfis').select('*').eq('id', ADMIN_ID).single();
-            
-            if (!data) {
-                const { data: newUser } = await _supabase.from('perfis').insert([{ id: ADMIN_ID }]).select().single();
-                user = newUser;
-            } else { user = data; }
-
-            if (ADMIN_ID === "5401881400") document.getElementById('btn-admin').style.display = 'flex';
-            showLoader(false);
-            render();
-        }
-
-        async function saveUser() {
-            await _supabase.from('perfis').update({
-                saldo_eur: user.saldo_eur,
-                bonus_restante: user.bonus_restante,
-                is_turbo: user.is_turbo
-            }).eq('id', ADMIN_ID);
-            updateBalanceUI();
-        }
-
-        // --- AÇÕES DO UTILIZADOR ---
-        async function doAction(type) {
-            let valor = TAXAS[type];
-            if (!user.is_turbo) valor *= TAXAS.REDUCAO_NORMAL;
-
-            user.saldo_eur = parseFloat(user.saldo_eur) + valor;
-
-            if (user.is_turbo) {
-                user.bonus_restante--;
-                if (user.bonus_restante <= 0) {
-                    user.is_turbo = false;
-                    alert("⚠️ Seu bónus Turbo acabou! Sincronize para voltar aos ganhos de 100%.");
-                }
-            }
-            await saveUser();
-            render();
-        }
-
-        async function startAdSync() {
-            showLoader(true);
-            // Simulação de tempo de vídeo Adsterra
-            setTimeout(async () => {
-                user.is_turbo = true;
-                user.bonus_restante = 20;
-                await saveUser();
-                showLoader(false);
-                alert("🔥 Sincronização Concluída! 20 Interações Turbo libertadas.");
-                render();
-            }, 3500);
-        }
-
-        // --- UI & NAVEGAÇÃO ---
+        const USER_ID = "5401881400"; // Teu ID Admin
+        let state = { saldo_eur: 0, bonus_restante: 0, is_turbo: false };
         let currentTab = 'feed';
+
+        const TAXAS = { LIKE: 0.0015, POST: 0.0150, NORMAL: 0.3 };
+
+        // --- INICIALIZAÇÃO ---
+        async function init() {
+            showLoader(true);
+            try {
+                let { data, error } = await supabaseClient.from('perfis').select('*').eq('id', USER_ID).single();
+                if (data) { state = data; } 
+                else {
+                    const { data: newUser } = await supabaseClient.from('perfis').insert([{ id: USER_ID }]).select().single();
+                    if (newUser) state = newUser;
+                }
+            } catch (e) { console.error("Erro na ligação SQL:", e); }
+
+            if (USER_ID === "5401881400") document.getElementById('btn-admin').style.display = 'flex';
+            showLoader(false);
+            switchTab('feed'); 
+        }
+
+        // --- LÓGICA DE GANHOS ---
+        async function doAction(type) {
+            let ganho = TAXAS[type];
+            if (!state.is_turbo) ganho *= TAXAS.NORMAL;
+
+            state.saldo_eur = parseFloat(state.saldo_eur) + ganho;
+
+            if (state.is_turbo) {
+                state.bonus_restante--;
+                if (state.bonus_restante <= 0) state.is_turbo = false;
+            }
+
+            // Atualização Otimista UI
+            document.getElementById('main-balance').innerText = state.saldo_eur.toFixed(4) + '€';
+            
+            // Gravação SQL
+            await supabaseClient.from('perfis').update({
+                saldo_eur: state.saldo_eur,
+                bonus_restante: state.bonus_restante,
+                is_turbo: state.is_turbo
+            }).eq('id', USER_ID);
+        }
+
+        async function startSync() {
+            showLoader(true);
+            setTimeout(async () => {
+                state.is_turbo = true;
+                state.bonus_restante = 20;
+                await supabaseClient.from('perfis').update({ is_turbo: true, bonus_restante: 20 }).eq('id', USER_ID);
+                showLoader(false);
+                switchTab(currentTab);
+                alert("Sincronização Adsterra OK! 20 Cliques Turbo libertados.");
+            }, 3000);
+        }
+
+        // --- MOTOR DAS ABAS ---
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
@@ -141,79 +127,59 @@
             render();
         }
 
-        function updateBalanceUI() {
-            document.getElementById('main-balance').innerText = parseFloat(user.saldo_eur).toFixed(4) + '€';
-        }
-
         function render() {
             const container = document.getElementById('app-content');
-            updateBalanceUI();
+            document.getElementById('main-balance').innerText = parseFloat(state.saldo_eur).toFixed(4) + '€';
 
             if (currentTab === 'feed') {
                 container.innerHTML = `
-                    <div class="card p-4 mb-4 border-l-4 border-blue-500 bg-blue-50 flex justify-between items-center shadow-sm">
+                    <div class="card p-4 mb-4 border-l-4 border-blue-500 bg-blue-50 flex justify-between items-center">
                         <div>
-                            <p class="text-[10px] font-black text-blue-600 uppercase">Status Turbo</p>
-                            <p class="text-sm font-bold text-gray-700">${user.is_turbo ? '🔥 Ativo ('+user.bonus_restante+' cliques)' : '❄️ Modo Económico'}</p>
+                            <p class="text-[10px] font-black text-blue-600 uppercase">Status</p>
+                            <p class="text-xs font-bold">${state.is_turbo ? '🔥 TURBO ('+state.bonus_restante+')' : '❄️ MODO NORMAL'}</p>
                         </div>
-                        <button onclick="startAdSync()" class="google-bg-blue text-white px-4 py-2 rounded-lg text-xs font-black uppercase shadow-md active:scale-95 transition">Sincronizar</button>
+                        <button onclick="startSync()" class="google-bg-blue text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase">Sincronizar</button>
                     </div>
 
                     <div class="card p-4 mb-4">
-                        <div class="flex items-center gap-2 mb-3">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-500 text-xs">A</div>
-                            <p class="text-xs font-black text-gray-800 uppercase tracking-tighter">Equipa de Suporte</p>
-                        </div>
-                        <p class="text-sm text-gray-600 leading-tight">Ganhe 0,0150€ agora publicando o seu link de convite! Lembre-se: posts verificados pagam mais.</p>
-                        <div class="flex gap-6 mt-4 pt-3 border-t">
-                            <button onclick="doAction('LIKE')" class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Gostar (+${user.is_turbo ? TAXAS.LIKE : (TAXAS.LIKE*TAXAS.REDUCAO_NORMAL).toFixed(4)}€)</button>
-                            <button class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Comentar</button>
+                        <p class="text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Post Sugerido</p>
+                        <p class="text-sm text-gray-700 leading-tight mb-4">Aproveita a v65. Partilha o teu link e ganha comissões reais por cada amigo.</p>
+                        <div class="flex gap-4 pt-3 border-t">
+                            <button onclick="doAction('LIKE')" class="text-[10px] font-black google-blue uppercase">Gostar (+${state.is_turbo ? TAXAS.LIKE : (TAXAS.LIKE*TAXAS.NORMAL).toFixed(4)}€)</button>
                         </div>
                     </div>
 
-                    <div class="card ad-placeholder p-6 text-center opacity-60">
-                        <p class="text-[9px] font-bold text-gray-400 uppercase">Espaço Publicitário Native</p>
-                    </div>
+                    <div class="ad-box opacity-50 my-6">Placeholder: Anúncio Adsterra Native</div>
                 `;
             } else if (currentTab === 'wallet') {
                 container.innerHTML = `
-                    <div class="card p-10 text-center bg-white">
-                        <p class="text-gray-400 text-[10px] font-black uppercase mb-2 tracking-widest">Disponível para Levantamento</p>
-                        <h1 class="text-5xl font-black mb-8 google-blue">${parseFloat(user.saldo_eur).toFixed(4)}€</h1>
-                        <button onclick="alert('Mínimo 10,00€')" class="w-full google-bg-blue text-white py-4 rounded-2xl font-black shadow-lg uppercase text-sm">Levantar via PayPal / PIX</button>
-                        
-                        <div class="mt-8 ad-placeholder p-4 rounded-xl flex items-center gap-4">
-                            <div class="w-10 h-10 bg-gray-200 rounded"></div>
-                            <div class="text-left"><p class="text-[10px] font-bold">Anúncio Social Bar</p><p class="text-[9px] text-gray-400 italic">Interaja para bónus extra</p></div>
-                        </div>
+                    <div class="card p-8 text-center">
+                        <p class="text-xs text-gray-400 uppercase font-black mb-2">Carteira</p>
+                        <h1 class="text-4xl font-black mb-8 google-blue">${parseFloat(state.saldo_eur).toFixed(4)}€</h1>
+                        <button class="w-full google-bg-blue text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg">Levantar via PayPal</button>
                     </div>
                 `;
             } else if (currentTab === 'friends') {
                 container.innerHTML = `
                     <div class="card p-6">
-                        <h3 class="font-black text-sm uppercase mb-1">Minha Rede (10%)</h3>
-                        <p class="text-xs text-gray-400 mb-6 leading-tight text-justify">Partilhe o seu código. Sempre que um afiliado sincronizar e ganhar, você recebe 10% da receita gerada por ele.</p>
-                        <div class="bg-gray-50 p-4 rounded-xl border border-dashed text-[11px] font-mono mb-6 text-blue-500 truncate">apex.social/ref/${ADMIN_ID}</div>
-                        <button onclick="startAdSync()" class="w-full border-2 border-blue-500 text-blue-500 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest">🚀 Ativar Impulso de Rede (Vídeo)</button>
+                        <h3 class="font-black text-xs uppercase mb-1">Link de Convite</h3>
+                        <div class="bg-gray-50 p-3 rounded border text-[10px] font-mono mb-4 truncate text-blue-500">apex.social/ref/${USER_ID}</div>
+                        <button onclick="startSync()" class="w-full border-2 border-blue-500 text-blue-500 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">🚀 Impulso de Rede (Vídeo)</button>
                     </div>
                 `;
             } else if (currentTab === 'profile') {
                 container.innerHTML = `
-                    <div class="card p-6">
-                        <div class="flex items-center gap-4 mb-10">
-                            <div class="w-16 h-16 bg-gray-50 rounded-full border flex items-center justify-center font-black text-xl google-blue">A</div>
-                            <div><p class="font-black uppercase text-sm">Administrador</p><p class="text-[10px] text-gray-400">ID: ${ADMIN_ID}</p></div>
-                        </div>
-                        <button onclick="startAdSync()" class="w-full bg-black text-white py-4 rounded-2xl text-[10px] font-black uppercase mb-4 tracking-widest">Agendar Autopost (Repetição)</button>
-                        <button onclick="startAdSync()" class="w-full border py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-500">Resetar Limites Diários</button>
+                    <div class="card p-4 text-center">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full mx-auto mb-3 flex items-center justify-center font-black google-blue">A</div>
+                        <p class="font-black text-xs uppercase mb-6">ID: ${USER_ID}</p>
+                        <button onclick="startSync()" class="w-full bg-black text-white py-3 rounded-xl text-[10px] font-black uppercase mb-3">Agendar Autopost (v57)</button>
                     </div>
                 `;
             } else if (currentTab === 'admin') {
                 container.innerHTML = `
-                    <div class="card p-4 border-red-500 border-2 bg-red-50">
-                        <h2 class="text-red-600 font-black uppercase text-xs mb-4">Painel de Controlo</h2>
-                        <button class="w-full bg-red-600 text-white py-4 rounded-xl text-[10px] font-black uppercase mb-3 shadow-lg">Ver Saques Pendentes</button>
-                        <button class="w-full bg-white border border-red-200 text-red-400 py-4 rounded-xl text-[10px] font-black uppercase">Moderar Utilizadores</button>
+                    <div class="card p-4 border-red-500 border-2">
+                        <h2 class="text-red-600 font-black uppercase text-xs mb-4">Admin Panel</h2>
+                        <button class="w-full bg-red-600 text-white py-3 rounded-lg text-[10px] font-black uppercase">Pagar Saques Pendentes</button>
                     </div>
                 `;
             }
@@ -221,7 +187,7 @@
 
         function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
 
-        window.onload = syncUser;
+        window.onload = init;
     </script>
 </body>
 </html>
