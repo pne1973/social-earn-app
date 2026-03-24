@@ -3,148 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Apex Social - Ultra Admin</title>
+    <title>Apex Social - Command Center v15</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1a73e8; --success: #34a853; --danger: #ea4335; --warning: #fbbc04; --bg: #f0f2f5; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); padding-top: 140px; padding-bottom: 80px; }
+        :root { --primary: #1a73e8; --dark: #1c1e21; --gray: #f0f2f5; --accent: #8e24aa; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--gray); padding-top: 60px; padding-bottom: 80px; }
 
-        /* HEADER */
-        .header-fixed { position: fixed; top: 0; width: 100%; z-index: 1000; background: #fff; border-bottom: 1px solid #ddd; }
-        .blue-bar { background: var(--primary); color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; letter-spacing: 1px; }
-        .stats-top { display: flex; justify-content: center; padding: 15px; background: #fff; border-bottom: 1px solid #eee; }
+        /* HEADER COMPACTO PARA ADMIN */
+        .admin-header { position: fixed; top: 0; width: 100%; height: 60px; background: var(--dark); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 1100; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .live-dot { height: 8px; width: 8px; background: #34a853; border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* DASHBOARD ADMIN */
-        .container { max-width: 600px; margin: 0 auto; padding: 10px; }
-        .view-section { display: none; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .container { max-width: 800px; margin: 0 auto; padding: 15px; }
+        .section { display: none; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        h3 { font-size: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: #444; }
+        /* CARDS TÁTICOS */
+        .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #ddd; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .card-title { font-size: 13px; font-weight: 800; color: #5f6368; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
 
-        /* GRID DE MÉTRICAS AVANÇADAS */
-        .grid-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .metric-box { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; position: relative; overflow: hidden; }
-        .metric-box::before { content: ''; position: absolute; left: 0; top: 0; width: 4px; height: 100%; background: var(--primary); }
-        .metric-box.green::before { background: var(--success); }
-        .metric-box.orange::before { background: var(--warning); }
-        .metric-box small { font-size: 10px; color: #777; font-weight: bold; text-transform: uppercase; }
-        .metric-box h2 { font-size: 20px; margin-top: 5px; color: #1c1e21; }
-        .trend { font-size: 10px; font-weight: bold; margin-top: 5px; }
-        .up { color: var(--success); }
+        /* GRID DE MÉTRICAS PROFISSIONAIS */
+        .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .m-box { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e0e0e0; }
+        .m-box h2 { font-size: 24px; color: var(--dark); margin: 5px 0; }
+        .m-box span { font-size: 11px; font-weight: 600; color: #70757a; }
+        .m-change { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
+        .pos { background: #e6f4ea; color: #1e8e3e; }
 
-        /* TABELAS FINANCEIRAS */
-        .admin-table-wrapper { overflow-x: auto; margin-top: 10px; }
-        .admin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .admin-table th { background: #f8f9fa; padding: 10px; text-align: left; color: #666; border-bottom: 2px solid #eee; }
-        .admin-table td { padding: 12px 10px; border-bottom: 1px solid #eee; }
-        .status-pill { padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
-        .pill-pending { background: #fff3cd; color: #856404; }
+        /* ANALYTICS DE ATIVIDADE (HEATMAP SIMULADO) */
+        .activity-bar { display: flex; gap: 3px; height: 40px; align-items: flex-end; margin-top: 10px; }
+        .bar { flex: 1; background: var(--primary); border-radius: 2px; min-height: 5px; opacity: 0.7; }
 
-        /* BOTÕES */
-        .btn { border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-pay { background: var(--success); color: #fff; font-size: 11px; }
-        .btn-pay:hover { background: #2d8a45; }
+        /* TABELAS DE AUDITORIA */
+        .table-res { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+        .table-res th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; color: #5f6368; }
+        .table-res td { padding: 12px; border-bottom: 1px solid #f1f3f4; vertical-align: middle; }
+        .user-pill { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .id-badge { background: #eee; padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 10px; }
 
-        /* BOTTOM NAV */
-        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid #ddd; }
-        .nav-item { background: none; border: none; color: #65676b; font-size: 11px; font-weight: bold; text-align: center; }
-        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
-        .nav-item.active { color: var(--primary); }
+        /* LOG DE SISTEMA */
+        .sys-log { background: #1c1e21; color: #00ff00; font-family: 'Courier New', monospace; padding: 15px; border-radius: 8px; font-size: 11px; max-height: 150px; overflow-y: auto; }
+
+        /* NAV */
+        .nav-admin { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid #ddd; z-index: 1100; }
+        .nav-item { flex: 1; padding: 15px; text-align: center; border: none; background: none; color: #5f6368; font-weight: bold; cursor: pointer; }
+        .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); }
     </style>
 </head>
 <body>
 
-    <header class="header-fixed">
-        <div class="blue-bar">APEX SOCIAL ADMIN • CONTA MESTRE</div>
-        <div class="stats-top">
-            <div style="text-align:center;"><label style="font-size:10px; color:#65676b; font-weight:bold;">BALANÇO GERAL</label><b id="stEUR" style="display:block; color:var(--primary); font-size:22px;">0.0000€</b></div>
-        </div>
+    <header class="admin-header">
+        <div><span class="live-dot"></span> <b>APEX COMMAND CENTER</b></div>
+        <div style="font-size: 12px; opacity: 0.8;" id="serverTime">00:00:00</div>
     </header>
 
     <main class="container">
         
-        <div id="view-admin" class="view-section" style="display: block;">
+        <div id="view-main" class="section" style="display: block;">
             
-            <h3><i class="fas fa-chart-line"></i> Desempenho da Rede</h3>
-            <div class="grid-metrics">
-                <div class="metric-box">
-                    <small>Utilizadores Ativos</small>
-                    <h2 id="admUsers">1,204</h2>
-                    <div class="trend up">▲ 12% este mês</div>
+            <div class="metric-grid">
+                <div class="m-box">
+                    <span>UTILIZADORES HOJE</span>
+                    <h2 id="mUsers">1,482</h2>
+                    <small class="m-change pos">+8.4%</small>
                 </div>
-                <div class="metric-box">
-                    <small>Posts Totais</small>
-                    <h2 id="admPosts">0</h2>
-                    <div class="trend up">▲ 54 hoje</div>
+                <div class="m-box">
+                    <span>POSTS TOTAIS</span>
+                    <h2 id="mPosts">0</h2>
+                    <small class="m-change pos">+122</small>
                 </div>
-                <div class="metric-box orange">
-                    <small>Engajamento Médio</small>
-                    <h2 id="admEngage">0.0%</h2>
+                <div class="m-box">
+                    <span>CLIQUE EM ANÚNCIOS</span>
+                    <h2>4,290</h2>
+                    <small class="m-change pos">CTR: 3.2%</small>
                 </div>
-                <div class="metric-box green">
-                    <small>CPM Estimado</small>
-                    <h2>1.45€</h2>
+                <div class="m-box">
+                    <span>SAÍDA PREVISTA (PAY)</span>
+                    <h2 style="color: #ea4335;">-14.80€</h2>
                 </div>
             </div>
 
             <div class="card">
-                <h3><i class="fas fa-university"></i> Fluxo de Caixa (PayPal)</h3>
-                <div class="grid-metrics">
-                    <div style="background: #e8f5e9; padding:10px; border-radius:8px;">
-                        <small>LUCRO ADDS</small>
-                        <h4 style="color:#2e7d32">+245.80€</h4>
+                <div class="card-title"><i class="fas fa-wave-square"></i> Pico de Atividade (24h)</div>
+                <div class="activity-bar" id="activityBar">
                     </div>
-                    <div style="background: #ffebee; padding:10px; border-radius:8px;">
-                        <small>DÍVIDA USERS</small>
-                        <h4 style="color:#c62828">-12.45€</h4>
-                    </div>
+                <div style="display:flex; justify-content: space-between; font-size: 10px; color:#999; margin-top:5px;">
+                    <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:59</span>
                 </div>
-                
-                <div class="admin-table-wrapper">
-                    <table class="admin-table">
+            </div>
+
+            <div class="card" style="background: #1c1e21;">
+                <div class="card-title" style="color:#fff;"><i class="fas fa-terminal"></i> System Live Audit Log</div>
+                <div class="sys-log" id="sysLog">
+                    [SYSTEM] Inicializando monitorização...<br>
+                    [DB] Conexão Supabase estável.<br>
+                    [AUTH] Sessão Master Admin ativa.<br>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-users" class="section">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-users-cog"></i> Auditoria de Utilizadores & Levantamentos</div>
+                <div class="table-res-wrapper">
+                    <table class="table-res">
                         <thead>
                             <tr>
-                                <th>USER ID</th>
-                                <th>SALDO</th>
-                                <th>MÉTODO</th>
+                                <th>UTILIZADOR</th>
+                                <th>SALDO ACUM.</th>
+                                <th>STATUS</th>
                                 <th>AÇÃO</th>
                             </tr>
                         </thead>
-                        <tbody id="payList">
+                        <tbody id="userTable">
                             <tr>
-                                <td>#5401881400</td>
-                                <td><b>15.50€</b></td>
-                                <td>PayPal</td>
-                                <td><button class="btn btn-pay" onclick="payUser('5401881400', 15.50)">PAGAR</button></td>
+                                <td><div class="user-pill"><i class="fas fa-user-circle"></i> User_5401 <span class="id-badge">ID:5401</span></div></td>
+                                <td><b>0.0520€</b></td>
+                                <td><span style="color:#34a853">Ativo</span></td>
+                                <td><button onclick="alert('Perfil detalhado bloqueado na versão FREE')" style="border:none; background:#eee; padding:5px; border-radius:4px; font-size:10px;">DETALHES</button></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-
-            <div class="card">
-                <h3><i class="fas fa-shield-alt"></i> Moderação & Segurança</h3>
-                <div style="display: flex; gap: 8px;">
-                    <input type="number" id="delID" placeholder="ID do Post" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px;">
-                    <button class="btn" style="background:var(--danger); color:#fff;" onclick="delById()">ELIMINAR</button>
-                </div>
-                <p style="font-size:10px; color:#999; margin-top:10px;">* A eliminação é permanente e remove os dados do Supabase.</p>
-            </div>
         </div>
 
-        <div id="view-feed" class="view-section">
-            <div id="feed"></div>
+        <div id="view-db" class="section">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-database"></i> Limpeza de Base de Dados</div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="delInput" placeholder="ID do Post" style="flex:1; padding:12px; border-radius:8px; border:1px solid #ddd;">
+                    <button onclick="delPost()" style="background:#ea4335; color:#fff; border:none; padding:0 20px; border-radius:8px; font-weight:bold;">DELETE</button>
+                </div>
+            </div>
         </div>
 
     </main>
 
-    <nav class="nav-bottom">
-        <button class="nav-item active" onclick="switchTab('admin', this)"><i class="fas fa-tachometer-alt"></i>ADMIN</button>
-        <button class="nav-item" onclick="switchTab('feed', this)"><i class="fas fa-stream"></i>FEED</button>
-        <button class="nav-item" onclick="alert('Relatórios em PDF disponíveis na versão Pro')"><i class="fas fa-file-invoice-dollar"></i>REPORTE</button>
+    <nav class="nav-admin">
+        <button class="nav-item active" onclick="nav('main', this)"><i class="fas fa-chart-pie"></i><br>DASHBOARD</button>
+        <button class="nav-item" onclick="nav('users', this)"><i class="fas fa-wallet"></i><br>FINANCEIRO</button>
+        <button class="nav-item" onclick="nav('db', this)"><i class="fas fa-shield-alt"></i><br>SEGURANÇA</button>
     </nav>
 
     <script>
@@ -152,62 +153,56 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const client = supabase.createClient(SB_URL, SB_KEY);
 
-        // --- SISTEMA DE ABAS ---
-        function switchTab(tab, btn) {
-            document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
-            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-            document.getElementById('view-' + tab).style.display = 'block';
+        // --- RELÓGIO SERVER ---
+        setInterval(() => {
+            document.getElementById('serverTime').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+
+        // --- NAVEGAÇÃO ---
+        function nav(id, btn) {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('view-' + id).style.display = 'block';
             btn.classList.add('active');
-            if(tab === 'admin') loadAnalytics();
+            if(id === 'main') refreshMetrics();
         }
 
-        // --- ANALYTICS AVANÇADO ---
-        async function loadAnalytics() {
+        // --- LOG DE SISTEMA REAL-TIME ---
+        function addLog(msg) {
+            const log = document.getElementById('sysLog');
+            log.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // --- MÉTRICAS E GRÁFICOS ---
+        async function refreshMetrics() {
             const { data: posts } = await client.from('posts').select('*');
-            if(!posts) return;
+            if(posts) {
+                document.getElementById('mPosts').innerText = posts.length;
+                addLog(`Monitor: ${posts.length} posts detectados na DB.`);
+            }
 
-            const totalPosts = posts.length;
-            const totalLikes = posts.reduce((acc, p) => acc + (p.likes || 0), 0);
-            const totalComms = posts.reduce((acc, p) => acc + (Array.isArray(p.comments_data) ? p.comments_data.length : 0), 0);
-            
-            // Cálculo de Engajamento: (Likes + Comms) / Posts
-            const engagement = totalPosts > 0 ? (((totalLikes + totalComms) / totalPosts) * 10).toFixed(1) : 0;
-
-            document.getElementById('admPosts').innerText = totalPosts;
-            document.getElementById('admEngage').innerText = engagement + "%";
+            // Gerar Heatmap Simulado
+            const barCont = document.getElementById('activityBar');
+            barCont.innerHTML = "";
+            for(let i=0; i<24; i++) {
+                const val = Math.floor(Math.random() * 35) + 5;
+                barCont.innerHTML += `<div class="bar" style="height: ${val}px"></div>`;
+            }
         }
 
-        // --- FINANCEIRO ---
-        function payUser(uid, val) {
-            const url = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=TEU_EMAIL@HERE.com&amount=${val}&currency_code=EUR&item_name=Pagamento_Apex_User_${uid}`;
-            window.open(url, '_blank');
-        }
-
-        // --- MODERAÇÃO ---
-        async function delById() {
-            const id = document.getElementById('delID').value;
+        async function delPost() {
+            const id = document.getElementById('delInput').value;
             if(!id) return;
             const { error } = await client.from('posts').delete().eq('id', id);
-            if(!error) { alert("Post removido com sucesso!"); loadAnalytics(); }
+            if(!error) {
+                addLog(`CRITICAL: Post #${id} eliminado manualmente.`);
+                alert("Post Eliminado.");
+                refreshMetrics();
+            }
         }
 
-        // --- CARREGAMENTO DO FEED ---
-        async function loadFeed() {
-            const { data: posts } = await client.from('posts').select('*').order('created_at', { ascending: false });
-            const feed = document.getElementById('feed');
-            feed.innerHTML = "";
-            posts.forEach(p => {
-                feed.innerHTML += `
-                <div class="card">
-                    <small>ID: #${p.id}</small>
-                    <p style="margin:10px 0;">${p.content || ''}</p>
-                    ${p.image_url ? `<img src="${p.image_url}" style="width:100%; border-radius:8px;">` : ''}
-                </div>`;
-            });
-        }
-
-        loadAnalytics();
-        loadFeed();
+        refreshMetrics();
     </script>
 </body>
 </html>
