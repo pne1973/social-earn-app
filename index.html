@@ -3,36 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Apex Social - Stable v5</title>
+    <title>Apex Social - Fixed v6</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: #f0f2f5; color: #1c1e21; font-family: -apple-system, sans-serif; padding-top: 150px; }
+        body { background: #f0f2f5; color: #1c1e21; font-family: sans-serif; padding-top: 140px; }
         
-        /* HEADER */
         .header-fixed { position: fixed; top: 0; width: 100%; z-index: 1000; background: #fff; border-bottom: 1px solid #ddd; }
         .blue-bar { background: #1a73e8; color: #fff; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
-        .stats { display: flex; justify-content: space-around; padding: 15px 0; text-align: center; }
-        .stats b { display: block; color: #1a73e8; font-size: 15px; }
+        .stats { display: flex; justify-content: space-around; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .stats b { display: block; color: #1a73e8; font-size: 14px; }
         .stats label { font-size: 9px; color: #65676b; text-transform: uppercase; font-weight: bold; }
 
-        /* FEED */
         .container { max-width: 500px; margin: 0 auto; padding: 10px; }
-        .card { background: #fff; border-radius: 8px; padding: 15px; margin-bottom: 12px; border: 1px solid #ddd; }
+        .card { background: #fff; border-radius: 8px; padding: 15px; margin-bottom: 12px; border: 1px solid #ddd; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         
-        textarea { width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 10px; min-height: 60px; resize: none; font-size: 15px; outline: none; background: #f5f6f7; }
+        textarea { width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 10px; min-height: 50px; resize: none; font-size: 14px; outline: none; background: #f5f6f7; }
+        .post-img-result { width: 100%; border-radius: 8px; margin: 10px 0; display: block; }
+        
         .post-actions { display: flex; justify-content: space-between; border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px; }
-        .btn-act { background: none; border: none; color: #65676b; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .btn-act i { color: #1a73e8; }
+        .btn-act { background: none; border: none; color: #65676b; font-weight: bold; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         
-        .img-preview { width: 100%; border-radius: 8px; margin-top: 10px; display: none; border: 1px solid #eee; }
-        .post-img-result { width: 100%; border-radius: 8px; margin: 10px 0; }
-        
-        /* COMMENTS */
-        .comm-box { display: none; background: #f0f2f5; padding: 10px; border-radius: 6px; margin-top: 10px; }
-        .comm-item { font-size: 12px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid #ddd; }
-        .comm-input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; outline: none; }
+        .comm-box { background: #f0f2f5; padding: 10px; border-radius: 6px; margin-top: 10px; display: none; }
+        .comm-input { width: 100%; padding: 6px 12px; border: 1px solid #ddd; border-radius: 15px; font-size: 13px; outline: none; margin-top: 5px; }
+        .comm-text { font-size: 12px; padding: 4px 0; border-bottom: 1px dashed #ccc; }
     </style>
 </head>
 <body>
@@ -41,17 +36,17 @@
         <div class="blue-bar">APEX SOCIAL NETWORK</div>
         <div class="stats">
             <div><label>SALDO</label><b id="stEUR">0.0000€</b></div>
-            <div><label>REDE</label><b id="stDebt" style="color:#d93025;">0.0000€</b></div>
+            <div><label>DÍVIDA</label><b id="stDebt" style="color:#d93025;">0.0000€</b></div>
         </div>
     </header>
 
     <main class="container">
         <div class="card">
             <textarea id="postTxt" placeholder="No que estás a pensar?"></textarea>
-            <img id="imgPre" class="img-preview">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                <label style="cursor:pointer; color:#1a73e8; font-size:20px;"><i class="fas fa-camera"></i><input type="file" id="fileIn" accept="image/*" style="display:none;" onchange="preImg(this)"></label>
-                <button onclick="send()" id="btnSend" style="background:#1a73e8; color:#fff; border:none; padding:8px 20px; border-radius:6px; font-weight:bold;">Publicar</button>
+            <div id="preDiv" style="display:none; margin-top:10px;"><img id="imgPre" style="width:100%; border-radius:8px; border:1px solid #ddd;"></div>
+            <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                <label style="cursor:pointer; color:#1a73e8; font-size:20px;"><i class="fas fa-camera"></i><input type="file" id="fileIn" accept="image/*" style="display:none;" onchange="handleFile(this)"></label>
+                <button onclick="send()" id="btnSend" style="background:#1a73e8; color:#fff; border:none; padding:7px 18px; border-radius:6px; font-weight:bold; cursor:pointer;">Publicar</button>
             </div>
         </div>
         <div id="feed"></div>
@@ -63,7 +58,7 @@
         const client = supabase.createClient(SB_URL, SB_KEY);
 
         let saldo = 0.0080;
-        let imgData = null;
+        let imgBase64 = null;
 
         function updateUI() {
             const v = saldo.toFixed(4) + "€";
@@ -71,11 +66,99 @@
             document.getElementById('stDebt').innerText = v;
         }
 
-        function preImg(input) {
+        function handleFile(input) {
             const file = input.files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    canvas.width = 500; canvas.height = (img.height/
+                    canvas.width = 500; canvas.height = (img.height/img.width)*500;
+                    canvas.getContext('2d').drawImage(img,0,0,500,canvas.height);
+                    imgBase64 = canvas.toDataURL('image/jpeg', 0.5);
+                    document.getElementById('imgPre').src = imgBase64;
+                    document.getElementById('preDiv').style.display = 'block';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function send() {
+            const txt = document.getElementById('postTxt').value;
+            if(!txt && !imgBase64) return;
+            document.getElementById('btnSend').innerText = "...";
+
+            const { error } = await client.from('posts').insert([{ 
+                content: txt, image_url: imgBase64, likes: 0, comments_data: [] 
+            }]);
+
+            if(error) {
+                alert("Erro ao publicar: " + error.message);
+                document.getElementById('btnSend').innerText = "Publicar";
+            } else {
+                saldo += 0.0015;
+                location.reload();
+            }
+        }
+
+        async function loadFeed() {
+            const { data: posts, error } = await client.from('posts').select('*').order('created_at', { ascending: false });
+            if(error) {
+                document.getElementById('feed').innerHTML = "<p>Erro ao carregar posts.</p>";
+                return;
+            }
+
+            const feed = document.getElementById('feed');
+            feed.innerHTML = "";
+            
+            posts.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                // Segurança contra dados nulos
+                const likes = p.likes || 0;
+                const comms = p.comments_data || [];
+                
+                div.innerHTML = `
+                    <p style="font-size:14px;">${p.content || ''}</p>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img-result">` : ''}
+                    <div class="post-actions">
+                        <button class="btn-act" onclick="like(${p.id}, ${likes})"><i class="fas fa-heart" style="color:#e0245e"></i> ${likes}</button>
+                        <button class="btn-act" onclick="document.getElementById('cb-${p.id}').style.display='block'"><i class="fas fa-comment"></i> ${comms.length}</button>
+                        <button class="btn-act" onclick="del(${p.id})" style="color:#999"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div id="cb-${p.id}" class="comm-box">
+                        <div id="cl-${p.id}">${comms.map(c => `<div class="comm-text">${c}</div>`).join('')}</div>
+                        <input type="text" class="comm-input" placeholder="Comentar..." onkeypress="if(event.key==='Enter') addC(this, ${p.id})">
+                    </div>
+                `;
+                feed.appendChild(div);
+            });
+        }
+
+        async function like(id, cur) {
+            await client.from('posts').update({ likes: cur + 1 }).eq('id', id);
+            saldo += 0.0002;
+            updateUI();
+            loadFeed();
+        }
+
+        async function addC(input, id) {
+            const val = input.value;
+            if(!val) return;
+            const { data } = await client.from('posts').select('comments_data').eq('id', id).single();
+            let list = data.comments_data || [];
+            list.push(val);
+            await client.from('posts').update({ comments_data: list }).eq('id', id);
+            loadFeed();
+        }
+
+        async function del(id) {
+            if(confirm("Apagar?")) { await client.from('posts').delete().eq('id', id); loadFeed(); }
+        }
+
+        updateUI();
+        loadFeed();
+    </script>
+</body>
+</html>
