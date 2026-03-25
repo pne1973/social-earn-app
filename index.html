@@ -3,67 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v34.504 - Ad Retention Fix</title>
+    <title>Apex Social v34.505 - Layout & Ad Logic Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; }
         
-        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3000; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
+        /* FEEDBACK VISUAL - NÚMEROS GRANDES */
+        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 4000; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
         @keyframes popUp {
             0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
             20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
-            80% { opacity: 1; transform: translate(-50%, -70%) scale(1); }
             100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
         }
         .earning-text { font-size: 4rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52, 168, 83, 0.4); -webkit-text-stroke: 2px white; }
 
-        .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #eee; width: 100%; flex-direction: column; }
-        .comment-section.active { display: flex; }
-        .comments-list { padding: 16px; display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; }
-        .comment-bubble { background: white; padding: 12px; border-radius: 14px; border: 1px solid #e0e0e0; }
-        .comment-input-area { background: white; padding: 12px 16px; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center; }
-        .interaction-badge { position: absolute; top: -4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; font-weight: 900; border: 2px solid white; pointer-events: none; }
+        /* CORREÇÃO DE LAYOUT DAS INTERAÇÕES */
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 12px 0; border: none; background: transparent; }
+        .interaction-badge { position: absolute; top: 4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: 900; border: 2px solid white; z-index: 10; min-width: 20px; text-align: center; }
+        
+        .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #eee; width: 100%; }
+        .comment-section.active { display: flex; flex-direction: column; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); font-weight: 900; }
-        .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 12px 16px; transition: transform 0.3s; }
-        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-        #feed-container { margin-top: 140px; }
-        .ad-card { border: 2px solid var(--g-blue); background: #f0f7ff; }
+        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
+        
+        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 5000; align-items: center; justify-content: center; padding: 20px; }
+        .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 100; background: #f1f3f4; padding: 12px 16px; }
+        #feed-container { margin-top: 150px; }
     </style>
 </head>
 <body class="pb-24">
 
-    <div id="floating-earning">
-        <div class="earning-text" id="earning-val">+0.0000€</div>
-    </div>
+    <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
 
     <div id="ad-overlay">
         <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl border-4 border-blue-600 p-8 text-center">
             <div id="ad-decision-ui">
-                <h3 class="text-xl font-black uppercase text-blue-600 mb-4">Sincronização Necessária</h3>
-                <p class="text-[10px] font-black uppercase mb-6 text-gray-400">Valide os seus ganhos para continuar a 100%.</p>
-                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl shadow-xl uppercase text-xs mb-3">Ver Anúncio (15s)</button>
-                <button onclick="degradeAndContinue()" class="w-full p-4 bg-white border-2 text-gray-400 rounded-2xl uppercase text-[10px]">Pular (-20% Ganhos)</button>
+                <h3 class="text-xl font-black uppercase text-blue-600 mb-2">Limite Atingido</h3>
+                <p class="text-[10px] font-black uppercase mb-6 text-gray-400">Vê um anúncio para manter 100% dos ganhos.</p>
+                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl shadow-xl uppercase text-xs mb-3 font-black">Ver Anúncio (15 seg)</button>
+                <button onclick="degradeAndContinue()" class="w-full p-4 bg-white border-2 text-gray-300 rounded-2xl uppercase text-[9px] font-black">Ignorar (-20% de bónus)</button>
             </div>
             <div id="ad-player-ui" class="hidden">
-                <div class="aspect-video bg-black rounded-xl mb-4 flex items-center justify-center relative overflow-hidden">
-                    <img id="ad-img-fs" src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400" class="absolute inset-0 w-full h-full object-cover opacity-60">
-                    <div class="relative z-10 flex flex-col items-center">
-                        <div id="ad-spinner" class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-                        <p id="ad-timer" class="text-white font-black uppercase text-xs tracking-widest">A validar...</p>
-                    </div>
+                <div class="aspect-video bg-black rounded-xl mb-6 flex items-center justify-center relative overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400" class="absolute inset-0 w-full h-full object-cover opacity-50">
+                    <div id="ad-timer-circle" class="relative z-10 text-white font-black text-2xl">15</div>
                 </div>
-                <button id="close-ad-btn" disabled class="w-full py-5 bg-gray-100 text-gray-400 rounded-xl uppercase text-xs font-black">Aguarde 15s...</button>
+                <button id="close-ad-btn" disabled class="w-full py-5 bg-gray-200 text-gray-400 rounded-xl uppercase text-xs font-black">Visualização Obrigatória...</button>
             </div>
         </div>
     </div>
 
-    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-50 px-4 flex justify-between items-center h-[72px]">
+    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">A</div>
             <div>
@@ -79,12 +74,12 @@
 
     <main class="max-w-lg mx-auto p-4 mt-[72px]">
         <section id="view-social" class="tab-content active">
-            <div id="publisher-box" class="sticky-publisher">
+            <div class="sticky-publisher">
                 <div class="google-card p-4 border-t-8 border-blue-600 shadow-xl">
                     <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none uppercase font-black" rows="1"></textarea>
                     <div id="expanded-post" class="hidden">
-                        <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-100 border-none text-[10px] p-3 rounded-xl mb-4 outline-none uppercase font-black">
-                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase">Publicar na Rede</button>
+                        <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-100 border-none text-[10px] p-3 rounded-xl mb-4 font-black uppercase outline-none">
+                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase shadow-lg">Publicar Agora</button>
                     </div>
                 </div>
             </div>
@@ -92,27 +87,17 @@
         </section>
 
         <section id="view-info" class="tab-content">
-            <div class="google-card p-12 text-center border-t-[10px] border-blue-600 mb-8 shadow-2xl mt-4">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">SALDO DISPONÍVEL</p>
+            <div class="google-card p-12 text-center border-t-[10px] border-blue-600 mt-4 shadow-2xl">
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2 italic">Saldo em Carteira</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
                 <p id="wall-brl" class="text-xs font-black text-gray-500 mt-2 uppercase italic">≈ 0.0000 BRL</p>
             </div>
         </section>
-
-        <section id="view-admin" class="tab-content">
-            <div class="google-card border-t-[8px] border-red-600 p-6 mt-4 shadow-2xl text-center">
-                <h2 class="text-red-600 font-black text-xs uppercase mb-6 underline">ADMIN PANEL</h2>
-                <div id="adm-debt" class="font-black text-2xl text-blue-700 mb-4">0.00€</div>
-                <input id="del-id" type="text" placeholder="ID DO POST" class="w-full p-4 border-2 rounded-xl mb-4 font-black uppercase text-[10px]">
-                <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase">Eliminar Post</button>
-            </div>
-        </section>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-50">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200]">
         <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase">REDE</span></button>
         <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase">GANHOS</span></button>
-        <button id="adm-btn" onclick="nav('admin')" class="hidden flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase italic text-red-400">ADMIN</span></button>
     </nav>
 
     <script>
@@ -122,46 +107,44 @@
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
         let user = { saldo: 0, interactions: 0, multiplier: 1.0 };
-        let pendingBonus = 0;
+        let pendingVal = 0;
 
         async function init() {
-            if(MASTER_ID === "5401881400") document.getElementById('adm-btn').classList.remove('hidden');
             const { data } = await sb.from('perfis').select('*').eq('id', MASTER_ID).single();
             if(data) user.saldo = Number(data.saldo) || 0;
             updateUI(); loadFeed();
         }
 
         function updateUI() {
-            const e = Number(user.saldo) || 0;
-            document.getElementById('main-eur').innerText = e.toFixed(4) + "€";
-            document.getElementById('wall-eur').innerText = e.toFixed(4) + "€";
-            document.getElementById('main-brl').innerText = (e * 6.12).toFixed(4) + " BRL";
-            const pct = Math.round(user.multiplier * 100);
+            document.getElementById('main-eur').innerText = user.saldo.toFixed(4) + "€";
+            document.getElementById('wall-eur').innerText = user.saldo.toFixed(4) + "€";
+            document.getElementById('main-brl').innerText = (user.saldo * 6.12).toFixed(4) + " BRL";
             const tag = document.getElementById('multiplier-tag');
-            tag.innerText = `STATUS: ${pct}% OK`;
-            tag.className = pct < 100 ? "text-[8px] font-black text-red-500 italic uppercase" : "text-[8px] font-black text-green-500 italic uppercase";
+            tag.innerText = `STATUS: ${Math.round(user.multiplier * 100)}% OK`;
+            tag.className = user.multiplier < 1.0 ? "text-[8px] font-black text-red-500 uppercase italic" : "text-[8px] font-black text-green-500 uppercase italic";
         }
 
         function showBigNumber(val) {
             const container = document.getElementById('floating-earning');
-            const text = document.getElementById('earning-val');
-            text.innerText = "+" + val.toFixed(4) + "€";
+            document.getElementById('earning-val').innerText = "+" + val.toFixed(4) + "€";
             container.style.display = 'block';
             setTimeout(() => { container.style.display = 'none'; }, 800);
         }
 
+        // LÓGICA DE INTERAÇÃO COM BLOQUEIO RIGOROSO
         async function reagir(val) {
-            if(user.interactions >= 5) { 
-                pendingBonus = val; 
-                document.getElementById('ad-overlay').style.display = 'flex'; 
-            } else {
-                user.interactions++;
-                const vFinal = Number(val) * user.multiplier;
-                user.saldo += vFinal;
-                showBigNumber(vFinal);
-                updateUI();
-                await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
+            if(user.interactions >= 3) { // Reduzi para 3 para testar a frequência
+                pendingVal = val;
+                document.getElementById('ad-overlay').style.display = 'flex';
+                return;
             }
+            
+            user.interactions++;
+            const ganhar = val * user.multiplier;
+            user.saldo += ganhar;
+            showBigNumber(ganhar);
+            updateUI();
+            await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
         }
 
         async function loadFeed() {
@@ -170,42 +153,46 @@
             if(!posts) return;
             container.innerHTML = "";
             
-            posts.forEach((p, index) => {
+            posts.forEach((p, idx) => {
                 const card = document.createElement('div');
                 card.className = "google-card shadow-sm mb-6";
                 card.innerHTML = `
                     <div class="p-5">
                         <p class="text-[13px] font-black uppercase text-gray-800 mb-4">${p.content}</p>
-                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 border">` : ''}
-                        <div class="flex justify-between border-t pt-4">
-                            <button onclick="reagir(0.0006)" class="flex-1 flex flex-col items-center relative"><span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-500 uppercase">Gostar</span></button>
-                            <button onclick="toggleComments('${p.id}')" class="flex-1 flex flex-col items-center relative border-x border-gray-100"><span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-500 uppercase">Comentar</span></button>
-                            <button onclick="reagir(0.0020)" class="flex-1 flex flex-col items-center relative"><span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-500 uppercase">Partilhar</span></button>
+                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 border border-gray-100">` : ''}
+                        <div class="flex border-t pt-2">
+                            <button onclick="reagir(0.0006)" class="interaction-btn">
+                                <div class="interaction-badge">${Math.floor(Math.random()*50)}</div>
+                                <span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-400 uppercase mt-1">Gostar</span>
+                            </button>
+                            <button onclick="toggleComments('${p.id}')" class="interaction-btn border-x border-gray-100">
+                                <div class="interaction-badge" id="badge-${p.id}">0</div>
+                                <span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-400 uppercase mt-1">Comentar</span>
+                            </button>
+                            <button onclick="reagir(0.0020)" class="interaction-btn">
+                                <div class="interaction-badge">${Math.floor(Math.random()*15)}</div>
+                                <span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-400 uppercase mt-1">Partilhar</span>
+                            </button>
                         </div>
                     </div>
                     <div id="comments-${p.id}" class="comment-section">
-                        <div id="list-${p.id}" class="comments-list"></div>
-                        <div class="comment-input-area">
-                            <input id="input-${p.id}" type="text" placeholder="A TUA MENSAGEM..." class="flex-1 text-[11px] p-3 bg-gray-100 rounded-xl outline-none font-black uppercase border-none">
-                            <button onclick="addComment('${p.id}')" class="bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase">OK</button>
+                        <div id="list-${p.id}" class="p-4 space-y-2 max-h-48 overflow-y-auto bg-gray-50"></div>
+                        <div class="p-3 bg-white border-t flex gap-2">
+                            <input id="in-${p.id}" type="text" placeholder="A TUA MENSAGEM..." class="flex-1 bg-gray-100 rounded-xl p-3 text-[10px] font-black uppercase border-none">
+                            <button onclick="addComment('${p.id}')" class="bg-blue-600 text-white px-5 rounded-xl font-black text-[10px] uppercase">OK</button>
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
+                updateCommentCount(p.id);
 
-                // RESTAURADO: INJEÇÃO DE ANÚNCIOS DE 3 EM 3 POSTS
-                if ((index + 1) % 3 === 0) {
-                    const adCard = document.createElement('div');
-                    adCard.className = "google-card p-6 ad-card shadow-lg mb-6 text-center";
-                    adCard.innerHTML = `
-                        <span class="bg-blue-600 text-white text-[8px] font-black px-2 py-1 rounded uppercase mb-2 inline-block">Patrocinado</span>
-                        <h4 class="text-xs font-black uppercase text-blue-700 mb-3">Anúncio Apex: Clique para Bónus</h4>
-                        <div class="w-full h-32 bg-gray-200 rounded-xl mb-4 overflow-hidden">
-                             <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400" class="w-full h-full object-cover opacity-80">
-                        </div>
-                        <button onclick="startAdFlow()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Ver e Ganhar 100%</button>
-                    `;
-                    container.appendChild(adCard);
+                if((idx + 1) % 3 === 0) {
+                    const ad = document.createElement('div');
+                    ad.className = "google-card p-6 border-2 border-blue-100 bg-blue-50 text-center mb-6";
+                    ad.innerHTML = `<p class="text-[8px] font-black text-blue-600 uppercase mb-2 italic">Publicidade Apex</p>
+                                    <h4 class="text-[11px] font-black uppercase mb-4">Ganhe o Dobro com Anúncios</h4>
+                                    <button onclick="startAdFlow()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md">Ver Agora</button>`;
+                    container.appendChild(ad);
                 }
             });
         }
@@ -213,83 +200,67 @@
         function startAdFlow() {
             document.getElementById('ad-decision-ui').classList.add('hidden');
             document.getElementById('ad-player-ui').classList.remove('hidden');
-            let timeLeft = 15; // ALTERADO PARA 15 SEGUNDOS
+            let time = 15;
             const btn = document.getElementById('close-ad-btn');
+            const timerText = document.getElementById('ad-timer-circle');
             
-            const timerInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('ad-timer').innerText = "Validando em " + timeLeft + "s...";
-                btn.innerText = "Aguarde " + timeLeft + "s...";
-                
-                if(timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    document.getElementById('ad-spinner').style.display = 'none';
-                    document.getElementById('ad-timer').innerText = "CONCLUÍDO";
+            const timer = setInterval(() => {
+                time--;
+                timerText.innerText = time;
+                btn.innerText = `Aguarde ${time}s...`;
+                if(time <= 0) {
+                    clearInterval(timer);
                     btn.disabled = false;
-                    btn.innerText = "RECOLHER GANHOS";
+                    btn.innerText = "VALIDAR E CONTINUAR";
                     btn.className = "w-full py-5 bg-green-600 text-white rounded-xl font-black uppercase text-xs shadow-xl";
                     btn.onclick = () => { user.multiplier = 1.0; user.interactions = 0; finalize(); };
                 }
             }, 1000);
         }
 
-        async function addComment(postId) {
-            const input = document.getElementById(`input-${postId}`);
-            if(!input.value) return;
-            const { error } = await sb.from('comentarios').insert([{ post_id: postId, user_id: MASTER_ID, content: input.value }]);
-            if(!error) {
-                input.value = "";
-                await reagir(0.0010);
-                updateCommentList(postId);
-            }
-        }
-
-        async function updateCommentList(postId) {
-            const list = document.getElementById(`list-${postId}`);
-            const { data } = await sb.from('comentarios').select('*').eq('post_id', postId).order('created_at', {ascending: true});
-            list.innerHTML = (data && data.length > 0) ? data.map(c => `<div class="comment-bubble"><p class="text-[8px] text-blue-600 font-black mb-1 italic">ID..${String(c.user_id).slice(-4)}</p><p class="text-[11px] font-black uppercase">${c.content}</p></div>`).join('') : '<p class="text-[9px] text-gray-400 text-center font-black py-4">Sem comentários.</p>';
-            list.scrollTop = list.scrollHeight;
-        }
-
-        async function publish() {
-            const t = document.getElementById('post-input').value;
-            const i = document.getElementById('post-url').value;
-            if(!t) return;
-            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: t, image_url: i }]);
-            if(!error) {
-                user.saldo += 0.0150;
-                showBigNumber(0.0150);
-                updateUI();
-                await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
-                document.getElementById('post-input').value = "";
-                loadFeed();
-            }
-        }
-
-        function degradeAndContinue() { user.multiplier = Math.max(0.1, user.multiplier - 0.20); user.interactions++; finalize(); }
+        function degradeAndContinue() { user.multiplier = Math.max(0.2, user.multiplier - 0.2); user.interactions++; finalize(); }
 
         async function finalize() {
             document.getElementById('ad-overlay').style.display = 'none';
             document.getElementById('ad-decision-ui').classList.remove('hidden');
             document.getElementById('ad-player-ui').classList.add('hidden');
-            user.saldo += (Number(pendingBonus) * user.multiplier);
-            updateUI(); 
-            await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID); 
-            loadFeed();
+            const bonus = pendingVal * user.multiplier;
+            user.saldo += bonus;
+            showBigNumber(bonus);
+            updateUI();
+            await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
         }
 
-        function toggleComments(id) { 
-            const s = document.getElementById(`comments-${id}`); 
-            s.classList.toggle('active'); 
-            if(s.classList.contains('active')) updateCommentList(id); 
+        async function addComment(pid) {
+            const input = document.getElementById(`in-${pid}`);
+            if(!input.value) return;
+            const { error } = await sb.from('comentarios').insert([{ post_id: pid, user_id: MASTER_ID, content: input.value }]);
+            if(!error) { input.value = ""; await reagir(0.0010); updateCommentList(pid); }
         }
 
-        function nav(t) {
-            document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-'+t).classList.add('active');
-            document.querySelector(`[onclick="nav('${t}')"]`).classList.add('active');
+        async function updateCommentList(pid) {
+            const { data } = await sb.from('comentarios').select('*').eq('post_id', pid).order('created_at', {ascending: true});
+            const list = document.getElementById(`list-${pid}`);
+            list.innerHTML = data.length ? data.map(c => `<div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm"><p class="text-[7px] text-blue-600 font-black italic">ID..${String(c.user_id).slice(-4)}</p><p class="text-[10px] font-black uppercase text-gray-700">${c.content}</p></div>`).join('') : '<p class="text-[8px] text-gray-400 text-center font-black py-4 uppercase">Sem comentários</p>';
+            updateCommentCount(pid);
         }
 
+        async function updateCommentCount(pid) {
+            const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', pid);
+            const badge = document.getElementById(`badge-${pid}`);
+            if(badge) badge.innerText = count || 0;
+        }
+
+        async function publish() {
+            const c = document.getElementById('post-input').value;
+            const i = document.getElementById('post-url').value;
+            if(!c) return;
+            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: c, image_url: i }]);
+            if(!error) { user.saldo += 0.0150; showBigNumber(0.0150); updateUI(); await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID); document.getElementById('post-input').value = ""; loadFeed(); }
+        }
+
+        function toggleComments(id) { document.getElementById(`comments-${id}`).classList.toggle('active'); updateCommentList(id); }
+        function nav(t) { document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active')); document.getElementById('view-'+t).classList.add('active'); event.currentTarget.classList.add('active'); }
         function expandPublisher() { document.getElementById('expanded-post').classList.remove('hidden'); document.getElementById('post-input').rows = 3; }
 
         window.onload = init;
