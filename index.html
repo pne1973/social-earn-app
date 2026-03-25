@@ -3,77 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v34.510</title>
+    <title>Apex Social v34.511</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; padding-top: 72px; padding-bottom: 80px; }
         
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; }
+        /* Header Fixo */
+        header { position: fixed; top: 0; left: 0; right: 0; height: 72px; background: white; border-bottom: 1px solid #dadce0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; px: 16px; }
         
-        /* Sistema de Ganhos Flutuantes */
-        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5000; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
-        @keyframes popUp {
-            0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
-            20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
-            100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
-        }
-        .earning-text { font-size: 4rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52, 168, 83, 0.4); -webkit-text-stroke: 2px white; }
+        /* Cards e Layout */
+        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(60,64,67,0.1); }
+        .content-area { max-width: 500px; margin: 0 auto; padding: 16px; }
 
-        /* Navegação e Abas */
+        /* Abas */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
 
-        /* Publicador Fixo */
-        .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 100; background: #f1f3f4; padding: 12px 16px; }
-        #feed-container { margin-top: 165px; }
+        /* Navegação Inferior Fixa */
+        nav { position: fixed; bottom: 0; left: 0; right: 0; height: 72px; background: white; border-top: 1px solid #dadce0; z-index: 1000; display: flex; justify-content: space-around; align-items: center; }
+        .nav-btn { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; border: none; background: none; color: #5f6368; }
+        .nav-btn.active { color: var(--g-blue); }
+        .nav-btn span { font-size: 10px; font-weight: 900; text-transform: uppercase; margin-top: 4px; }
 
-        /* Estilo dos Botões de Interação */
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; position: relative; }
-        .interaction-badge { position: absolute; top: 4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; border: 2px solid white; }
+        /* Interações */
+        .interaction-row { display: flex; border-top: 1px solid #f1f3f4; }
+        .int-btn { flex: 1; padding: 12px 0; display: flex; flex-direction: column; align-items: center; position: relative; }
+        .badge { position: absolute; top: 6px; right: 20%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; border: 2px solid white; }
     </style>
 </head>
-<body class="pb-24">
+<body>
 
-    <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
-
-    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
+    <header class="px-4">
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-sm">A</div>
-            <h1 class="text-sm font-black uppercase text-blue-600 tracking-tighter">Apex Social</h1>
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">A</div>
+            <span class="text-sm font-black uppercase text-blue-600">Apex Social</span>
         </div>
         <div class="text-right">
-            <div id="main-eur" class="font-black text-green-600 text-lg">0.0000€</div>
-            <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase italic">0.0000 BRL</div>
+            <div id="val-eur" class="text-green-600 font-black text-lg leading-tight">0.0000€</div>
+            <div id="val-brl" class="text-[9px] text-gray-400 font-black uppercase italic">0.0000 BRL</div>
         </div>
     </header>
 
-    <main class="max-w-lg mx-auto p-4 mt-[72px]">
+    <main class="content-area">
         
         <section id="view-social" class="tab-content active">
-            <div class="sticky-publisher">
-                <div class="google-card p-4 border-t-8 border-blue-600 shadow-lg">
-                    <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none text-xs font-black uppercase outline-none focus:ring-0" rows="1"></textarea>
-                    <div id="expanded-post" class="hidden mt-4">
-                        <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full bg-gray-50 p-4 rounded-xl mb-4 text-[10px] font-black border border-gray-100 outline-none">
-                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[11px]">Publicar Agora</button>
-                    </div>
+            <div class="google-card p-4 border-t-8 border-blue-600 shadow-md mb-8">
+                <textarea id="post-input" onclick="this.rows=3; document.getElementById('post-extra').style.display='block'" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none text-xs font-black uppercase focus:ring-0 outline-none resize-none" rows="1"></textarea>
+                <div id="post-extra" style="display:none;" class="mt-4">
+                    <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full bg-gray-50 p-4 rounded-xl mb-4 text-[10px] font-black border border-gray-100 outline-none">
+                    <button onclick="publish()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[11px] shadow-sm">Publicar Agora</button>
                 </div>
             </div>
-            <div id="feed-container" class="space-y-6"></div>
+            <div id="feed-container">
+                </div>
         </section>
 
         <section id="view-info" class="tab-content">
-            <div class="google-card p-12 text-center border-t-[10px] border-blue-600 mt-4 shadow-xl">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Carteira de Utilizador</p>
+            <div class="google-card p-12 text-center border-t-[10px] border-blue-600 shadow-md">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Saldo em Carteira</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
             </div>
         </section>
 
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200]">
-        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-
+    <nav>
+        <button onclick="changeTab('social', this)" class="nav-btn active">
+            <span class="text-2xl">🏠</span>
+            <span>Rede</span>
+        </button>
+        <button onclick="changeTab('info', this)" class="nav-btn">
+            <span class="text-2xl">💰</span>
+            <span>Ganhos</span>
+        </button>
+    </nav>
+
+    <script>
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const MASTER_ID = "5401881400";
+        const sb = window.supabase.createClient(SB_URL, SB_KEY);
+        
+        let balance = 0;
+
+        async function init() {
+            const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if(data) balance = Number(data.saldo);
+            updateDisplay();
+            loadFeed();
+        }
+
+        function updateDisplay() {
+            const val = balance.toFixed(4);
+            document.getElementById('val-eur').innerText = val + "€";
+            document.getElementById('wall-eur').innerText = val + "€";
+            document.getElementById('val-brl').innerText = (balance * 6.12).toFixed(4) + " BRL";
+        }
+
+        async function addMoney(amt) {
+            balance += amt;
+            updateDisplay();
+            await sb.from('perfis').update({ saldo: balance }).eq('id', MASTER_ID);
+        }
+
+        async function publish() {
+            const txt = document.getElementById('post-input').value;
+            const img = document.getElementById('post-url').value;
+            if(!txt) return;
+            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID
