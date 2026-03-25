@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v140</title>
+    <title>Apex Social v145</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -13,17 +13,14 @@
         .nav-btn.active { color: #4285F4; border-top: 3px solid #4285F4; font-weight: 900; background: #f1f3f4; }
         .card { background: white; border-radius: 14px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .ad-slot { background: #fffde7; border: 1px dashed #fbc02d; text-align: center; padding: 15px; border-radius: 10px; margin: 10px 0; font-size: 10px; font-weight: 900; color: #856404; }
-        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 10000; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500"></div></div>
-
     <header class="sticky top-0 bg-white border-b z-50 px-5 py-4 flex justify-between items-center shadow-sm">
         <div>
             <h1 class="text-xl font-black text-blue-600 italic tracking-tighter uppercase">Apex Social</h1>
-            <p class="text-[9px] font-black text-gray-400 uppercase">OFFICIAL PRODUCTION</p>
+            <p class="text-[9px] font-black text-gray-400 uppercase">Vercel Official v145</p>
         </div>
         <div class="text-right">
             <span id="bal-eur" class="font-black text-green-600 text-lg">0.0000€</span>
@@ -35,56 +32,36 @@
         
         <section id="view-feed" class="tab-content active">
             <div class="card p-4 bg-blue-600 text-white flex justify-between items-center mb-4">
-                <div><p class="text-[9px] font-black uppercase opacity-80">Ações Disponíveis</p><p id="bonus-display" class="text-sm font-black italic">🔥 15 Ações Turbo</p></div>
+                <div><p class="text-[9px] font-black uppercase opacity-80">Saldo Turbo</p><p id="bonus-display" class="text-sm font-black italic">🔥 15 Ações Turbo</p></div>
                 <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-1 rounded-full text-[10px] font-black uppercase font-bold">Recarregar</button>
             </div>
             
-            <div class="card p-4">
-                <textarea id="post-text" placeholder="Publica agora e ganha 0,0150€" class="w-full text-sm border-none focus:ring-0 p-0 mb-3" rows="2"></textarea>
-                <div class="flex space-x-2">
-                    <button onclick="sendPost()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md">Publicar</button>
-                    <button onclick="shareLink()" class="bg-gray-100 px-4 rounded-xl font-black text-[10px] uppercase border text-gray-500">Link</button>
-                </div>
-            </div>
-
-            <div class="ad-slot">ADSTERRA NATIVE FEED</div>
             <div id="posts-list" class="space-y-4">
-                <p class="text-center text-gray-300 text-[10px] py-10 uppercase font-black italic">A carregar...</p>
+                <p class="text-center text-gray-300 text-[10px] py-10 uppercase font-black italic">A carregar rede social...</p>
             </div>
         </section>
 
         <section id="view-wallet" class="tab-content">
-            <div class="card p-10 text-center mb-4 border-b-4 border-blue-500">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">A Tua Carteira</p>
+            <div class="card p-10 text-center mb-4 border-b-4 border-blue-500 shadow-sm">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Carteira Virtual</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600 tracking-tighter">0.0000€</h1>
             </div>
             <div class="card p-5 space-y-4 text-center">
-                <button onclick="syncBonus()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic shadow-xl">Sincronizar Bónus</button>
-                <button onclick="addCash(0.0500)" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase">Check-in Diário (+0,0500€)</button>
-                <div class="ad-slot">BANNER ADSTERRA 320X50</div>
-                <p class="text-[8px] font-black text-gray-300 uppercase">Mínimo de Saque: 10,0000€</p>
+                <button onclick="syncBonus()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic shadow-xl">Sincronizar Ações</button>
+                <button onclick="addCash(0.0500)" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase font-bold">Check-in Diário (+0,0500€)</button>
+                <div class="ad-slot">BANNER PUBLICITÁRIO</div>
+                <p class="text-[8px] font-black text-gray-300 uppercase italic">Saque Mínimo: 10,0000€ via PayPal</p>
             </div>
         </section>
 
         <section id="view-friends" class="tab-content">
-            <div class="card p-6 border-l-4 border-blue-500">
-                <h2 class="font-black text-sm uppercase text-blue-600 mb-1">Rede de Afiliados (10%)</h2>
-                <p class="text-[10px] font-bold text-gray-400 uppercase mb-6 leading-tight">Ganha comissão vitalícia sobre os lucros da tua rede.</p>
-                <div class="bg-gray-50 p-4 rounded-xl border border-dashed mb-6 text-[9px] font-mono text-blue-600 italic break-all text-center" id="ref-box">
+            <div class="card p-6 border-l-4 border-blue-500 shadow-sm">
+                <h2 class="font-black text-sm uppercase text-blue-600 mb-1">O Teu Convite</h2>
+                <p class="text-[10px] font-bold text-gray-400 uppercase mb-6 leading-tight">Ganha 10% de comissão sobre os lucros da tua rede.</p>
+                <div class="bg-gray-50 p-4 rounded-xl border border-dashed mb-6 text-[10px] font-mono text-blue-700 italic break-all text-center" id="ref-box">
                     https://social-earn-app.vercel.app/?ref=5401881400
                 </div>
                 <button onclick="shareLink()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-md">Convidar via WhatsApp</button>
-            </div>
-        </section>
-
-        <section id="view-admin" class="tab-content">
-            <div class="card p-6 border-2 border-red-500 bg-red-50 text-center shadow-lg">
-                <h2 class="text-red-600 font-black text-xs uppercase mb-6 italic">Painel Admin</h2>
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="bg-white p-3 rounded-lg border"><p class="text-[8px] font-bold text-gray-400 uppercase">Users</p><p id="adm-users" class="font-black text-red-600 text-lg">...</p></div>
-                    <div class="bg-white p-3 rounded-lg border"><p class="text-[8px] font-bold text-gray-400 uppercase">Posts</p><p id="adm-posts" class="font-black text-red-600 text-lg">...</p></div>
-                </div>
-                <button class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-[10px] uppercase">Pagamentos PayPal</button>
             </div>
         </section>
 
@@ -94,10 +71,10 @@
         <button onclick="nav('feed')" id="btn-feed" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400 active"><span class="text-[10px] font-black uppercase">Feed</span></button>
         <button onclick="nav('wallet')" id="btn-wallet" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Ganhos</span></button>
         <button onclick="nav('friends')" id="btn-friends" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Rede</span></button>
-        <button onclick="nav('admin')" id="btn-admin" class="nav-btn hidden flex-1 flex flex-col items-center p-3 text-red-300 italic"><span class="text-[10px] font-black uppercase">Admin</span></button>
     </nav>
 
     <script>
+        // CONFIGURAÇÃO VERCEL + SUPABASE
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
         const VERCEL_URL = "https://social-earn-app.vercel.app";
@@ -115,22 +92,17 @@
         }
 
         async function init() {
-            if (UID === "5401881400") document.getElementById('btn-admin').classList.remove('hidden');
-            
             try {
-                const { data: profile } = await supabase.from('perfis').select('*').eq('id', UID).single();
-                if (profile) localData = profile;
+                // Tenta buscar saldo
+                const { data, error } = await supabase.from('perfis').select('*').eq('id', UID).single();
+                if (data) localData = data;
                 
-                const { data: posts } = await supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(10);
-                if (posts) renderPosts(data);
-
-                if (UID === "5401881400") {
-                    const { count: uC } = await supabase.from('perfis').select('*', { count: 'exact', head: true });
-                    const { count: pC } = await supabase.from('posts').select('*', { count: 'exact', head: true });
-                    document.getElementById('adm-users').innerText = uC || 0;
-                    document.getElementById('adm-posts').innerText = pC || 0;
-                }
-            } catch (e) { console.warn("Modo Offline"); }
+                // Tenta carregar posts
+                const { data: posts } = await supabase.from('posts').select('*').limit(5);
+                if (posts) renderPosts(posts);
+            } catch (e) {
+                console.log("Sistema em cache.");
+            }
             refresh();
         }
 
@@ -142,52 +114,32 @@
             document.getElementById('bonus-display').innerText = `🔥 ${localData.bonus} Ações Turbo`;
         }
 
-        function renderPosts(data) {
+        function renderPosts(posts) {
             const list = document.getElementById('posts-list');
-            if (!data || data.length === 0) { list.innerHTML = "<p class='text-center text-gray-400 text-[10px] py-10 uppercase font-black'>Aguardando novos posts</p>"; return; }
-            list.innerHTML = data.map(p => `
+            if (!posts || posts.length === 0) return;
+            list.innerHTML = posts.map(p => `
                 <div class="card p-4">
-                    <p class="text-[9px] font-black text-gray-400 mb-2 uppercase">User #${p.user_id.slice(-4)}</p>
-                    <p class="text-xs text-gray-700 font-medium">${p.content}</p>
+                    <p class="text-[9px] font-black text-gray-400 uppercase">User #${p.user_id.slice(-4)}</p>
+                    <p class="text-xs text-gray-800 mt-2">${p.content}</p>
                 </div>
-            `).join('<div class="ad-slot py-2">ADSTERRA NATIVE</div>');
+            `).join('<div class="ad-slot py-2">ADSTERRA</div>');
         }
 
         async function addCash(amt) {
-            if (localData.bonus <= 0) return alert("Limite atingido! Sincronize o bónus.");
             localData.saldo += amt;
-            localData.bonus--;
             refresh();
-            await supabase.from('perfis').upsert({ id: UID, saldo: localData.saldo, bonus: localData.bonus });
-        }
-
-        async function sendPost() {
-            const txt = document.getElementById('post-text').value;
-            if (!txt) return;
-            document.getElementById('loader').style.display = 'flex';
-            const { error } = await supabase.from('posts').insert([{ user_id: UID, content: txt }]);
-            if (!error) {
-                document.getElementById('post-text').value = "";
-                await addCash(0.0150);
-                init();
-            }
-            document.getElementById('loader').style.display = 'none';
-        }
-
-        function shareLink() {
-            const m = `Vem ganhar dinheiro no Apex Social! Regista-te: ${VERCEL_URL}/?ref=${UID}`;
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(m)}`);
+            await supabase.from('perfis').upsert({ id: UID, saldo: localData.saldo });
         }
 
         function syncBonus() {
-            document.getElementById('loader').style.display = 'flex';
-            setTimeout(async () => {
-                localData.bonus = 15;
-                refresh();
-                await supabase.from('perfis').upsert({ id: UID, bonus: 15 });
-                document.getElementById('loader').style.display = 'none';
-                nav('feed');
-            }, 1500);
+            alert("Sincronizado com sucesso!");
+            localData.bonus = 15;
+            refresh();
+        }
+
+        function shareLink() {
+            const m = `Ganha dinheiro no Apex Social: ${VERCEL_URL}/?ref=${UID}`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(m)}`);
         }
 
         window.onload = init;
