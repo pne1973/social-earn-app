@@ -3,172 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v32.185</title>
+    <title>Apex Social v32.190</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f8f9fa; color: #202124; margin: 0; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #202124; margin: 0; }
         .tab-content { display: none; }
         .tab-content.active { display: block; padding-bottom: 120px; }
-        .nav-btn.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); font-weight: 900; background: #f1f3f4; }
+        .nav-btn.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); font-weight: 900; background: #fff; }
         .card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; }
-        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.7); z-index: 9999; align-items: center; justify-content: center; font-weight: 900; color: var(--g-blue); text-transform: uppercase; font-size: 10px; }
-        .ad-unit { background: #fffde7; border: 1px dashed #fbc02d; text-align: center; padding: 12px; font-[9px]; font-weight: 900; color: #856404; margin: 10px 0; border-radius: 8px; }
+        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 9999; align-items: center; justify-content: center; }
+        #tutorial { position: fixed; inset: 0; background: var(--g-blue); z-index: 10000; color: white; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
+        .ad-unit { background: #fff8e1; border: 1px dashed #ffc107; text-align: center; padding: 15px; font-size: 10px; font-weight: 900; color: #795548; margin: 15px 0; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-    <div id="loader"><span>Processing...</span></div>
+    <div id="loader" class="flex-col">
+        <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-600 mb-2"></div>
+        <p class="text-[10px] font-black uppercase tracking-widest">A processar...</p>
+    </div>
 
-    <header class="sticky top-0 bg-white border-b z-50 px-5 py-3 flex justify-between items-center shadow-sm">
+    <div id="tutorial">
+        <h2 class="text-3xl font-black mb-4 italic uppercase">Bem-vindo!</h2>
+        <p class="mb-8 font-bold text-sm opacity-90">Ganha XP por cada interação. 5000 XP = 10,00€ via PayPal.</p>
+        <button onclick="closeTutorial()" class="bg-white text-blue-600 px-12 py-4 rounded-2xl font-black uppercase shadow-2xl">Começar a Ganhar</button>
+    </div>
+
+    <header class="sticky top-0 bg-white border-b z-50 px-6 py-4 flex justify-between items-center shadow-sm">
         <div>
             <h1 class="text-xl font-black italic tracking-tighter" style="color: var(--g-blue)">APEX SOCIAL</h1>
-            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Production 1.0</p>
+            <p class="text-[9px] font-black text-gray-400 uppercase">Production v32</p>
         </div>
         <div class="text-right">
-            <span id="bal-eur" class="font-black text-green-600 text-lg">0.0000€</span>
-            <p id="bal-brl" class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">0.0000 BRL</p>
+            <div id="bal-eur" class="font-black text-green-600 text-lg leading-none">0.0000€</div>
+            <div id="bal-brl" class="text-[9px] font-bold text-gray-400 uppercase">0.0000 BRL</div>
         </div>
     </header>
 
-    <main class="p-4 max-w-md mx-auto">
+    <main class="p-4 max-w-lg mx-auto">
         
         <section id="view-feed" class="tab-content active">
-            <div class="card p-4 bg-gradient-to-br from-blue-600 to-blue-400 text-white flex justify-between items-center mb-4">
-                <div><p class="text-[9px] font-black uppercase opacity-75">Sessão Ativa</p><p id="bonus-display" class="font-black italic">🔥 15 Ações Turbo</p></div>
-                <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-2 rounded-full text-[10px] font-black uppercase">Recarregar</button>
+            <div class="card p-3 mb-4 bg-gray-50 border-dashed flex items-center space-x-3 overflow-x-auto no-scrollbar">
+                <span class="text-[9px] font-black text-blue-600 uppercase italic">Top Ranking:</span>
+                <div id="ranking-list" class="flex space-x-2 text-[9px] font-bold text-gray-500 uppercase">
+                    </div>
             </div>
 
-            <div class="card p-4">
-                <textarea id="post-input" placeholder="Partilha algo novo... (+15 XP)" class="w-full text-sm border-none focus:ring-0 p-0 mb-3 resize-none" rows="2"></textarea>
-                <div class="flex justify-between items-center border-t pt-3">
-                    <span class="text-[9px] font-black text-gray-300 uppercase">Ganha 0.0150€</span>
-                    <button onclick="handlePost()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-black text-[10px] uppercase">Publicar</button>
+            <div class="card p-4 border-2 border-blue-100 shadow-sm">
+                <textarea id="post-input" placeholder="O que queres partilhar? (+15 XP)" class="w-full text-sm border-none focus:ring-0 p-0 mb-3 resize-none" rows="2"></textarea>
+                <div class="flex justify-between items-center pt-3 border-t">
+                    <div class="flex space-x-2">
+                         <button class="text-gray-400"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg></button>
+                    </div>
+                    <button onclick="handlePost()" class="bg-blue-600 text-white px-8 py-2 rounded-lg font-black text-[10px] uppercase shadow-md">Publicar</button>
                 </div>
             </div>
 
             <div id="feed-container" class="mt-4 space-y-4"></div>
+            <div id="load-more" class="text-center py-10 text-[10px] font-black text-gray-300 uppercase italic">A carregar mais posts...</div>
         </section>
 
-        <section id="view-wallet" class="tab-content">
-            <div class="card p-8 text-center border-b-4 shadow-md" style="border-color: var(--g-blue)">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Saldo Atualizado</p>
-                <h1 id="wall-eur" class="text-5xl font-black tracking-tighter text-blue-600">0.0000€</h1>
-                <p id="wall-brl" class="text-sm font-bold text-gray-400 mt-2 uppercase tracking-tighter">≈ 0.0000 BRL</p>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-2 mt-4">
-                <div class="card p-3 text-center"><p class="text-[8px] font-black text-gray-400 uppercase">Post</p><p class="text-xs font-black">+15 XP</p></div>
-                <div class="card p-3 text-center"><p class="text-[8px] font-black text-gray-400 uppercase">Check-in</p><p class="text-xs font-black">+5 XP</p></div>
-            </div>
-
-            <button onclick="syncAd()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic my-4">Sincronizar Ganhos (Ad)</button>
-            <button onclick="doCheckIn()" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase">Check-in Diário (+0.0500€)</button>
-        </section>
-
-        <section id="view-admin" class="tab-content">
-            <div class="card p-5 border-2 border-red-500 bg-red-50">
-                <h2 class="text-red-600 font-black text-xs uppercase italic mb-4 tracking-widest">Master Admin Panel</h2>
-                <div class="space-y-3">
-                    <div class="flex justify-between bg-white p-3 rounded border border-red-100">
-                        <span class="text-[10px] font-bold uppercase text-gray-400 tracking-tighter">Total Users</span>
-                        <span id="adm-u" class="font-black text-red-600">...</span>
-                    </div>
-                    <div class="flex justify-between bg-white p-3 rounded border border-red-100">
-                        <span class="text-[10px] font-bold uppercase text-gray-400 tracking-tighter">Total Posts</span>
-                        <span id="adm-p" class="font-black text-red-600">...</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <section id="view-wallet" class="tab-content">...</section>
+        <section id="view-friends" class="tab-content">...</section>
+        <section id="view-admin" class="tab-content">...</section>
 
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-1 z-40 shadow-2xl">
-        <button onclick="nav('feed')" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400 active"><span class="text-[9px] font-black uppercase">Social</span></button>
-        <button onclick="nav('wallet')" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[9px] font-black uppercase">Carteira</span></button>
-        <button id="adm-btn" onclick="nav('admin')" class="hidden nav-btn flex-1 flex flex-col items-center p-3 text-red-300 italic"><span class="text-[9px] font-black uppercase">Admin</span></button>
+        <button onclick="nav('feed')" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400 active"><span class="text-[10px] font-black uppercase">Social</span></button>
+        <button onclick="nav('wallet')" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Carteira</span></button>
+        <button id="adm-btn" onclick="nav('admin')" class="hidden nav-btn flex-1 flex flex-col items-center p-3 text-red-300 italic"><span class="text-[10px] font-black uppercase">Admin</span></button>
     </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
         const UID = "5401881400";
-        const RATE = 6.1245;
+        const BRL_RATE = 6.1245;
 
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-        let user = { saldo: 0, bonus: 15 };
+        let userData = { saldo: 0, bonus: 15 };
+        let page = 0;
 
         function nav(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById('view-'+t).classList.add('active');
+            window.scrollTo(0,0);
         }
 
         async function init() {
+            // Check Tutorial
+            if(!localStorage.getItem('apex_tour')) document.getElementById('tutorial').style.display = 'flex';
             if(UID === "5401881400") document.getElementById('adm-btn').classList.remove('hidden');
+
             const { data } = await supabase.from('perfis').select('*').eq('id', UID).single();
-            if(data) user = data;
-            loadFeed();
-            refreshUI();
-            if(UID === "5401881400") loadStats();
+            if(data) userData = data;
+            
+            loadRanking();
+            loadFeed(true);
+            updateUI();
         }
 
-        function refreshUI() {
-            const e = user.saldo.toFixed(4);
-            const b = (user.saldo * RATE).toFixed(4);
+        function updateUI() {
+            const e = userData.saldo.toFixed(4);
             document.getElementById('bal-eur').innerText = e + "€";
-            document.getElementById('wall-eur').innerText = e + "€";
-            document.getElementById('bal-brl').innerText = b + " BRL";
-            document.getElementById('wall-brl').innerText = "≈ " + b + " BRL";
-            document.getElementById('bonus-display').innerText = `🔥 ${user.bonus} Ações Turbo`;
+            document.getElementById('bal-brl').innerText = (userData.saldo * BRL_RATE).toFixed(4) + " BRL";
         }
 
-        async function loadFeed() {
-            const { data } = await supabase.from('posts').select('*').order('created_at', {ascending: false});
-            const cont = document.getElementById('feed-container');
+        async function loadRanking() {
+            const { data } = await supabase.from('perfis').select('id, saldo').order('saldo', {ascending: false}).limit(10);
             if(data) {
-                cont.innerHTML = data.map((p, i) => `
-                    <div class="card p-4">
-                        <p class="text-[9px] font-black text-blue-500 mb-2 uppercase tracking-widest">User #${p.user_id.slice(-4)}</p>
-                        <p class="text-sm text-gray-700">${p.content}</p>
-                        <div class="mt-4 pt-2 border-t flex space-x-4">
-                            <button onclick="doLike()" class="text-[9px] font-black text-gray-400 uppercase">Like (+2 XP)</button>
-                            <button class="text-[9px] font-black text-red-300 uppercase italic">Report</button>
+                document.getElementById('ranking-list').innerHTML = data.map((u, i) => `
+                    <span class="${i === 0 ? 'text-yellow-500' : ''}">#${i+1} User..${u.id.slice(-3)}</span>
+                `).join(' • ');
+            }
+        }
+
+        async function loadFeed(reset = false) {
+            if(reset) { page = 0; document.getElementById('feed-container').innerHTML = ''; }
+            const start = page * 10;
+            const end = start + 9;
+
+            const { data } = await supabase.from('posts').select('*').order('created_at', {ascending: false}).range(start, end);
+            
+            if(data) {
+                const cont = document.getElementById('feed-container');
+                cont.innerHTML += data.map((p, i) => `
+                    <div class="card p-5 shadow-sm">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-[9px] font-black text-blue-600 uppercase bg-blue-50 px-2 py-1 rounded">User #${p.user_id.slice(-4)}</span>
+                            <button onclick="flagPost('${p.id}')" class="text-gray-300"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-7h.01"></path></svg></button>
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed">${p.content}</p>
+                        <div class="mt-4 pt-3 border-t flex space-x-6">
+                            <button onclick="handleLike()" class="text-[10px] font-black text-gray-400 uppercase">Like (+2 XP)</button>
+                            <span class="text-[8px] font-bold text-gray-200 uppercase tracking-tighter">ID: ${p.id}</span>
                         </div>
                     </div>
-                    ${i % 3 === 2 ? '<div class="ad-unit">PUBLICIDADE AUTOMÁTICA ADSTERRA/GOOGLE</div>' : ''}
+                    ${i % 3 === 2 ? '<div class="ad-unit tracking-widest">MONETIZAÇÃO ATIVA • ANÚNCIO</div>' : ''}
                 `).join('');
+                page++;
             }
         }
 
         async function handlePost() {
-            const t = document.getElementById('post-input').value;
-            if(!t || user.bonus <= 0) return;
+            const val = document.getElementById('post-input').value;
+            if(!val || userData.bonus <= 0) return alert("Sem bónus!");
+            
             document.getElementById('loader').style.display = 'flex';
-            const { error } = await supabase.from('posts').insert([{ user_id: UID, content: t }]);
+            const { error } = await supabase.from('posts').insert([{ user_id: UID, content: val }]);
+            
             if(!error) {
-                user.saldo += 0.0150;
-                user.bonus--;
-                await supabase.from('perfis').upsert({ id: UID, saldo: user.saldo, bonus: user.bonus });
+                userData.saldo += 0.0150;
+                userData.bonus--;
+                await supabase.from('perfis').upsert({ id: UID, saldo: userData.saldo, bonus: userData.bonus });
                 document.getElementById('post-input').value = "";
-                init();
+                loadFeed(true);
+                updateUI();
             }
             document.getElementById('loader').style.display = 'none';
         }
 
-        async function doCheckIn() {
-            user.saldo += 0.0500;
-            refreshUI();
-            await supabase.from('perfis').upsert({ id: UID, saldo: user.saldo });
+        function flagPost(id) {
+            alert("Conteúdo denunciado. A nossa equipa irá analisar o post ID: " + id);
         }
 
-        async function loadStats() {
-            const { count: u } = await supabase.from('perfis').select('*', { count: 'exact', head: true });
-            const { count: p } = await supabase.from('posts').select('*', { count: 'exact', head: true });
-            document.getElementById('adm-u').innerText = u;
-            document.getElementById('adm-p').innerText = p;
+        function closeTutorial() {
+            localStorage.setItem('apex_tour', 'true');
+            document.getElementById('tutorial').style.display = 'none';
         }
+
+        // Infinite Scroll Logic
+        window.onscroll = function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                loadFeed();
+            }
+        };
 
         window.onload = init;
     </script>
