@@ -3,31 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v90 - Full Production</title>
+    <title>Apex Social v92</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; margin: 0; padding-0; -webkit-tap-highlight-color: transparent; }
         .google-blue { color: #4285F4; }
         .google-bg-blue { background-color: #4285F4; }
         .nav-active { color: #4285F4 !important; border-top: 3px solid #4285F4; font-weight: 900; background: #f8f9fa; }
-        .card { background: white; border-radius: 16px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 12px; }
-        .ad-slot { background: #fffde7; border: 1px dashed #fbc02d; text-align: center; font-size: 10px; color: #856404; font-weight: bold; border-radius: 8px; margin: 10px 0; padding: 15px; }
-        #loader { display: none; position: fixed; inset: 0; background: white; z-index: 10000; align-items: center; justify-content: center; flex-direction: column; }
-        .btn-turbo { background: linear-gradient(135deg, #4285F4, #34a853); color: white; }
+        .card { background: white; border-radius: 16px; border: 1px solid #e0e0e0; margin-bottom: 12px; overflow: hidden; }
+        .ad-slot { background: #fffde7; border: 1px dashed #fbc02d; text-align: center; font-size: 10px; color: #856404; border-radius: 8px; margin: 10px 0; padding: 15px; }
+        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 10000; align-items: center; justify-content: center; flex-direction: column; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body class="pb-28">
 
     <div id="loader">
-        <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 mb-2"></div>
-        <p class="text-[10px] font-black uppercase text-blue-600">Sincronizando v60...</p>
+        <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500"></div>
     </div>
 
     <header class="sticky top-0 bg-white border-b z-50 px-5 py-4 flex justify-between items-center shadow-sm">
         <div>
-            <h1 class="text-xl font-black google-blue tracking-tighter">APEX SOCIAL</h1>
+            <h1 class="text-xl font-black google-blue tracking-tighter italic">APEX SOCIAL</h1>
             <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Dossiê v60 Master</p>
         </div>
         <div class="text-right">
@@ -36,146 +35,170 @@
         </div>
     </header>
 
-    <main id="app-content" class="p-4 max-w-md mx-auto min-h-screen"></main>
+    <main class="p-4 max-w-md mx-auto">
+        
+        <section id="content-feed" class="tab-content active">
+            <div class="card p-4 bg-gradient-to-r from-blue-500 to-green-500 text-white flex justify-between items-center mb-4">
+                <div><p class="text-[9px] font-black uppercase">Bónus Ativo</p><p id="bonus-txt" class="text-sm font-black italic">🔥 15 Interações</p></div>
+                <button onclick="changeTab('wallet')" class="bg-white text-blue-600 px-4 py-1 rounded-full text-[10px] font-black uppercase shadow">Turbo</button>
+            </div>
+            
+            <div class="card p-4 shadow-sm">
+                <textarea id="post-txt" placeholder="O que vais postar para ganhar 0,0150€?" class="w-full text-sm border-none focus:ring-0 p-0 mb-3" rows="2"></textarea>
+                <div class="flex space-x-2">
+                    <button onclick="handlePost()" class="flex-1 google-bg-blue text-white py-3 rounded-xl font-black text-[10px] uppercase">Postar Agora</button>
+                    <button onclick="handleShare()" class="bg-blue-50 text-blue-600 px-4 rounded-xl font-black text-[10px] uppercase border">Partilhar</button>
+                </div>
+            </div>
+
+            <div class="ad-slot uppercase font-black tracking-widest">[ ADSTERRA NATIVE FEED ]</div>
+            <div id="feed-list" class="space-y-4">
+                </div>
+        </section>
+
+        <section id="content-wallet" class="tab-content">
+            <div class="card p-10 text-center mb-4">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Saldo Real em Carteira</p>
+                <h1 id="total-eur" class="text-5xl font-black google-blue tracking-tighter">0.0000€</h1>
+            </div>
+            <div class="card p-5 space-y-4">
+                <button onclick="syncAd()" class="w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white py-5 rounded-2xl font-black text-xs uppercase shadow-xl italic">Sincronizar Ganhos (Video Ad)</button>
+                <button onclick="handleReward(0.0500)" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase">Check-in Diário (+0,0500€)</button>
+                <div class="ad-slot">[ BANNER ADSTERRA 320X50 ]</div>
+            </div>
+        </section>
+
+        <section id="content-friends" class="tab-content">
+            <div class="card p-6 border-l-4 border-blue-500">
+                <h2 class="font-black text-sm uppercase google-blue mb-1">Amigos (Comissão 10%)</h2>
+                <p class="text-[10px] font-bold text-gray-400 uppercase mb-6 leading-tight">Ganha sobre o que a tua rede faturar.</p>
+                <div class="bg-gray-50 p-4 rounded-xl border border-dashed mb-6 text-[9px] font-mono text-blue-500 italic break-all" id="ref-link">A carregar link...</div>
+                <button onclick="handleShare()" class="w-full google-bg-blue text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-lg">Convidar Amigos</button>
+            </div>
+        </section>
+
+        <section id="content-profile" class="tab-content">
+            <div class="card p-6 text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center font-black text-gray-300">#</div>
+                <p class="font-black text-[12px] uppercase mb-8" id="profile-id">ID: 5401881400</p>
+                <div class="space-y-3">
+                    <button onclick="changeTab('wallet')" class="w-full bg-white py-4 border rounded-xl text-[9px] font-black uppercase shadow-sm">Autopost (Sincronizar)</button>
+                    <button onclick="changeTab('wallet')" class="w-full bg-white py-4 border rounded-xl text-[9px] font-black uppercase shadow-sm">Reset de Nível</button>
+                    <button onclick="changeTab('wallet')" class="w-full bg-white py-4 border rounded-xl text-[9px] font-black uppercase shadow-sm">Validar Bio</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="content-admin" class="tab-content">
+            <div class="card p-6 border-2 border-red-500 bg-red-50 text-center">
+                <h2 class="text-red-600 font-black text-xs uppercase mb-6">Painel Admin Master</h2>
+                <button class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-[10px] uppercase shadow-lg mb-6">Pedidos de Levantamento</button>
+            </div>
+        </section>
+
+    </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-1 z-40 shadow-2xl">
-        <button onclick="renderTab('feed')" id="tab-feed" class="flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Feed</span></button>
-        <button onclick="renderTab('wallet')" id="tab-wallet" class="flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Carteira</span></button>
-        <button onclick="renderTab('friends')" id="tab-friends" class="flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Amigos</span></button>
-        <button onclick="renderTab('profile')" id="tab-profile" class="flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Perfil</span></button>
-        <button onclick="renderTab('admin')" id="tab-admin" class="flex-1 flex flex-col items-center p-3 text-red-300 hidden italic"><span class="text-[10px] font-black uppercase tracking-tighter">Admin</span></button>
+        <button onclick="changeTab('feed')" id="btn-feed" class="flex-1 flex flex-col items-center p-3 text-gray-400 nav-btn"><span class="text-[10px] font-black uppercase">Feed</span></button>
+        <button onclick="changeTab('wallet')" id="btn-wallet" class="flex-1 flex flex-col items-center p-3 text-gray-400 nav-btn"><span class="text-[10px] font-black uppercase">Carteira</span></button>
+        <button onclick="changeTab('friends')" id="btn-friends" class="flex-1 flex flex-col items-center p-3 text-gray-400 nav-btn"><span class="text-[10px] font-black uppercase">Amigos</span></button>
+        <button onclick="changeTab('profile')" id="btn-profile" class="flex-1 flex flex-col items-center p-3 text-gray-400 nav-btn"><span class="text-[10px] font-black uppercase">Perfil</span></button>
+        <button onclick="changeTab('admin')" id="btn-admin" class="hidden flex-1 flex flex-col items-center p-3 text-red-300 nav-btn"><span class="text-[10px] font-black uppercase">Admin</span></button>
     </nav>
 
     <script>
+        // CONFIG
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
+        const SB_KEY = "COLA_AQUI_A_TUA_ANON_KEY"; 
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
         const UID = "5401881400";
 
-        let state = { saldo: 0, bonus: 15, posts: [] };
+        let userState = { saldo: 0, bonus: 15 };
 
-        async function init() {
-            if (UID === "5401881400") document.getElementById('tab-admin').classList.remove('hidden');
+        // 1. NAVEGAÇÃO (Funciona Independente)
+        function changeTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('nav-active'));
+            
+            document.getElementById('content-' + tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('nav-active');
+            window.scrollTo(0, 0);
+        }
+
+        // 2. LÓGICA CORE
+        async function loadData() {
+            if (UID === "5401881400") document.getElementById('btn-admin').classList.remove('hidden');
+            document.getElementById('ref-link').innerText = `https://apex-social.onrender.com/?ref=${UID}`;
+            
             try {
-                const { data: p } = await supabase.from('perfis').select('*').eq('id', UID).single();
-                if (p) { state.saldo = p.saldo; state.bonus = p.bonus; }
-                const { data: f } = await supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(10);
-                if (f) state.posts = f;
-            } catch (e) { console.log("Offline Mode"); }
+                const { data } = await supabase.from('perfis').select('*').eq('id', UID).single();
+                if (data) userState = data;
+                
+                const { data: posts } = await supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(10);
+                renderFeed(posts || []);
+            } catch (e) { console.log("Erro ao carregar"); }
+            
             updateUI();
-            renderTab('feed');
         }
 
-        async function action(amt) {
-            if (state.bonus <= 0) { alert("Sessão Expirada! Sincronize na Carteira."); return; }
-            state.saldo += amt;
-            state.bonus--;
-            updateUI();
-            await supabase.from('perfis').upsert({ id: UID, saldo: state.saldo, bonus: state.bonus });
-            renderTab(window.currentTab);
+        function updateUI() {
+            document.getElementById('bal-eur').innerText = userState.saldo.toFixed(4) + "€";
+            document.getElementById('total-eur').innerText = userState.saldo.toFixed(4) + "€";
+            document.getElementById('bal-brl').innerText = (userState.saldo * 6.12).toFixed(4) + " BRL";
+            document.getElementById('bonus-txt').innerText = `🔥 ${userState.bonus} Interações`;
         }
 
-        async function post() {
+        function renderFeed(posts) {
+            const list = document.getElementById('feed-list');
+            list.innerHTML = posts.map(p => `
+                <div class="card p-4">
+                    <p class="text-[9px] font-black text-gray-400 uppercase mb-2">User #${p.user_id.slice(-4)}</p>
+                    <p class="text-xs text-gray-700 font-medium mb-4">${p.content}</p>
+                    <button onclick="handleReward(0.0015)" class="w-full border py-2 rounded-lg text-[9px] font-black uppercase text-blue-500 italic">Gostar (+0,0015€)</button>
+                </div>
+            `).join('<div class="ad-slot py-3">PUBLICIDADE ADSTERRA</div>');
+        }
+
+        async function handleReward(amt) {
+            if (userState.bonus <= 0) return alert("Bónus expirado! Sincronize na Carteira.");
+            userState.saldo += amt;
+            userState.bonus--;
+            updateUI();
+            await supabase.from('perfis').upsert({ id: UID, saldo: userState.saldo, bonus: userState.bonus });
+        }
+
+        async function handlePost() {
             const txt = document.getElementById('post-txt').value;
             if (!txt) return;
-            showLoad(true);
+            document.getElementById('loader').style.display = 'flex';
             const { error } = await supabase.from('posts').insert([{ user_id: UID, content: txt }]);
             if (!error) {
                 document.getElementById('post-txt').value = "";
-                await action(0.0150);
-                init();
+                await handleReward(0.0150);
+                loadData();
             }
-            showLoad(false);
+            document.getElementById('loader').style.display = 'none';
         }
 
-        function share() {
-            const msg = `Estou a faturar no Apex! Regista-te: https://apex-social.onrender.com/?ref=${UID}`;
+        function handleShare() {
+            const msg = `Vem ganhar dinheiro no Apex Social! Regista-te: https://apex-social.onrender.com/?ref=${UID}`;
             if (navigator.share) navigator.share({ title: 'Apex Social', text: msg });
             else window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`);
         }
 
-        function updateUI() {
-            document.getElementById('bal-eur').innerText = state.saldo.toFixed(4) + "€";
-            document.getElementById('bal-brl').innerText = (state.saldo * 6.12).toFixed(4) + " BRL";
+        function syncAd() {
+            document.getElementById('loader').style.display = 'flex';
+            setTimeout(async () => {
+                userState.bonus = 15;
+                updateUI();
+                await supabase.from('perfis').upsert({ id: UID, bonus: 15 });
+                document.getElementById('loader').style.display = 'none';
+                changeTab('feed');
+            }, 2000);
         }
 
-        function renderTab(t) {
-            window.currentTab = t;
-            const container = document.getElementById('app-content');
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('nav-active'));
-            document.getElementById('tab-' + t).classList.add('nav-active');
-
-            if (t === 'feed') {
-                container.innerHTML = `
-                    <div class="card p-4 btn-turbo flex justify-between items-center shadow-lg">
-                        <div><p class="text-[9px] font-black uppercase opacity-70">Contador Turbo</p><p class="text-sm font-black italic">🔥 ${state.bonus} Interações</p></div>
-                        <button onclick="renderTab('wallet')" class="bg-white text-blue-600 px-4 py-2 rounded-full text-[10px] font-black uppercase">Sincronizar</button>
-                    </div>
-                    <div class="card p-4">
-                        <textarea id="post-txt" placeholder="No que estás a pensar? (+0,0150€)" class="w-full text-sm border-none focus:ring-0 p-0 mb-3" rows="2"></textarea>
-                        <div class="flex space-x-2">
-                            <button onclick="post()" class="flex-1 google-bg-blue text-white py-3 rounded-xl font-black text-[10px] uppercase">Postar Agora</button>
-                            <button onclick="share()" class="bg-blue-50 text-blue-600 px-4 rounded-xl font-black text-[10px] uppercase border">Partilhar</button>
-                        </div>
-                    </div>
-                    <div class="ad-slot">[ADSTERRA NATIVE: VALIDAR FEED]</div>
-                    <div class="space-y-4">
-                        ${state.posts.map(p => `
-                            <div class="card p-4">
-                                <span class="text-[9px] font-black text-gray-400 uppercase">User #${p.user_id.slice(-4)}</span>
-                                <p class="text-xs text-gray-700 my-3 font-medium">${p.content}</p>
-                                <button onclick="action(0.0015)" class="w-full border py-2 rounded-lg text-[9px] font-black uppercase text-blue-500">Gostar (+0,0015€)</button>
-                            </div>
-                        `).join('<div class="ad-slot py-3">ANÚNCIO IN-FEED</div>')}
-                    </div>
-                `;
-            } else if (t === 'wallet') {
-                container.innerHTML = `
-                    <div class="card p-10 text-center"><p class="text-[10px] font-black text-gray-400 uppercase mb-2">Saldo Real</p><h1 class="text-5xl font-black google-blue tracking-tighter">${state.saldo.toFixed(4)}€</h1></div>
-                    <div class="card p-5 space-y-4">
-                        <button onclick="renderTab('feed')" class="w-full btn-turbo py-5 rounded-2xl font-black text-xs uppercase shadow-xl italic">Sincronizar Sessão (Turbo Ads)</button>
-                        <button onclick="action(0.0500)" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase">Check-in Diário (+0,0500€)</button>
-                        <div class="ad-slot">[ADSTERRA BANNER: 320X50]</div>
-                    </div>
-                `;
-            } else if (t === 'friends') {
-                container.innerHTML = `
-                    <div class="card p-6 border-l-4 border-blue-500">
-                        <h2 class="font-black text-sm uppercase google-blue mb-1">Rede de Amigos</h2>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-6 leading-tight">Ganha 10% sobre os ganhos da tua rede.</p>
-                        <div class="bg-gray-50 p-4 rounded-xl border border-dashed mb-6 text-[9px] font-mono text-blue-500 italic">https://apex-social.onrender.com/?ref=${UID}</div>
-                        <button onclick="share()" class="w-full google-bg-blue text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-lg">Convidar Amigos</button>
-                    </div>
-                `;
-            } else if (t === 'profile') {
-                container.innerHTML = `
-                    <div class="card p-6 text-center">
-                        <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 border-2 border-blue-100 flex items-center justify-center font-black text-gray-200">#</div>
-                        <p class="font-black text-[12px] uppercase mb-8">Utilizador #${UID}</p>
-                        <div class="space-y-3">
-                            <button onclick="renderTab('wallet')" class="w-full bg-white py-4 border rounded-xl text-[9px] font-black uppercase shadow-sm">Autopost (Sincronizar)</button>
-                            <button onclick="renderTab('wallet')" class="w-full bg-white py-4 border rounded-xl text-[9px] font-black uppercase shadow-sm">Reset de Nível</button>
-                            <button onclick="renderTab('wallet')" class="w-full bg-white py-4 border rounded-xl text-[9px] font-black uppercase shadow-sm">Validar Bio</button>
-                        </div>
-                    </div>
-                    <div class="ad-slot">[ADSTERRA: VALIDAR PERFIL]</div>
-                `;
-            } else if (t === 'admin') {
-                container.innerHTML = `
-                    <div class="card p-6 border-2 border-red-500 bg-red-50 text-center">
-                        <h2 class="text-red-600 font-black text-xs uppercase mb-6 tracking-widest italic">Painel Admin Master</h2>
-                        <button class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-[10px] uppercase shadow-lg mb-6">Pedidos de Levantamento</button>
-                        <div class="bg-white p-4 rounded-xl border">
-                            <p class="text-[8px] font-black text-gray-400 uppercase mb-2">Eliminar Post (ID)</p>
-                            <div class="flex space-x-2"><input placeholder="ID" class="flex-1 border p-2 text-xs rounded-lg"><button class="bg-black text-white px-4 rounded-lg text-[9px] font-black uppercase">Del</button></div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function showLoad(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
-        window.onload = init;
+        window.onload = loadData;
+        changeTab('feed'); // Ativa a primeira aba logo no início
     </script>
 </body>
 </html>
