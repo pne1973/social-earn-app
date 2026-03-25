@@ -1,301 +1,107 @@
-<!DOCTYPE html>
-<html lang="pt-pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v32.6 - Enterprise</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; --g-yellow: #FBBC04; --g-gray: #5f6368; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; }
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; transition: all 0.2s; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .nav-item.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); font-weight: 900; }
-        .gold-comment { background: #fffdf2; border: 1px solid #fbe9a1; border-left: 4px solid var(--g-yellow); }
-        .sync-animation { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-        .coin-pop { position: absolute; animation: flyUp 0.6s ease-out forwards; pointer-events: none; color: var(--g-blue); font-weight: 900; }
-        @keyframes flyUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-30px); opacity: 0; } }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-    </style>
-</head>
-<body class="pb-24">
-
-    <header class="sticky top-0 bg-white border-b z-50 px-4 py-3 flex justify-between items-center shadow-sm">
-        <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-[#4285F4] rounded-xl flex items-center justify-center text-white font-black italic shadow-md">A</div>
+<section id="view-admin" class="tab-content">
+    <div class="google-card border-t-4 border-red-600 shadow-xl overflow-hidden">
+        <div class="bg-gray-50 p-4 border-b flex justify-between items-center">
             <div>
-                <h1 class="text-xs font-black uppercase tracking-tighter leading-none text-blue-600">Apex Social</h1>
-                <span class="text-[7px] font-bold text-gray-400 uppercase tracking-widest">Enterprise v32.600</span>
+                <h2 class="text-red-600 font-black text-[11px] uppercase tracking-widest leading-none">Terminal de Tesouraria</h2>
+                <span class="text-[7px] font-bold text-gray-400 uppercase">Master Node: 5401881400</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
+                <span class="text-[8px] font-black text-green-600 uppercase">Live</span>
             </div>
         </div>
-        <div class="text-right">
-            <div id="main-eur" class="font-black text-blue-600 text-sm tracking-tight">0.0000€</div>
-            <div id="main-brl" class="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">0.0000 BRL</div>
-        </div>
-    </header>
 
-    <main class="max-w-lg mx-auto p-3">
+        <div class="p-5 space-y-6">
+            <div>
+                <div class="flex justify-between text-[8px] font-black uppercase mb-1.5 italic">
+                    <span class="text-gray-500">Distribuição de Lucro (Alvo: 40% Admin)</span>
+                    <span id="health-pct" class="text-blue-600">Eficiência: 0%</span>
+                </div>
+                <div class="w-full bg-gray-100 h-3 rounded-full overflow-hidden flex border shadow-inner">
+                    <div id="bar-user" class="bg-blue-500 h-full border-r border-white/20 transition-all duration-1000" style="width: 0%;"></div>
+                    <div id="bar-admin" class="bg-green-500 h-full transition-all duration-1000" style="width: 0%;"></div>
+                </div>
+                <div class="flex justify-between mt-1 text-[7px] font-bold text-gray-400 uppercase">
+                    <span>Rede (60%)</span>
+                    <span>Teu Lucro (40%)</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <p class="text-[7px] font-black text-blue-400 uppercase mb-1">Passivo Total (Rede)</p>
+                    <p id="adm-debt" class="text-lg font-black text-blue-700 tracking-tighter">0.0000€</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                    <p class="text-[7px] font-black text-green-400 uppercase mb-1">Receita Est. (Adsterra)</p>
+                    <p id="adm-revenue" class="text-lg font-black text-green-700 tracking-tighter">0.0000€</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-xl border">
+                    <p class="text-[7px] font-black text-gray-400 uppercase mb-1">Engagement %</p>
+                    <p id="adm-eng" class="text-lg font-black text-gray-700">0%</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-xl border">
+                    <p class="text-[7px] font-black text-gray-400 uppercase mb-1">Utilizadores</p>
+                    <p id="adm-users" class="text-lg font-black text-gray-700">0</p>
+                </div>
+            </div>
+
+            <div class="bg-black rounded-xl p-4 font-mono text-[9px]">
+                <p class="text-green-400 mb-2 font-bold uppercase tracking-widest border-b border-green-900/50 pb-1">Pendentes de Levantamento (>10€)</p>
+                <div id="payout-list" class="max-h-24 overflow-y-auto space-y-2 no-scrollbar text-gray-400">
+                    <p class="italic">A verificar transações em bloco...</p>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-gray-100 space-y-3">
+                <div class="flex gap-2">
+                    <input id="del-id" type="text" placeholder="ID DO POST" class="flex-1 bg-gray-50 border rounded-lg px-3 py-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-red-400">
+                    <button onclick="adminDelete()" class="bg-red-600 text-white px-6 py-3 rounded-lg font-black text-[10px] uppercase shadow-lg hover:bg-red-700 active:scale-95 transition-all">Eliminar</button>
+                </div>
+                <button onclick="alert('Relatório exportado para CSV')" class="w-full border-2 border-gray-200 text-gray-500 py-3 rounded-lg font-black text-[9px] uppercase hover:bg-gray-50">Exportar Log de Auditoria</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // LÓGICA DE ATUALIZAÇÃO DO ADMIN (SCRIPT ADICIONAL)
+    async function loadAdminStats() {
+        const { data: users, count: uCount } = await sb.from('perfis').select('*', { count: 'exact' });
+        const { count: pCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
         
-        <section id="view-social" class="tab-content active">
-            <div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar py-1">
-                <button class="bg-blue-600 text-white px-5 py-2 rounded-full text-[10px] font-black uppercase shadow-sm">Tudo</button>
-                <button class="bg-white border px-5 py-2 rounded-full text-[10px] font-bold text-gray-500 uppercase hover:bg-gray-50">Amigos</button>
-                <button class="bg-white border px-5 py-2 rounded-full text-[10px] font-bold text-gray-500 uppercase hover:bg-gray-50">Explorar</button>
-            </div>
+        if(!users) return;
 
-            <div class="google-card p-2 mb-4 bg-blue-50 border-blue-100 flex items-center overflow-hidden">
-                <div class="text-[8px] font-black text-blue-600 uppercase italic mr-3 px-2 border-r border-blue-200">🏆 Top XP</div>
-                <div id="top-rank" class="text-[9px] font-bold text-gray-500 flex gap-4 whitespace-nowrap italic">A carregar rede...</div>
-            </div>
+        // Cálculo Financeiro (Simulação da Regra dos 40%)
+        let totalDebt = users.reduce((acc, u) => acc + (u.saldo || 0), 0);
+        let estRevenue = totalDebt / 0.6; // O lucro é 40%, logo a dívida é 60% do total gerado
+        let engRate = uCount > 0 ? (pCount / uCount) * 100 : 0;
 
-            <div class="google-card p-4 mb-5 shadow-sm border-t-4 border-blue-500">
-                <textarea id="post-input" placeholder="O que pretende validar hoje? (+0.0150€)" class="w-full border-none focus:ring-0 text-sm p-0 mb-3 resize-none placeholder-gray-400" rows="2"></textarea>
-                <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-                    <button class="text-gray-400 hover:text-blue-500 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></button>
-                    <button onclick="publish()" class="bg-blue-600 text-white px-8 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg active:scale-95 transition-all">Publicar</button>
+        // Atualizar UI
+        document.getElementById('adm-users').innerText = uCount;
+        document.getElementById('adm-eng').innerText = engRate.toFixed(1) + "%";
+        document.getElementById('adm-debt').innerText = totalDebt.toFixed(4) + "€";
+        document.getElementById('adm-revenue').innerText = estRevenue.toFixed(4) + "€";
+        
+        // Atualizar Barras de Lucro
+        document.getElementById('bar-user').style.width = "60%";
+        document.getElementById('bar-admin').style.width = "40%";
+        document.getElementById('health-pct').innerText = "Eficiência: " + (engRate > 50 ? 'ALTA' : 'NOMINAL');
+
+        // Lista de Levantamentos (Filtro > 10€)
+        const toPay = users.filter(u => u.saldo >= 10);
+        const listContainer = document.getElementById('payout-list');
+        
+        if(toPay.length > 0) {
+            listContainer.innerHTML = toPay.map(u => `
+                <div class="flex justify-between items-center border-b border-gray-900 pb-1">
+                    <span>ID: ..${String(u.id).slice(-4)}</span>
+                    <span class="text-green-500 font-bold">${u.saldo.toFixed(4)}€</span>
+                    <button onclick="alert('API PayPal Iniciada para ${u.id}')" class="text-[7px] bg-green-900 text-green-400 px-2 py-0.5 rounded uppercase font-black">Pagar</button>
                 </div>
-            </div>
-
-            <div id="feed-container" class="space-y-4"></div>
-
-            <div id="fatigue-lock" class="hidden google-card p-6 text-center bg-red-50 border-red-100 mt-4">
-                <p class="text-red-600 font-black text-xs uppercase italic animate-pulse">⚠️ Validação de Segurança</p>
-                <p class="text-[8px] font-bold text-red-400 uppercase mt-1">Sincronização de tráfego em curso (5s)...</p>
-            </div>
-        </section>
-
-        <section id="view-info" class="tab-content">
-            <div class="google-card p-10 text-center border-t-8 border-blue-600 mb-5 shadow-lg bg-white">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Saldo de Validação</p>
-                <h1 id="wall-eur" class="text-5xl font-black text-blue-600 tracking-tighter">0.0000€</h1>
-                <p id="wall-brl" class="text-sm font-bold text-gray-400 mt-2">≈ 0.0000 BRL</p>
-                <div class="mt-4 pt-4 border-t border-gray-100">
-                    <p class="text-[9px] font-black text-green-600 uppercase italic">Mínimo de levantamento: 10,00€</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 gap-3">
-                <button onclick="triggerSync('Check-in Turbo', 0.0050)" class="google-card p-5 flex justify-between items-center hover:bg-blue-50">
-                    <div class="text-left">
-                        <p class="text-xs font-black text-gray-800 uppercase">Check-in Turbo</p>
-                        <p class="text-[8px] font-bold text-blue-500 uppercase italic">Multiplicador 1.2x Ativo</p>
-                    </div>
-                    <span class="text-2xl">⚡</span>
-                </button>
-                <button onclick="triggerSync('Reset de Nível', 0.0000)" class="google-card p-5 flex justify-between items-center hover:bg-green-50">
-                    <div class="text-left">
-                        <p class="text-xs font-black text-gray-800 uppercase">Reset de Nível</p>
-                        <p class="text-[8px] font-bold text-green-500 uppercase italic">Recuperar 100% da Taxa de Ganho</p>
-                    </div>
-                    <span class="text-2xl">🔄</span>
-                </button>
-            </div>
-        </section>
-
-        <section id="view-admin" class="tab-content">
-            <div class="google-card p-6 border-t-4 border-red-600 bg-white shadow-xl">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-red-600 font-black text-xs uppercase italic tracking-widest">Painel Enterprise Admin</h2>
-                    <span class="bg-red-100 text-red-600 text-[8px] px-2 py-1 rounded font-black">MASTER ACTIVE</span>
-                </div>
-
-                <div class="mb-6">
-                    <div class="flex justify-between text-[8px] font-black uppercase mb-1 italic">
-                        <span>Lucratividade (Admin 40% / Rede 60%)</span>
-                        <span id="health-label" class="text-green-600">Saúde Rede: Stable</span>
-                    </div>
-                    <div class="w-full bg-gray-100 h-4 rounded-full overflow-hidden flex border shadow-inner">
-                        <div id="profit-bar" class="bg-blue-500 h-full border-r border-white/20" style="width: 60%;"></div>
-                        <div class="bg-green-500 h-full" style="width: 40%;"></div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="bg-gray-50 p-4 border rounded-xl">
-                        <p class="text-[7px] font-black text-gray-400 uppercase">Engagement %</p>
-                        <p id="adm-engagement" class="text-xl font-black text-blue-600">0%</p>
-                    </div>
-                    <div class="bg-gray-50 p-4 border rounded-xl">
-                        <p class="text-[7px] font-black text-gray-400 uppercase">Users Totais</p>
-                        <p id="adm-users" class="text-xl font-black text-green-600">0</p>
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <button onclick="alert('Lista de Pagamentos PayPal > 10€ Gerada')" class="w-full border-2 border-green-600 text-green-600 py-3 rounded-xl font-black text-[10px] uppercase">Gerir Levantamentos PayPal</button>
-                    <input id="del-id" type="text" placeholder="ID do Post para eliminação" class="w-full p-4 bg-gray-50 border rounded-xl text-xs outline-none focus:border-red-400 mt-2">
-                    <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-[10px] uppercase shadow-lg">Eliminar Conteúdo</button>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-20 z-50 px-2 pb-2 shadow-lg">
-        <button onclick="nav('social')" class="nav-item active flex-1 flex flex-col items-center py-2 transition-all">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
-            <span class="text-[8px] font-black uppercase tracking-tighter">Feed</span>
-        </button>
-        <button onclick="nav('info')" class="nav-item flex-1 flex flex-col items-center py-2 text-gray-400 transition-all">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-            <span class="text-[8px] font-black uppercase tracking-tighter">Sincronizar</span>
-        </button>
-        <button id="adm-btn" onclick="nav('admin')" class="hidden flex-1 flex flex-col items-center py-2 text-red-300 transition-all">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-            <span class="text-[8px] font-black uppercase tracking-tighter underline">Admin</span>
-        </button>
-    </nav>
-
-    <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const MASTER_ID = "5401881400";
-        const BRL_FIX = 6.1245;
-
-        const sb = window.supabase.createClient(SB_URL, SB_KEY);
-        let user = { saldo: 0 };
-        let scrollCount = 0;
-        let isLocked = false;
-
-        function nav(t) {
-            document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-'+t).classList.add('active');
-            const targetBtn = Array.from(document.querySelectorAll('.nav-item')).find(btn => btn.innerText.toLowerCase().includes(t.substring(0,3)));
-            if(targetBtn) targetBtn.classList.add('active');
-            if(t === 'admin') loadAdminStats();
-        }
-
-        async function init() {
-            if(MASTER_ID === "5401881400") document.getElementById('adm-btn').classList.remove('hidden');
-            try {
-                const { data } = await sb.from('perfis').select('*').eq('id', MASTER_ID).single();
-                if(data) user = data;
-                updateUI();
-                loadRanking();
-                loadFeed();
-            } catch(e) { console.error(e); }
-        }
-
-        function updateUI() {
-            const e = user.saldo || 0;
-            const b = e * BRL_FIX;
-            document.getElementById('main-eur').innerText = e.toFixed(4) + "€";
-            document.getElementById('wall-eur').innerText = e.toFixed(4) + "€";
-            document.getElementById('main-brl').innerText = b.toFixed(4) + " BRL";
-            document.getElementById('wall-brl').innerText = "≈ " + b.toFixed(4) + " BRL";
-        }
-
-        async function loadFeed() {
-            const { data } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const container = document.getElementById('feed-container');
-            if(!data) return;
-
-            container.innerHTML = data.map((p, i) => `
-                <div class="google-card p-5 relative border-l-4 ${i % 3 === 0 ? 'border-blue-500 shadow-md' : 'border-transparent'}">
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-[10px] font-black text-blue-600 border">U</div>
-                            <div class="flex flex-col leading-none">
-                                <span class="text-[10px] font-black text-gray-800 uppercase tracking-tighter">ID: ..${String(p.user_id).slice(-4)}</span>
-                                <span class="text-[7px] font-bold text-gray-300 uppercase italic">Validado via Nó</span>
-                            </div>
-                        </div>
-                        ${i % 4 === 0 ? '<span class="bg-blue-600 text-white text-[6px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest sync-animation">Impulsionado</span>' : ''}
-                    </div>
-                    <p class="text-[13px] text-gray-600 leading-relaxed font-normal mb-5">${p.content}</p>
-                    
-                    <div class="gold-comment p-3 rounded-lg mb-4 text-[9px] font-medium text-gray-500 italic">
-                        <span class="font-black text-yellow-600 uppercase tracking-tighter mr-2">Destaque:</span>
-                        "A atividade de rede foi validada e processada com sucesso."
-                    </div>
-
-                    <div class="flex justify-between items-center pt-4 border-t border-gray-100">
-                        <div class="flex gap-5">
-                            <button onclick="reagir(this, 0.0006)" class="text-[9px] font-black text-gray-400 uppercase hover:text-blue-600 transition-colors flex items-center gap-1">👍 Like <span class="text-blue-500">+2 XP</span></button>
-                            <button onclick="triggerSync('Destaque', 0.0010)" class="text-[9px] font-black text-gray-400 uppercase hover:text-yellow-600 flex items-center gap-1">💬 Comentar</button>
-                        </div>
-                        <button onclick="triggerSync('Partilha', 0.0020)" class="text-[9px] font-black text-blue-600 uppercase italic underline underline-offset-4">🔗 Partilhar p/ Ganhar</button>
-                    </div>
-                </div>
-                ${(i+1) % 15 === 0 ? '<div class="p-4 bg-gray-50 border-2 border-dashed border-gray-200 text-center rounded-2xl mb-4"><p class="text-[9px] font-black text-gray-400 uppercase tracking-widest italic animate-pulse">A atualizar fluxo de bónus para validação...</p></div>' : ''}
             `).join('');
+        } else {
+            listContainer.innerHTML = '<p class="italic text-gray-600 uppercase text-[7px]">Nenhum utilizador atingiu o limite de 10.00€.</p>';
         }
-
-        async function publish() {
-            const txt = document.getElementById('post-input').value;
-            if(!txt || txt.length < 3) return;
-            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: txt }]);
-            if(!error) {
-                user.saldo += 0.0050; // +15 XP
-                await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
-                document.getElementById('post-input').value = "";
-                updateUI();
-                loadFeed();
-            }
-        }
-
-        async function reagir(btn, val) {
-            // Reação Animada (Gamificação Visual)
-            const pop = document.createElement('span');
-            pop.className = 'coin-pop';
-            pop.innerText = '+2XP';
-            btn.appendChild(pop);
-            setTimeout(() => pop.remove(), 600);
-
-            user.saldo += val;
-            updateUI();
-            await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
-        }
-
-        function triggerSync(type, val) {
-            alert("Sincronizando " + type + "...\nAguarde a validação do sistema para processar o bónus.");
-            if(val > 0) reagir({appendChild:()=>{}, append:()=>{}}, val);
-        }
-
-        async function loadRanking() {
-            const { data } = await sb.from('perfis').select('id, saldo').order('saldo', {ascending: false}).limit(3);
-            if(data) document.getElementById('top-rank').innerHTML = data.map((u, i) => `<span>#${i+1} ..${String(u.id).slice(-3)} (${u.saldo.toFixed(2)}€)</span>`).join(' • ');
-        }
-
-        async function loadAdminStats() {
-            const { count: uCount } = await sb.from('perfis').select('*', { count: 'exact', head: true });
-            const { count: pCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
-            document.getElementById('adm-users').innerText = uCount || 0;
-            const eng = ((pCount / uCount) * 100).toFixed(1);
-            document.getElementById('adm-engagement').innerText = eng + "%";
-            
-            // Lógica da Barra de Lucro
-            const profitWidth = Math.max(10, 100 - (eng / 2)); 
-            document.getElementById('profit-bar').style.width = profitWidth + "%";
-        }
-
-        async function adminDelete() {
-            const id = document.getElementById('del-id').value;
-            const { error } = await sb.from('posts').delete().eq('id', id);
-            if(!error) { alert("Removido."); loadFeed(); }
-        }
-
-        // INFINITE SCROLL & GATILHO DE FADIGA
-        window.onscroll = () => {
-            if(isLocked) return;
-            scrollCount++;
-            if(scrollCount > 150) { // Comportamento agressivo
-                isLocked = true;
-                document.getElementById('fatigue-lock').classList.remove('hidden');
-                setTimeout(() => { 
-                    isLocked = false; 
-                    scrollCount = 0;
-                    document.getElementById('fatigue-lock').classList.add('hidden');
-                }, 5000);
-            }
-        };
-
-        window.onload = init;
-    </script>
-</body>
-</html>
+    }
+</script>
