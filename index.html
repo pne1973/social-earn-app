@@ -3,39 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v35.1 - Data Saver</title>
+    <title>Apex Social v35.2</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root { --blue: #4285F4; --green: #34A853; }
-        body { font-family: sans-serif; background: #f8f9fa; margin: 0; padding-top: 70px; padding-bottom: 80px; }
-        .header { position: fixed; top: 0; width: 100%; height: 65px; background: white; border-bottom: 1px solid #eee; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; }
-        .post-card { background: white; border-radius: 16px; border: 1px solid #e1e4e8; margin: 0 15px 20px 15px; overflow: hidden; }
-        .img-container { background: #000; min-height: 200px; display: flex; align-items: center; justify-content: center; }
+        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding-top: 70px; padding-bottom: 80px; }
+        .header { position: fixed; top: 0; width: 100%; height: 60px; background: white; border-bottom: 1px solid #ddd; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
+        .post-card { background: white; border-radius: 12px; border: 1px solid #ddd; margin: 0 10px 15px 10px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .img-container { background: #eee; width: 100%; min-height: 200px; display: flex; align-items: center; justify-content: center; }
         .img-container img { width: 100%; height: auto; display: block; }
-        .btn-act { flex: 1; padding: 15px 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; color: #5f6368; font-size: 11px; }
-        .badge { background: #EA4335; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+        .btn-act { flex: 1; padding: 12px 0; display: flex; align-items: center; justify-content: center; gap: 5px; font-weight: 800; color: #65676b; font-size: 11px; text-transform: uppercase; }
+        .badge { background: #fa3e3e; color: white; padding: 1px 6px; border-radius: 10px; font-size: 10px; }
+        nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; border-top: 1px solid #ddd; display: flex; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #888; }
+        .nav-item.active { color: var(--blue); border-top: 3px solid var(--blue); }
     </style>
 </head>
 <body>
 
     <header class="header">
         <div style="font-weight: 900; color: var(--blue); font-size: 18px;">APEX SOCIAL</div>
-        <div id="u-saldo" style="color: var(--green); font-weight: 900; font-size: 16px;">0.0000€</div>
+        <div id="u-saldo" style="color: var(--green); font-weight: 900;">0.0000€</div>
     </header>
 
     <main>
-        <div class="post-card p-5" style="border-top: 8px solid var(--blue);">
-            <textarea id="in-text" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-4" rows="2"></textarea>
-            <div id="status-msg" class="hidden text-center text-blue-600 font-black text-[10px] mb-3 uppercase">Processando Imagem...</div>
-            <div class="flex gap-3">
-                <label for="in-file" class="flex-1 bg-gray-100 p-4 rounded-2xl text-center text-[10px] font-black cursor-pointer uppercase">📸 FOTO</label>
-                <input type="file" id="in-file" accept="image/*" class="hidden" onchange="document.getElementById('status-msg').classList.remove('hidden'); document.getElementById('status-msg').innerText='✅ FOTO PRONTA'">
-                <button onclick="publicarComCompressao()" id="btn-pub" class="flex-[2] bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase shadow-md">Publicar</button>
+        <div class="post-card p-4" style="border-top: 6px solid var(--blue);">
+            <textarea id="in-text" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
+            <div id="status" class="hidden text-center text-[10px] font-black mb-2 uppercase"></div>
+            <div class="flex gap-2">
+                <label for="in-file" class="flex-1 bg-gray-100 p-3 rounded-lg text-center text-[10px] font-black cursor-pointer uppercase">📸 FOTO</label>
+                <input type="file" id="in-file" accept="image/*" class="hidden" onchange="showReady()">
+                <button onclick="enviarPost()" id="btn-pub" class="flex-[2] bg-blue-600 text-white rounded-lg font-black text-[10px] uppercase">Publicar</button>
             </div>
         </div>
+        
         <div id="feed"></div>
     </main>
+
+    <nav>
+        <div class="nav-item active">Rede</div>
+        <div class="nav-item">Ganhos</div>
+    </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
@@ -46,93 +55,79 @@
         let saldo = 0;
 
         async function init() {
-            const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) saldo = data.saldo;
-            document.getElementById('u-saldo').innerText = saldo.toFixed(4) + "€";
-            loadFeed();
+            try {
+                const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+                if(data) saldo = data.saldo;
+                document.getElementById('u-saldo').innerText = saldo.toFixed(4) + "€";
+                loadFeed();
+            } catch(e) { console.error(e); }
         }
 
-        // Função mágica para reduzir o tamanho da imagem antes do upload
-        async function compressImage(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 1080; // Resolução padrão Instagram
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Converte para JPEG com 60% de qualidade (gera ficheiros minúsculos)
-                        canvas.toBlob((blob) => {
-                            resolve(blob);
-                        }, 'image/jpeg', 0.6);
-                    };
-                };
-            });
+        function showReady() {
+            const s = document.getElementById('status');
+            s.innerText = "✅ Foto Selecionada";
+            s.className = "text-center text-[10px] font-black mb-2 uppercase text-green-600";
+            s.classList.remove('hidden');
         }
 
-        async function publicarComCompressao() {
+        async function enviarPost() {
             const txt = document.getElementById('in-text').value;
             const file = document.getElementById('in-file').files[0];
             const btn = document.getElementById('btn-pub');
+            const s = document.getElementById('status');
+
             if(!txt) return;
-
             btn.disabled = true;
-            document.getElementById('status-msg').classList.remove('hidden');
-            document.getElementById('status-msg').innerText = "Otimizando Espaço...";
-
-            let finalUrl = "";
+            btn.innerText = "A ENVIAR...";
+            
+            let url = "";
             if(file) {
-                const optimizedBlob = await compressImage(file);
-                const fName = `post_${Date.now()}.jpg`;
-                
-                const { data: upData, error: upErr } = await sb.storage.from('images').upload(fName, optimizedBlob);
+                const fName = `img_${Date.now()}.jpg`;
+                const { error: upErr } = await sb.storage.from('images').upload(fName, file);
                 if(!upErr) {
-                    const { data: urlData } = sb.storage.from('images').getPublicUrl(fName);
-                    finalUrl = urlData.publicUrl;
+                    const { data } = sb.storage.from('images').getPublicUrl(fName);
+                    url = data.publicUrl;
                 }
             }
 
-            await sb.from('posts').insert([{ 
-                user_id: MASTER_ID, content: txt, image_url: finalUrl, likes: 0, shares: 0 
+            const { error } = await sb.from('posts').insert([{ 
+                user_id: MASTER_ID, content: txt, image_url: url 
             }]);
 
-            saldo += 0.0150;
-            await sb.from('perfis').update({ saldo: saldo }).eq('id', MASTER_ID);
-            window.location.reload();
+            if(!error) {
+                saldo += 0.0150;
+                await sb.from('perfis').update({ saldo: saldo }).eq('id', MASTER_ID);
+                window.location.reload();
+            } else {
+                btn.disabled = false;
+                btn.innerText = "Tentar Novamente";
+                s.innerText = "Erro ao gravar. Verifique o SQL.";
+                s.className = "text-center text-[10px] font-black mb-2 uppercase text-red-600";
+                s.classList.remove('hidden');
+            }
         }
 
         async function loadFeed() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const feed = document.getElementById('feed');
             feed.innerHTML = "";
-            if(!posts) return;
+
+            if(!posts || posts.length === 0) {
+                feed.innerHTML = "<p class='text-center text-xs font-bold text-gray-400 mt-10'>NENHUM POST NO FEED</p>";
+                return;
+            }
 
             posts.forEach(p => {
                 const card = document.createElement('div');
                 card.className = "post-card";
                 card.innerHTML = `
                     ${p.image_url ? `<div class="img-container"><img src="${p.image_url}" loading="lazy"></div>` : ''}
-                    <div class="p-5">
-                        <p class="text-[12px] font-bold text-gray-800 uppercase mb-4">${p.content}</p>
-                        <div class="flex border-t pt-3">
-                            <button class="btn-act">👍 <span class="badge">${p.likes || 0}</span></button>
+                    <div class="p-4">
+                        <p class="text-[12px] font-bold text-gray-800 uppercase mb-3">${p.content}</p>
+                        <div class="flex border-t pt-2">
+                            <button class="btn-act">👍 <span class="badge">0</span></button>
                             <button class="btn-act" style="border-left:1px solid #eee; border-right:1px solid #eee;">💬 <span class="badge">0</span></button>
-                            <button class="btn-act">🔗 <span class="badge">${p.shares || 0}</span></button>
+                            <button class="btn-act">🔗 <span class="badge">0</span></button>
                         </div>
                     </div>
                 `;
