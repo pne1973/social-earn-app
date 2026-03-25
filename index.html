@@ -3,101 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social - Oficial</title>
+    <title>Apex Social v40.1 - Master Production</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #4285F4; --bg: #f2f4f7; --text: #1c1e21; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding-top: 60px; padding-bottom: 70px; }
+        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; --border: #dadce0; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; margin: 0; padding-top: 72px; padding-bottom: 85px; }
         
-        /* HEADER OFICIAL */
-        header { position: fixed; top: 0; width: 100%; height: 55px; background: white; border-bottom: 1px solid #ddd; z-index: 9999; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
-
-        /* FEED E CARDS */
-        #feed { display: flex; flex-direction: column; gap: 12px; padding: 10px; max-width: 500px; margin: 0 auto; }
-        .post-card { background: white; border-radius: 12px; border: 1px solid #e1e4e8; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-
-        /* SOLUÇÃO PARA IMAGENS COMPRIDAS */
-        .post-img-container { width: 100%; max-height: 280px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #eee; }
-        .post-img-container img { width: 100%; height: 100%; object-fit: contain; }
-
-        .post-content { padding: 12px 16px; }
-        .post-text { font-size: 15px; color: var(--text); font-weight: 500; margin-bottom: 8px; }
+        .google-card { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         
-        /* GAMIFICAÇÃO E AÇÕES */
-        .post-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid #f0f2f5; padding: 10px 0; }
-        .action-btn { text-align: center; font-size: 11px; font-weight: 800; color: #65676b; text-transform: uppercase; cursor: pointer; }
+        /* Sistema de Ganhos Flutuantes */
+        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
+        @keyframes popUp {
+            0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
+            20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
+        }
+        .earning-text { font-size: 3.5rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 15px rgba(52, 168, 83, 0.3); -webkit-text-stroke: 1.5px white; }
 
-        /* NAV INFERIOR */
-        nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; border-top: 1px solid #ddd; display: flex; justify-content: space-around; align-items: center; z-index: 9999; }
-        .nav-item { text-align: center; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
-        .nav-item.active { color: var(--blue); }
+        /* Ajuste de Imagem (O que faltava na v34) */
+        .img-container { width: 100%; max-height: 320px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid #eee; }
+        .img-container img { width: 100%; height: 100%; object-fit: contain; }
 
-        .btn-pub { background: var(--blue); color: white; border-radius: 8px; font-weight: 800; padding: 12px; width: 100%; }
-        
-        /* BANNER MONETIZAÇÃO */
-        .ad-banner { background: #fffbe6; border: 1px dashed #ffe58f; padding: 10px; margin: 10px; border-radius: 8px; text-align: center; font-size: 11px; font-weight: bold; }
+        /* Navegação */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .nav-item { color: #5f6368; transition: 0.2s; }
+        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
+
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
+        .btn-main { background: var(--g-blue); color: white; border-radius: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div style="font-weight: 900; color: var(--blue); font-size: 18px;">APEX SOCIAL</div>
+    <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
+
+    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[500] px-4 flex justify-between items-center h-[72px]">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-sm">A</div>
+            <h1 class="text-sm font-black uppercase text-blue-600 tracking-tighter">Apex Social</h1>
+        </div>
         <div class="text-right">
-            <div id="u-eur" style="color: #28a745; font-weight: 900; font-size: 14px;">0.0000€</div>
-            <div id="u-brl" style="color: #666; font-size: 10px; font-weight: 700;">0.0000 BRL</div>
+            <div id="main-eur" class="font-black text-green-600 text-lg">0.0000€</div>
+            <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase italic">0.0000 BRL</div>
         </div>
     </header>
 
-    <main id="main-content">
-        <div class="post-card p-4 m-3">
-            <textarea id="in-txt" placeholder="O que está a pensar?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
-            <div id="status-img" class="hidden text-[10px] font-black text-blue-600 mb-2 uppercase text-center">📸 Imagem Otimizada</div>
-            <div class="flex gap-2">
-                <label for="in-file" class="bg-gray-100 p-3 rounded-lg cursor-pointer text-[10px] font-black text-gray-500 uppercase">Foto</label>
-                <input type="file" id="in-file" accept="image/*" class="hidden" onchange="comprimirFoto()">
-                <button onclick="publicarPost()" id="btn-pub" class="btn-pub uppercase">Publicar agora</button>
+    <main class="max-w-lg mx-auto p-3">
+        
+        <section id="view-social" class="tab-content active">
+            <div class="google-card p-4 mb-6 border-t-8 border-blue-600 shadow-md">
+                <textarea id="post-input" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none text-xs font-black uppercase outline-none focus:ring-0 mb-3" rows="2" onfocus="document.getElementById('post-ops').classList.remove('hidden')"></textarea>
+                <div id="post-ops" class="hidden">
+                    <div id="post-status" class="hidden text-[10px] font-black text-blue-500 mb-2 uppercase">📸 Imagem Otimizada</div>
+                    <div class="flex gap-2">
+                        <label for="post-file" class="bg-gray-100 p-3 rounded-lg cursor-pointer text-[10px] font-black text-gray-500 uppercase">Anexar Foto</label>
+                        <input type="file" id="post-file" accept="image/*" class="hidden" onchange="comprimir()">
+                        <button onclick="publish()" id="btn-pub" class="btn-main px-6 py-3 flex-1 text-[11px]">Publicar Agora</button>
+                    </div>
+                </div>
             </div>
-        </div>
+            <div id="feed-container" class="space-y-4"></div>
+        </section>
 
-        <div id="feed">
-            <div class="ad-banner">PUBLICIDADE: Ganhe mais pontos convidando amigos!</div>
-        </div>
+        <section id="view-info" class="tab-content">
+            <div class="google-card p-10 text-center border-t-[10px] border-blue-600 mt-4 shadow-xl">
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Saldo em Carteira</p>
+                <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
+                <div class="mt-6 p-4 bg-blue-50 rounded-xl">
+                    <p class="text-[10px] text-blue-400 uppercase">Mínimo para Levantamento</p>
+                    <p class="font-black text-blue-900">5000 XP / 25.00€</p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <nav>
-        <div class="nav-item active" onclick="mostrarPagina('rede')">Rede</div>
-        <div class="nav-item" onclick="mostrarPagina('ganhos')">Ganhos</div>
-        <div class="nav-item" onclick="mostrarPagina('admin')">Admin</div>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[500]">
+        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black">REDE</span></button>
+        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black">GANHOS</span></button>
+        <button onclick="nav('admin')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black">GESTÃO</span></button>
     </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const _sb = window.supabase.createClient(SB_URL, SB_KEY);
+        const MASTER_ID = "5401881400";
+        const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
-        const ADMIN_ID = "5401881400";
-        let fotoBase64 = "";
-        const TAXA_BRL = 6.1245; // Exemplo de conversão (4 casas decimais)
+        let userBalance = 0;
+        let fotoData = "";
 
         async function init() {
-            carregarSaldos();
-            carregarFeed();
+            const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if(data) userBalance = Number(data.saldo);
+            updateUI(); loadFeed();
         }
 
-        async function carregarSaldos() {
-            const { data } = await _sb.from('perfis').select('saldo').eq('id', ADMIN_ID).single();
-            if(data) {
-                const eur = data.saldo;
-                const brl = eur * TAXA_BRL;
-                document.getElementById('u-eur').innerText = eur.toFixed(4) + "€";
-                document.getElementById('u-brl').innerText = brl.toFixed(4) + " BRL";
-            }
+        function updateUI() {
+            const eur = userBalance.toFixed(4);
+            document.getElementById('main-eur').innerText = eur + "€";
+            document.getElementById('wall-eur').innerText = eur + "€";
+            document.getElementById('main-brl').innerText = (userBalance * 6.1245).toFixed(4) + " BRL";
         }
 
-        function comprimirFoto() {
-            const file = document.getElementById('in-file').files[0];
-            if (!file) return;
+        async function updateBalance(gain) {
+            userBalance += gain;
+            const el = document.getElementById('floating-earning');
+            document.getElementById('earning-val').innerText = "+" + gain.toFixed(4) + "€";
+            el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 800);
+            updateUI();
+            await sb.from('perfis').update({ saldo: userBalance }).eq('id', MASTER_ID);
+        }
+
+        function comprimir() {
+            const file = document.getElementById('post-file').files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
@@ -105,83 +127,59 @@
                     const canvas = document.createElement('canvas');
                     const maxW = 800;
                     const scale = maxW / img.width;
-                    canvas.width = maxW;
-                    canvas.height = img.height * scale;
+                    canvas.width = maxW; canvas.height = img.height * scale;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    fotoBase64 = canvas.toDataURL('image/jpeg', 0.6); // Performance: Compresso < 500KB
-                    document.getElementById('status-img').classList.remove('hidden');
+                    fotoData = canvas.toDataURL('image/jpeg', 0.6);
+                    document.getElementById('post-status').classList.remove('hidden');
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        async function publicarPost() {
-            const txt = document.getElementById('in-txt').value;
-            if(!txt && !fotoBase64) return;
+        async function publish() {
+            const content = document.getElementById('post-input').value;
+            if(!content && !fotoData) return;
+            document.getElementById('btn-pub').disabled = true;
 
-            const btn = document.getElementById('btn-pub');
-            btn.disabled = true; btn.innerText = "PROCESSANDO...";
-
-            // Gamificação: +15 Pontos por Post
-            const { error } = await _sb.from('posts').insert([{ 
-                user_id: ADMIN_ID, 
-                content: txt, 
-                image_url: fotoBase64 
-            }]);
-
-            if(!error) window.location.reload();
+            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: content, image_url: fotoData }]);
+            if(!error) {
+                await updateBalance(0.0150);
+                window.location.reload();
+            }
         }
 
-        async function carregarFeed() {
-            const { data: posts } = await _sb.from('posts').select('*').order('created_at', { ascending: false }).limit(10);
-            const feed = document.getElementById('feed');
-
-            posts?.forEach((p, index) => {
+        async function loadFeed() {
+            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            const container = document.getElementById('feed-container');
+            container.innerHTML = "";
+            
+            posts.forEach(p => {
                 const card = document.createElement('div');
-                card.className = "post-card";
-                
-                let imgHtml = p.image_url ? `
-                    <div class="post-img-container">
-                        <img src="${p.image_url}" loading="lazy">
-                    </div>` : "";
-
+                card.className = "google-card shadow-sm";
                 card.innerHTML = `
-                    ${imgHtml}
-                    <div class="post-content">
-                        <p class="post-text">${p.content || ''}</p>
-                        <div class="text-[10px] text-gray-400 mb-2">ID: ${p.user_id.slice(0,5)}...</div>
-                        <div class="post-actions">
-                            <div class="action-btn" onclick="gamificar('like')">Gostar (+2)</div>
-                            <div class="action-btn">Comentar</div>
-                            <div class="action-btn">Denunciar</div>
+                    <div class="p-4 border-b border-gray-50 flex items-center justify-between">
+                        <span class="text-[9px] font-black text-gray-400 uppercase italic">Utilizador Master</span>
+                        <span class="text-[9px] font-black text-gray-300">#${String(p.id).slice(-3)}</span>
+                    </div>
+                    ${p.image_url ? `<div class="img-container"><img src="${p.image_url}" loading="lazy"></div>` : ''}
+                    <div class="p-5">
+                        <p class="text-[13px] font-black uppercase text-gray-800 mb-5 leading-tight">${p.content || ''}</p>
+                        <div class="flex border-t pt-3">
+                            <div onclick="updateBalance(0.0002)" class="interaction-btn"><span class="text-xl mb-1">👍</span><span>Gostar</span></div>
+                            <div class="interaction-btn border-x border-gray-50"><span class="text-xl mb-1">💬</span><span>Comentar</span></div>
+                            <div onclick="updateBalance(0.0005)" class="interaction-btn"><span class="text-xl mb-1">🔗</span><span>Partilhar</span></div>
                         </div>
                     </div>
                 `;
-                feed.appendChild(card);
-
-                // Injeção automática de anúncios a cada 3 posts
-                if((index + 1) % 3 === 0) {
-                    const ad = document.createElement('div');
-                    ad.className = "ad-banner";
-                    ad.innerText = "ANÚNCIO: Use o Apex e ganhe recompensas diárias!";
-                    feed.appendChild(ad);
-                }
+                container.appendChild(card);
             });
         }
 
-        function gamificar(tipo) {
-            // Lógica interna para somar pontos (Like +2, Post +15, etc)
-            alert("Gamificação: " + tipo.toUpperCase() + " registado!");
-        }
+        function nav(t) { document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active')); document.getElementById('view-'+t).classList.add('active'); event.currentTarget.classList.add('active'); }
 
-        function mostrarPagina(pg) {
-            // Alternar entre abas (Rede, Ganhos com Tabela de Recompensas, Admin)
-            console.log("A mudar para: " + pg);
-        }
-
-        init();
+        window.onload = init;
     </script>
 </body>
 </html>
