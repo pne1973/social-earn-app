@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v77 - Dossiê v60</title>
+    <title>Apex Social v80 - Produção Mestre</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
@@ -12,27 +12,28 @@
         .google-blue { color: #4285F4; }
         .google-bg-blue { background-color: #4285F4; }
         .nav-active { color: #4285F4 !important; border-top: 3px solid #4285F4; font-weight: 900; }
-        .card { background: white; border-radius: 12px; border: 1px solid #dadce0; }
-        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 10000; align-items: center; justify-content: center; flex-direction: column; }
-        .btn-turbo { background: linear-gradient(135deg, #4285F4, #34a853); color: white; font-weight: 900; }
-        .ad-slot { background: #f1f3f4; border: 1px dashed #bdc1c6; border-radius: 8px; min-height: 50px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #70757a; text-transform: uppercase; margin: 10px 0; }
+        .card { background: white; border-radius: 12px; border: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); overflow: hidden; }
+        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 10000; align-items: center; justify-content: center; flex-direction: column; }
+        .turbo-gradient { background: linear-gradient(135deg, #4285F4, #34a853); }
+        .ad-example { background: #fffde7; border: 1px dashed #fbc02d; padding: 12px; text-align: center; border-radius: 8px; margin: 10px 0; }
+        .share-btn { background: #1da1f2; color: white; font-weight: 900; }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-28">
 
     <div id="loader">
         <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 mb-4"></div>
-        <p class="text-[10px] font-black uppercase tracking-widest text-blue-600">Sincronizando Servidor...</p>
+        <p id="loader-text" class="text-[10px] font-black uppercase tracking-widest text-blue-600 italic">Sincronizando Servidor...</p>
     </div>
 
-    <div class="ad-slot m-0 rounded-none border-x-0 border-t-0 bg-yellow-50">
-        [Adsterra: Autenticação de Sessão Obrigatória - 728x90]
+    <div class="ad-example text-[9px] text-yellow-700 font-bold m-0 rounded-none border-x-0">
+        [ADSTERRA BANNER: 728x90 - AUTENTICAÇÃO DE SESSÃO ATIVA]
     </div>
 
-    <header class="sticky top-0 bg-white border-b z-50 px-4 py-3 flex justify-between items-center">
+    <header class="sticky top-0 bg-white border-b z-50 px-4 py-3 flex justify-between items-center shadow-sm">
         <div>
             <h1 class="text-xl font-black google-blue tracking-tighter uppercase leading-none">Apex Social</h1>
-            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1">Sessão Segura v60</p>
+            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1 italic">Dossiê v60 Master</p>
         </div>
         <div class="text-right">
             <span id="main-balance" class="font-black text-green-700 text-lg">0,0000€</span>
@@ -42,27 +43,25 @@
 
     <main id="app-content" class="p-4 max-w-md mx-auto min-h-screen space-y-4"></main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-50 shadow-lg">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-40 shadow-xl">
         <button onclick="switchTab('feed')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-feed"><span class="text-[10px] font-black uppercase">Feed</span></button>
         <button onclick="switchTab('wallet')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-wallet"><span class="text-[10px] font-black uppercase">Carteira</span></button>
         <button onclick="switchTab('friends')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-friends"><span class="text-[10px] font-black uppercase">Amigos</span></button>
         <button onclick="switchTab('profile')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-profile"><span class="text-[10px] font-black uppercase">Perfil</span></button>
-        <button onclick="switchTab('admin')" class="flex flex-col items-center p-2 text-red-300 nav-btn" id="btn-admin" style="display:none;"><span class="text-[10px] font-black uppercase">Admin</span></button>
+        <button onclick="switchTab('admin')" class="flex flex-col items-center p-2 text-red-300 nav-btn" id="btn-admin" style="display:none;"><span class="text-[10px] font-black uppercase italic">Admin</span></button>
     </nav>
 
     <script>
-        // CONFIGURAÇÃO DOS PILARES v60
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
-
+        const SB_KEY = "COLA_AQUI_A_TUA_KEY"; 
         const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
         const USER_ID = "5401881400";
-        const EUR_BRL = 6.12; 
-        
-        let state = { saldo_eur: 0, bonus_cliques: 0, is_turbo: false };
+        const EUR_BRL = 6.1245;
 
+        let state = { saldo_eur: 0, bonus_cliques: 0, is_turbo: false, last_checkin: null, amigos: 0 };
+        
         async function init() {
-            showLoader(true);
+            showLoader(true, "Iniciando Protocolo v60...");
             try {
                 let { data } = await supabaseClient.from('perfis').select('*').eq('id', USER_ID).single();
                 if (data) state = data;
@@ -73,41 +72,33 @@
             switchTab('feed');
         }
 
-        // ENGENHARIA DE GANHOS (v60)
-        async function doAction(type) {
-            if (!state.is_turbo && state.bonus_cliques <= 0) {
-                alert("Sincronize o servidor para ativar os Ganhos Turbo!");
+        async function handleAction(type) {
+            if (state.bonus_cliques <= 0 && !state.is_turbo) {
+                alert("Sessão Expirada! Sincronize na aba Carteira.");
                 return;
             }
-
-            showLoader(true);
-            let reward = 0;
-            if (type === 'like') reward = 0.0015;
-            if (type === 'comment') reward = 0.0030;
-            if (type === 'post') reward = 0.0150;
-
-            state.saldo_eur = parseFloat(state.saldo_eur) + reward;
-            state.bonus_cliques--;
-
-            if (state.bonus_cliques <= 0) state.is_turbo = false;
-
-            setTimeout(async () => {
-                updateUI();
-                await supabaseClient.from('perfis').update(state).eq('id', USER_ID);
-                showLoader(false);
-            }, 600);
+            let rewards = { like: 0.0015, comment: 0.0030, post: 0.0150, checkin: 0.0500 };
+            state.saldo_eur = parseFloat(state.saldo_eur) + rewards[type];
+            state.bonus_cliques = Math.max(0, state.bonus_cliques - 1);
+            if (state.bonus_cliques === 0) state.is_turbo = false;
+            updateUI();
+            await supabaseClient.from('perfis').update(state).eq('id', USER_ID);
         }
 
-        // NARRATIVA DE NÃO-CHATEAR: Sincronização de Servidor
-        function syncServer() {
-            showLoader(true);
+        async function sync(msg) {
+            showLoader(true, msg);
             setTimeout(() => {
                 state.is_turbo = true;
-                state.bonus_cliques = 15; // Bónus por 15 interações
+                state.bonus_cliques = 15;
                 updateUI();
                 showLoader(false);
                 render(currentTab);
-            }, 2000); // Simula visualização de vídeo/ad
+            }, 3000);
+        }
+
+        function updateUI() {
+            document.getElementById('main-balance').innerText = parseFloat(state.saldo_eur).toFixed(4) + '€';
+            document.getElementById('brl-balance').innerText = (state.saldo_eur * EUR_BRL).toFixed(4) + ' BRL';
         }
 
         function switchTab(tab) {
@@ -117,87 +108,108 @@
             render(tab);
         }
 
-        function updateUI() {
-            document.getElementById('main-balance').innerText = parseFloat(state.saldo_eur).toFixed(4) + '€';
-            document.getElementById('brl-balance').innerText = (state.saldo_eur * EUR_BRL).toFixed(4) + ' BRL';
+        function shareSocial() {
+            const text = `Estou a faturar no Apex Social! Regista-te e ganha também: https://apex-social.onrender.com/?ref=${USER_ID}`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         }
 
         function render(tab) {
             const container = document.getElementById('app-content');
-            updateUI();
-            
             if (tab === 'feed') {
                 container.innerHTML = `
-                    <div class="card p-4 btn-turbo flex justify-between items-center shadow-lg">
-                        <div>
-                            <p class="text-[10px] font-black uppercase opacity-80">Contador de Bónus</p>
-                            <p class="text-sm font-black italic">🔥 ${state.bonus_cliques} interações restantes</p>
+                    <div class="card p-4 turbo-gradient text-white flex justify-between items-center">
+                        <div><p class="text-[10px] font-black uppercase opacity-70">Contador de Bónus (v51)</p><p class="text-sm font-black italic">🔥 ${state.bonus_cliques} Interações Restantes</p></div>
+                        <button onclick="sync('Sincronizando Servidor...')" class="bg-white text-blue-600 px-3 py-2 rounded font-black text-[9px] uppercase shadow">Sincronizar</button>
+                    </div>
+
+                    <div class="card p-4 bg-gray-50">
+                        <textarea id="post-text" placeholder="Escreve algo... (Ganho: 0,0150€)" class="w-full bg-white border p-3 text-sm rounded-lg mb-2"></textarea>
+                        <div class="flex space-x-2">
+                            <button onclick="handleAction('post')" class="flex-1 google-bg-blue text-white py-2 rounded font-black text-[10px] uppercase">Postar Texto</button>
+                            <button onclick="shareSocial()" class="share-btn px-4 rounded flex items-center justify-center"><span class="text-[10px] font-black uppercase">Partilhar</span></button>
                         </div>
-                        <button onclick="syncServer()" class="bg-white text-blue-600 px-4 py-2 rounded font-black text-[9px] uppercase shadow">Sincronizar</button>
                     </div>
 
                     <div class="card p-4">
-                        <div class="flex items-center space-x-2 mb-4"><div class="w-8 h-8 rounded-full bg-gray-100 border"></div><p class="text-xs font-black uppercase text-gray-500">Membro Premium</p></div>
-                        <p class="text-sm text-gray-700 mb-6 font-medium leading-relaxed">"Otimizando os ganhos diários através da nova API do Apex Social."</p>
+                        <div class="flex items-center space-x-2 mb-3"><div class="w-7 h-7 rounded-full bg-blue-500"></div><span class="text-[10px] font-black uppercase text-gray-500">Membro Premium • Agora</span></div>
+                        <p class="text-sm text-gray-700 mb-4 font-medium italic">"A nova atualização v80 está incrível para faturar."</p>
                         <div class="flex space-x-2">
-                            <button onclick="doAction('like')" class="flex-1 google-bg-blue text-white py-3 rounded font-black text-[10px] uppercase shadow-md active:scale-95">Like (+0,0015€)</button>
-                            <button onclick="doAction('comment')" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded font-black text-[10px] uppercase border active:scale-95">Comentar</button>
+                            <button onclick="handleAction('like')" class="flex-1 border-2 border-blue-50 py-2 rounded text-[9px] font-black uppercase text-blue-600">Gostar (+0,0015€)</button>
+                            <button onclick="handleAction('comment')" class="flex-1 border py-2 rounded text-[9px] font-black uppercase text-gray-400">Comentar</button>
                         </div>
                     </div>
-                    <div class="ad-slot">[Validar Agendamento - Adsterra Native]</div>
+
+                    <div class="ad-example">[ADSTERRA NATIVE: VALIDAR AGENDAMENTO]</div>
                 `;
             } else if (tab === 'wallet') {
                 container.innerHTML = `
                     <div class="card p-8 text-center border-b-4 border-blue-500">
-                        <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Saldo Total (Auditado)</p>
+                        <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Saldo Real Auditado</p>
                         <h1 class="text-5xl font-black google-blue tracking-tighter">${state.saldo_eur.toFixed(4)}€</h1>
                     </div>
-                    <div class="card p-4">
-                        <p class="text-[10px] font-black uppercase mb-4 text-gray-400">Engenharia de Ganhos Agressiva</p>
-                        <button onclick="syncServer()" class="w-full btn-turbo py-4 rounded-xl font-black text-xs uppercase shadow-xl mb-4 italic">Sincronizar Sessão (Ganhos Turbo)</button>
-                        <p class="text-[9px] text-center text-gray-400 font-bold uppercase">Saque Mínimo: 10,00€ | Prazo: 15 dias úteis</p>
+                    <div class="card p-5 space-y-4">
+                        <button onclick="sync('Autenticando Sessão...')" class="w-full turbo-gradient text-white py-4 rounded-xl font-black text-xs uppercase shadow-xl italic">Sincronizar Sessão (Turbo)</button>
+                        <button onclick="handleAction('checkin')" class="w-full border-2 border-green-500 text-green-600 py-3 rounded-xl font-black text-[10px] uppercase">Check-in Diário (+0,0500€)</button>
+                        <div class="pt-4 border-t space-y-2">
+                            <p class="text-[10px] font-black uppercase text-gray-400">Tabela de Ganhos Turbo</p>
+                            <div class="flex justify-between text-[9px] font-bold"><span>Like / Gosto</span><span class="text-blue-600">0,0015€</span></div>
+                            <div class="flex justify-between text-[9px] font-bold"><span>Postar Texto</span><span class="text-blue-600">0,0150€</span></div>
+                            <div class="flex justify-between text-[9px] font-bold"><span>Comissão Amigo</span><span class="text-blue-600">10%</span></div>
+                        </div>
+                        <p class="text-[8px] text-center text-gray-300 font-black uppercase mt-4 italic">Saque Mínimo: 10,00€ | Prazo: 15 Dias</p>
                     </div>
+                    <div class="ad-example">[ADSTERRA: IMPULSIONAR GANHOS - 320x50]</div>
                 `;
             } else if (tab === 'friends') {
                 container.innerHTML = `
-                    <div class="card p-6">
-                        <h3 class="font-black text-xs uppercase google-blue mb-4 tracking-widest border-b pb-2">Impulso de Rede</h3>
-                        <p class="text-[10px] font-bold text-gray-500 mb-6">Convide amigos e ganhe 10% de comissão vitalícia.</p>
-                        <div class="bg-gray-50 p-3 rounded border border-dashed border-blue-300 mb-6">
-                            <p class="text-[9px] font-mono text-blue-600 truncate uppercase">https://apex-social.onrender.com/?ref=${USER_ID}</p>
+                    <div class="card p-6 border-l-4 border-blue-500">
+                        <h3 class="font-black text-xs uppercase google-blue mb-2 tracking-widest">Impulso de Rede</h3>
+                        <p class="text-[10px] font-bold text-gray-400 mb-6 uppercase tracking-tighter leading-tight">Ganha 10% de comissão sobre o ganho bruto vitalício.</p>
+                        <div class="bg-gray-50 p-4 rounded border border-dashed border-blue-200 mb-6">
+                            <p class="text-[9px] font-mono text-blue-600 truncate italic">https://apex-social.onrender.com/?ref=${USER_ID}</p>
                         </div>
-                        <button onclick="syncServer()" class="w-full bg-blue-50 text-blue-600 py-3 rounded font-black text-[10px] uppercase border border-blue-200">Impulsionar Rede (Vídeo)</button>
+                        <div class="flex space-x-2">
+                            <button onclick="sync('Impulsionando Rede...')" class="flex-1 bg-blue-50 text-blue-600 py-4 rounded-xl font-black text-[10px] uppercase border border-blue-200">Acordar Afiliados</button>
+                            <button onclick="shareSocial()" class="share-btn px-6 rounded-xl font-black text-[10px] uppercase">Partilhar</button>
+                        </div>
                     </div>
                 `;
             } else if (tab === 'profile') {
                 container.innerHTML = `
                     <div class="card p-6 text-center">
-                        <div class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 border-2 border-white shadow flex items-center justify-center font-black text-gray-300">#</div>
-                        <p class="font-black text-xs text-gray-800 uppercase tracking-tighter italic">Utilizador #${USER_ID}</p>
-                        
-                        <div class="mt-8 space-y-2">
-                            <button onclick="syncServer()" class="w-full bg-gray-50 text-gray-600 py-3 rounded border text-[9px] font-black uppercase">Autopost de Repetição (Sincronizar)</button>
-                            <button onclick="syncServer()" class="w-full bg-gray-50 text-gray-600 py-3 rounded border text-[9px] font-black uppercase">Validar Bio Clicável (48h)</button>
+                        <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 border-4 border-white shadow flex items-center justify-center font-black text-gray-200 text-3xl">#</div>
+                        <p class="font-black text-[11px] text-gray-800 uppercase italic mb-8">Utilizador #${USER_ID}</p>
+                        <div class="space-y-2">
+                            <button onclick="sync('Validando Agendamento...')" class="w-full bg-white text-gray-500 py-3 rounded border text-[9px] font-black uppercase shadow-sm">Autopost de Repetição</button>
+                            <button onclick="sync('Resetando Nível...')" class="w-full bg-white text-gray-500 py-3 rounded border text-[9px] font-black uppercase shadow-sm">Reset de Nível Diário</button>
+                            <button onclick="sync('Validando Link...')" class="w-full bg-white text-gray-500 py-3 rounded border text-[9px] font-black uppercase shadow-sm">Validar Bio Clicável (48h)</button>
                         </div>
                     </div>
+                    <div class="ad-example text-[8px]">[ADSTERRA: BANNER NATIVO - VALIDAÇÃO DE PERFIL]</div>
                 `;
             } else if (tab === 'admin') {
                 container.innerHTML = `
                     <div class="card p-6 border-2 border-red-500 bg-red-50">
-                        <h2 class="text-red-600 font-black text-xs uppercase mb-6 text-center tracking-widest">Painel Admin (Margem 40%)</h2>
+                        <h2 class="text-red-600 font-black text-xs uppercase mb-8 text-center tracking-widest italic underline">Controlo Admin (Margem 40%)</h2>
                         <div class="space-y-4">
-                            <div class="bg-white p-3 rounded border text-center">
-                                <p class="text-[8px] font-black text-gray-400 uppercase">eCPM Global</p>
-                                <p class="text-lg font-black text-red-600">0.0025€</p>
+                            <div class="bg-white p-4 rounded border">
+                                <p class="text-[8px] font-black text-gray-400 uppercase mb-2">eCPM Global: 0.0025€</p>
+                                <button class="w-full bg-red-600 text-white py-3 rounded font-black text-[10px] uppercase">Ver Pedidos de Saque</button>
                             </div>
-                            <button class="w-full bg-red-600 text-white py-3 rounded font-black text-[10px] uppercase shadow-md">Ver Pedidos de Levantamento</button>
+                            <div class="bg-white p-4 rounded border">
+                                <p class="text-[8px] font-black text-gray-400 uppercase mb-2">Eliminar Post por ID</p>
+                                <div class="flex space-x-2"><input placeholder="ID" class="flex-1 border p-2 text-xs rounded"><button class="bg-gray-800 text-white px-4 rounded text-[9px] font-black uppercase">DEL</button></div>
+                            </div>
                         </div>
                     </div>
                 `;
             }
         }
 
-        function showLoader(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
+        function showLoader(show, text) { 
+            document.getElementById('loader').style.display = show ? 'flex' : 'none'; 
+            document.getElementById('loader-text').innerText = text; 
+        }
         window.onload = init;
     </script>
 </body>
