@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex v35.100</title>
+    <title>Apex v35.200 - Admin Intelligence</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
         .badge { position: absolute; top: -5px; right: 15%; background: #ef4444; color: white; font-size: 10px; padding: 2px 7px; border-radius: 99px; border: 2px solid white; }
         #feed { margin-top: 160px; }
         .sticky-header { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 10px 16px; }
+        .admin-stat { border-left: 4px solid #4285F4; padding-left: 10px; }
     </style>
 </head>
 <body class="pb-24">
@@ -34,7 +35,7 @@
             <div class="sticky-header">
                 <div class="card p-4 border-t-8 border-blue-600">
                     <textarea id="post-txt" onclick="this.rows=3; document.getElementById('post-btn').classList.remove('hidden')" placeholder="PARTILHAR... (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none" rows="1"></textarea>
-                    <button id="post-btn" onclick="novoPost()" class="hidden w-full bg-blue-600 text-white py-3 rounded-xl text-xs">PUBLICAR AGORA</button>
+                    <button id="post-btn" onclick="novoPost()" class="hidden w-full bg-blue-600 text-white py-3 rounded-xl text-xs">PUBLICAR</button>
                 </div>
             </div>
             <div id="feed"></div>
@@ -43,14 +44,55 @@
         <section id="ganhos" class="tab-content">
             <div class="card p-12 text-center border-t-[10px] border-blue-600 mt-4">
                 <h1 id="saldo-wall" class="text-5xl text-blue-600">0.0000€</h1>
-                <p class="text-gray-400 mt-4 text-xs">SALDO DISPONÍVEL</p>
+                <p class="text-gray-400 mt-4 text-xs">O TEU SALDO</p>
+            </div>
+        </section>
+
+        <section id="admin" class="tab-content">
+            <div class="card p-6 border-t-[10px] border-red-600 mt-4">
+                <h2 class="text-red-600 mb-6 text-center">Painel de Controlo Master</h2>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="admin-stat bg-gray-50 p-3 rounded">
+                        <p class="text-[9px] text-gray-500">UTILIZADORES</p>
+                        <h3 id="stat-users" class="text-lg">0</h3>
+                    </div>
+                    <div class="admin-stat bg-gray-50 p-3 rounded">
+                        <p class="text-[9px] text-gray-500">POSTS TOTAIS</p>
+                        <h3 id="stat-posts" class="text-lg">0</h3>
+                    </div>
+                    <div class="admin-stat bg-gray-50 p-3 rounded border-green-500">
+                        <p class="text-[9px] text-gray-500">DÍVIDA TOTAL (EUR)</p>
+                        <h3 id="stat-eur" class="text-lg text-green-600">0.00€</h3>
+                    </div>
+                    <div class="admin-stat bg-gray-50 p-3 rounded border-green-500">
+                        <p class="text-[9px] text-gray-500">DÍVIDA TOTAL (BRL)</p>
+                        <h3 id="stat-brl" class="text-lg text-green-600">0.00</h3>
+                    </div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <p class="text-[10px] mb-2">Eliminar Post por ID</p>
+                    <div class="flex gap-2 mb-6">
+                        <input id="del-id" type="text" placeholder="ID DO POST" class="flex-1 p-2 border-2 rounded-lg text-xs">
+                        <button onclick="adminDelPost()" class="bg-red-600 text-white px-4 rounded-lg text-[10px]">APAGAR</button>
+                    </div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <p class="text-[10px] mb-2">Pedidos de Levantamento (PayPal)</p>
+                    <div id="payout-list" class="text-[9px] space-y-2">
+                        <p class="text-gray-400">Nenhum pedido pendente.</p>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-50">
-        <button onclick="mudarTab('rede')" class="flex-1 text-[11px] text-blue-600">REDE</button>
-        <button onclick="mudarTab('ganhos')" class="flex-1 text-[11px] text-gray-400">GANHOS</button>
+        <button onclick="mudarTab('rede')" class="flex-1 text-[10px]">REDE</button>
+        <button onclick="mudarTab('ganhos')" class="flex-1 text-[10px]">GANHOS</button>
+        <button id="nav-admin" onclick="mudarTab('admin')" class="hidden flex-1 text-[10px] text-red-600">GESTÃO</button>
     </nav>
 
     <script>
@@ -62,10 +104,34 @@
         let saldoAtual = 0;
 
         async function iniciar() {
+            if(MASTER_ID === "5401881400") {
+                document.getElementById('nav-admin').classList.remove('hidden');
+                carregarStats();
+            }
             const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
             if(data) saldoAtual = Number(data.saldo);
             atualizarValores();
             carregarFeed();
+        }
+
+        async function carregarStats() {
+            const { count: users } = await sb.from('perfis').select('*', { count: 'exact', head: true });
+            const { count: posts } = await sb.from('posts').select('*', { count: 'exact', head: true });
+            const { data: saldos } = await sb.from('perfis').select('saldo');
+            
+            let totalDevido = saldos.reduce((acc, curr) => acc + (Number(curr.saldo) || 0), 0);
+            
+            document.getElementById('stat-users').innerText = users;
+            document.getElementById('stat-posts').innerText = posts;
+            document.getElementById('stat-eur').innerText = totalDevido.toFixed(2) + "€";
+            document.getElementById('stat-brl').innerText = (totalDevido * 6.12).toFixed(2);
+        }
+
+        async function adminDelPost() {
+            const id = document.getElementById('del-id').value;
+            if(!id) return;
+            const { error } = await sb.from('posts').delete().eq('id', id);
+            if(!error) { alert("POST ELIMINADO"); location.reload(); }
         }
 
         function atualizarValores() {
@@ -77,34 +143,29 @@
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const feed = document.getElementById('feed');
             feed.innerHTML = "";
-
             for (const p of posts) {
                 const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
-                
-                const cardPost = document.createElement('div');
-                cardPost.className = "card p-6";
-                cardPost.innerHTML = `
-                    <div class="text-[10px] text-gray-400 mb-2">UTILIZADOR ID..${String(p.user_id).slice(-4)}</div>
+                const div = document.createElement('div');
+                div.className = "card p-6";
+                div.innerHTML = `
+                    <div class="text-[8px] text-gray-400 mb-2">POST ID: ${p.id}</div>
                     <div class="text-sm text-gray-800 mb-4">${p.content}</div>
-                    
                     <div class="flex justify-between border-t pt-4 relative">
-                        <button onclick="ganhar(0.0005)" class="flex-1 text-center"><span class="text-xl">👍</span><div class="text-[9px]">GOSTAR</div></button>
-                        <button onclick="abrirCmt('${p.id}')" class="flex-1 text-center relative border-x">
-                            <div id="count-${p.id}" class="badge">${count || 0}</div>
-                            <span class="text-xl">💬</span><div class="text-[9px]">COMENTAR</div>
+                        <button onclick="ganhar(0.0005)" class="flex-1 text-center"><span class="text-xl">👍</span></button>
+                        <button onclick="abrirCmt('${p.id}')" class="flex-1 text-center border-x relative">
+                            <div id="count-${p.id}" class="badge">${count || 0}</div>💬
                         </button>
-                        <button onclick="ganhar(0.0005)" class="flex-1 text-center"><span class="text-xl">🔗</span><div class="text-[9px]">PARTILHAR</div></button>
+                        <button onclick="ganhar(0.0005)" class="flex-1 text-center"><span class="text-xl">🔗</span></button>
                     </div>
-
                     <div id="box-${p.id}" class="comment-box">
-                        <div id="lista-${p.id}" class="space-y-3 mb-4 max-h-40 overflow-y-auto text-[11px]"></div>
+                        <div id="lista-${p.id}" class="space-y-2 mb-4 max-h-40 overflow-y-auto text-[10px]"></div>
                         <div class="flex gap-2">
-                            <input id="input-${p.id}" type="text" placeholder="A TUA MENSAGEM..." class="flex-1 p-3 bg-white border-2 rounded-xl outline-none text-xs">
-                            <button onclick="enviarCmt('${p.id}')" class="bg-blue-600 text-white px-6 rounded-xl text-xs shadow-md active:scale-95 transition-transform">OK</button>
+                            <input id="input-${p.id}" type="text" class="flex-1 p-2 border rounded-lg text-[10px]">
+                            <button onclick="enviarCmt('${p.id}')" class="bg-blue-600 text-white px-4 rounded-lg text-[10px]">OK</button>
                         </div>
                     </div>
                 `;
-                feed.appendChild(cardPost);
+                feed.appendChild(div);
             }
         }
 
@@ -112,42 +173,29 @@
             const box = document.getElementById(`box-${id}`);
             const lista = document.getElementById(`lista-${id}`);
             box.classList.toggle('active');
-            
             if(box.classList.contains('active')) {
                 lista.innerHTML = "CARREGANDO...";
                 const { data } = await sb.from('comentarios').select('*').eq('post_id', id).order('created_at', {ascending: true});
-                lista.innerHTML = data.map(c => `<div class="bg-white p-2 rounded-lg border"><b>ID..${String(c.user_id).slice(-4)}:</b> ${c.content}</div>`).join('') || "SEM COMENTÁRIOS.";
+                lista.innerHTML = data.map(c => `<div class="p-1 border-b">ID..${String(c.user_id).slice(-4)}: ${c.content}</div>`).join('') || "SEM COMENTÁRIOS.";
             }
         }
 
         async function enviarCmt(id) {
             const campo = document.getElementById(`input-${id}`);
-            const lista = document.getElementById(`lista-${id}`);
             const texto = campo.value.trim();
             if(!texto) return;
-
-            // Injeta logo visualmente para não haver atraso
-            const div = document.createElement('div');
-            div.className = "bg-blue-50 p-2 rounded-lg border border-blue-100";
-            div.innerHTML = `<b>TU:</b> ${texto}`;
-            if(lista.innerText.includes("SEM COMENTÁRIOS")) lista.innerHTML = "";
-            lista.appendChild(div);
-            
-            campo.value = ""; // Limpa logo
-            
-            // Grava no Supabase "silenciosamente"
             const { error } = await sb.from('comentarios').insert([{ post_id: id, user_id: MASTER_ID, content: texto }]);
-            
             if(!error) {
                 const b = document.getElementById(`count-${id}`);
                 b.innerText = parseInt(b.innerText) + 1;
+                campo.value = "";
+                abrirCmt(id); // Refresh na lista
                 ganhar(0.0010);
             }
         }
 
         async function ganhar(v) {
-            saldoAtual += v;
-            atualizarValores();
+            saldoAtual += v; atualizarValores();
             await sb.from('perfis').update({ saldo: saldoAtual }).eq('id', MASTER_ID);
         }
 
