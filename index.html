@@ -3,52 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v37.5</title>
+    <title>Apex Social v38.0</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --blue: #4285F4; --bg: #f0f2f5; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); padding-top: 60px; padding-bottom: 70px; }
+        :root { --blue: #4285F4; --bg: #f2f4f7; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding-top: 60px; }
         
-        /* Card Ajustado: Remove espaços fantasmas */
-        .card { background: white; border-radius: 12px; margin: 12px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #e0e0e0; }
+        /* Header Fixo */
+        header { position: fixed; top: 0; width: 100%; height: 55px; background: white; border-bottom: 1px solid #ddd; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
         
-        /* Contentor de Imagem com Proporção Fixa mas Flexível */
-        .feed-img-box { 
-            width: 100%; 
-            max-height: 300px; /* Altura ideal para telemóvel */
-            display: block;
-            background: #000;
-        }
-        .feed-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        /* Cartão de Post Único */
+        .post-card { background: white; border-radius: 12px; margin: 15px; border: 1px solid #e1e4e8; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* Área de Texto: Colada à imagem como no print */
-        .post-content { padding: 12px 16px; border-top: 1px solid #f0f0f0; }
-        .post-text { font-size: 14px; font-weight: 600; color: #1c1e21; line-height: 1.4; }
-
-        /* Botão Publicar Estilo Google */
-        .btn-main { background: var(--blue); color: white; border-radius: 8px; font-weight: 700; transition: opacity 0.2s; }
-        .btn-main:disabled { opacity: 0.5; }
+        /* Contentor de Imagem com Limite de Altura */
+        .img-box { width: 100%; background: #000; display: flex; justify-content: center; align-items: center; max-height: 280px; overflow: hidden; }
+        .img-box img { width: 100%; height: auto; display: block; }
+        
+        /* Área de Conteúdo do Post */
+        .post-body { padding: 12px 15px; background: white; }
+        .post-text { font-size: 14px; font-weight: 700; color: #222; margin: 0; line-height: 1.4; }
+        
+        /* Botão de Publicar */
+        .btn-pub { background: var(--blue); color: white; border-radius: 8px; font-weight: 800; font-size: 12px; text-transform: uppercase; padding: 12px; width: 100%; }
     </style>
 </head>
 <body>
 
-    <header class="fixed top-0 w-full h-[55px] bg-white border-b flex items-center justify-between px-5 z-50">
-        <span style="font-weight: 900; color: var(--blue); letter-spacing: -1px; font-size: 20px;">APEX</span>
-        <div id="u-saldo" style="color: #34A853; font-weight: 800;">0.0000€</div>
+    <header>
+        <div style="font-weight: 900; color: var(--blue); font-size: 18px;">APEX SOCIAL</div>
+        <div id="u-saldo" style="color: #28a745; font-weight: 900;">0.0000€</div>
     </header>
 
     <main class="max-w-md mx-auto">
-        <div class="card p-4 shadow-sm">
-            <textarea id="in-txt" placeholder="O que está a pensar?" class="w-full border-none focus:ring-0 text-sm font-medium mb-2" rows="2"></textarea>
+        <div class="post-card p-4">
+            <textarea id="in-txt" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
+            <div id="status" class="hidden text-[10px] font-black text-blue-500 mb-2 uppercase text-center">✅ Foto Pronta</div>
             
-            <div id="status" class="hidden text-[10px] font-bold text-blue-500 mb-2 uppercase">Imagem processada com sucesso</div>
-            
-            <div class="flex items-center gap-2">
-                <label for="in-file" class="bg-gray-100 p-3 rounded-lg cursor-pointer text-[11px] font-bold uppercase text-gray-600">📸 Foto</label>
+            <div class="flex gap-2">
+                <label for="in-file" class="bg-gray-100 p-3 rounded-lg cursor-pointer text-[10px] font-black uppercase text-gray-500 flex items-center justify-center px-4">📸 FOTO</label>
                 <input type="file" id="in-file" accept="image/*" class="hidden" onchange="processarFoto()">
-                
-                <button onclick="publicar()" id="btn-pub" class="flex-1 btn-main py-3 text-[11px] uppercase">Publicar</button>
+                <button onclick="publicar()" id="btn-pub" class="btn-pub">Publicar Agora</button>
             </div>
         </div>
 
@@ -77,13 +72,13 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const maxW = 800; // Melhor qualidade para evitar pixelização
+                    const maxW = 600; 
                     const scale = maxW / img.width;
                     canvas.width = maxW;
                     canvas.height = img.height * scale;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    fotoData = canvas.toDataURL('image/jpeg', 0.7);
+                    fotoData = canvas.toDataURL('image/jpeg', 0.6);
                 };
                 img.src = e.target.result;
             };
@@ -94,12 +89,11 @@
             const txt = document.getElementById('in-txt').value;
             if(!txt) return;
             const btn = document.getElementById('btn-pub');
-            btn.disabled = true;
-            btn.innerText = "A ENVIAR...";
+            btn.disabled = true; btn.innerText = "A ENVIAR...";
 
             const { error } = await _sb.from('posts').insert([{ user_id: MASTER_ID, content: txt, image_url: fotoData }]);
             if(!error) window.location.reload();
-            else { btn.disabled = false; btn.innerText = "ERRO"; }
+            else { btn.disabled = false; btn.innerText = "TENTAR NOVAMENTE"; }
         }
 
         async function carregarFeed() {
@@ -108,27 +102,27 @@
             feed.innerHTML = "";
 
             posts?.forEach(p => {
-                if(!p.content && !p.image_url) return; // Limpa posts fantasmas
+                if(!p.content && !p.image_url) return;
 
-                const div = document.createElement('div');
-                div.className = "card shadow-sm";
+                const card = document.createElement('div');
+                card.className = "post-card";
                 
                 const imgHtml = p.image_url ? `
-                    <div class="feed-img-box">
-                        <img src="${p.image_url}" class="feed-img">
+                    <div class="img-box">
+                        <img src="${p.image_url}">
                     </div>` : "";
 
-                div.innerHTML = `
+                card.innerHTML = `
                     ${imgHtml}
-                    <div class="post-content">
+                    <div class="post-body">
                         <p class="post-text">${p.content}</p>
                     </div>
                 `;
-                feed.appendChild(div);
+                feed.appendChild(card);
             });
         }
 
-        window.onload = init;
+        init();
     </script>
 </body>
 </html>
