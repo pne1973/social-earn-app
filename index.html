@@ -3,258 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Social v32</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>Apex Social v32 - Produção</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --google-blue: #1a73e8;
-            --google-gray: #5f6368;
-            --google-light: #f8f9fa;
-            --google-border: #dadce0;
-            --success-green: #1e8e3e;
+            --google-bg: #f8f9fa;
+            --text-dark: #202124;
+            --text-gray: #70757a;
+            --border: #dadce0;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: var(--google-light);
+            background-color: var(--google-bg);
             margin: 0;
-            color: #202124;
+            padding: 0;
+            color: var(--text-dark);
             display: flex;
             flex-direction: column;
             height: 100vh;
         }
 
-        /* Header Estilo Google */
+        /* Header Consertado */
         header {
-            background: white;
-            padding: 12px 16px;
+            background: #fff;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--google-border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 1px 2px rgba(60,64,67,0.1);
         }
 
-        .logo-container {
+        .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            background: var(--google-blue);
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .balance {
-            color: var(--success-green);
-            font-weight: 500;
+            gap: 10px;
+            color: var(--google-blue);
+            font-weight: 700;
             font-size: 1.1rem;
         }
 
-        /* Feed e Cards */
-        .feed {
+        .balance {
+            color: #1e8e3e;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Feed e Cards Restaurados */
+        .container {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
-            max-width: 600px;
+            padding: 20px;
+            max-width: 500px;
             margin: 0 auto;
             width: 100%;
+            box-sizing: border-box;
         }
 
         .post-card {
-            background: white;
-            border: 1px solid var(--google-border);
-            border-radius: 8px;
-            margin-bottom: 16px;
-            padding: 16px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        .post-header {
+        .post-meta {
             display: flex;
             justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--google-gray);
-            margin-bottom: 12px;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            margin-bottom: 15px;
         }
 
-        .post-content {
-            font-size: 1rem;
-            margin-bottom: 16px;
+        .post-text {
+            font-size: 1.1rem;
             font-weight: 500;
+            margin-bottom: 20px;
+            line-height: 1.4;
         }
 
-        /* Ações */
-        .post-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            border-top: 1px solid var(--google-border);
-            padding-top: 12px;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            color: var(--google-gray);
+        /* Área de Ações Simétrica */
+        .actions {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
+            justify-content: space-around;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .action-item {
+            text-align: center;
             cursor: pointer;
+            color: var(--text-gray);
             font-size: 0.75rem;
-            text-transform: uppercase;
+            font-weight: 500;
+            transition: color 0.2s;
         }
 
-        /* Seção de Comentários Corrigida */
-        .comment-section {
-            background: #f1f3f4;
+        .action-item:hover { color: var(--google-blue); }
+
+        .icon {
+            font-size: 1.4rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Seção de Comentários Organizada */
+        .comment-box {
+            background: #f8f9fa;
             border-radius: 8px;
-            padding: 12px;
-            margin-top: 12px;
+            padding: 15px;
+            margin-top: 10px;
         }
 
-        .status-text {
-            font-size: 0.7rem;
+        .processing-label {
             color: var(--google-blue);
-            font-weight: bold;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .comment-list {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 12px 0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: block;
         }
 
         .comment-item {
-            font-size: 0.9rem;
-            padding: 4px 0;
-            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.95rem;
+            padding: 8px 0;
+            border-bottom: 1px solid #e8eaed;
         }
 
-        .comment-input-group {
+        .input-group {
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            margin-top: 15px;
         }
 
-        input[type="text"] {
+        input {
             flex: 1;
-            border: 1px solid var(--google-border);
-            border-radius: 4px;
-            padding: 8px 12px;
+            padding: 10px 15px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
             outline: none;
+            font-size: 0.9rem;
         }
 
-        .send-btn {
+        button {
             background: var(--google-blue);
             color: white;
             border: none;
-            border-radius: 4px;
-            padding: 0 16px;
+            padding: 0 20px;
+            border-radius: 20px;
             font-weight: 500;
             cursor: pointer;
         }
 
-        /* Bottom Nav */
+        /* Footer Nav Clean */
         nav {
             background: white;
-            border-top: 1px solid var(--google-border);
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            padding: 8px 0;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
         }
 
-        .nav-item {
-            text-align: center;
-            font-size: 0.75rem;
-            color: var(--google-gray);
+        .nav-link {
             text-decoration: none;
-            font-weight: 500;
+            color: var(--text-gray);
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
         }
 
-        .nav-item.active {
-            color: var(--google-blue);
-        }
+        .nav-link.active { color: var(--google-blue); }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-container">
-        <div class="logo-icon">A</div>
-        <span style="font-weight: 500; color: var(--google-blue);">APEX SOCIAL</span>
+    <div class="logo">
+        <span style="background:var(--google-blue); color:white; padding:4px 8px; border-radius:4px;">A</span>
+        APEX SOCIAL
     </div>
-    <div class="balance" id="userBalance">0.0000€</div>
+    <div class="balance">0.0000€</div>
 </header>
 
-<div class="feed" id="mainFeed">
+<div class="container">
     <div class="post-card">
-        <div class="post-header">
+        <div class="post-meta">
             <span>ID: #79</span>
             <span>Utilizador #1400</span>
         </div>
-        <div class="post-content">TYHHHHH</div>
-        <div class="post-actions">
-            <button class="action-btn">👍<br>Gostar</button>
-            <button class="action-btn">💬<br>Comentar</button>
-            <button class="action-btn">🔗<br>Partilhar</button>
-        </div>
+        <div class="post-text">TYHHHHH</div>
         
-        <div class="comment-section">
-            <div class="status-text" id="status-79">Processing...</div>
-            <ul class="comment-list" id="list-79">
-                <li class="comment-item">Ttgggyy</li>
-            </ul>
-            <div class="comment-input-group">
+        <div class="actions">
+            <div class="action-item"><span class="icon">👍</span>GOSTAR</div>
+            <div class="action-item"><span class="icon">💬</span>COMENTAR</div>
+            <div class="action-item"><span class="icon">🔗</span>PARTILHAR</div>
+        </div>
+
+        <div class="comment-box">
+            <span class="processing-label">PROCESSING...</span>
+            <div id="comments-79">
+                <div class="comment-item">Ttgggyy</div>
+            </div>
+            <div class="input-group">
                 <input type="text" placeholder="A tua mensagem..." id="input-79">
-                <button class="send-btn" onclick="addComment(79)">OK</button>
+                <button onclick="sendComment(79)">OK</button>
             </div>
         </div>
     </div>
 </div>
 
 <nav>
-    <a href="#" class="nav-item active">REDE</a>
-    <a href="#" class="nav-item">GANHOS</a>
-    <a href="#" class="nav-item">GESTÃO</a>
+    <a href="#" class="nav-link active">REDE</a>
+    <a href="#" class="nav-link">GANHOS</a>
+    <a href="#" class="nav-link">GESTÃO</a>
 </nav>
 
 <script>
-    // Lógica para manter 4 casas decimais e status Processing
-    function addComment(postId) {
-        const input = document.getElementById(`input-${postId}`);
-        const list = document.getElementById(`list-${postId}`);
-        const status = document.getElementById(`status-${postId}`);
-
-        if (input.value.trim() !== "") {
-            status.innerText = "Processing...";
-            
-            // Simulação de delay de rede
-            setTimeout(() => {
-                const li = document.createElement("li");
-                li.className = "comment-item";
-                li.innerText = input.value;
-                list.appendChild(li);
-                input.value = "";
-                status.innerText = ""; // Limpa após concluir
-                
-                // Atualização de saldo (Exemplo de Gamification +2)
-                // Nota: A lógica real de ganhos deve ser processada via backend
-            }, 800);
+    function sendComment(id) {
+        const input = document.getElementById(`input-${id}`);
+        const list = document.getElementById(`comments-${id}`);
+        if(input.value.trim() !== "") {
+            const div = document.createElement('div');
+            div.className = 'comment-item';
+            div.innerText = input.value;
+            list.appendChild(div);
+            input.value = "";
         }
     }
-
-    // Configuração de Performance: Image Compression < 500KB deve ser tratada no upload
 </script>
 
 </body>
