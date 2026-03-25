@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v34.700 - Absolute Injection</title>
+    <title>Apex Social v34.800 - Definitive</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
@@ -20,9 +20,9 @@
 
         .comment-section { display: none; background: #f8f9fa; border-top: 2px solid #eee; padding: 15px; }
         .comment-section.active { display: block; }
-        .comment-list { max-height: 250px; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .comment-list { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
         
-        .comment-bubble { background: white; padding: 10px 14px; border-radius: 14px; border: 1px solid #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .comment-bubble { background: white; padding: 10px 14px; border-radius: 14px; border: 1px solid #e0e0e0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .interaction-badge { position: absolute; top: -5px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: 900; border: 2px solid white; }
         
         #feed-container { margin-top: 150px; }
@@ -35,7 +35,7 @@
         <div class="flex items-center gap-2">
             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg">A</div>
             <div>
-                <h1 class="text-sm font-black uppercase text-blue-600 tracking-tighter">Apex Social</h1>
+                <h1 class="text-sm font-black uppercase text-blue-600">Apex Social</h1>
                 <span id="multiplier-tag" class="text-[8px] font-black text-green-500 uppercase italic">STATUS: 100% OK</span>
             </div>
         </div>
@@ -52,7 +52,7 @@
                     <textarea id="post-input" onclick="this.rows=3; document.getElementById('expanded-post').classList.remove('hidden')" placeholder="PARTILHE ALGO... (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none uppercase font-black" rows="1"></textarea>
                     <div id="expanded-post" class="hidden">
                         <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-100 border-none text-[10px] p-3 rounded-xl mb-4 outline-none uppercase font-black">
-                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase shadow-lg">Publicar Agora</button>
+                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase">Publicar</button>
                     </div>
                 </div>
             </div>
@@ -78,7 +78,7 @@
         const MASTER_ID = "5401881400";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
-        let user = { saldo: 0, interactions: 0, multiplier: 1.0 };
+        let user = { saldo: 0, interactions: 0 };
         let lastScroll = 0;
 
         window.addEventListener('scroll', () => {
@@ -108,7 +108,7 @@
             if(!posts) return;
 
             container.innerHTML = "";
-            posts.forEach(async (p) => {
+            for (const p of posts) {
                 const { count: cCount } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
                 const card = document.createElement('div');
                 card.className = "google-card p-6 relative";
@@ -118,36 +118,32 @@
                         <span class="text-[10px] font-black text-gray-400 uppercase italic">ID..${String(p.user_id).slice(-4)}</span>
                     </div>
                     <p class="text-[13px] font-black uppercase text-gray-800 mb-3">${p.content}</p>
-                    ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 border">` : ''}
+                    ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 border shadow-sm">` : ''}
                     <div class="flex justify-between border-t-2 pt-4 relative">
-                        <button onclick="reagir(this, 0.0006)" class="flex-1 flex flex-col items-center relative">
-                            <div class="interaction-badge">${Math.floor(Math.random()*15)}</div>
-                            <span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-500 uppercase">GOSTAR</span>
-                        </button>
-                        <button onclick="toggleComments('${p.id}')" class="flex-1 flex flex-col items-center relative border-x-2 border-gray-100">
+                        <button onclick="reagir(this, 0.0006)" class="flex-1 flex flex-col items-center relative"><span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-500 uppercase">GOSTAR</span></button>
+                        <button onclick="toggleComments('${p.id}', this)" class="flex-1 flex flex-col items-center relative border-x-2 border-gray-100">
                             <div id="badge-c-${p.id}" class="interaction-badge">${cCount || 0}</div>
                             <span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-500 uppercase">COMENTAR</span>
                         </button>
-                        <button onclick="reagir(this, 0.0002)" class="flex-1 flex flex-col items-center relative">
-                            <div class="interaction-badge">0</div>
-                            <span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-500 uppercase">PARTILHAR</span>
-                        </button>
+                        <button onclick="reagir(this, 0.0002)" class="flex-1 flex flex-col items-center relative"><span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-500 uppercase">PARTILHAR</span></button>
                     </div>
                     <div id="section-${p.id}" class="comment-section">
-                        <div id="list-${p.id}" class="comment-list"></div>
+                        <div class="comment-list"></div>
                         <div class="flex gap-2">
-                            <input id="input-${p.id}" type="text" placeholder="ESCREVER..." class="flex-1 text-[11px] p-3 border-2 rounded-xl outline-none font-black uppercase">
-                            <button onclick="addComment('${p.id}')" class="bg-blue-600 text-white px-5 rounded-xl text-[10px] font-black uppercase">OK</button>
+                            <input type="text" placeholder="ESCREVER..." class="flex-1 text-[11px] p-3 border-2 rounded-xl outline-none font-black uppercase">
+                            <button onclick="addComment('${p.id}', this)" class="bg-blue-600 text-white px-5 rounded-xl text-[10px] font-black uppercase">OK</button>
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
-            });
+            }
         }
 
-        async function toggleComments(postId) {
-            const section = document.getElementById(`section-${postId}`);
-            const list = document.getElementById(`list-${postId}`);
+        async function toggleComments(postId, btn) {
+            const card = btn.closest('.google-card');
+            const section = card.querySelector('.comment-section');
+            const list = card.querySelector('.comment-list');
+            
             if(section.classList.contains('active')) {
                 section.classList.remove('active');
             } else {
@@ -158,39 +154,35 @@
                         <p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p>
                         <p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p>
                     </div>
-                `).join('') || '<p id="empty-'+postId+'" class="text-[9px] text-gray-400 text-center uppercase py-4">Sem comentários ainda.</p>';
-                setTimeout(() => { list.scrollTop = list.scrollHeight; }, 50);
+                `).join('') || '<p class="empty-msg text-[9px] text-gray-400 text-center uppercase py-4">Sem comentários.</p>';
+                list.scrollTop = list.scrollHeight;
             }
         }
 
-        async function addComment(postId) {
-            const input = document.getElementById(`input-${postId}`);
-            const list = document.getElementById(`list-${postId}`);
+        async function addComment(postId, btn) {
+            const card = btn.closest('.google-card');
+            const input = card.querySelector('input');
+            const list = card.querySelector('.comment-list');
             const content = input.value.trim();
             if(!content) return;
             
-            const { data, error } = await sb.from('comentarios').insert([{ post_id: postId, user_id: MASTER_ID, content: content }]).select();
+            const { error } = await sb.from('comentarios').insert([{ post_id: postId, user_id: MASTER_ID, content: content }]);
             
             if(!error) {
-                // Remover mensagem de vazio se existir
-                const emptyMsg = document.getElementById(`empty-${postId}`);
-                if(emptyMsg) emptyMsg.remove();
+                const empty = list.querySelector('.empty-msg');
+                if(empty) empty.remove();
 
-                // INJEÇÃO REAL NO FINAL DA LISTA
-                const newBubble = document.createElement('div');
-                newBubble.className = "comment-bubble";
-                newBubble.innerHTML = `<p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(MASTER_ID).slice(-4)}</p><p class="text-[11px] font-black uppercase text-gray-800">${content}</p>`;
-                list.appendChild(newBubble);
+                const div = document.createElement('div');
+                div.className = "comment-bubble";
+                div.innerHTML = `<p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(MASTER_ID).slice(-4)}</p><p class="text-[11px] font-black uppercase text-gray-800">${content}</p>`;
+                list.appendChild(div);
                 
-                // Limpar e Atualizar
                 input.value = "";
-                const badge = document.getElementById(`badge-c-${postId}`);
+                const badge = card.querySelector('.interaction-badge');
                 badge.innerText = parseInt(badge.innerText) + 1;
                 
-                // Scroll Forçado
-                setTimeout(() => { list.scrollTop = list.scrollHeight; }, 100);
+                setTimeout(() => { list.scrollTop = list.scrollHeight; }, 50);
                 
-                // Ganho de interação
                 user.saldo += 0.0010;
                 updateUI();
                 await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
@@ -207,8 +199,8 @@
             const t = document.getElementById('post-input').value;
             const i = document.getElementById('post-url').value;
             if(!t) return;
-            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: t, image_url: i }]);
-            if(!error) location.reload();
+            await sb.from('posts').insert([{ user_id: MASTER_ID, content: t, image_url: i }]);
+            location.reload();
         }
 
         function nav(t) {
