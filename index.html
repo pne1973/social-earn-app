@@ -1,228 +1,193 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Social v32 - Produção</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Apex Social v35.100 - Produção</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --google-blue: #1a73e8;
-            --google-bg: #f8f9fa;
-            --text-dark: #202124;
-            --text-gray: #70757a;
-            --border: #dadce0;
-            --success: #1e8e3e;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--google-bg);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            color: var(--text-dark);
-        }
-
-        header {
-            background: #fff;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            color: var(--google-blue);
-        }
-
-        .balance {
-            color: var(--success);
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-
-        .container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            max-width: 500px;
-            margin: 0 auto;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .post-card {
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .post-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            color: var(--text-gray);
-            margin-bottom: 15px;
-        }
-
-        .post-content {
-            font-size: 1.1rem;
-            font-weight: 500;
-            line-height: 1.4;
-            margin-bottom: 20px;
-        }
-
-        .actions {
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-
-        .action-item {
-            text-align: center;
-            color: var(--text-gray);
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .icon-large {
-            display: block;
-            font-size: 1.4rem;
-            margin-bottom: 5px;
-        }
-
-        .comment-section {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-
-        .status {
-            color: var(--google-blue);
-            font-size: 0.7rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            outline: none;
-        }
-
-        button {
-            background: var(--google-blue);
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 20px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        nav {
-            background: white;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0;
-            position: sticky;
-            bottom: 0;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-gray);
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-
-        .nav-link.active {
-            color: var(--google-blue);
-        }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; -webkit-tap-highlight-color: transparent; }
+        .card { background: white; border: 1px solid #dadce0; border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .comment-box { display: none; background: #f8f9fa; border-top: 1px solid #eee; padding: 15px; }
+        .comment-box.active { display: block; }
+        .badge { position: absolute; top: -5px; right: 12%; background: #ef4444; color: white; font-size: 10px; padding: 2px 7px; border-radius: 99px; border: 2px solid white; font-weight: 700; }
+        #feed-margin { margin-top: 150px; }
+        .sticky-header { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 10px 16px; }
     </style>
 </head>
-<body>
+<body class="pb-24">
 
-<header>
-    <div class="logo">
-        <span style="background:var(--google-blue); color:white; padding:4px 8px; border-radius:4px;">A</span>
-        APEX SOCIAL
-    </div>
-    <div class="balance">0.0000€</div>
-</header>
-
-<div class="container">
-    <div class="post-card">
-        <div class="post-meta">
-            <span>ID: #79</span>
-            <span>Utilizador #1400</span>
+    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-50 p-4 flex justify-between items-center h-[72px]">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">A</div>
+            <span class="text-blue-600 font-bold text-sm tracking-tight">APEX SOCIAL</span>
         </div>
-        <div class="post-content">TYHHHHH</div>
+        <div id="saldo-top" class="text-green-600 font-bold text-lg">0.0000€</div>
+    </header>
+
+    <main class="max-w-lg mx-auto p-4">
+        <section id="rede" class="tab-content active">
+            <div class="sticky-header">
+                <div class="card p-4 border-t-4 border-blue-600 shadow-sm">
+                    <textarea id="post-txt" onclick="this.rows=3; document.getElementById('post-btn').classList.remove('hidden')" 
+                        placeholder="O QUE ESTÁS A PENSAR? (+0.0150€)" 
+                        class="w-full border-none focus:ring-0 text-sm mb-2 resize-none font-medium" rows="1"></textarea>
+                    <button id="post-btn" onclick="novoPost()" class="hidden w-full bg-blue-600 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider">Publicar Agora</button>
+                </div>
+            </div>
+            <div id="feed-margin">
+                <div id="feed"></div>
+            </div>
+        </section>
+
+        <section id="ganhos" class="tab-content">
+            <div class="card p-12 text-center border-t-[10px] border-blue-600 mt-4 shadow-md">
+                <h1 id="saldo-wall" class="text-5xl font-bold text-blue-600">0.0000€</h1>
+                <p class="text-gray-500 mt-4 text-xs font-bold">SALDO DISPONÍVEL (EUR)</p>
+            </div>
+        </section>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-50">
+        <button onclick="mudarTab('rede')" class="flex-1 text-[11px] font-bold text-blue-600">REDE</button>
+        <button onclick="mudarTab('ganhos')" class="flex-1 text-[11px] font-bold text-gray-400">GANHOS</button>
+    </nav>
+
+    <script>
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const MASTER_ID = "5401881400";
+        const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
-        <div class="actions">
-            <div class="action-item"><span class="icon-large">👍</span>GOSTAR</div>
-            <div class="action-item"><span class="icon-large">💬</span>COMENTAR</div>
-            <div class="action-item"><span class="icon-large">🔗</span>PARTILHAR</div>
-        </div>
+        let saldoAtual = 0;
 
-        <div class="comment-section">
-            <div class="status">Processing...</div>
-            <div id="comments-79">
-                <div style="padding: 5px 0; font-size: 0.95rem;">Ttgggyy</div>
-            </div>
-            <div class="input-group">
-                <input type="text" placeholder="Escreve um comentário..." id="in-79">
-                <button onclick="addComment(79)">OK</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<nav>
-    <a href="#" class="nav-link active">REDE</a>
-    <a href="#" class="nav-link">GANHOS</a>
-    <a href="#" class="nav-link">GESTÃO</a>
-</nav>
-
-<script>
-    function addComment(id) {
-        const input = document.getElementById(`in-${id}`);
-        const box = document.getElementById(`comments-${id}`);
-        if(input.value.trim() !== "") {
-            const div = document.createElement('div');
-            div.style.padding = "5px 0";
-            div.style.fontSize = "0.95rem";
-            div.innerText = input.value;
-            box.appendChild(div);
-            input.value = "";
+        async function iniciar() {
+            const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if(data) saldoAtual = Number(data.saldo);
+            atualizarValores();
+            carregarFeed();
         }
-    }
-</script>
 
+        function atualizarValores() {
+            const display = saldoAtual.toFixed(4) + "€";
+            document.getElementById('saldo-top').innerText = display;
+            document.getElementById('saldo-wall').innerText = display;
+        }
+
+        async function carregarFeed() {
+            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            const feed = document.getElementById('feed');
+            feed.innerHTML = "";
+
+            for (const p of posts) {
+                const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
+                
+                const cardPost = document.createElement('div');
+                cardPost.className = "card p-6 shadow-sm";
+                cardPost.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="text-[10px] text-gray-500 font-bold uppercase">ID..${String(p.user_id).slice(-4)}</div>
+                        <div class="text-[10px] text-gray-400 font-medium">${new Date(p.created_at).toLocaleDateString()}</div>
+                    </div>
+                    <div class="text-sm text-gray-800 mb-6 leading-relaxed font-medium">${p.content}</div>
+                    
+                    <div class="flex justify-between border-t pt-4 relative">
+                        <button onclick="ganhar(0.0005)" class="flex-1 text-center group">
+                            <span class="text-xl">👍</span>
+                            <div class="text-[9px] font-bold text-gray-500 group-active:text-blue-600">GOSTAR</div>
+                        </button>
+                        <button onclick="abrirCmt('${p.id}')" class="flex-1 text-center relative border-x group">
+                            <div id="count-${p.id}" class="badge">${count || 0}</div>
+                            <span class="text-xl">💬</span>
+                            <div class="text-[9px] font-bold text-gray-500 group-active:text-blue-600">COMENTAR</div>
+                        </button>
+                        <button onclick="ganhar(0.0005)" class="flex-1 text-center group">
+                            <span class="text-xl">🔗</span>
+                            <div class="text-[9px] font-bold text-gray-500 group-active:text-blue-600">PARTILHAR</div>
+                        </button>
+                    </div>
+
+                    <div id="box-${p.id}" class="comment-box">
+                        <div id="status-${p.id}" class="text-[9px] text-blue-600 font-bold mb-2 hidden">PROCESSING...</div>
+                        <div id="lista-${p.id}" class="space-y-3 mb-4 max-h-48 overflow-y-auto text-[11px]"></div>
+                        <div class="flex gap-2">
+                            <input id="input-${p.id}" type="text" placeholder="Escreve uma mensagem..." class="flex-1 p-3 bg-white border rounded-xl outline-none text-xs font-medium focus:border-blue-400">
+                            <button onclick="enviarCmt('${p.id}')" class="bg-blue-600 text-white px-5 rounded-xl text-xs font-bold shadow-md active:scale-95">OK</button>
+                        </div>
+                    </div>
+                `;
+                feed.appendChild(cardPost);
+            }
+        }
+
+        async function abrirCmt(id) {
+            const box = document.getElementById(`box-${id}`);
+            const lista = document.getElementById(`lista-${id}`);
+            const status = document.getElementById(`status-${id}`);
+            box.classList.toggle('active');
+            
+            if(box.classList.contains('active')) {
+                status.classList.remove('hidden');
+                const { data } = await sb.from('comentarios').select('*').eq('post_id', id).order('created_at', {ascending: true});
+                status.classList.add('hidden');
+                lista.innerHTML = data.map(c => `
+                    <div class="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                        <span class="text-blue-600 font-bold">#${String(c.user_id).slice(-4)}:</span> 
+                        <span class="text-gray-700 font-medium">${c.content}</span>
+                    </div>
+                `).join('') || "<div class='text-center text-gray-400 py-2 font-bold'>SEM COMENTÁRIOS</div>";
+            }
+        }
+
+        async function enviarCmt(id) {
+            const campo = document.getElementById(`input-${id}`);
+            const lista = document.getElementById(`lista-${id}`);
+            const texto = campo.value.trim();
+            if(!texto) return;
+
+            const div = document.createElement('div');
+            div.className = "bg-blue-50 p-3 rounded-lg border border-blue-100 shadow-sm";
+            div.innerHTML = `<span class="text-blue-700 font-bold">TU:</span> <span class="text-blue-900 font-medium">${texto}</span>`;
+            if(lista.innerText.includes("SEM COMENTÁRIOS")) lista.innerHTML = "";
+            lista.appendChild(div);
+            campo.value = ""; 
+
+            const { error } = await sb.from('comentarios').insert([{ post_id: id, user_id: MASTER_ID, content: texto }]);
+            if(!error) {
+                const b = document.getElementById(`count-${id}`);
+                b.innerText = parseInt(b.innerText) + 1;
+                ganhar(0.0010);
+            }
+        }
+
+        async function ganhar(v) {
+            saldoAtual += v;
+            atualizarValores();
+            await sb.from('perfis').update({ saldo: saldoAtual }).eq('id', MASTER_ID);
+        }
+
+        async function novoPost() {
+            const t = document.getElementById('post-txt').value;
+            if(!t) return;
+            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: t }]);
+            if(!error) {
+                ganhar(0.0150);
+                location.reload();
+            }
+        }
+
+        function mudarTab(t) {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+            document.getElementById(t).classList.add('active');
+            document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-blue-600', 'text-gray-400'));
+            event.target.classList.replace('text-gray-400', 'text-blue-600');
+        }
+
+        window.onload = iniciar;
+    </script>
 </body>
 </html>
