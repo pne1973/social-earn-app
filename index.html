@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v35 - Final Production</title>
+    <title>Apex Social v34.500 - Logic Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
@@ -15,8 +15,8 @@
         .tab-content.active { display: block; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); font-weight: 900; }
         
-        /* FIXED HEADER & PUBLISHER SPACE */
-        .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 12px 16px; transition: transform 0.3s; }
+        /* SMART STICKY PUBLISHER */
+        .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 12px 16px; transition: transform 0.3s ease-in-out; }
         .publisher-hidden { transform: translateY(-135%); }
 
         #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
@@ -26,11 +26,12 @@
         .comment-section { display: none; background: #f8f9fa; border-top: 2px solid #eee; }
         .comment-section.active { display: block; }
         
-        .interaction-badge { position: absolute; top: -4px; right: 12%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; font-weight: 900; border: 2px solid white; pointer-events: none; }
-        #feed-container { margin-top: 155px; }
+        /* BADGES DE CONTABILIZAÇÃO */
+        .interaction-badge { position: absolute; top: -4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; font-weight: 900; border: 2px solid white; pointer-events: none; }
+        input, textarea, button { font-weight: 900 !important; }
         
-        /* LOADING STATE */
-        .proc-label { color: var(--g-blue); font-size: 9px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .ad-card { border: 2px solid var(--g-blue); background: #f0f7ff; }
+        #feed-container { margin-top: 140px; }
     </style>
 </head>
 <body class="pb-24">
@@ -38,24 +39,24 @@
     <div id="ad-overlay">
         <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl border-4 border-blue-600">
             <div id="ad-decision-ui" class="p-8 text-center">
-                <h3 class="text-xl font-black uppercase text-blue-600 mb-2">Sincronização Necessária</h3>
-                <p class="text-[10px] font-black uppercase mb-6 text-gray-400">Valide a sua sessão para manter 100% dos ganhos.</p>
-                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl shadow-xl uppercase text-xs mb-3 font-black">Ver Anúncio (Full Pay)</button>
-                <button onclick="degradeAndContinue()" class="w-full p-4 bg-white border-2 text-gray-400 rounded-2xl uppercase text-[10px] font-black">Continuar com -20%</button>
+                <h3 class="text-xl font-black uppercase text-blue-600 mb-4">Rede em Carga</h3>
+                <p class="text-[10px] font-black uppercase mb-6">Sincronize para validar os seus ganhos pendentes.</p>
+                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl shadow-xl uppercase text-xs mb-3">Ver Anúncio (100% Ganhos)</button>
+                <button onclick="degradeAndContinue()" class="w-full p-4 bg-white border-2 text-gray-400 rounded-2xl uppercase text-[10px]">Continuar com -20%</button>
             </div>
             <div id="ad-player-ui" class="hidden">
                 <div class="aspect-video bg-black relative flex items-center justify-center">
                     <img id="ad-img-fs" src="" class="absolute inset-0 w-full h-full object-cover opacity-60">
-                    <p id="ad-timer" class="relative text-white font-black uppercase text-xs tracking-widest">A validar em 5s...</p>
+                    <p id="ad-timer" class="relative text-white font-black uppercase text-xs tracking-widest">Validando em 5s...</p>
                 </div>
                 <div class="p-6">
-                    <button id="close-ad-btn" disabled class="w-full py-5 bg-gray-100 text-gray-400 rounded-xl uppercase text-xs font-black">Aguarde...</button>
+                    <button id="close-ad-btn" disabled class="w-full py-5 bg-gray-100 text-gray-400 rounded-xl uppercase text-xs">Aguarde...</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-50 px-4 flex justify-between items-center h-[72px]">
+    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-50 px-4 py-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg">A</div>
             <div>
@@ -73,10 +74,10 @@
         <section id="view-social" class="tab-content active">
             <div id="publisher-box" class="sticky-publisher">
                 <div class="google-card p-4 border-t-8 border-blue-600 shadow-xl">
-                    <textarea id="post-input" onclick="expandPublisher()" placeholder="PARTILHAR NOVIDADE? (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none uppercase font-black" rows="1"></textarea>
+                    <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none uppercase font-black" rows="1"></textarea>
                     <div id="expanded-post" class="hidden">
-                        <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full bg-gray-100 border-none text-[10px] p-3 rounded-xl mb-4 outline-none uppercase font-black">
-                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase shadow-lg">Publicar Agora</button>
+                        <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-100 border-none text-[10px] p-3 rounded-xl mb-4 outline-none uppercase font-black">
+                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase shadow-lg">Publicar na Rede</button>
                     </div>
                 </div>
             </div>
@@ -85,33 +86,33 @@
 
         <section id="view-info" class="tab-content">
             <div class="google-card p-12 text-center border-t-[10px] border-blue-600 mb-8 shadow-2xl mt-4">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Saldo em Carteira</p>
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">SALDO DISPONÍVEL</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
                 <p id="wall-brl" class="text-xs font-black text-gray-500 mt-2 uppercase italic">≈ 0.0000 BRL</p>
             </div>
             <button onclick="shareAffiliate()" class="w-full google-card p-6 flex justify-between items-center border-l-[8px] border-green-500 shadow-lg">
-                <div class="text-left font-black"><p class="text-sm uppercase">Convidar Amigos</p><p class="text-[9px] text-green-600 uppercase italic">Link de Afiliado Ativo</p></div>
+                <div class="text-left font-black"><p class="text-sm uppercase">CONVIDAR REDE</p><p class="text-[9px] text-green-600 uppercase">PARTILHE O SEU LINK</p></div>
                 <span class="text-3xl">👥</span>
             </button>
         </section>
 
         <section id="view-admin" class="tab-content">
             <div class="google-card border-t-[8px] border-red-600 p-6 mt-4 shadow-2xl">
-                <h2 class="text-red-600 font-black text-[10px] uppercase mb-6 tracking-widest">Painel de Controlo Master</h2>
+                <h2 class="text-red-600 font-black text-xs uppercase mb-6 underline">CONTROLO MASTER</h2>
                 <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-gray-50 p-4 border rounded-xl text-center"><p class="text-[8px] text-gray-400 font-black uppercase">Dívida Total</p><p id="adm-debt" class="font-black text-blue-700 text-lg">0.00€</p></div>
-                    <div class="bg-gray-50 p-4 border rounded-xl text-center"><p class="text-[8px] text-gray-400 font-black uppercase">Lucro Est.</p><p id="adm-profit" class="font-black text-green-700 text-lg">0.00€</p></div>
+                    <div class="bg-gray-50 p-4 border-2 rounded-xl text-center"><p class="text-[8px] text-gray-400 font-black uppercase">DÍVIDA</p><p id="adm-debt" class="font-black text-blue-700 text-lg">0.00€</p></div>
+                    <div class="bg-gray-50 p-4 border-2 rounded-xl text-center"><p class="text-[8px] text-gray-400 font-black uppercase">LUCRO</p><p id="adm-profit" class="font-black text-green-700 text-lg">0.00€</p></div>
                 </div>
-                <input id="del-id" type="text" placeholder="ID DO POST PARA ELIMINAR" class="w-full p-4 border rounded-xl mb-4 font-black uppercase text-[10px] outline-none focus:border-red-500">
-                <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg">Eliminar Post</button>
+                <input id="del-id" type="text" placeholder="ID DO POST" class="w-full p-4 border-2 rounded-xl mb-4 font-black uppercase text-[10px]">
+                <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase">Eliminar Post</button>
             </div>
         </section>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-50 shadow-2xl">
-        <button onclick="nav('social')" class="nav-item active flex-1 flex flex-col items-center py-2"><span class="text-[10px] font-black uppercase">Rede</span></button>
-        <button onclick="nav('info')" class="nav-item flex-1 flex flex-col items-center py-2 text-gray-400"><span class="text-[10px] font-black uppercase">Ganhos</span></button>
-        <button id="adm-btn" onclick="nav('admin')" class="hidden flex-1 flex flex-col items-center py-2 text-red-300"><span class="text-[10px] font-black uppercase italic">Master</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-50 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+        <button onclick="nav('social')" class="nav-item active flex-1 flex flex-col items-center py-2"><span class="text-[10px] font-black uppercase">REDE</span></button>
+        <button onclick="nav('info')" class="nav-item flex-1 flex flex-col items-center py-2 text-gray-400"><span class="text-[10px] font-black uppercase">GANHOS</span></button>
+        <button id="adm-btn" onclick="nav('admin')" class="hidden flex-1 flex flex-col items-center py-2 text-red-300"><span class="text-[10px] font-black uppercase italic">ADMIN</span></button>
     </nav>
 
     <script>
@@ -132,7 +133,7 @@
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
             const pub = document.getElementById('publisher-box');
-            if (currentScroll > lastScroll && currentScroll > 100) pub.classList.add('publisher-hidden');
+            if (currentScroll > lastScroll && currentScroll > 150) pub.classList.add('publisher-hidden');
             else pub.classList.remove('publisher-hidden');
             lastScroll = currentScroll;
         });
@@ -146,12 +147,9 @@
 
         function updateUI() {
             const e = Number(user.saldo) || 0;
-            const elements = ['main-eur', 'wall-eur'];
-            elements.forEach(id => document.getElementById(id).innerText = e.toFixed(4) + "€");
-            const brl = (e * 6.12).toFixed(4);
-            document.getElementById('main-brl').innerText = brl + " BRL";
-            document.getElementById('wall-brl').innerText = "≈ " + brl + " BRL";
-            
+            document.getElementById('main-eur').innerText = e.toFixed(4) + "€";
+            document.getElementById('wall-eur').innerText = e.toFixed(4) + "€";
+            document.getElementById('main-brl').innerText = (e * 6.12).toFixed(4) + " BRL";
             const pct = Math.round(user.multiplier * 100);
             const tag = document.getElementById('multiplier-tag');
             tag.innerText = `STATUS: ${pct}% OK`;
@@ -162,13 +160,162 @@
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const container = document.getElementById('feed-container');
             if(!posts) return;
-            container.innerHTML = "";
 
-            posts.forEach(async (p, index) => {
+            container.innerHTML = "";
+            let pCount = 0;
+            for(const p of posts) {
+                pCount++;
                 const { count: cCount } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
-                const lCount = Math.floor(Math.random() * 40) + 10;
+                // Simulação de Likes e Shares para os badges
+                const lCount = Math.floor(Math.random() * 50) + 5;
+                const sCount = Math.floor(Math.random() * 15);
+
                 const card = document.createElement('div');
-                card.className = "google-card p-6 relative shadow-sm";
+                card.className = "google-card p-6 relative";
                 card.innerHTML = `
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-
+                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-[10px] text-white italic font-black">U</div>
+                        <span class="text-[10px] font-black text-gray-400 uppercase italic">ID..${String(p.user_id).slice(-4)}</span>
+                    </div>
+                    <p class="text-[13px] font-black uppercase text-gray-800 mb-3">${p.content}</p>
+                    ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 shadow-sm border">` : ''}
+                    <div class="flex justify-between border-t-2 pt-4 relative">
+                        <button onclick="reagir(this, 0.0006)" class="flex-1 flex flex-col items-center relative">
+                            <div class="interaction-badge">${lCount}</div>
+                            <span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-500 uppercase">GOSTAR</span>
+                        </button>
+                        <button onclick="toggleComments('${p.id}')" class="flex-1 flex flex-col items-center relative border-x-2 border-gray-100">
+                            <div class="interaction-badge">${cCount}</div>
+                            <span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-500 uppercase">COMENTAR</span>
+                        </button>
+                        <button onclick="shareAffiliate(this)" class="flex-1 flex flex-col items-center relative">
+                            <div class="interaction-badge">${sCount}</div>
+                            <span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-500 uppercase">PARTILHAR</span>
+                        </button>
+                    </div>
+                    <div id="comments-${p.id}" class="comment-section p-5 rounded-b-xl">
+                        <div id="list-${p.id}" class="space-y-4 mb-5 max-h-48 overflow-y-auto"></div>
+                        <div class="flex gap-2">
+                            <input id="input-${p.id}" type="text" placeholder="DIGITE..." class="flex-1 text-[11px] p-3 bg-white border-2 rounded-xl outline-none font-black uppercase">
+                            <button onclick="addComment('${p.id}', this)" class="bg-blue-600 text-white px-5 rounded-xl text-[10px] font-black uppercase">OK</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                if(pCount % 3 === 0) {
+                    const adCard = document.createElement('div');
+                    adCard.className = "google-card p-6 ad-card shadow-lg";
+                    adCard.innerHTML = `<span class="ad-tag font-black uppercase bg-blue-600 text-white p-1 rounded text-[8px] mb-2 inline-block">Patrocinado</span>
+                        <h4 class="text-[14px] font-black uppercase mb-3 text-blue-700">OFERTA APEX NETWORK</h4>
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600" class="w-full h-40 object-cover rounded-xl mb-4">
+                        <button onclick="startAdFlow()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md">Saber Mais</button>`;
+                    container.appendChild(adCard);
+                }
+            }
+        }
+
+        async function toggleComments(postId) {
+            const el = document.getElementById(`comments-${postId}`);
+            const list = document.getElementById(`list-${postId}`);
+            if(el.classList.contains('active')) el.classList.remove('active');
+            else {
+                el.classList.add('active');
+                const { data } = await sb.from('comentarios').select('*').eq('post_id', postId).order('created_at', {ascending: true});
+                list.innerHTML = data.map(c => `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p><p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p></div>`).join('') || '<p class="text-[9px] text-gray-400 text-center uppercase font-black py-4">Sem comentários.</p>';
+            }
+        }
+
+        async function addComment(postId, btn) {
+            const input = document.getElementById(`input-${postId}`);
+            const content = input.value;
+            if(!content) return;
+            const { error } = await sb.from('comentarios').insert([{ post_id: postId, user_id: MASTER_ID, content: content }]);
+            if(!error) {
+                input.value = "";
+                await reagir(btn, 0.0010);
+                const list = document.getElementById(`list-${postId}`);
+                const { data } = await sb.from('comentarios').select('*').eq('post_id', postId).order('created_at', {ascending: true});
+                list.innerHTML = data.map(c => `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p><p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p></div>`).join('');
+                list.scrollTop = list.scrollHeight; // SCROLL PARA BAIXO
+            }
+        }
+
+        async function reagir(btn, val) {
+            if(user.interactions >= 1) { pendingBonus = val; document.getElementById('ad-overlay').style.display = 'flex'; }
+            else {
+                user.interactions++;
+                const v = Number(val) * user.multiplier; user.saldo += v;
+                const pop = document.createElement('span'); pop.className = 'coin-pop'; pop.innerText = '+' + v.toFixed(4) + '€';
+                btn.appendChild(pop); setTimeout(() => pop.remove(), 600);
+                updateUI(); await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
+            }
+        }
+
+        function startAdFlow() {
+            document.getElementById('ad-decision-ui').classList.add('hidden');
+            document.getElementById('ad-player-ui').classList.remove('hidden');
+            document.getElementById('ad-img-fs').src = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600";
+            let c = 5;
+            const t = document.getElementById('ad-timer');
+            const b = document.getElementById('close-ad-btn');
+            const i = setInterval(() => {
+                c--; t.innerText = "VALIDANDO EM " + c + "S...";
+                if(c <= 0) { clearInterval(i); t.innerText = "VALIDADO!"; b.disabled = false; b.innerText = "RESTAURAR"; b.className = "w-full py-5 bg-green-600 text-white rounded-xl font-black uppercase text-xs shadow-xl"; b.onclick = () => { user.multiplier = 1.0; user.interactions = 0; finalize(); }; }
+            }, 1000);
+        }
+
+        function degradeAndContinue() { user.multiplier = Math.max(0.1, user.multiplier - 0.20); user.interactions++; finalize(); }
+
+        async function finalize() {
+            document.getElementById('ad-overlay').style.display = 'none';
+            document.getElementById('ad-decision-ui').classList.remove('hidden');
+            document.getElementById('ad-player-ui').classList.add('hidden');
+            const v = Number(pendingBonus) * user.multiplier; user.saldo += v;
+            updateUI(); await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID); loadFeed();
+        }
+
+        async function publish() {
+            const t = document.getElementById('post-input').value;
+            const i = document.getElementById('post-url').value;
+            if(!t) return;
+            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: t, image_url: i }]);
+            if(!error) {
+                user.saldo += 0.0150; updateUI(); await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
+                document.getElementById('post-input').value = ""; document.getElementById('post-url').value = "";
+                document.getElementById('expanded-post').classList.add('hidden'); document.getElementById('post-input').rows = 1;
+                loadFeed();
+            }
+        }
+
+        function shareAffiliate(btn) {
+            if(btn) reagir(btn, 0.0020);
+            const aff = window.location.href.split('?')[0] + "?ref=" + MASTER_ID;
+            navigator.clipboard.writeText(aff);
+            alert("LINK COPIADO: RECEBA 5% DE COMISSÃO.");
+        }
+
+        function nav(t) {
+            document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-'+t).classList.add('active');
+            document.querySelector(`[onclick="nav('${t}')"]`).classList.add('active');
+            if(t === 'admin') loadAdmin();
+        }
+
+        async function loadAdmin() {
+            const { data } = await sb.from('perfis').select('saldo');
+            let total = data.reduce((acc, u) => acc + Number(u.saldo), 0);
+            document.getElementById('adm-debt').innerText = total.toFixed(2) + "€";
+            document.getElementById('adm-profit').innerText = (total / 0.6 * 0.4).toFixed(2) + "€";
+        }
+
+        async function adminDelete() {
+            const id = document.getElementById('del-id').value;
+            await sb.from('posts').delete().eq('id', id); loadFeed();
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
+
