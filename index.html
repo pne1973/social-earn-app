@@ -3,34 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v37.2</title>
+    <title>Apex Social v37.3</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; padding-top: 60px; }
-        .post-card { background: white; border-radius: 15px; margin: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
-        .img-container { width: 100%; background: #f8f8f8; display: flex; align-items: center; justify-content: center; }
-        .img-container img { width: 100%; height: auto; display: block; }
+        body { font-family: sans-serif; background: #f0f2f5; padding-top: 60px; padding-bottom: 80px; }
+        .card { background: white; border-radius: 12px; border: 1px solid #ddd; margin: 10px; overflow: hidden; }
+        
+        /* Ajuste de tamanho da imagem no feed */
+        .post-img-container { 
+            width: 100%; 
+            max-height: 350px; /* Limita a altura para não ficar gigante */
+            overflow: hidden; 
+            background: #f8f8f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .post-img { width: 100%; height: auto; object-fit: cover; }
+        
+        .btn-blue { background: #4285F4; color: white; border-radius: 8px; font-weight: 900; font-size: 11px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <header class="fixed top-0 w-full h-[55px] bg-white border-b flex items-center justify-between px-4 z-50">
-        <div class="font-black text-blue-600 uppercase tracking-taller">APEX SOCIAL</div>
-        <div id="u-saldo" class="font-black text-green-600">0.0000€</div>
+        <div style="font-weight: 900; color: #4285F4; font-size: 18px;">APEX SOCIAL</div>
+        <div id="u-saldo" style="color: #34A853; font-weight: 900;">0.0000€</div>
     </header>
 
     <main class="max-w-md mx-auto">
-        <div class="post-card p-4 border-t-4 border-blue-500">
-            <textarea id="txt-input" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
+        <div class="card p-4" style="border-top: 4px solid #4285F4;">
+            <textarea id="in-txt" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
             
-            <div id="status-lab" class="hidden text-center text-[10px] font-black mb-2 text-blue-500 uppercase">A preparar foto...</div>
+            <div id="msg-status" class="hidden text-center text-[10px] font-black mb-2 text-blue-500 uppercase">A processar...</div>
             
             <div class="flex gap-2">
-                <label for="file-input" class="flex-1 bg-gray-100 p-3 rounded-xl text-center text-[10px] font-black cursor-pointer uppercase">📸 Foto</label>
-                <input type="file" id="file-input" accept="image/*" class="hidden" onchange="processarFoto()">
+                <label for="in-file" class="flex-1 bg-gray-100 p-3 rounded-lg text-center text-[10px] font-black cursor-pointer uppercase">📸 Foto</label>
+                <input type="file" id="in-file" accept="image/*" class="hidden" onchange="processarFoto()">
                 
-                <button onclick="enviarPublicacao()" id="btn-post" class="flex-[2] bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase shadow-lg shadow-blue-200">Publicar Agora</button>
+                <button onclick="publicar()" id="btn-pub" class="flex-[2] btn-blue p-3">Publicar</button>
             </div>
         </div>
 
@@ -40,22 +52,22 @@
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const _supabase = window.supabase.createClient(SB_URL, SB_KEY);
-        const USER_ID = "5401881400";
-        let stringImagem = "";
+        const _sb = window.supabase.createClient(SB_URL, SB_KEY);
+        const MASTER_ID = "5401881400";
+        let fotoBase64 = "";
 
         async function init() {
-            const { data } = await _supabase.from('perfis').select('saldo').eq('id', USER_ID).single();
+            const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
             if(data) document.getElementById('u-saldo').innerText = data.saldo.toFixed(4) + "€";
-            carregarPosts();
+            carregarFeed();
         }
 
         function processarFoto() {
-            const file = document.getElementById('file-input').files[0];
+            const file = document.getElementById('in-file').files[0];
             if (!file) return;
 
-            document.getElementById('status-lab').classList.remove('hidden');
-            document.getElementById('status-lab').innerText = "✅ Foto Processada";
+            document.getElementById('msg-status').classList.remove('hidden');
+            document.getElementById('msg-status').innerText = "✅ Foto pronta";
 
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -64,58 +76,61 @@
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     
-                    // Comprimir para 800px de largura mantendo proporção
-                    const larguraAlvo = 800;
-                    const escala = larguraAlvo / img.width;
-                    canvas.width = larguraAlvo;
-                    canvas.height = img.height * escala;
+                    // Comprime para 600px (mais pequeno para ecrãs de telemóvel)
+                    const maxW = 600;
+                    const scale = maxW / img.width;
+                    canvas.width = maxW;
+                    canvas.height = img.height * scale;
                     
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    // Converter para string de texto (JPEG 0.7 de qualidade)
-                    stringImagem = canvas.toDataURL('image/jpeg', 0.7);
+                    fotoBase64 = canvas.toDataURL('image/jpeg', 0.6); // Qualidade 0.6 para poupar espaço
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        async function enviarPublicacao() {
-            const texto = document.getElementById('txt-input').value;
-            const btn = document.getElementById('btn-post');
-            if(!texto) return;
+        async function publicar() {
+            const txt = document.getElementById('in-txt').value;
+            const btn = document.getElementById('btn-pub');
+            if(!txt) return;
 
             btn.disabled = true;
             btn.innerText = "A ENVIAR...";
 
-            // Enviamos a string da imagem diretamente para a coluna image_url
-            const { error } = await _supabase.from('posts').insert([{ 
-                user_id: USER_ID, 
-                content: texto, 
-                image_url: stringImagem 
-            }]);
+            const { error } = await _sb.from('posts').insert([
+                { user_id: MASTER_ID, content: txt, image_url: fotoBase64 }
+            ]);
 
-            if(!error) {
-                window.location.reload();
-            } else {
-                alert("Erro ao publicar. Verifique a sua ligação.");
-                btn.disabled = false;
-                btn.innerText = "Tentar Novamente";
-            }
+            if(!error) window.location.reload();
+            else { btn.disabled = false; btn.innerText = "ERRO"; }
         }
 
-        async function carregarPosts() {
-            const { data } = await _supabase.from('posts').select('*').order('created_at', {ascending: false});
-            const feed = document.getElementById('feed');
-            feed.innerHTML = data?.map(p => `
-                <div class="post-card">
-                    ${p.image_url ? `<div class="img-container"><img src="${p.image_url}"></div>` : ''}
-                    <div class="p-4 text-xs font-bold text-gray-700 uppercase leading-relaxed">${p.content}</div>
-                </div>
-            `).join('') || "";
+        async function carregarFeed() {
+            const { data: posts } = await _sb.from('posts').select('*').order('created_at', { ascending: false });
+            const container = document.getElementById('feed');
+            container.innerHTML = "";
+
+            posts?.forEach(p => {
+                const div = document.createElement('div');
+                div.className = "card";
+                
+                const imgHtml = p.image_url ? `
+                    <div class="post-img-container">
+                        <img src="${p.image_url}" class="post-img">
+                    </div>` : "";
+
+                div.innerHTML = `
+                    ${imgHtml}
+                    <div class="p-4">
+                        <p class="text-[12px] font-bold text-gray-800 uppercase leading-snug">${p.content}</p>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
         }
 
-        init();
+        window.onload = init;
     </script>
 </body>
 </html>
