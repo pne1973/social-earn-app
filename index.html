@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v145</title>
+    <title>Apex Social v150</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -20,7 +20,7 @@
     <header class="sticky top-0 bg-white border-b z-50 px-5 py-4 flex justify-between items-center shadow-sm">
         <div>
             <h1 class="text-xl font-black text-blue-600 italic tracking-tighter uppercase">Apex Social</h1>
-            <p class="text-[9px] font-black text-gray-400 uppercase">Vercel Official v145</p>
+            <p class="text-[9px] font-black text-gray-400 uppercase">Vercel Build v150</p>
         </div>
         <div class="text-right">
             <span id="bal-eur" class="font-black text-green-600 text-lg">0.0000€</span>
@@ -32,36 +32,32 @@
         
         <section id="view-feed" class="tab-content active">
             <div class="card p-4 bg-blue-600 text-white flex justify-between items-center mb-4">
-                <div><p class="text-[9px] font-black uppercase opacity-80">Saldo Turbo</p><p id="bonus-display" class="text-sm font-black italic">🔥 15 Ações Turbo</p></div>
-                <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-1 rounded-full text-[10px] font-black uppercase font-bold">Recarregar</button>
+                <div><p class="text-[9px] font-black uppercase opacity-80">Ações Turbo</p><p id="bonus-display" class="text-sm font-black italic">🔥 15 Ações Turbo</p></div>
+                <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-1 rounded-full text-[10px] font-black uppercase">Recarregar</button>
             </div>
-            
             <div id="posts-list" class="space-y-4">
-                <p class="text-center text-gray-300 text-[10px] py-10 uppercase font-black italic">A carregar rede social...</p>
+                <p class="text-center text-gray-300 text-[10px] py-10 uppercase font-black italic">A carregar...</p>
             </div>
         </section>
 
         <section id="view-wallet" class="tab-content">
-            <div class="card p-10 text-center mb-4 border-b-4 border-blue-500 shadow-sm">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Carteira Virtual</p>
-                <h1 id="wall-eur" class="text-5xl font-black text-blue-600 tracking-tighter">0.0000€</h1>
+            <div class="card p-10 text-center mb-4 border-b-4 border-blue-500">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Carteira</p>
+                <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
             </div>
             <div class="card p-5 space-y-4 text-center">
-                <button onclick="syncBonus()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic shadow-xl">Sincronizar Ações</button>
-                <button onclick="addCash(0.0500)" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase font-bold">Check-in Diário (+0,0500€)</button>
-                <div class="ad-slot">BANNER PUBLICITÁRIO</div>
-                <p class="text-[8px] font-black text-gray-300 uppercase italic">Saque Mínimo: 10,0000€ via PayPal</p>
+                <button onclick="syncBonus()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic shadow-xl">Sincronizar Bónus</button>
+                <button onclick="addCash(0.0500)" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase">Check-in Diário (+0,0500€)</button>
             </div>
         </section>
 
         <section id="view-friends" class="tab-content">
-            <div class="card p-6 border-l-4 border-blue-500 shadow-sm">
-                <h2 class="font-black text-sm uppercase text-blue-600 mb-1">O Teu Convite</h2>
-                <p class="text-[10px] font-bold text-gray-400 uppercase mb-6 leading-tight">Ganha 10% de comissão sobre os lucros da tua rede.</p>
+            <div class="card p-6 border-l-4 border-blue-500">
+                <h2 class="font-black text-sm uppercase text-blue-600 mb-1">Convite</h2>
                 <div class="bg-gray-50 p-4 rounded-xl border border-dashed mb-6 text-[10px] font-mono text-blue-700 italic break-all text-center" id="ref-box">
-                    https://social-earn-app.vercel.app/?ref=5401881400
+                    A gerar link...
                 </div>
-                <button onclick="shareLink()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-md">Convidar via WhatsApp</button>
+                <button onclick="shareLink()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase">Partilhar Link</button>
             </div>
         </section>
 
@@ -74,10 +70,9 @@
     </nav>
 
     <script>
-        // CONFIGURAÇÃO VERCEL + SUPABASE
+        // APENAS SUPABASE E VERCEL
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
-        const VERCEL_URL = "https://social-earn-app.vercel.app";
         const UID = "5401881400";
 
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
@@ -88,21 +83,20 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('view-' + tab).classList.add('active');
             document.getElementById('btn-' + tab).classList.add('active');
-            window.scrollTo(0, 0);
         }
 
         async function init() {
+            // Gera o link automaticamente com base na URL atual (Vercel)
+            const currentUrl = window.location.origin;
+            document.getElementById('ref-box').innerText = `${currentUrl}/?ref=${UID}`;
+            
             try {
-                // Tenta buscar saldo
-                const { data, error } = await supabase.from('perfis').select('*').eq('id', UID).single();
+                const { data } = await supabase.from('perfis').select('*').eq('id', UID).single();
                 if (data) localData = data;
                 
-                // Tenta carregar posts
                 const { data: posts } = await supabase.from('posts').select('*').limit(5);
-                if (posts) renderPosts(posts);
-            } catch (e) {
-                console.log("Sistema em cache.");
-            }
+                if (posts) render(posts);
+            } catch (e) { console.log("Ligação pendente..."); }
             refresh();
         }
 
@@ -114,15 +108,9 @@
             document.getElementById('bonus-display').innerText = `🔥 ${localData.bonus} Ações Turbo`;
         }
 
-        function renderPosts(posts) {
+        function render(posts) {
             const list = document.getElementById('posts-list');
-            if (!posts || posts.length === 0) return;
-            list.innerHTML = posts.map(p => `
-                <div class="card p-4">
-                    <p class="text-[9px] font-black text-gray-400 uppercase">User #${p.user_id.slice(-4)}</p>
-                    <p class="text-xs text-gray-800 mt-2">${p.content}</p>
-                </div>
-            `).join('<div class="ad-slot py-2">ADSTERRA</div>');
+            list.innerHTML = posts.map(p => `<div class="card p-4"><p class="text-xs text-gray-800">${p.content}</p></div>`).join('');
         }
 
         async function addCash(amt) {
@@ -132,14 +120,14 @@
         }
 
         function syncBonus() {
-            alert("Sincronizado com sucesso!");
             localData.bonus = 15;
             refresh();
+            alert("Bónus Sincronizado!");
         }
 
         function shareLink() {
-            const m = `Ganha dinheiro no Apex Social: ${VERCEL_URL}/?ref=${UID}`;
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(m)}`);
+            const link = document.getElementById('ref-box').innerText;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Ganha dinheiro aqui: " + link)}`);
         }
 
         window.onload = init;
