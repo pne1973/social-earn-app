@@ -3,69 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v34.500 - Final Fix</title>
+    <title>Apex Social v34.501 - Structural Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; position: relative; }
+        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; }
+        
+        /* FIX DEFINITIVO PARA COMENTÁRIOS */
+        .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #eee; width: 100%; }
+        .comment-section.active { display: flex; flex-direction: column; }
+        
+        .comments-list { padding: 16px; display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; }
+        .comment-bubble { background: white; padding: 12px; border-radius: 14px; border: 1px solid #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+        
+        .comment-input-area { background: white; padding: 12px 16px; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center; }
+        /* ------------------------------ */
+
+        .interaction-badge { position: absolute; top: -4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; font-weight: 900; border: 2px solid white; pointer-events: none; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); font-weight: 900; }
         
-        .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 12px 16px; transition: transform 0.3s ease-in-out; }
+        .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 12px 16px; transition: transform 0.3s; }
         .publisher-hidden { transform: translateY(-135%); }
-
+        
         #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-        .coin-pop { position: absolute; animation: flyUp 0.6s ease-out forwards; pointer-events: none; color: var(--g-green); font-weight: 900; font-size: 12px; z-index: 100; }
-        @keyframes flyUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-40px); opacity: 0; } }
-        
-        /* CORREÇÃO VISUAL DA SECÇÃO DE COMENTÁRIOS */
-        .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #dadce0; width: 100%; }
-        .comment-section.active { display: block; }
-        .comment-bubble { background: white; padding: 10px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        
-        .interaction-badge { position: absolute; top: -4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; font-weight: 900; border: 2px solid white; pointer-events: none; }
         input, textarea, button { font-weight: 900 !important; }
-        
-        .ad-card { border: 2px solid var(--g-blue); background: #f0f7ff; }
         #feed-container { margin-top: 140px; }
     </style>
 </head>
 <body class="pb-24">
 
     <div id="ad-overlay">
-        <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl border-4 border-blue-600">
-            <div id="ad-decision-ui" class="p-8 text-center">
+        <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl border-4 border-blue-600 p-8 text-center">
+            <div id="ad-decision-ui">
                 <h3 class="text-xl font-black uppercase text-blue-600 mb-4">Rede em Carga</h3>
-                <p class="text-[10px] font-black uppercase mb-6">Sincronize para validar os seus ganhos pendentes.</p>
-                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl shadow-xl uppercase text-xs mb-3">Ver Anúncio (100% Ganhos)</button>
+                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl shadow-xl uppercase text-xs mb-3">Sincronizar (100% Ganhos)</button>
                 <button onclick="degradeAndContinue()" class="w-full p-4 bg-white border-2 text-gray-400 rounded-2xl uppercase text-[10px]">Continuar com -20%</button>
             </div>
             <div id="ad-player-ui" class="hidden">
-                <div class="aspect-video bg-black relative flex items-center justify-center">
-                    <img id="ad-img-fs" src="" class="absolute inset-0 w-full h-full object-cover opacity-60">
-                    <p id="ad-timer" class="relative text-white font-black uppercase text-xs tracking-widest">Validando em 5s...</p>
+                <div class="aspect-video bg-black rounded-xl mb-4 flex items-center justify-center relative overflow-hidden">
+                    <img id="ad-img-fs" src="" class="absolute inset-0 w-full h-full object-cover opacity-50">
+                    <p id="ad-timer" class="relative text-white font-black uppercase text-xs">Validando...</p>
                 </div>
-                <div class="p-6">
-                    <button id="close-ad-btn" disabled class="w-full py-5 bg-gray-100 text-gray-400 rounded-xl uppercase text-xs">Aguarde...</button>
-                </div>
+                <button id="close-ad-btn" disabled class="w-full py-5 bg-gray-100 text-gray-400 rounded-xl uppercase text-xs">Aguarde...</button>
             </div>
         </div>
     </div>
 
-    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-50 px-4 py-4 flex justify-between items-center h-[72px]">
+    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-50 px-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg">A</div>
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">A</div>
             <div>
                 <h1 class="text-sm font-black uppercase text-blue-600">Apex Social</h1>
                 <span id="multiplier-tag" class="text-[8px] font-black text-green-500 uppercase italic">STATUS: 100% OK</span>
             </div>
         </div>
         <div class="text-right">
-            <div id="main-eur" class="font-black text-green-600 text-base tracking-tighter">0.0000€</div>
+            <div id="main-eur" class="font-black text-green-600 text-base">0.0000€</div>
             <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase italic">0.0000 BRL</div>
         </div>
     </header>
@@ -77,7 +75,7 @@
                     <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none uppercase font-black" rows="1"></textarea>
                     <div id="expanded-post" class="hidden">
                         <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-100 border-none text-[10px] p-3 rounded-xl mb-4 outline-none uppercase font-black">
-                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase shadow-lg">Publicar na Rede</button>
+                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase">Publicar</button>
                     </div>
                 </div>
             </div>
@@ -90,29 +88,22 @@
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
                 <p id="wall-brl" class="text-xs font-black text-gray-500 mt-2 uppercase italic">≈ 0.0000 BRL</p>
             </div>
-            <button onclick="shareAffiliate()" class="w-full google-card p-6 flex justify-between items-center border-l-[8px] border-green-500 shadow-lg">
-                <div class="text-left font-black"><p class="text-sm uppercase">CONVIDAR REDE</p><p class="text-[9px] text-green-600 uppercase">PARTILHE O SEU LINK</p></div>
-                <span class="text-3xl">👥</span>
-            </button>
         </section>
 
         <section id="view-admin" class="tab-content">
-            <div class="google-card border-t-[8px] border-red-600 p-6 mt-4 shadow-2xl">
-                <h2 class="text-red-600 font-black text-xs uppercase mb-6 underline">CONTROLO MASTER</h2>
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-gray-50 p-4 border-2 rounded-xl text-center"><p class="text-[8px] text-gray-400 font-black uppercase">DÍVIDA</p><p id="adm-debt" class="font-black text-blue-700 text-lg">0.00€</p></div>
-                    <div class="bg-gray-50 p-4 border-2 rounded-xl text-center"><p class="text-[8px] text-gray-400 font-black uppercase">LUCRO</p><p id="adm-profit" class="font-black text-green-700 text-lg">0.00€</p></div>
-                </div>
+            <div class="google-card border-t-[8px] border-red-600 p-6 mt-4 shadow-2xl text-center">
+                <h2 class="text-red-600 font-black text-xs uppercase mb-6 underline">ADMIN PANEL</h2>
+                <p id="adm-debt" class="font-black text-2xl text-blue-700 mb-2">0.00€</p>
                 <input id="del-id" type="text" placeholder="ID DO POST" class="w-full p-4 border-2 rounded-xl mb-4 font-black uppercase text-[10px]">
-                <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase">Eliminar Post</button>
+                <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase">Eliminar</button>
             </div>
         </section>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-50 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-        <button onclick="nav('social')" class="nav-item active flex-1 flex flex-col items-center py-2"><span class="text-[10px] font-black uppercase">REDE</span></button>
-        <button onclick="nav('info')" class="nav-item flex-1 flex flex-col items-center py-2 text-gray-400"><span class="text-[10px] font-black uppercase">GANHOS</span></button>
-        <button id="adm-btn" onclick="nav('admin')" class="hidden flex-1 flex flex-col items-center py-2 text-red-300"><span class="text-[10px] font-black uppercase italic">ADMIN</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-50">
+        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase">REDE</span></button>
+        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase">GANHOS</span></button>
+        <button id="adm-btn" onclick="nav('admin')" class="hidden flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase italic">ADMIN</span></button>
     </nav>
 
     <script>
@@ -122,21 +113,9 @@
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
         let user = { saldo: 0, interactions: 0, multiplier: 1.0 };
-        let lastScroll = 0;
         let pendingBonus = 0;
 
-        function expandPublisher() {
-            document.getElementById('expanded-post').classList.remove('hidden');
-            document.getElementById('post-input').rows = 3;
-        }
-
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            const pub = document.getElementById('publisher-box');
-            if (currentScroll > lastScroll && currentScroll > 150) pub.classList.add('publisher-hidden');
-            else pub.classList.remove('publisher-hidden');
-            lastScroll = currentScroll;
-        });
+        function expandPublisher() { document.getElementById('expanded-post').classList.remove('hidden'); document.getElementById('post-input').rows = 3; }
 
         async function init() {
             if(MASTER_ID === "5401881400") document.getElementById('adm-btn').classList.remove('hidden');
@@ -162,107 +141,85 @@
             if(!posts) return;
 
             container.innerHTML = "";
-            let pCount = 0;
-            for(const p of posts) {
-                pCount++;
+            for(let i=0; i<posts.length; i++) {
+                const p = posts[i];
                 const { count: cCount } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
-                const lCount = Math.floor(Math.random() * 50) + 5;
-                const sCount = Math.floor(Math.random() * 15);
-
+                
                 const card = document.createElement('div');
-                card.className = "google-card mb-6";
+                card.className = "google-card shadow-sm mb-6";
                 card.innerHTML = `
-                    <div class="p-6">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-[10px] text-white italic font-black">U</div>
-                            <span class="text-[10px] font-black text-gray-400 uppercase italic">ID..${String(p.user_id).slice(-4)}</span>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-[10px] font-black italic">U</div>
+                            <span class="text-[9px] font-black text-gray-400 uppercase italic">UTILIZADOR ID..${String(p.user_id).slice(-4)}</span>
                         </div>
-                        <p class="text-[13px] font-black uppercase text-gray-800 mb-3">${p.content}</p>
-                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 shadow-sm border">` : ''}
+                        <p class="text-[13px] font-black uppercase text-gray-800 mb-4">${p.content}</p>
+                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 border shadow-sm">` : ''}
                         
-                        <div class="flex justify-between border-t pt-4 relative">
+                        <div class="flex justify-between border-t pt-4">
                             <button onclick="reagir(this, 0.0006)" class="flex-1 flex flex-col items-center relative">
-                                <div class="interaction-badge">${lCount}</div>
-                                <span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-500 uppercase">GOSTAR</span>
+                                <div class="interaction-badge">${Math.floor(Math.random()*40)+5}</div>
+                                <span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-500">GOSTAR</span>
                             </button>
                             <button onclick="toggleComments('${p.id}')" class="flex-1 flex flex-col items-center relative border-x border-gray-100">
                                 <div class="interaction-badge">${cCount || 0}</div>
-                                <span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-500 uppercase">COMENTAR</span>
+                                <span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-500">COMENTAR</span>
                             </button>
-                            <button onclick="shareAffiliate(this)" class="flex-1 flex flex-col items-center relative">
-                                <div class="interaction-badge">${sCount}</div>
-                                <span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-500 uppercase">PARTILHAR</span>
+                            <button onclick="reagir(this, 0.0020)" class="flex-1 flex flex-col items-center relative">
+                                <div class="interaction-badge">${Math.floor(Math.random()*10)}</div>
+                                <span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-500">PARTILHAR</span>
                             </button>
                         </div>
                     </div>
                     
                     <div id="comments-${p.id}" class="comment-section">
-                        <div id="list-${p.id}" class="p-4 space-y-2 max-h-60 overflow-y-auto bg-gray-50"></div>
-                        <div class="p-4 bg-white border-t flex gap-2">
-                            <input id="input-${p.id}" type="text" placeholder="ESCREVER COMENTÁRIO..." class="flex-1 text-[11px] p-3 bg-gray-100 rounded-xl outline-none font-black uppercase">
-                            <button onclick="addComment('${p.id}', this)" class="bg-blue-600 text-white px-6 rounded-xl text-[10px] font-black uppercase shadow-md">OK</button>
+                        <div id="list-${p.id}" class="comments-list"></div>
+                        <div class="comment-input-area">
+                            <input id="input-${p.id}" type="text" placeholder="A TUA MENSAGEM..." class="flex-1 text-[11px] p-3 bg-gray-100 rounded-xl outline-none font-black uppercase border-none">
+                            <button onclick="addComment('${p.id}', this)" class="bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase shadow-md">OK</button>
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
-
-                if(pCount % 3 === 0) {
-                    const adCard = document.createElement('div');
-                    adCard.className = "google-card p-6 ad-card shadow-lg mb-6";
-                    adCard.innerHTML = `<span class="ad-tag font-black uppercase bg-blue-600 text-white p-1 rounded text-[8px] mb-2 inline-block">Patrocinado</span>
-                        <h4 class="text-[14px] font-black uppercase mb-3 text-blue-700">OFERTA APEX NETWORK</h4>
-                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600" class="w-full h-40 object-cover rounded-xl mb-4">
-                        <button onclick="startAdFlow()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md">Saber Mais</button>`;
-                    container.appendChild(adCard);
-                }
             }
         }
 
         async function toggleComments(postId) {
             const section = document.getElementById(`comments-${postId}`);
-            const list = document.getElementById(`list-${postId}`);
-            
             if(section.classList.contains('active')) {
                 section.classList.remove('active');
             } else {
                 section.classList.add('active');
-                list.innerHTML = '<p class="text-[10px] font-black text-blue-600 uppercase text-center py-4 italic">A carregar...</p>';
-                const { data } = await sb.from('comentarios').select('*').eq('post_id', postId).order('created_at', {ascending: true});
-                
-                if(data && data.length > 0) {
-                    list.innerHTML = data.map(c => `
-                        <div class="comment-bubble">
-                            <p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p>
-                            <p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p>
-                        </div>
-                    `).join('');
-                } else {
-                    list.innerHTML = '<p class="text-[9px] text-gray-400 text-center uppercase font-black py-4">Sem comentários.</p>';
-                }
-                list.scrollTop = list.scrollHeight;
+                updateCommentList(postId);
             }
+        }
+
+        async function updateCommentList(postId) {
+            const list = document.getElementById(`list-${postId}`);
+            list.innerHTML = '<p class="text-[9px] font-black text-blue-600 uppercase text-center py-2 italic">A carregar...</p>';
+            const { data } = await sb.from('comentarios').select('*').eq('post_id', postId).order('created_at', {ascending: true});
+            
+            if(data && data.length > 0) {
+                list.innerHTML = data.map(c => `
+                    <div class="comment-bubble">
+                        <p class="text-[8px] text-blue-600 font-black uppercase mb-1 italic">ID..${String(c.user_id).slice(-4)}</p>
+                        <p class="text-[11px] font-black uppercase text-gray-700">${c.content}</p>
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = '<p class="text-[9px] text-gray-400 text-center uppercase font-black py-4">Sem comentários.</p>';
+            }
+            list.scrollTop = list.scrollHeight;
         }
 
         async function addComment(postId, btn) {
             const input = document.getElementById(`input-${postId}`);
-            const content = input.value;
-            if(!content) return;
-            
-            const { error } = await sb.from('comentarios').insert([{ post_id: postId, user_id: MASTER_ID, content: content }]);
+            if(!input.value) return;
+            const { error } = await sb.from('comentarios').insert([{ post_id: postId, user_id: MASTER_ID, content: input.value }]);
             if(!error) {
                 input.value = "";
                 await reagir(btn, 0.0010);
-                
-                // Recarregar lista
-                const list = document.getElementById(`list-${postId}`);
-                const { data } = await sb.from('comentarios').select('*').eq('post_id', postId).order('created_at', {ascending: true});
-                list.innerHTML = data.map(c => `
-                    <div class="comment-bubble">
-                        <p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p>
-                        <p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p>
-                    </div>
-                `).join('');
-                list.scrollTop = list.scrollHeight;
+                updateCommentList(postId);
             }
         }
 
@@ -271,8 +228,6 @@
             else {
                 user.interactions++;
                 const v = Number(val) * user.multiplier; user.saldo += v;
-                const pop = document.createElement('span'); pop.className = 'coin-pop'; pop.innerText = '+' + v.toFixed(4) + '€';
-                btn.appendChild(pop); setTimeout(() => pop.remove(), 600);
                 updateUI(); await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
             }
         }
@@ -282,11 +237,14 @@
             document.getElementById('ad-player-ui').classList.remove('hidden');
             document.getElementById('ad-img-fs').src = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600";
             let c = 5;
-            const t = document.getElementById('ad-timer');
-            const b = document.getElementById('close-ad-btn');
             const i = setInterval(() => {
-                c--; t.innerText = "VALIDANDO EM " + c + "S...";
-                if(c <= 0) { clearInterval(i); t.innerText = "VALIDADO!"; b.disabled = false; b.innerText = "RESTAURAR"; b.className = "w-full py-5 bg-green-600 text-white rounded-xl font-black uppercase text-xs shadow-xl"; b.onclick = () => { user.multiplier = 1.0; user.interactions = 0; finalize(); }; }
+                c--; document.getElementById('ad-timer').innerText = "Sincronizando em " + c + "s...";
+                if(c <= 0) {
+                    clearInterval(i);
+                    const b = document.getElementById('close-ad-btn');
+                    b.disabled = false; b.innerText = "Concluído"; b.className = "w-full py-5 bg-green-600 text-white rounded-xl font-black uppercase text-xs";
+                    b.onclick = () => { user.multiplier = 1.0; user.interactions = 0; finalize(); };
+                }
             }, 1000);
         }
 
@@ -296,7 +254,7 @@
             document.getElementById('ad-overlay').style.display = 'none';
             document.getElementById('ad-decision-ui').classList.remove('hidden');
             document.getElementById('ad-player-ui').classList.add('hidden');
-            const v = Number(pendingBonus) * user.multiplier; user.saldo += v;
+            user.saldo += (Number(pendingBonus) * user.multiplier);
             updateUI(); await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID); loadFeed();
         }
 
@@ -313,13 +271,6 @@
             }
         }
 
-        function shareAffiliate(btn) {
-            if(btn) reagir(btn, 0.0020);
-            const aff = window.location.href.split('?')[0] + "?ref=" + MASTER_ID;
-            navigator.clipboard.writeText(aff);
-            alert("LINK COPIADO: RECEBA 5% DE COMISSÃO.");
-        }
-
         function nav(t) {
             document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('view-'+t).classList.add('active');
@@ -329,9 +280,7 @@
 
         async function loadAdmin() {
             const { data } = await sb.from('perfis').select('saldo');
-            let total = data.reduce((acc, u) => acc + Number(u.saldo), 0);
-            document.getElementById('adm-debt').innerText = total.toFixed(2) + "€";
-            document.getElementById('adm-profit').innerText = (total / 0.6 * 0.4).toFixed(2) + "€";
+            document.getElementById('adm-debt').innerText = data.reduce((acc, u) => acc + Number(u.saldo), 0).toFixed(2) + "€";
         }
 
         async function adminDelete() {
