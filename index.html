@@ -3,37 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v40.1 - Master Production</title>
+    <title>Apex Social v32.2 - Produção Corrigida</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; --border: #dadce0; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; margin: 0; padding-top: 72px; padding-bottom: 85px; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; margin: 0; padding-top: 72px; padding-bottom: 85px; }
         
-        .google-card { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        /* Design Google Edition */
+        .google-card { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+        .ad-banner { background: #fff8e1; border: 2px dashed #fbc02d; padding: 15px; text-align: center; border-radius: 12px; margin: 10px 0; }
         
-        /* Sistema de Ganhos Flutuantes */
+        /* Ganhos Flutuantes */
         #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
         @keyframes popUp {
             0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
             20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
             100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
         }
-        .earning-text { font-size: 3.5rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 15px rgba(52, 168, 83, 0.3); -webkit-text-stroke: 1.5px white; }
+        .earning-text { font-size: 3rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 15px rgba(52, 168, 83, 0.3); -webkit-text-stroke: 1.5px white; }
 
-        /* Ajuste de Imagem (O que faltava na v34) */
-        .img-container { width: 100%; max-height: 320px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid #eee; }
-        .img-container img { width: 100%; height: 100%; object-fit: contain; }
-
-        /* Navegação */
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .nav-item { color: #5f6368; transition: 0.2s; }
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; cursor: pointer; transition: background 0.2s; }
+        .interaction-btn:active { background: #f8f9fa; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
-
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
-        .btn-main { background: var(--g-blue); color: white; border-radius: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
@@ -52,134 +45,33 @@
     </header>
 
     <main class="max-w-lg mx-auto p-3">
-        
+        <div class="ad-banner mb-4">
+            <p class="text-[10px] font-black text-yellow-700 uppercase">Anúncio Patrocinado</p>
+            <p class="text-xs font-black">Ganhe mais XP convidando amigos!</p>
+        </div>
+
         <section id="view-social" class="tab-content active">
-            <div class="google-card p-4 mb-6 border-t-8 border-blue-600 shadow-md">
-                <textarea id="post-input" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none text-xs font-black uppercase outline-none focus:ring-0 mb-3" rows="2" onfocus="document.getElementById('post-ops').classList.remove('hidden')"></textarea>
-                <div id="post-ops" class="hidden">
-                    <div id="post-status" class="hidden text-[10px] font-black text-blue-500 mb-2 uppercase">📸 Imagem Otimizada</div>
-                    <div class="flex gap-2">
-                        <label for="post-file" class="bg-gray-100 p-3 rounded-lg cursor-pointer text-[10px] font-black text-gray-500 uppercase">Anexar Foto</label>
-                        <input type="file" id="post-file" accept="image/*" class="hidden" onchange="comprimir()">
-                        <button onclick="publish()" id="btn-pub" class="btn-main px-6 py-3 flex-1 text-[11px]">Publicar Agora</button>
-                    </div>
-                </div>
+            <div class="google-card p-4 border-t-8 border-blue-600 shadow-md">
+                <textarea id="post-input" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none text-xs font-black uppercase outline-none focus:ring-0 mb-3" rows="2"></textarea>
+                <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black uppercase text-[11px]">Publicar (+0.0150€)</button>
             </div>
-            <div id="feed-container" class="space-y-4"></div>
+            <div id="feed-container"></div>
         </section>
 
-        <section id="view-info" class="tab-content">
+        <section id="view-info" class="tab-content hidden">
             <div class="google-card p-10 text-center border-t-[10px] border-blue-600 mt-4 shadow-xl">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Saldo em Carteira</p>
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Carteira Total</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
-                <div class="mt-6 p-4 bg-blue-50 rounded-xl">
-                    <p class="text-[10px] text-blue-400 uppercase">Mínimo para Levantamento</p>
-                    <p class="font-black text-blue-900">5000 XP / 25.00€</p>
-                </div>
+                <p id="wall-brl" class="text-sm font-black text-gray-400 mt-2">0.0000 BRL</p>
             </div>
         </section>
-
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[500]">
         <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black">REDE</span></button>
         <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black">GANHOS</span></button>
-        <button onclick="nav('admin')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black">GESTÃO</span></button>
     </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const MASTER_ID = "5401881400";
-        const sb = window.supabase.createClient(SB_URL, SB_KEY);
-        
-        let userBalance = 0;
-        let fotoData = "";
-
-        async function init() {
-            const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) userBalance = Number(data.saldo);
-            updateUI(); loadFeed();
-        }
-
-        function updateUI() {
-            const eur = userBalance.toFixed(4);
-            document.getElementById('main-eur').innerText = eur + "€";
-            document.getElementById('wall-eur').innerText = eur + "€";
-            document.getElementById('main-brl').innerText = (userBalance * 6.1245).toFixed(4) + " BRL";
-        }
-
-        async function updateBalance(gain) {
-            userBalance += gain;
-            const el = document.getElementById('floating-earning');
-            document.getElementById('earning-val').innerText = "+" + gain.toFixed(4) + "€";
-            el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 800);
-            updateUI();
-            await sb.from('perfis').update({ saldo: userBalance }).eq('id', MASTER_ID);
-        }
-
-        function comprimir() {
-            const file = document.getElementById('post-file').files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const maxW = 800;
-                    const scale = maxW / img.width;
-                    canvas.width = maxW; canvas.height = img.height * scale;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    fotoData = canvas.toDataURL('image/jpeg', 0.6);
-                    document.getElementById('post-status').classList.remove('hidden');
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        async function publish() {
-            const content = document.getElementById('post-input').value;
-            if(!content && !fotoData) return;
-            document.getElementById('btn-pub').disabled = true;
-
-            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: content, image_url: fotoData }]);
-            if(!error) {
-                await updateBalance(0.0150);
-                window.location.reload();
-            }
-        }
-
-        async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const container = document.getElementById('feed-container');
-            container.innerHTML = "";
-            
-            posts.forEach(p => {
-                const card = document.createElement('div');
-                card.className = "google-card shadow-sm";
-                card.innerHTML = `
-                    <div class="p-4 border-b border-gray-50 flex items-center justify-between">
-                        <span class="text-[9px] font-black text-gray-400 uppercase italic">Utilizador Master</span>
-                        <span class="text-[9px] font-black text-gray-300">#${String(p.id).slice(-3)}</span>
-                    </div>
-                    ${p.image_url ? `<div class="img-container"><img src="${p.image_url}" loading="lazy"></div>` : ''}
-                    <div class="p-5">
-                        <p class="text-[13px] font-black uppercase text-gray-800 mb-5 leading-tight">${p.content || ''}</p>
-                        <div class="flex border-t pt-3">
-                            <div onclick="updateBalance(0.0002)" class="interaction-btn"><span class="text-xl mb-1">👍</span><span>Gostar</span></div>
-                            <div class="interaction-btn border-x border-gray-50"><span class="text-xl mb-1">💬</span><span>Comentar</span></div>
-                            <div onclick="updateBalance(0.0005)" class="interaction-btn"><span class="text-xl mb-1">🔗</span><span>Partilhar</span></div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function nav(t) { document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active')); document.getElementById('view-'+t).classList.add('active'); event.currentTarget.classList.add('active'); }
-
-        window.onload = init;
-    </script>
-</body>
-</html>
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
