@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v35.6</title>
+    <title>Apex Social v35.7</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -11,8 +11,10 @@
         body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding-top: 65px; padding-bottom: 80px; }
         .header { position: fixed; top: 0; width: 100%; height: 60px; background: white; border-bottom: 1px solid #ddd; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
         .post-card { background: white; border-radius: 12px; border: 1px solid #ddd; margin: 10px; overflow: hidden; }
-        .img-feed { width: 100%; max-height: 350px; object-fit: cover; display: block; background: #eee; }
-        .btn-blue { background: var(--blue); color: white; border-radius: 8px; font-weight: 900; font-size: 11px; text-transform: uppercase; }
+        /* Garante que a imagem tenha espaço mesmo antes de carregar */
+        .img-wrapper { width: 100%; background: #eee; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .img-wrapper img { width: 100%; height: auto; display: block; }
+        .btn-pub { background: var(--blue); color: white; border-radius: 8px; font-weight: 900; font-size: 11px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -25,83 +27,87 @@
     <main>
         <div class="post-card p-4" style="border-top: 6px solid var(--blue);">
             <textarea id="in-txt" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
-            
-            <div id="in-info" class="hidden text-center text-[10px] font-black mb-2 text-blue-500 uppercase">Otimizando para poupar espaço...</div>
-
+            <div id="status-envio" class="hidden text-center text-[10px] font-black mb-2 text-orange-500 uppercase">Processando...</div>
             <div class="flex gap-2">
                 <label for="in-img" class="flex-1 bg-gray-100 p-3 rounded-lg text-center text-[10px] font-black cursor-pointer uppercase">📸 FOTO</label>
-                <input type="file" id="in-img" accept="image/*" class="hidden" onchange="document.getElementById('in-info').classList.remove('hidden'); document.getElementById('in-info').innerText='✅ FOTO PRONTA'">
-                <button onclick="enviarApenasUrl()" id="btn-pub" class="flex-[2] btn-blue p-3">Publicar agora</button>
+                <input type="file" id="in-img" accept="image/*" class="hidden" onchange="document.getElementById('status-envio').classList.remove('hidden'); document.getElementById('status-envio').innerText='✅ FOTO PRONTA'">
+                <button onclick="publicarPost()" id="btn-envio" class="flex-[2] btn-pub p-3">Publicar agora</button>
             </div>
         </div>
-        <div id="feed"></div>
+        <div id="feed-social"></div>
     </main>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const MASTER_ID = "5401881400"; //
-        const _sb = window.supabase.createClient(SB_URL, SB_KEY);
-        let sld = 0;
+        const MASTER_ID = "5401881400";
+        const _client = window.supabase.createClient(SB_URL, SB_KEY);
+        let saldoAtual = 0;
 
         async function init() {
-            const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) sld = data.saldo;
-            document.getElementById('u-saldo').innerText = sld.toFixed(4) + "€";
-            render();
+            const { data } = await _client.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if(data) saldoAtual = data.saldo;
+            document.getElementById('u-saldo').innerText = saldoAtual.toFixed(4) + "€";
+            carregarFeed();
         }
 
-        async function enviarApenasUrl() {
+        async function publicarPost() {
             const txt = document.getElementById('in-txt').value;
             const file = document.getElementById('in-img').files[0];
-            const btn = document.getElementById('btn-pub');
+            const btn = document.getElementById('btn-envio');
             if(!txt) return;
 
             btn.disabled = true;
-            btn.innerText = "A PROCESSAR...";
+            btn.innerText = "A ENVIAR...";
 
-            let publicUrl = "";
-
+            let urlFinal = "";
             if(file) {
-                // 1. Upload do ficheiro para o STORAGE (Balde de ficheiros)
-                const fileName = `post_${Date.now()}.jpg`;
-                const { data: upData, error: upErr } = await _sb.storage.from('images').upload(fileName, file);
+                const extensao = file.name.split('.').pop();
+                const nomeFicheiro = `${Date.now()}.${extensao}`;
                 
-                if(!upErr) {
-                    // 2. Gerar a URL pública do ficheiro que acabámos de enviar
-                    const { data: urlData } = _sb.storage.from('images').getPublicUrl(fileName);
-                    publicUrl = urlData.publicUrl; // Aqui temos apenas o TEXTO do link
+                // 1. Upload para o Storage
+                const { data: uploadData, error: uploadErr } = await _client.storage.from('images').upload(nomeFicheiro, file);
+                
+                if(!uploadErr) {
+                    // 2. Obter URL oficial
+                    const { data: urlData } = _client.storage.from('images').getPublicUrl(nomeFicheiro);
+                    urlFinal = urlData.publicUrl;
                 }
             }
 
-            // 3. Enviar apenas a URL (Texto) para a TABELA posts
-            const { error: dbErr } = await _sb.from('posts').insert([{ 
+            // 3. Gravar na tabela com a URL corrigida
+            const { error: dbErr } = await _client.from('posts').insert([{ 
                 user_id: MASTER_ID, 
                 content: txt, 
-                image_url: publicUrl // Enviando apenas a string da URL
+                image_url: urlFinal 
             }]);
 
             if(!dbErr) {
-                sld += 0.0150;
-                await _sb.from('perfis').update({ saldo: sld }).eq('id', MASTER_ID);
+                saldoAtual += 0.0150;
+                await _client.from('perfis').update({ saldo: saldoAtual }).eq('id', MASTER_ID);
                 window.location.reload();
             } else {
                 btn.disabled = false;
-                btn.innerText = "ERRO NA TABELA";
+                btn.innerText = "ERRO DE TABELA";
             }
         }
 
-        async function render() {
-            const { data } = await _sb.from('posts').select('*').order('created_at', {ascending: false});
-            const f = document.getElementById('feed');
-            f.innerHTML = data?.map(p => `
-                <div class="post-card">
-                    ${p.image_url ? `<img src="${p.image_url}" class="img-feed">` : ''}
+        async function carregarFeed() {
+            const { data: posts } = await _client.from('posts').select('*').order('created_at', {ascending: false});
+            const feed = document.getElementById('feed-social');
+            feed.innerHTML = "";
+
+            posts?.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "post-card";
+                card.innerHTML = `
+                    ${p.image_url ? `<div class="img-wrapper"><img src="${p.image_url}" onerror="this.parentElement.style.display='none'"></div>` : ''}
                     <div class="p-4">
-                        <p class="text-xs font-bold uppercase text-gray-800">${p.content}</p>
+                        <p class="text-[12px] font-bold uppercase text-gray-800">${p.content}</p>
                     </div>
-                </div>
-            `).join('') || "";
+                `;
+                feed.appendChild(card);
+            });
         }
 
         window.onload = init;
