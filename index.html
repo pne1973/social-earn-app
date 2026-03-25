@@ -15,7 +15,6 @@
         .tab-content.active { display: block; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); font-weight: 900; }
         
-        /* SMART STICKY PUBLISHER */
         .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 12px 16px; transition: transform 0.3s ease-in-out; }
         .publisher-hidden { transform: translateY(-135%); }
 
@@ -23,10 +22,9 @@
         .coin-pop { position: absolute; animation: flyUp 0.6s ease-out forwards; pointer-events: none; color: var(--g-green); font-weight: 900; font-size: 12px; z-index: 100; }
         @keyframes flyUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-40px); opacity: 0; } }
         
-        .comment-section { display: none; background: #f8f9fa; border-top: 2px solid #eee; }
+        .comment-section { display: none; background: #f8f9fa; border-top: 2px solid #eee; width: 100%; }
         .comment-section.active { display: block; }
         
-        /* BADGES DE CONTABILIZAÇÃO */
         .interaction-badge { position: absolute; top: -4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; font-weight: 900; border: 2px solid white; pointer-events: none; }
         input, textarea, button { font-weight: 900 !important; }
         
@@ -170,7 +168,7 @@
                 const sCount = Math.floor(Math.random() * 15);
 
                 const card = document.createElement('div');
-                card.className = "google-card p-6 relative";
+                card.className = "google-card p-6 relative mb-6";
                 card.innerHTML = `
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-[10px] text-white italic font-black">U</div>
@@ -178,13 +176,14 @@
                     </div>
                     <p class="text-[13px] font-black uppercase text-gray-800 mb-3">${p.content}</p>
                     ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 shadow-sm border">` : ''}
-                    <div class="flex justify-between border-t-2 pt-4 relative">
+                    
+                    <div class="flex justify-between border-t-2 pt-4 relative mb-2">
                         <button onclick="reagir(this, 0.0006)" class="flex-1 flex flex-col items-center relative">
                             <div class="interaction-badge">${lCount}</div>
                             <span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-500 uppercase">GOSTAR</span>
                         </button>
                         <button onclick="toggleComments('${p.id}')" class="flex-1 flex flex-col items-center relative border-x-2 border-gray-100">
-                            <div class="interaction-badge">${cCount}</div>
+                            <div class="interaction-badge">${cCount || 0}</div>
                             <span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-500 uppercase">COMENTAR</span>
                         </button>
                         <button onclick="shareAffiliate(this)" class="flex-1 flex flex-col items-center relative">
@@ -192,6 +191,7 @@
                             <span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-500 uppercase">PARTILHAR</span>
                         </button>
                     </div>
+
                     <div id="comments-${p.id}" class="comment-section p-5 rounded-b-xl">
                         <div id="list-${p.id}" class="space-y-4 mb-5 max-h-48 overflow-y-auto"></div>
                         <div class="flex gap-2">
@@ -204,7 +204,7 @@
 
                 if(pCount % 3 === 0) {
                     const adCard = document.createElement('div');
-                    adCard.className = "google-card p-6 ad-card shadow-lg";
+                    adCard.className = "google-card p-6 ad-card shadow-lg mb-6";
                     adCard.innerHTML = `<span class="ad-tag font-black uppercase bg-blue-600 text-white p-1 rounded text-[8px] mb-2 inline-block">Patrocinado</span>
                         <h4 class="text-[14px] font-black uppercase mb-3 text-blue-700">OFERTA APEX NETWORK</h4>
                         <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600" class="w-full h-40 object-cover rounded-xl mb-4">
@@ -217,11 +217,13 @@
         async function toggleComments(postId) {
             const el = document.getElementById(`comments-${postId}`);
             const list = document.getElementById(`list-${postId}`);
-            if(el.classList.contains('active')) el.classList.remove('active');
-            else {
+            if(el.classList.contains('active')) {
+                el.classList.remove('active');
+            } else {
                 el.classList.add('active');
                 const { data } = await sb.from('comentarios').select('*').eq('post_id', postId).order('created_at', {ascending: true});
                 list.innerHTML = data.map(c => `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p><p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p></div>`).join('') || '<p class="text-[9px] text-gray-400 text-center uppercase font-black py-4">Sem comentários.</p>';
+                list.scrollTop = list.scrollHeight;
             }
         }
 
@@ -236,10 +238,7 @@
                 const list = document.getElementById(`list-${postId}`);
                 const { data } = await sb.from('comentarios').select('*').eq('post_id', postId).order('created_at', {ascending: true});
                 list.innerHTML = data.map(c => `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p><p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p></div>`).join('');
-                
-                // CORREÇÃO: Garante que a secção está visível e faz scroll para o novo comentário
-                document.getElementById(`comments-${postId}`).classList.add('active');
-                setTimeout(() => { list.scrollTop = list.scrollHeight; }, 100);
+                list.scrollTop = list.scrollHeight;
             }
         }
 
