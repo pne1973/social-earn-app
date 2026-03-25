@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v34.500 - Logic Fix</title>
+    <title>Apex Social v34.500 - Final Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; }
+        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; position: relative; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); font-weight: 900; }
@@ -22,8 +22,10 @@
         .coin-pop { position: absolute; animation: flyUp 0.6s ease-out forwards; pointer-events: none; color: var(--g-green); font-weight: 900; font-size: 12px; z-index: 100; }
         @keyframes flyUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-40px); opacity: 0; } }
         
-        .comment-section { display: none; background: #f8f9fa; border-top: 2px solid #eee; width: 100%; }
+        /* CORREÇÃO VISUAL DA SECÇÃO DE COMENTÁRIOS */
+        .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #dadce0; width: 100%; }
         .comment-section.active { display: block; }
+        .comment-bubble { background: white; padding: 10px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         
         .interaction-badge { position: absolute; top: -4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; font-weight: 900; border: 2px solid white; pointer-events: none; }
         input, textarea, button { font-weight: 900 !important; }
@@ -168,35 +170,37 @@
                 const sCount = Math.floor(Math.random() * 15);
 
                 const card = document.createElement('div');
-                card.className = "google-card p-6 relative mb-6";
+                card.className = "google-card mb-6";
                 card.innerHTML = `
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-[10px] text-white italic font-black">U</div>
-                        <span class="text-[10px] font-black text-gray-400 uppercase italic">ID..${String(p.user_id).slice(-4)}</span>
+                    <div class="p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-[10px] text-white italic font-black">U</div>
+                            <span class="text-[10px] font-black text-gray-400 uppercase italic">ID..${String(p.user_id).slice(-4)}</span>
+                        </div>
+                        <p class="text-[13px] font-black uppercase text-gray-800 mb-3">${p.content}</p>
+                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 shadow-sm border">` : ''}
+                        
+                        <div class="flex justify-between border-t pt-4 relative">
+                            <button onclick="reagir(this, 0.0006)" class="flex-1 flex flex-col items-center relative">
+                                <div class="interaction-badge">${lCount}</div>
+                                <span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-500 uppercase">GOSTAR</span>
+                            </button>
+                            <button onclick="toggleComments('${p.id}')" class="flex-1 flex flex-col items-center relative border-x border-gray-100">
+                                <div class="interaction-badge">${cCount || 0}</div>
+                                <span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-500 uppercase">COMENTAR</span>
+                            </button>
+                            <button onclick="shareAffiliate(this)" class="flex-1 flex flex-col items-center relative">
+                                <div class="interaction-badge">${sCount}</div>
+                                <span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-500 uppercase">PARTILHAR</span>
+                            </button>
+                        </div>
                     </div>
-                    <p class="text-[13px] font-black uppercase text-gray-800 mb-3">${p.content}</p>
-                    ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 shadow-sm border">` : ''}
                     
-                    <div class="flex justify-between border-t-2 pt-4 relative mb-2">
-                        <button onclick="reagir(this, 0.0006)" class="flex-1 flex flex-col items-center relative">
-                            <div class="interaction-badge">${lCount}</div>
-                            <span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-500 uppercase">GOSTAR</span>
-                        </button>
-                        <button onclick="toggleComments('${p.id}')" class="flex-1 flex flex-col items-center relative border-x-2 border-gray-100">
-                            <div class="interaction-badge">${cCount || 0}</div>
-                            <span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-500 uppercase">COMENTAR</span>
-                        </button>
-                        <button onclick="shareAffiliate(this)" class="flex-1 flex flex-col items-center relative">
-                            <div class="interaction-badge">${sCount}</div>
-                            <span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-500 uppercase">PARTILHAR</span>
-                        </button>
-                    </div>
-
-                    <div id="comments-${p.id}" class="comment-section p-5 rounded-b-xl">
-                        <div id="list-${p.id}" class="space-y-4 mb-5 max-h-48 overflow-y-auto"></div>
-                        <div class="flex gap-2">
-                            <input id="input-${p.id}" type="text" placeholder="DIGITE..." class="flex-1 text-[11px] p-3 bg-white border-2 rounded-xl outline-none font-black uppercase">
-                            <button onclick="addComment('${p.id}', this)" class="bg-blue-600 text-white px-5 rounded-xl text-[10px] font-black uppercase">OK</button>
+                    <div id="comments-${p.id}" class="comment-section">
+                        <div id="list-${p.id}" class="p-4 space-y-2 max-h-60 overflow-y-auto bg-gray-50"></div>
+                        <div class="p-4 bg-white border-t flex gap-2">
+                            <input id="input-${p.id}" type="text" placeholder="ESCREVER COMENTÁRIO..." class="flex-1 text-[11px] p-3 bg-gray-100 rounded-xl outline-none font-black uppercase">
+                            <button onclick="addComment('${p.id}', this)" class="bg-blue-600 text-white px-6 rounded-xl text-[10px] font-black uppercase shadow-md">OK</button>
                         </div>
                     </div>
                 `;
@@ -215,14 +219,26 @@
         }
 
         async function toggleComments(postId) {
-            const el = document.getElementById(`comments-${postId}`);
+            const section = document.getElementById(`comments-${postId}`);
             const list = document.getElementById(`list-${postId}`);
-            if(el.classList.contains('active')) {
-                el.classList.remove('active');
+            
+            if(section.classList.contains('active')) {
+                section.classList.remove('active');
             } else {
-                el.classList.add('active');
+                section.classList.add('active');
+                list.innerHTML = '<p class="text-[10px] font-black text-blue-600 uppercase text-center py-4 italic">A carregar...</p>';
                 const { data } = await sb.from('comentarios').select('*').eq('post_id', postId).order('created_at', {ascending: true});
-                list.innerHTML = data.map(c => `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p><p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p></div>`).join('') || '<p class="text-[9px] text-gray-400 text-center uppercase font-black py-4">Sem comentários.</p>';
+                
+                if(data && data.length > 0) {
+                    list.innerHTML = data.map(c => `
+                        <div class="comment-bubble">
+                            <p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p>
+                            <p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<p class="text-[9px] text-gray-400 text-center uppercase font-black py-4">Sem comentários.</p>';
+                }
                 list.scrollTop = list.scrollHeight;
             }
         }
@@ -231,13 +247,21 @@
             const input = document.getElementById(`input-${postId}`);
             const content = input.value;
             if(!content) return;
+            
             const { error } = await sb.from('comentarios').insert([{ post_id: postId, user_id: MASTER_ID, content: content }]);
             if(!error) {
                 input.value = "";
                 await reagir(btn, 0.0010);
+                
+                // Recarregar lista
                 const list = document.getElementById(`list-${postId}`);
                 const { data } = await sb.from('comentarios').select('*').eq('post_id', postId).order('created_at', {ascending: true});
-                list.innerHTML = data.map(c => `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p><p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p></div>`).join('');
+                list.innerHTML = data.map(c => `
+                    <div class="comment-bubble">
+                        <p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p>
+                        <p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p>
+                    </div>
+                `).join('');
                 list.scrollTop = list.scrollHeight;
             }
         }
