@@ -166,7 +166,6 @@
             for(const p of posts) {
                 pCount++;
                 const { count: cCount } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
-                // Simulação de Likes e Shares para os badges
                 const lCount = Math.floor(Math.random() * 50) + 5;
                 const sCount = Math.floor(Math.random() * 15);
 
@@ -237,7 +236,10 @@
                 const list = document.getElementById(`list-${postId}`);
                 const { data } = await sb.from('comentarios').select('*').eq('post_id', postId).order('created_at', {ascending: true});
                 list.innerHTML = data.map(c => `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><p class="text-[8px] text-blue-600 font-black uppercase mb-1">ID..${String(c.user_id).slice(-4)}</p><p class="text-[11px] font-black uppercase text-gray-800">${c.content}</p></div>`).join('');
-                list.scrollTop = list.scrollHeight; // SCROLL PARA BAIXO
+                
+                // CORREÇÃO: Garante que a secção está visível e faz scroll para o novo comentário
+                document.getElementById(`comments-${postId}`).classList.add('active');
+                setTimeout(() => { list.scrollTop = list.scrollHeight; }, 100);
             }
         }
 
@@ -318,4 +320,3 @@
     </script>
 </body>
 </html>
-
