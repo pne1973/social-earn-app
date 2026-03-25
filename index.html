@@ -3,47 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v38.0</title>
+    <title>Apex Social v38.1</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --blue: #4285F4; --bg: #f2f4f7; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding-top: 60px; }
+        :root { --blue: #4285F4; --bg: #f8f9fa; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); padding-top: 65px; margin: 0; }
         
-        /* Header Fixo */
-        header { position: fixed; top: 0; width: 100%; height: 55px; background: white; border-bottom: 1px solid #ddd; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
+        header { position: fixed; top: 0; width: 100%; height: 60px; background: white; border-bottom: 1px solid #eee; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; }
+
+        /* Contentor do Post: Agora com display block para evitar flutuação */
+        .post-card { 
+            background: white; 
+            border-radius: 16px; 
+            margin: 15px; 
+            border: 1px solid #e5e7eb; 
+            display: block; /* Garante que os elementos empilham */
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
         
-        /* Cartão de Post Único */
-        .post-card { background: white; border-radius: 12px; margin: 15px; border: 1px solid #e1e4e8; display: flex; flex-direction: column; overflow: hidden; }
+        /* A Imagem agora respeita o fluxo do documento */
+        .post-img-box { 
+            width: 100%; 
+            max-height: 320px; 
+            background: #f1f3f4;
+            display: block;
+        }
+        .post-img-box img { 
+            width: 100%; 
+            height: auto; 
+            max-height: 320px; 
+            object-fit: cover; /* Mantém a imagem centrada sem esticar */
+            display: block;
+        }
         
-        /* Contentor de Imagem com Limite de Altura */
-        .img-box { width: 100%; background: #000; display: flex; justify-content: center; align-items: center; max-height: 280px; overflow: hidden; }
-        .img-box img { width: 100%; height: auto; display: block; }
-        
-        /* Área de Conteúdo do Post */
-        .post-body { padding: 12px 15px; background: white; }
-        .post-text { font-size: 14px; font-weight: 700; color: #222; margin: 0; line-height: 1.4; }
-        
-        /* Botão de Publicar */
-        .btn-pub { background: var(--blue); color: white; border-radius: 8px; font-weight: 800; font-size: 12px; text-transform: uppercase; padding: 12px; width: 100%; }
+        /* Área de Texto: Forçada a aparecer abaixo da imagem */
+        .post-info { 
+            padding: 15px; 
+            background: white; 
+            border-top: 1px solid #f9fafb;
+            clear: both; /* Previne que nada se sobreponha */
+        }
+        .post-text { font-size: 14px; font-weight: 700; color: #111; margin: 0; }
+
+        .btn-pub { background: var(--blue); color: white; border-radius: 10px; font-weight: 800; font-size: 11px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="font-weight: 900; color: var(--blue); font-size: 18px;">APEX SOCIAL</div>
-        <div id="u-saldo" style="color: #28a745; font-weight: 900;">0.0000€</div>
+        <div style="font-weight: 900; color: var(--blue); font-size: 18px;">APEX</div>
+        <div id="u-saldo" style="color: #34A853; font-weight: 900; font-size: 16px;">0.0000€</div>
     </header>
 
     <main class="max-w-md mx-auto">
-        <div class="post-card p-4">
-            <textarea id="in-txt" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
-            <div id="status" class="hidden text-[10px] font-black text-blue-500 mb-2 uppercase text-center">✅ Foto Pronta</div>
-            
-            <div class="flex gap-2">
-                <label for="in-file" class="bg-gray-100 p-3 rounded-lg cursor-pointer text-[10px] font-black uppercase text-gray-500 flex items-center justify-center px-4">📸 FOTO</label>
+        <div class="post-card p-5">
+            <textarea id="in-txt" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-4" rows="2"></textarea>
+            <div id="status" class="hidden text-[10px] font-black text-blue-500 mb-3 uppercase">✅ Imagem Carregada</div>
+            <div class="flex gap-3">
+                <label for="in-file" class="flex-1 bg-gray-50 p-4 rounded-xl text-center text-[10px] font-black cursor-pointer text-gray-400">📸 FOTO</label>
                 <input type="file" id="in-file" accept="image/*" class="hidden" onchange="processarFoto()">
-                <button onclick="publicar()" id="btn-pub" class="btn-pub">Publicar Agora</button>
+                <button onclick="publicar()" id="btn-pub" class="flex-[2] btn-pub">Publicar</button>
             </div>
         </div>
 
@@ -55,7 +76,7 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const _sb = window.supabase.createClient(SB_URL, SB_KEY);
         const MASTER_ID = "5401881400";
-        let fotoData = "";
+        let fotoFinal = "";
 
         async function init() {
             const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
@@ -72,13 +93,13 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const maxW = 600; 
+                    const maxW = 600;
                     const scale = maxW / img.width;
                     canvas.width = maxW;
                     canvas.height = img.height * scale;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    fotoData = canvas.toDataURL('image/jpeg', 0.6);
+                    fotoFinal = canvas.toDataURL('image/jpeg', 0.6);
                 };
                 img.src = e.target.result;
             };
@@ -91,9 +112,9 @@
             const btn = document.getElementById('btn-pub');
             btn.disabled = true; btn.innerText = "A ENVIAR...";
 
-            const { error } = await _sb.from('posts').insert([{ user_id: MASTER_ID, content: txt, image_url: fotoData }]);
+            const { error } = await _sb.from('posts').insert([{ user_id: MASTER_ID, content: txt, image_url: fotoFinal }]);
             if(!error) window.location.reload();
-            else { btn.disabled = false; btn.innerText = "TENTAR NOVAMENTE"; }
+            else { btn.disabled = false; btn.innerText = "ERRO"; }
         }
 
         async function carregarFeed() {
@@ -108,13 +129,13 @@
                 card.className = "post-card";
                 
                 const imgHtml = p.image_url ? `
-                    <div class="img-box">
+                    <div class="post-img-box">
                         <img src="${p.image_url}">
                     </div>` : "";
 
                 card.innerHTML = `
                     ${imgHtml}
-                    <div class="post-body">
+                    <div class="post-info">
                         <p class="post-text">${p.content}</p>
                     </div>
                 `;
