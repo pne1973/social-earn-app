@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v155</title>
+    <title>Apex Social v160</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -11,124 +11,93 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; padding-bottom: 120px; }
         .nav-btn.active { color: #4285F4; border-top: 3px solid #4285F4; font-weight: 900; background: #f1f3f4; }
-        .card { background: white; border-radius: 14px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .card { background: white; border-radius: 14px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; }
     </style>
 </head>
 <body>
 
-    <header class="sticky top-0 bg-white border-b z-50 px-5 py-4 flex justify-between items-center shadow-sm">
+    <header class="sticky top-0 bg-white border-b z-50 px-5 py-4 flex justify-between items-center">
         <div>
             <h1 class="text-xl font-black text-blue-600 italic uppercase">Apex Social</h1>
-            <p class="text-[9px] font-black text-red-500 uppercase italic">Vercel Mode Active</p>
+            <p class="text-[10px] font-black text-green-500 uppercase">Vercel Active Deployment</p>
         </div>
         <div class="text-right">
             <span id="bal-eur" class="font-black text-green-600 text-lg">0.0000€</span>
-            <p id="bal-brl" class="text-[9px] font-bold text-gray-400 uppercase">0.0000 BRL</p>
         </div>
     </header>
 
     <main class="p-4 max-w-md mx-auto">
         
         <section id="view-feed" class="tab-content active">
-            <div class="card p-4 bg-blue-600 text-white flex justify-between items-center mb-4">
-                <div><p class="text-[9px] font-black uppercase opacity-80">Ações</p><p id="bonus-display" class="text-sm font-black italic">🔥 15 Ações Turbo</p></div>
-                <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-1 rounded-full text-[10px] font-black uppercase">Recarregar</button>
-            </div>
             <div id="posts-list" class="space-y-4">
-                <p class="text-center text-gray-300 text-[10px] py-10 uppercase font-black italic">A carregar rede...</p>
+                <p class="text-center text-gray-300 text-[10px] py-10 uppercase font-black">A carregar rede...</p>
             </div>
         </section>
 
         <section id="view-wallet" class="tab-content">
             <div class="card p-10 text-center mb-4 border-b-4 border-blue-500">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Carteira</p>
+                <p class="text-[10px] font-black text-gray-400 uppercase">Saldo</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
             </div>
-            <div class="card p-5 space-y-4 text-center">
-                <button onclick="sync()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic">Sincronizar Bónus</button>
-                <button onclick="checkIn()" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase font-bold">Check-in Diário (+0,0500€)</button>
-            </div>
+            <button onclick="checkIn()" class="w-full bg-green-500 text-white py-5 rounded-2xl font-black text-xs uppercase shadow-xl">Check-in Diário (+0,0500€)</button>
         </section>
 
         <section id="view-friends" class="tab-content">
             <div class="card p-6 border-l-4 border-blue-500">
-                <h2 class="font-black text-sm uppercase text-blue-600 mb-1">Link de Rede</h2>
-                <p class="text-[10px] font-bold text-gray-400 uppercase mb-6 leading-tight">Recebe 10% de comissão vitalícia.</p>
-                <div class="bg-gray-50 p-4 rounded-xl border border-dashed mb-6 text-[10px] font-mono text-blue-700 italic break-all text-center" id="ref-box">
-                    ...
-                </div>
-                <button onclick="share()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-md">Copiar Link WhatsApp</button>
+                <h2 class="font-black text-sm uppercase text-blue-600">O Teu Link Vercel</h2>
+                <div class="bg-gray-100 p-4 rounded-xl my-4 text-[10px] font-mono break-all" id="ref-box">A gerar...</div>
+                <button onclick="share()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase">Enviar Link</button>
             </div>
         </section>
 
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-1 z-40 shadow-2xl">
-        <button onclick="nav('feed')" id="btn-feed" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400 active"><span class="text-[10px] font-black uppercase">Feed</span></button>
-        <button onclick="nav('wallet')" id="btn-wallet" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Ganhos</span></button>
-        <button onclick="nav('friends')" id="btn-friends" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Rede</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-1 z-40">
+        <button onclick="nav('feed')" class="nav-btn flex-1 p-3 text-gray-400 active"><span class="text-[10px] font-black">FEED</span></button>
+        <button onclick="nav('wallet')" class="nav-btn flex-1 p-3 text-gray-400"><span class="text-[10px] font-black">GANHOS</span></button>
+        <button onclick="nav('friends')" class="nav-btn flex-1 p-3 text-gray-400"><span class="text-[10px] font-black">REDE</span></button>
     </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
         const UID = "5401881400";
-
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-        let dataLocal = { saldo: 0, bonus: 15 };
+        let userStats = { saldo: 0 };
 
-        function nav(tab) {
+        function nav(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('view-' + tab).classList.add('active');
-            document.getElementById('btn-' + tab).classList.add('active');
+            document.getElementById('view-'+t).classList.add('active');
         }
 
-        async function startApp() {
-            // Gera link dinâmico da Vercel
-            document.getElementById('ref-box').innerText = `${window.location.origin}/?ref=${UID}`;
-            
-            try {
-                const { data } = await supabase.from('perfis').select('*').eq('id', UID).single();
-                if (data) dataLocal = data;
-                
-                const { data: posts } = await supabase.from('posts').select('*').limit(3);
-                if (posts) drawPosts(posts);
-            } catch (e) { console.log("Offline mode"); }
-            updateUI();
+        async function init() {
+            // DETEÇÃO AUTOMÁTICA DA URL (Elimina dependência do Render)
+            const siteUrl = window.location.origin;
+            document.getElementById('ref-box').innerText = `${siteUrl}/?ref=${UID}`;
+
+            const { data } = await supabase.from('perfis').select('*').eq('id', UID).single();
+            if (data) userStats = data;
+            refresh();
         }
 
-        function updateUI() {
-            const v = dataLocal.saldo.toFixed(4);
-            document.getElementById('bal-eur').innerText = v + "€";
-            document.getElementById('wall-eur').innerText = v + "€";
-            document.getElementById('bal-brl').innerText = (dataLocal.saldo * 6.1245).toFixed(4) + " BRL";
-            document.getElementById('bonus-display').innerText = `🔥 ${dataLocal.bonus} Ações Turbo`;
-        }
-
-        function drawPosts(posts) {
-            const list = document.getElementById('posts-list');
-            list.innerHTML = posts.map(p => `<div class="card p-4"><p class="text-xs text-gray-800">${p.content}</p></div>`).join('');
+        function refresh() {
+            document.getElementById('bal-eur').innerText = userStats.saldo.toFixed(4) + "€";
+            document.getElementById('wall-eur').innerText = userStats.saldo.toFixed(4) + "€";
         }
 
         async function checkIn() {
-            dataLocal.saldo += 0.0500;
-            updateUI();
-            await supabase.from('perfis').upsert({ id: UID, saldo: dataLocal.saldo });
-        }
-
-        function sync() {
-            dataLocal.bonus = 15;
-            updateUI();
-            alert("Sincronizado!");
+            userStats.saldo += 0.0500;
+            refresh();
+            await supabase.from('perfis').upsert({ id: UID, saldo: userStats.saldo });
+            alert("Check-in feito!");
         }
 
         function share() {
             const link = document.getElementById('ref-box').innerText;
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Ganha aqui: " + link)}`);
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(link)}`);
         }
 
-        window.onload = startApp;
+        window.onload = init;
     </script>
 </body>
 </html>
