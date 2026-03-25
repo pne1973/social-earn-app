@@ -1,80 +1,112 @@
-<div id="feed-container" class="space-y-4">
-    </div>
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Apex Social v32.225</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; margin: 0; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; padding-bottom: 100px; }
+        .nav-btn.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); background: #fff; font-weight: 900; }
+        .card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; }
+        #loader { display: none; position: fixed; inset: 0; background: white; z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+    </style>
+</head>
+<body>
 
-<script>
-// 1. SISTEMA DE LIKES (+2 XP)
-async function handleLike(postId) {
-    try {
-        // Feedback visual imediato
-        user.saldo += 0.0020; // Recompensa de +2 XP
-        updateUI(); 
-        
-        // Grava no Supabase (Opcional: tabela de likes para evitar duplicados)
-        await supabase.from('perfis').update({ saldo: user.saldo }).eq('id', UID);
-        console.log("Like computado no post:", postId);
-    } catch (e) { console.error("Erro no Like", e); }
-}
+    <div id="loader"><div class="animate-spin h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full mb-2"></div><p class="text-[10px] font-black uppercase italic">Apex Processing...</p></div>
 
-// 2. SISTEMA DE COMENTÁRIOS (Expansível)
-function toggleComments(postId) {
-    const section = document.getElementById(`comments-${postId}`);
-    section.classList.toggle('hidden');
-}
-
-// 3. PARTILHA NAS REDES (Link Único v32)
-function sharePost(postId) {
-    const shareText = `Vê este post na Apex Social! Ganha dinheiro a interagir: https://social-earn-app.vercel.app/?ref=${UID}`;
-    
-    if (navigator.share) {
-        navigator.share({
-            title: 'Apex Social',
-            text: shareText,
-            url: window.location.href
-        });
-    } else {
-        // Fallback para cópia de link
-        navigator.clipboard.writeText(shareText);
-        alert("Link de convite copiado para a área de transferência!");
-    }
-}
-
-// FUNÇÃO DE RENDERIZAÇÃO DO FEED (ATUALIZADA)
-async function renderFeed() {
-    const { data } = await supabase.from('posts').select('*').order('created_at', {ascending: false});
-    const cont = document.getElementById('feed-container');
-    
-    cont.innerHTML = data.map((p, i) => `
-        <div class="card p-5 shadow-sm border-l-4 border-blue-500 bg-white mb-4">
-            <div class="flex justify-between items-center mb-3">
-                <span class="text-[9px] font-black text-blue-600 uppercase">User #${p.user_id.slice(-4)}</span>
-                <span class="text-[8px] text-gray-300 font-bold uppercase italic">ID: ${p.id}</span>
-            </div>
-
-            <p class="text-sm text-gray-700 leading-relaxed mb-4">${p.content}</p>
-
-            <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                <div class="flex space-x-5">
-                    <button onclick="handleLike('${p.id}')" class="flex items-center text-[10px] font-black text-gray-400 uppercase hover:text-blue-500 transition-colors">
-                        <span class="text-base mr-1">👍</span> Like <span class="ml-1 text-blue-500">+2 XP</span>
-                    </button>
-                    
-                    <button onclick="toggleComments('${p.id}')" class="flex items-center text-[10px] font-black text-gray-400 uppercase hover:text-green-500 transition-colors">
-                        <span class="text-base mr-1">💬</span> Comentar
-                    </button>
-                </div>
-
-                <button onclick="sharePost('${p.id}')" class="flex items-center text-[10px] font-black text-blue-400 uppercase italic">
-                    <span class="text-base mr-1">🔗</span> Partilhar
-                </button>
-            </div>
-
-            <div id="comments-${p.id}" class="hidden mt-4 pt-3 border-t border-dashed border-gray-100 animate-fade-in">
-                <input type="text" placeholder="Escreve um comentário..." class="w-full bg-gray-50 border-none rounded-lg p-2 text-xs focus:ring-1 focus:ring-blue-200">
-                <p class="text-[8px] text-gray-400 mt-2 uppercase font-bold text-center">Os comentários serão ativados na v33 (Full Social)</p>
-            </div>
+    <header class="sticky top-0 bg-white border-b z-50 px-5 py-3 flex justify-between items-center shadow-sm">
+        <div>
+            <h1 class="text-xl font-black italic tracking-tighter text-blue-600">APEX SOCIAL</h1>
+            <p class="text-[8px] font-bold text-gray-400 uppercase">Production v32.225</p>
         </div>
+        <div class="text-right">
+            <div id="bal-eur" class="font-black text-green-600 text-lg">0.0000€</div>
+            <div id="bal-brl" class="text-[9px] font-bold text-gray-400 uppercase">0.0000 BRL</div>
+        </div>
+    </header>
 
-        ${i % 3 === 2 ? '<div class="ad-slot bg-yellow-50 border-2 border-dashed border-yellow-100 p-4 text-center rounded-xl mb-4 text-[9px] font-black text-yellow-600 uppercase italic tracking-widest">Sponsored Advertisement</div>' : ''}
-    `).join('');
-}
-</script>
+    <main class="p-4 max-w-lg mx-auto">
+        
+        <section id="view-feed" class="tab-content active">
+            <div class="card p-3 mb-4 bg-blue-50 border-blue-100 flex items-center space-x-2 overflow-x-auto whitespace-nowrap no-scrollbar">
+                <span class="text-[9px] font-black text-blue-600 uppercase italic">Top 10:</span>
+                <div id="ranking" class="text-[9px] font-bold text-gray-500 flex space-x-3 uppercase"></div>
+            </div>
+
+            <div class="card p-4 border-2 border-blue-50 shadow-sm">
+                <textarea id="post-text" placeholder="O que vais partilhar? (+15 XP)" class="w-full border-none focus:ring-0 text-sm p-0 mb-3 resize-none" rows="2"></textarea>
+                <div class="flex justify-between items-center pt-3 border-t">
+                    <button class="text-gray-400"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg></button>
+                    <button onclick="sendPost()" class="bg-blue-600 text-white px-8 py-2 rounded-lg font-black text-xs uppercase shadow-md">Publicar</button>
+                </div>
+            </div>
+
+            <div id="feed" class="mt-4 space-y-4"></div>
+        </section>
+
+        <section id="view-wallet" class="tab-content">
+            <div class="card p-10 text-center shadow-xl border-t-8 border-blue-600">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Teu Saldo</p>
+                <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
+                <p id="wall-brl" class="text-sm font-bold text-gray-400 mt-2 uppercase tracking-tighter">≈ 0.0000 BRL</p>
+            </div>
+            <button onclick="doCheckIn()" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase mt-4">Check-in Diário (+0.0500€)</button>
+        </section>
+
+        <section id="view-admin" class="tab-content">
+            <div class="card p-6 border-4 border-red-500 bg-red-50">
+                <h2 class="text-red-600 font-black text-xs uppercase mb-4 tracking-widest">Painel Master Admin</h2>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded text-center"><p class="text-[8px] uppercase">Users</p><p id="adm-u" class="font-black text-2xl text-red-600">...</p></div>
+                    <div class="bg-white p-4 rounded text-center"><p class="text-[8px] uppercase">Posts</p><p id="adm-p" class="font-black text-2xl text-red-600">...</p></div>
+                </div>
+                <input id="del-id" type="text" placeholder="ID do Post" class="w-full p-4 border rounded-xl text-sm mb-2">
+                <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase">Apagar Post por ID</button>
+            </div>
+        </section>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-40">
+        <button onclick="nav('feed')" class="nav-btn flex-1 flex flex-col items-center py-2 text-gray-400 active"><span class="text-[10px] font-black uppercase">Social</span></button>
+        <button onclick="nav('wallet')" class="nav-btn flex-1 flex flex-col items-center py-2 text-gray-400"><span class="text-[10px] font-black uppercase">Carteira</span></button>
+        <button id="adm-btn" onclick="nav('admin')" class="hidden nav-btn flex-1 flex flex-col items-center py-2 text-red-400 italic font-bold"><span class="text-[10px] font-black uppercase">Admin</span></button>
+    </nav>
+
+    <script>
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
+        const UID = "5401881400";
+        const BRL_VAL = 6.1245;
+
+        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+        let user = { saldo: 0, bonus: 15 };
+
+        function nav(t) {
+            document.querySelectorAll('.tab-content, .nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-'+t).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        async function init() {
+            if(UID === "5401881400") document.getElementById('adm-btn').classList.remove('hidden');
+            try {
+                const { data } = await supabase.from('perfis').select('*').eq('id', UID).single();
+                if(data) user = data;
+                updateUI();
+                loadRanking();
+                loadFeed();
+                if(UID === "5401881400") loadStats();
+            } catch(e) { console.error(e); }
+        }
+
+        function updateUI() {
+            const e = user.saldo.toFixed(4);
+            const b = (user.saldo * BRL_VAL).toFixed(4);
+            document.getElementById('bal-eur').innerText = e + "€";
+            document.getElementById('wall-eur').innerText = e + "€";
