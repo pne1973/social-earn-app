@@ -3,73 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v34.520</title>
+    <title>Apex Social v34.521</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; padding-bottom: 80px; }
-        
-        /* Header Fixo */
-        header { position: fixed; top: 0; width: 100%; height: 65px; background: white; border-bottom: 2px solid #dadce0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
-        
-        /* Publisher Area */
-        .publisher { margin-top: 80px; padding: 15px; }
-        .card { background: white; border-radius: 12px; border: 1px solid #dadce0; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        
-        /* Feed */
-        #feed-container { padding: 0 15px; }
-        .post-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 20px; overflow: hidden; }
-        .post-img { width: 100%; display: block; background: #eee; min-height: 200px; object-fit: cover; }
-        
-        /* Interações Estilo Google */
-        .btn-interact { flex: 1; padding: 12px 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; color: #5f6368; border: none; background: transparent; }
-        .badge { background: var(--g-red); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; }
-
-        /* Tabs */
-        nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; border-top: 2px solid #dadce0; display: flex; z-index: 1000; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
-        .nav-btn.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
+        :root { --blue: #4285F4; --red: #EA4335; --green: #34A853; }
+        body { font-family: sans-serif; background: #f1f3f4; margin: 0; padding-bottom: 80px; font-weight: bold; }
+        header { position: fixed; top: 0; width: 100%; height: 60px; background: white; border-bottom: 2px solid #ddd; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
+        .feed { margin-top: 75px; padding: 0 15px; }
+        .post-card { background: white; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .post-img { width: 100%; height: auto; display: block; background: #fafafa; border-bottom: 1px solid #eee; }
+        .btn-action { flex: 1; padding: 15px 0; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; color: #555; background: none; border: none; font-weight: 900; }
+        .count-badge { background: var(--red); color: white; padding: 2px 7px; border-radius: 10px; font-size: 10px; }
+        nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; border-top: 2px solid #ddd; display: flex; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; text-transform: uppercase; font-size: 11px; color: #777; }
+        .nav-item.active { color: var(--blue); border-top: 4px solid var(--blue); }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="background: var(--g-blue); color: white; padding: 8px 12px; border-radius: 8px; font-weight: 900;">A</div>
-            <span style="color: var(--g-blue); font-weight: 900; font-size: 14px;">APEX SOCIAL</span>
-        </div>
-        <div id="saldo-header" style="color: var(--g-green); font-weight: 900; font-size: 16px;">0.0000€</div>
+        <div style="color: var(--blue); font-size: 18px;">APEX <b>SOCIAL</b></div>
+        <div id="saldo-topo" style="color: var(--green); font-size: 16px;">0.0000€</div>
     </header>
 
-    <main id="tab-rede">
-        <div class="publisher">
-            <div class="card p-4" style="border-top: 8px solid var(--g-blue);">
-                <textarea id="post-text" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 font-black uppercase text-xs mb-3" rows="2"></textarea>
-                <div id="upload-preview" class="hidden mb-3 text-[10px] text-green-600 font-bold text-center">✅ IMAGEM PRONTA</div>
-                <div class="flex gap-2">
-                    <label for="file-in" class="flex-1 bg-gray-100 p-3 rounded-lg text-center text-[10px] font-black cursor-pointer uppercase">📸 FOTO</label>
-                    <input type="file" id="file-in" accept="image/*" class="hidden" onchange="document.getElementById('upload-preview').classList.remove('hidden')">
-                    <button onclick="enviarPost()" id="btn-envio" class="flex-[2] bg-blue-600 text-white rounded-lg font-black text-[10px] uppercase">Publicar (+0.0150€)</button>
-                </div>
+    <div class="feed">
+        <div class="post-card p-4 mb-6" style="border-top: 6px solid var(--blue);">
+            <textarea id="txt-post" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 text-sm mb-3" rows="2"></textarea>
+            <div id="preview-msg" class="hidden text-[10px] text-green-500 mb-2">✅ IMAGEM SELECIONADA</div>
+            <div class="flex gap-2">
+                <label for="img-file" class="bg-gray-100 flex-1 p-3 rounded-lg text-center text-[10px] uppercase cursor-pointer">📸 FOTO</label>
+                <input type="file" id="img-file" accept="image/*" class="hidden" onchange="document.getElementById('preview-msg').classList.remove('hidden')">
+                <button onclick="publicar()" id="btn-pub" class="bg-blue-600 text-white flex-[2] rounded-lg text-[10px] uppercase">Publicar</button>
             </div>
         </div>
 
-        <div id="feed-container">
-            </div>
-    </main>
-
-    <main id="tab-ganhos" class="hidden p-10 mt-20 text-center">
-        <div class="card p-10 border-t-[10px] border-blue-600">
-            <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Carteira Total</p>
-            <h1 id="saldo-total" class="text-4xl font-black text-blue-600">0.0000€</h1>
-        </div>
-    </main>
+        <div id="lista-feed"></div>
+    </div>
 
     <nav>
-        <button onclick="mudarTab('rede')" id="nav-rede" class="nav-btn active">Rede</button>
-        <button onclick="mudarTab('ganhos')" id="nav-ganhos" class="nav-btn">Ganhos</button>
+        <div class="nav-item active">Rede</div>
+        <div class="nav-item">Ganhos</div>
     </nav>
 
     <script>
@@ -78,96 +52,83 @@
         const MASTER_ID = "5401881400";
         const _sb = window.supabase.createClient(SB_URL, SB_KEY);
 
-        let saldo = 0;
+        let meuSaldo = 0;
 
         async function init() {
             const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) saldo = data.saldo;
-            atualizarUI();
-            carregarFeed();
+            if(data) meuSaldo = data.saldo;
+            document.getElementById('saldo-topo').innerText = meuSaldo.toFixed(4) + "€";
+            carregarPosts();
         }
 
-        async function enviarPost() {
-            const txt = document.getElementById('post-text').value;
-            const file = document.getElementById('file-in').files[0];
-            const btn = document.getElementById('btn-envio');
-            if(!txt) return;
+        async function publicar() {
+            const msg = document.getElementById('txt-post').value;
+            const file = document.getElementById('img-file').files[0];
+            const btn = document.getElementById('btn-pub');
+            if(!msg) return;
 
             btn.disabled = true;
             btn.innerText = "A ENVIAR...";
 
-            let url = "";
+            let finalUrl = "";
             if(file) {
                 const fd = new FormData();
                 fd.append("image", file);
                 try {
                     const res = await fetch("https://api.imgbb.com/1/upload?key=90868f06f74304629e474585642d627c", { method: "POST", body: fd });
-                    const resJ = await res.json();
-                    url = resJ.data.url;
-                } catch(e) { console.log("Erro no ImgBB"); }
+                    const resJson = await res.json();
+                    finalUrl = resJson.data.url;
+                } catch(e) { console.error("Erro ImgBB"); }
             }
 
-            const { error } = await _sb.from('posts').insert([{ user_id: MASTER_ID, content: txt, image_url: url, likes: 0, shares: 0 }]);
-            
+            const { error } = await _sb.from('posts').insert([{ 
+                user_id: MASTER_ID, 
+                content: msg, 
+                image_url: finalUrl,
+                likes: 0,
+                shares: 0
+            }]);
+
             if(!error) {
-                saldo += 0.0150;
-                await _sb.from('perfis').update({ saldo: saldo }).eq('id', MASTER_ID);
-                location.reload(); // Recarrega para limpar tudo e mostrar o post
+                meuSaldo += 0.0150;
+                await _sb.from('perfis').update({ saldo: meuSaldo }).eq('id', MASTER_ID);
+                window.location.reload(); 
             }
         }
 
-        async function carregarFeed() {
+        async function carregarPosts() {
             const { data: posts } = await _sb.from('posts').select('*').order('created_at', {ascending: false});
-            const container = document.getElementById('feed-container');
-            container.innerHTML = "";
+            const feed = document.getElementById('lista-feed');
+            feed.innerHTML = "";
 
             for(const p of posts) {
                 const { count } = await _sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
                 
-                const card = document.createElement('div');
-                card.className = "post-card shadow-sm";
-                card.innerHTML = `
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
+                const div = document.createElement('div');
+                div.className = "post-card";
+                div.innerHTML = `
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img" alt="Post">` : ''}
                     <div class="p-4">
-                        <p class="text-xs font-black uppercase text-gray-800 mb-4">${p.content}</p>
-                        <div class="flex border-t pt-2 gap-1">
-                            <button onclick="reagir('${p.id}', 'likes', 0.0006)" class="btn-interact">
-                                <span>👍</span> <div class="badge">${p.likes || 0}</div>
-                            </button>
-                            <button class="btn-interact" style="border-left: 1px solid #eee; border-right: 1px solid #eee;">
-                                <span>💬</span> <div class="badge">${count || 0}</div>
-                            </button>
-                            <button onclick="reagir('${p.id}', 'shares', 0.0020)" class="btn-interact">
-                                <span>🔗</span> <div class="badge">${p.shares || 0}</div>
-                            </button>
+                        <div class="text-xs uppercase text-gray-800 mb-4">${p.content}</div>
+                        <div class="flex border-t pt-2">
+                            <button onclick="acao('${p.id}', 'likes', 0.0006)" class="btn-action">👍 <span class="count-badge">${p.likes || 0}</span></button>
+                            <button class="btn-action" style="border-left:1px solid #eee; border-right:1px solid #eee;">💬 <span class="count-badge">${count || 0}</span></button>
+                            <button onclick="acao('${p.id}', 'shares', 0.0020)" class="btn-action">🔗 <span class="count-badge">${p.shares || 0}</span></button>
                         </div>
                     </div>
                 `;
-                container.appendChild(card);
+                feed.appendChild(div);
             }
         }
 
-        async function reagir(id, tipo, valor) {
-            const { data } = await _sb.from('posts').select(tipo).eq('id', id).single();
-            const novo = (data[tipo] || 0) + 1;
-            await _sb.from('posts').update({ [tipo]: novo }).eq('id', id);
+        async function acao(id, coluna, valor) {
+            const { data } = await _sb.from('posts').select(coluna).eq('id', id).single();
+            const novoValor = (data[coluna] || 0) + 1;
+            await _sb.from('posts').update({ [coluna]: novoValor }).eq('id', id);
             
-            saldo += valor;
-            await _sb.from('perfis').update({ saldo: saldo }).eq('id', MASTER_ID);
-            atualizarUI();
-            carregarFeed(); // Atualiza os números no ecrã
-        }
-
-        function atualizarUI() {
-            document.getElementById('saldo-header').innerText = saldo.toFixed(4) + "€";
-            document.getElementById('saldo-total').innerText = saldo.toFixed(4) + "€";
-        }
-
-        function mudarTab(tab) {
-            document.getElementById('tab-rede').classList.toggle('hidden', tab !== 'rede');
-            document.getElementById('tab-ganhos').classList.toggle('hidden', tab !== 'ganhos');
-            document.getElementById('nav-rede').classList.toggle('active', tab === 'rede');
-            document.getElementById('nav-ganhos').classList.toggle('active', tab === 'ganhos');
+            meuSaldo += valor;
+            await _sb.from('perfis').update({ saldo: meuSaldo }).eq('id', MASTER_ID);
+            init(); // Recarrega saldo e feed
         }
 
         window.onload = init;
