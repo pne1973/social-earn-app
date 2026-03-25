@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v73 - Final</title>
+    <title>Apex Social v74 - Full Content</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Roboto', sans-serif; background-color: #f3f4f6; -webkit-tap-highlight-color: transparent; }
         .google-blue { color: #4285F4; }
         .google-bg-blue { background-color: #4285F4; }
         .nav-active { color: #4285F4 !important; border-top: 3px solid #4285F4; font-weight: 900; }
-        .card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         #loader { display: none; position: fixed; inset: 0; background: white; z-index: 10000; align-items: center; justify-content: center; }
-        .btn-interact:active { scale: 0.95; opacity: 0.8; }
+        .ad-placeholder { background: #fdfdfd; border: 2px dashed #cbd5e1; border-radius: 8px; min-height: 100px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body class="pb-24">
@@ -26,16 +26,16 @@
     <header class="sticky top-0 bg-white border-b z-50 px-4 py-3 flex justify-between items-center shadow-sm">
         <div>
             <h1 class="text-xl font-black google-blue tracking-tighter uppercase">Apex Social</h1>
-            <p class="text-[9px] font-bold text-gray-400 uppercase">v73 • Ligado</p>
+            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Produção v74</p>
         </div>
-        <div class="bg-green-50 px-4 py-1.5 rounded-full border border-green-200">
-            <span id="main-balance" class="font-black text-green-700 text-lg">0,0000€</span>
+        <div class="bg-green-100 px-4 py-1.5 rounded-full border border-green-200 shadow-inner">
+            <span id="main-balance" class="font-black text-green-700 text-lg tracking-tighter">0,0000€</span>
         </div>
     </header>
 
-    <main id="app-content" class="p-4 max-w-md mx-auto min-h-screen"></main>
+    <main id="app-content" class="p-4 max-w-md mx-auto min-h-screen space-y-4"></main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-50 shadow-lg">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-50 shadow-2xl">
         <button onclick="switchTab('feed')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-feed"><span class="text-[10px] font-black uppercase">Feed</span></button>
         <button onclick="switchTab('wallet')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-wallet"><span class="text-[10px] font-black uppercase">Carteira</span></button>
         <button onclick="switchTab('friends')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-friends"><span class="text-[10px] font-black uppercase">Rede</span></button>
@@ -44,14 +44,14 @@
     </nav>
 
     <script>
-        // CONFIGURAÇÃO DIRETA (SUBSTITUI PELOS TEUS DADOS)
+        // --- CONFIGURAÇÃO (COLA AS TUAS CHAVES AQUI) ---
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; // Põe aqui a chave eyJ...
+        const SB_KEY = "COLA_AQUI_A_TUA_KEY_SUPABASE"; 
 
         const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
         const USER_ID = "5401881400";
         
-        let state = { saldo_eur: 0, bonus_restante: 0, is_turbo: false };
+        let state = { saldo_eur: 0, bonus_restante: 0, is_turbo: false, total_posts: 0, amigos: 0 };
         let currentTab = 'feed';
 
         async function init() {
@@ -60,7 +60,7 @@
                 let { data } = await supabaseClient.from('perfis').select('*').eq('id', USER_ID).single();
                 if (data) state = data;
                 else await supabaseClient.from('perfis').insert([{ id: USER_ID }]);
-            } catch (e) { console.error("Erro Supabase"); }
+            } catch (e) { console.error("Erro de sincronização."); }
 
             if (USER_ID === "5401881400") document.getElementById('btn-admin').style.display = 'flex';
             showLoader(false);
@@ -70,11 +70,14 @@
         async function doAction() {
             let ganho = state.is_turbo ? 0.0015 : 0.0004;
             state.saldo_eur = parseFloat(state.saldo_eur) + ganho;
-            if (state.is_turbo) {
+            state.total_posts++;
+            
+            if (state.is_turbo && state.bonus_restante > 0) {
                 state.bonus_restante--;
-                if (state.bonus_restante <= 0) state.is_turbo = false;
+                if (state.bonus_restante === 0) state.is_turbo = false;
             }
-            updateUI();
+
+            updateBalanceUI();
             await supabaseClient.from('perfis').update(state).eq('id', USER_ID);
         }
 
@@ -85,32 +88,89 @@
             render();
         }
 
-        function updateUI() {
+        function updateBalanceUI() {
             document.getElementById('main-balance').innerText = parseFloat(state.saldo_eur).toFixed(4) + '€';
         }
 
         function render() {
             const container = document.getElementById('app-content');
-            updateUI();
+            updateBalanceUI();
+
             if (currentTab === 'feed') {
                 container.innerHTML = `
-                    <div class="card p-4 mb-4 bg-blue-50 flex justify-between items-center">
-                        <p class="text-[10px] font-black uppercase">${state.is_turbo ? '🔥 Turbo' : '❄️ Normal'}</p>
-                        <button onclick="location.reload()" class="google-bg-blue text-white px-4 py-2 rounded text-[10px] font-black uppercase">Atualizar</button>
+                    <div class="card p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] font-black uppercase opacity-80">Modo de Ganho</p>
+                            <p class="text-lg font-black">${state.is_turbo ? '🔥 TURBO ATIVO' : '❄️ MODO NORMAL'}</p>
+                        </div>
+                        <p class="text-2xl font-black">${state.bonus_restante}</p>
                     </div>
+
+                    <div class="ad-placeholder p-2">
+                        <span>Espaço Adsterra (728x90 Native Banner)</span>
+                    </div>
+
                     <div class="card p-4">
-                        <p class="text-sm mb-4">Clique no botão abaixo para validar a sua atividade diária.</p>
-                        <button onclick="doAction()" class="google-blue font-black text-[10px] uppercase tracking-widest btn-interact">Gostar (+${state.is_turbo ? '0,0015' : '0,0004'}€)</button>
+                        <div class="flex items-center space-x-2 mb-3">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center font-black text-blue-500 text-xs">A</div>
+                            <p class="text-xs font-black text-gray-700 uppercase">Admin • Post Oficial</p>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-6">Valide o seu bónus diário clicando no botão abaixo. Cada interação gera receita direta.</p>
+                        <button onclick="doAction()" class="w-full google-bg-blue text-white py-3 rounded-lg font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all">Gostar (+${state.is_turbo ? '0,0015' : '0,0004'}€)</button>
                     </div>
+
+                    <div class="text-center p-2 opacity-50"><p class="text-[8px] font-bold uppercase">Anúncio Patrocinado</p></div>
                 `;
             } else if (currentTab === 'wallet') {
-                container.innerHTML = `<div class="card p-10 text-center"><h1 class="text-5xl font-black google-blue">${state.saldo_eur.toFixed(4)}€</h1><p class="mt-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Saldo Disponível</p></div>`;
+                container.innerHTML = `
+                    <div class="card p-8 text-center bg-white border-b-4 border-blue-500">
+                        <p class="text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Saldo na Conta</p>
+                        <h1 class="text-5xl font-black google-blue tracking-tighter">${state.saldo_eur.toFixed(4)}€</h1>
+                    </div>
+
+                    <div class="card p-4">
+                        <p class="text-[10px] font-black uppercase mb-3 text-gray-400">Tabela de Ganhos</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs border-b pb-1"><span>Ação Normal</span><span class="font-bold">0.0004€</span></div>
+                            <div class="flex justify-between text-xs border-b pb-1 text-orange-500 font-bold"><span>Ação Turbo</span><span>0.0015€</span></div>
+                            <div class="flex justify-between text-xs pt-1"><span>Convite Ativo</span><span class="font-bold text-green-600">0.0500€</span></div>
+                        </div>
+                    </div>
+
+                    <button class="w-full bg-gray-800 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg opacity-50 cursor-not-allowed">Mínimo de levantamento: 5.00€</button>
+                `;
             } else if (currentTab === 'friends') {
-                container.innerHTML = `<div class="card p-6"><p class="text-[10px] font-mono text-blue-500">ref/${USER_ID}</p></div>`;
+                container.innerHTML = `
+                    <div class="card p-6">
+                        <h3 class="font-black text-sm uppercase mb-2">A tua Rede</h3>
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4 text-center">
+                            <p class="text-3xl font-black google-blue">${state.amigos || 0}</p>
+                            <p class="text-[10px] font-black text-gray-400 uppercase">Amigos Convidados</p>
+                        </div>
+                        <p class="text-[10px] font-bold uppercase mb-2 text-gray-400">Link de Afiliado:</p>
+                        <input readonly value="https://apex-social.onrender.com/?ref=${USER_ID}" class="w-full bg-gray-100 p-3 rounded border text-[10px] font-mono text-blue-600 mb-4">
+                        <p class="text-[9px] text-gray-400 leading-tight">Ganha bónus vitalício de 5% sobre os ganhos de cada amigo que usar o teu link.</p>
+                    </div>
+                `;
             } else if (currentTab === 'profile') {
-                container.innerHTML = `<div class="card p-6 text-center"><p class="font-black text-xs text-gray-400 uppercase">Utilizador #${USER_ID}</p></div>`;
+                container.innerHTML = `
+                    <div class="card p-6 text-center">
+                        <div class="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center font-black text-gray-400">#</div>
+                        <p class="font-black text-sm text-gray-800 uppercase tracking-tighter">ID: ${USER_ID}</p>
+                        <div class="mt-6 grid grid-cols-2 gap-2">
+                            <div class="bg-gray-50 p-3 rounded">
+                                <p class="text-[10px] font-black text-gray-400 uppercase">Posts</p>
+                                <p class="font-bold">${state.total_posts || 0}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded">
+                                <p class="text-[10px] font-black text-gray-400 uppercase">Nível</p>
+                                <p class="font-bold text-blue-500">Membro</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
             } else if (currentTab === 'admin') {
-                container.innerHTML = `<div class="card p-4 border-red-500 border-2 bg-red-50 text-center"><p class="text-red-600 font-black text-[10px] uppercase">Admin Ativo</p></div>`;
+                container.innerHTML = `<div class="card p-10 border-2 border-red-500 bg-red-50 text-center"><p class="text-red-600 font-black uppercase">Estatísticas Admin Ativas</p></div>`;
             }
         }
 
