@@ -3,68 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v39.0</title>
+    <title>Apex Social v39.2</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --blue: #4285F4; --bg: #f2f4f7; }
-        body { font-family: sans-serif; background: var(--bg); margin: 0; padding-top: 60px; padding-bottom: 20px; }
+        :root { --blue: #4285F4; --bg: #f8f9fa; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding-top: 60px; padding-bottom: 20px; }
         
         header { position: fixed; top: 0; width: 100%; height: 55px; background: white; border-bottom: 1px solid #ddd; z-index: 9999; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
 
-        /* CONTENTOR PRINCIPAL: Garante que os posts não se batam */
-        #feed { display: block; width: 100%; max-width: 500px; margin: 0 auto; }
+        /* CONTENTOR DO FEED */
+        #feed { display: flex; flex-direction: column; gap: 12px; padding: 10px; max-width: 450px; margin: 0 auto; }
 
-        /* CARTÃO: Isolamento absoluto */
+        /* CARTÃO OTIMIZADO: Texto e Imagem em harmonia */
         .post-card { 
             background: white; 
-            margin: 12px; 
-            border-radius: 12px; 
+            border-radius: 16px; 
             border: 1px solid #e1e4e8;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Corta qualquer coisa que tente sair do cartão */
-            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        /* IMAGEM: Respeita o aspeto original sem sobrepor */
-        .post-img-container { width: 100%; background: #f8f9fa; }
-        .post-img-container img { 
+        /* REDUÇÃO DA IMAGEM: Agora com moldura e tamanho controlado */
+        .post-img-frame { 
+            width: 92%; 
+            margin: 12px auto 0 auto;
+            max-height: 220px; /* Redução drástica para caber tudo no ecrã */
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f1f3f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .post-img-frame img { 
             width: 100%; 
-            height: auto; 
-            display: block; 
-            max-height: 400px; 
-            object-fit: contain; /* Garante que a foto inteira apareça sem esticar */
+            height: 100%; 
+            object-fit: cover; /* Foca no centro da imagem sem a deformar */
         }
 
-        /* TEXTO E BOTÕES: Empilhamento garantido */
-        .post-footer { padding: 12px; border-top: 1px solid #f0f0f0; }
-        .post-text { font-size: 14px; font-weight: 700; color: #222; margin-bottom: 10px; }
+        .post-body { padding: 12px 16px; }
+        .post-text { font-size: 15px; font-weight: 700; color: #1c1e21; line-height: 1.4; margin-bottom: 8px; }
         
+        /* Ações compactas */
         .post-actions { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; 
-            border-top: 1px solid #eee; 
-            padding-top: 8px;
+            display: flex; 
+            justify-content: space-around;
+            border-top: 1px solid #f0f2f5; 
+            padding: 8px 0;
         }
-        .action-item { text-align: center; font-size: 10px; font-weight: 800; color: #5f6368; text-transform: uppercase; }
+        .action-item { font-size: 11px; font-weight: 800; color: #65676b; text-transform: uppercase; }
 
-        .btn-pub { background: var(--blue); color: white; border-radius: 8px; font-weight: 800; padding: 12px; width: 100%; }
+        .btn-pub { background: var(--blue); color: white; border-radius: 10px; font-weight: 800; padding: 12px; width: 100%; transition: scale 0.1s; }
+        .btn-pub:active { scale: 0.98; }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="font-weight: 900; color: var(--blue);">APEX SOCIAL</div>
-        <div id="u-saldo" style="color: #28a745; font-weight: 900;">0.0000€</div>
+        <div style="font-weight: 900; color: var(--blue); font-size: 18px; letter-spacing: -0.5px;">APEX</div>
+        <div id="u-saldo" style="color: #34A853; font-weight: 900;">0.0000€</div>
     </header>
 
     <main>
-        <div class="post-card p-4">
+        <div class="post-card p-4 mx-3 mt-2">
             <textarea id="in-txt" placeholder="O que pretende partilhar?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
-            <div id="status" class="hidden text-[10px] font-black text-blue-600 mb-2 uppercase">📸 Imagem Pronta</div>
+            <div id="status" class="hidden text-[10px] font-black text-blue-500 mb-2 uppercase text-center">✨ Foto pronta</div>
             <div class="flex gap-2">
-                <label for="in-file" class="bg-gray-100 p-3 rounded-lg cursor-pointer text-[10px] font-black text-gray-500 uppercase">Foto</label>
+                <label for="in-file" class="bg-gray-100 p-3 rounded-lg cursor-pointer text-[10px] font-black text-gray-500 uppercase flex items-center">📸 Foto</label>
                 <input type="file" id="in-file" accept="image/*" class="hidden" onchange="processarFoto()">
                 <button onclick="publicar()" id="btn-pub" class="btn-pub uppercase">Publicar</button>
             </div>
@@ -78,7 +86,7 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const _sb = window.supabase.createClient(SB_URL, SB_KEY);
         const MASTER_ID = "5401881400";
-        let fotoBase64 = "";
+        let fotoData = "";
 
         async function init() {
             const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
@@ -95,13 +103,13 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const maxW = 700;
+                    const maxW = 600; // Otimizado para telemóvel
                     const scale = maxW / img.width;
                     canvas.width = maxW;
                     canvas.height = img.height * scale;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    fotoBase64 = canvas.toDataURL('image/jpeg', 0.5); // Comprimido para 50% para carregar mais rápido
+                    fotoData = canvas.toDataURL('image/jpeg', 0.6);
                 };
                 img.src = e.target.result;
             };
@@ -110,12 +118,11 @@
 
         async function publicar() {
             const txt = document.getElementById('in-txt').value;
+            if(!txt && !fotoData) return;
             const btn = document.getElementById('btn-pub');
-            if(!txt && !fotoBase64) return;
-            
-            btn.disabled = true; btn.innerText = "A ENVIAR...";
+            btn.disabled = true; btn.innerText = "A PUBLICAR...";
 
-            const { error } = await _sb.from('posts').insert([{ user_id: MASTER_ID, content: txt, image_url: fotoBase64 }]);
+            const { error } = await _sb.from('posts').insert([{ user_id: MASTER_ID, content: txt, image_url: fotoData }]);
             if(!error) window.location.reload();
             else { btn.disabled = false; btn.innerText = "ERRO"; }
         }
@@ -131,19 +138,19 @@
                 const card = document.createElement('div');
                 card.className = "post-card";
                 
-                let imgHtml = p.image_url ? `
-                    <div class="post-img-container">
+                let imgPart = p.image_url ? `
+                    <div class="post-img-frame">
                         <img src="${p.image_url}" loading="lazy">
                     </div>` : "";
 
                 card.innerHTML = `
-                    ${imgHtml}
-                    <div class="post-footer">
+                    ${imgPart}
+                    <div class="post-body">
                         ${p.content ? `<p class="post-text">${p.content}</p>` : ''}
                         <div class="post-actions">
-                            <div class="action-item">Gosto</div>
-                            <div class="action-item">Comentar</div>
-                            <div class="action-item">Partilhar</div>
+                            <span class="action-item">Gosto</span>
+                            <span class="action-item">Comentar</span>
+                            <span class="action-item">Partilhar</span>
                         </div>
                     </div>
                 `;
