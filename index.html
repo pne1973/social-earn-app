@@ -3,67 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v35.000</title>
+    <title>Apex v35.100</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; font-weight: 900; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
+        .card { background: white; border: 1px solid #dadce0; border-radius: 16px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        
-        /* PUBLISHER FIXO */
-        .sticky-pub { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 12px 16px; }
-        
-        /* COMENTÁRIOS */
-        .comment-area { display: none; background: #f8f9fa; border-top: 2px solid #eee; padding: 15px; }
-        .comment-area.open { display: block; }
-        .c-list { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-        .c-bubble { background: white; padding: 10px; border-radius: 12px; border: 1px solid #e0e0e0; font-size: 11px; font-weight: 900; text-transform: uppercase; }
-        
-        .badge { position: absolute; top: -5px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: 900; border: 2px solid white; }
-        
-        #feed { margin-top: 155px; }
-        input, textarea, button { font-weight: 900 !important; text-transform: uppercase; }
+        .comment-box { display: none; background: #f9fafb; border-top: 2px solid #f3f4f6; padding: 15px; }
+        .comment-box.active { display: block; }
+        .badge { position: absolute; top: -5px; right: 15%; background: #ef4444; color: white; font-size: 10px; padding: 2px 7px; border-radius: 99px; border: 2px solid white; }
+        #feed { margin-top: 160px; }
+        .sticky-header { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 10px 16px; }
     </style>
 </head>
 <body class="pb-24">
 
-    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-50 px-4 py-4 flex justify-between items-center h-[72px]">
+    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-50 p-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">A</div>
-            <h1 class="text-sm font-black text-blue-600">APEX SOCIAL</h1>
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">A</div>
+            <span class="text-blue-600 text-sm">APEX SOCIAL</span>
         </div>
-        <div id="main-eur" class="font-black text-green-600 text-base">0.0000€</div>
+        <div id="saldo-top" class="text-green-600 text-lg">0.0000€</div>
     </header>
 
     <main class="max-w-lg mx-auto p-4">
-        <section id="view-social" class="tab-content active">
-            <div class="sticky-pub">
-                <div class="google-card p-4 border-t-8 border-blue-600 shadow-lg">
-                    <textarea id="post-txt" onclick="this.rows=3; document.getElementById('post-extra').classList.remove('hidden')" placeholder="PARTILHAR... (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none" rows="1"></textarea>
-                    <div id="post-extra" class="hidden text-right">
-                        <input id="post-img" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-100 border-none text-[10px] p-3 rounded-xl mb-4 outline-none">
-                        <button onclick="enviarPost()" class="w-full bg-blue-600 text-white py-3 rounded-xl text-[11px]">PUBLICAR</button>
-                    </div>
+        <section id="rede" class="tab-content active">
+            <div class="sticky-header">
+                <div class="card p-4 border-t-8 border-blue-600">
+                    <textarea id="post-txt" onclick="this.rows=3; document.getElementById('post-btn').classList.remove('hidden')" placeholder="PARTILHAR... (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none" rows="1"></textarea>
+                    <button id="post-btn" onclick="novoPost()" class="hidden w-full bg-blue-600 text-white py-3 rounded-xl text-xs">PUBLICAR AGORA</button>
                 </div>
             </div>
             <div id="feed"></div>
         </section>
 
-        <section id="view-info" class="tab-content">
-            <div class="google-card p-12 text-center border-t-[10px] border-blue-600 mt-4">
-                <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
-                <p class="text-[10px] text-gray-400 mt-4">SALDO TOTAL</p>
+        <section id="ganhos" class="tab-content">
+            <div class="card p-12 text-center border-t-[10px] border-blue-600 mt-4">
+                <h1 id="saldo-wall" class="text-5xl text-blue-600">0.0000€</h1>
+                <p class="text-gray-400 mt-4 text-xs">SALDO DISPONÍVEL</p>
             </div>
         </section>
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-50">
-        <button onclick="tab('social')" class="flex-1 py-2 font-black text-[10px] text-blue-600">REDE</button>
-        <button onclick="tab('info')" class="flex-1 py-2 font-black text-[10px] text-gray-400">GANHOS</button>
+        <button onclick="mudarTab('rede')" class="flex-1 text-[11px] text-blue-600">REDE</button>
+        <button onclick="mudarTab('ganhos')" class="flex-1 text-[11px] text-gray-400">GANHOS</button>
     </nav>
 
     <script>
@@ -72,21 +59,21 @@
         const MASTER_ID = "5401881400";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
-        let saldo = 0;
+        let saldoAtual = 0;
 
-        async function init() {
+        async function iniciar() {
             const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) saldo = Number(data.saldo);
-            renderUI();
-            loadFeed();
+            if(data) saldoAtual = Number(data.saldo);
+            atualizarValores();
+            carregarFeed();
         }
 
-        function renderUI() {
-            document.getElementById('main-eur').innerText = saldo.toFixed(4) + "€";
-            document.getElementById('wall-eur').innerText = saldo.toFixed(4) + "€";
+        function atualizarValores() {
+            document.getElementById('saldo-top').innerText = saldoAtual.toFixed(4) + "€";
+            document.getElementById('saldo-wall').innerText = saldoAtual.toFixed(4) + "€";
         }
 
-        async function loadFeed() {
+        async function carregarFeed() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const feed = document.getElementById('feed');
             feed.innerHTML = "";
@@ -94,98 +81,89 @@
             for (const p of posts) {
                 const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
                 
-                const div = document.createElement('div');
-                div.className = "google-card p-6";
-                div.innerHTML = `
-                    <p class="text-[10px] text-gray-400 mb-2">ID..${String(p.user_id).slice(-4)}</p>
-                    <p class="text-[13px] text-gray-800 mb-3 uppercase">${p.content}</p>
-                    ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 border">` : ''}
+                const cardPost = document.createElement('div');
+                cardPost.className = "card p-6";
+                cardPost.innerHTML = `
+                    <div class="text-[10px] text-gray-400 mb-2">UTILIZADOR ID..${String(p.user_id).slice(-4)}</div>
+                    <div class="text-sm text-gray-800 mb-4">${p.content}</div>
                     
                     <div class="flex justify-between border-t pt-4 relative">
-                        <button onclick="pagar(0.0006)" class="flex-1 text-center"><span class="text-xl">👍</span><br><span class="text-[8px]">GOSTAR</span></button>
-                        
-                        <button onclick="abrirComentarios('${p.id}')" class="flex-1 text-center relative border-x">
-                            <div id="badge-${p.id}" class="badge">${count || 0}</div>
-                            <span class="text-xl">💬</span><br><span class="text-[8px]">COMENTAR</span>
+                        <button onclick="ganhar(0.0005)" class="flex-1 text-center"><span class="text-xl">👍</span><div class="text-[9px]">GOSTAR</div></button>
+                        <button onclick="abrirCmt('${p.id}')" class="flex-1 text-center relative border-x">
+                            <div id="count-${p.id}" class="badge">${count || 0}</div>
+                            <span class="text-xl">💬</span><div class="text-[9px]">COMENTAR</div>
                         </button>
-                        
-                        <button onclick="pagar(0.0002)" class="flex-1 text-center"><span class="text-xl">🔗</span><br><span class="text-[8px]">PARTILHAR</span></button>
+                        <button onclick="ganhar(0.0005)" class="flex-1 text-center"><span class="text-xl">🔗</span><div class="text-[9px]">PARTILHAR</div></button>
                     </div>
 
-                    <div id="area-${p.id}" class="comment-area">
-                        <div id="list-${p.id}" class="c-list"></div>
+                    <div id="box-${p.id}" class="comment-box">
+                        <div id="lista-${p.id}" class="space-y-3 mb-4 max-h-40 overflow-y-auto text-[11px]"></div>
                         <div class="flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="ESCREVER..." class="flex-1 text-[11px] p-3 border-2 rounded-xl outline-none">
-                            <button onclick="enviarComentario('${p.id}')" class="bg-blue-600 text-white px-5 rounded-xl text-[10px]">OK</button>
+                            <input id="input-${p.id}" type="text" placeholder="A TUA MENSAGEM..." class="flex-1 p-3 bg-white border-2 rounded-xl outline-none text-xs">
+                            <button onclick="enviarCmt('${p.id}')" class="bg-blue-600 text-white px-6 rounded-xl text-xs shadow-md active:scale-95 transition-transform">OK</button>
                         </div>
                     </div>
                 `;
-                feed.appendChild(div);
+                feed.appendChild(cardPost);
             }
         }
 
-        async function abrirComentarios(id) {
-            const area = document.getElementById(`area-${id}`);
-            const list = document.getElementById(`list-${id}`);
+        async function abrirCmt(id) {
+            const box = document.getElementById(`box-${id}`);
+            const lista = document.getElementById(`lista-${id}`);
+            box.classList.toggle('active');
             
-            if(area.classList.contains('open')) {
-                area.classList.remove('open');
-            } else {
-                area.classList.add('open');
-                list.innerHTML = "<p class='text-[9px] text-center py-2'>A CARREGAR...</p>";
+            if(box.classList.contains('active')) {
+                lista.innerHTML = "CARREGANDO...";
                 const { data } = await sb.from('comentarios').select('*').eq('post_id', id).order('created_at', {ascending: true});
-                list.innerHTML = data.map(c => `<div class="c-bubble"><p class="text-[8px] text-blue-600 mb-1">ID..${String(c.user_id).slice(-4)}</p>${c.content}</div>`).join('') || "<p class='text-[9px] text-center py-2'>SEM COMENTÁRIOS</p>";
-                list.scrollTop = list.scrollHeight;
+                lista.innerHTML = data.map(c => `<div class="bg-white p-2 rounded-lg border"><b>ID..${String(c.user_id).slice(-4)}:</b> ${c.content}</div>`).join('') || "SEM COMENTÁRIOS.";
             }
         }
 
-        async function enviarComentario(id) {
-            const input = document.getElementById(`in-${id}`);
-            const list = document.getElementById(`list-${id}`);
-            const val = input.value.trim();
-            if(!val) return;
+        async function enviarCmt(id) {
+            const campo = document.getElementById(`input-${id}`);
+            const lista = document.getElementById(`lista-${id}`);
+            const texto = campo.value.trim();
+            if(!texto) return;
 
-            // Inserir no Supabase
-            const { error } = await sb.from('comentarios').insert([{ post_id: id, user_id: MASTER_ID, content: val }]);
+            // Injeta logo visualmente para não haver atraso
+            const div = document.createElement('div');
+            div.className = "bg-blue-50 p-2 rounded-lg border border-blue-100";
+            div.innerHTML = `<b>TU:</b> ${texto}`;
+            if(lista.innerText.includes("SEM COMENTÁRIOS")) lista.innerHTML = "";
+            lista.appendChild(div);
+            
+            campo.value = ""; // Limpa logo
+            
+            // Grava no Supabase "silenciosamente"
+            const { error } = await sb.from('comentarios').insert([{ post_id: id, user_id: MASTER_ID, content: texto }]);
             
             if(!error) {
-                // Atualizar lista visualmente NA HORA
-                if(list.innerText.includes("SEM COMENTÁRIOS")) list.innerHTML = "";
-                const novo = document.createElement('div');
-                novo.className = "c-bubble";
-                novo.innerHTML = `<p class="text-[8px] text-blue-600 mb-1">ID..${String(MASTER_ID).slice(-4)}</p>${val}`;
-                list.appendChild(novo);
-                
-                // Limpar input e atualizar badge
-                input.value = "";
-                const b = document.getElementById(`badge-${id}`);
+                const b = document.getElementById(`count-${id}`);
                 b.innerText = parseInt(b.innerText) + 1;
-                
-                list.scrollTop = list.scrollHeight;
-                pagar(0.0010);
+                ganhar(0.0010);
             }
         }
 
-        async function pagar(valor) {
-            saldo += valor;
-            renderUI();
-            await sb.from('perfis').update({ saldo: saldo }).eq('id', MASTER_ID);
+        async function ganhar(v) {
+            saldoAtual += v;
+            atualizarValores();
+            await sb.from('perfis').update({ saldo: saldoAtual }).eq('id', MASTER_ID);
         }
 
-        async function enviarPost() {
+        async function novoPost() {
             const t = document.getElementById('post-txt').value;
-            const i = document.getElementById('post-img').value;
             if(!t) return;
-            await sb.from('posts').insert([{ user_id: MASTER_ID, content: t, image_url: i }]);
+            await sb.from('posts').insert([{ user_id: MASTER_ID, content: t }]);
             location.reload();
         }
 
-        function tab(t) {
+        function mudarTab(t) {
             document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
-            document.getElementById('view-'+t).classList.add('active');
+            document.getElementById(t).classList.add('active');
         }
 
-        window.onload = init;
+        window.onload = iniciar;
     </script>
 </body>
 </html>
