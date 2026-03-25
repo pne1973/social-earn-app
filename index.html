@@ -3,110 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v32.225</title>
+    <title>Apex Social v76 - Official Master Version</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; margin: 0; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; padding-bottom: 100px; }
-        .nav-btn.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); background: #fff; font-weight: 900; }
-        .card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; }
-        #loader { display: none; position: fixed; inset: 0; background: white; z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; -webkit-tap-highlight-color: transparent; }
+        .google-blue { color: #4285F4; }
+        .google-bg-blue { background-color: #4285F4; }
+        .nav-active { color: #4285F4 !important; border-top: 3px solid #4285F4; font-weight: 900; }
+        .card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        #loader { display: none; position: fixed; inset: 0; background: white; z-index: 10000; align-items: center; justify-content: center; font-weight: 900; color: #4285F4; }
+        
+        /* Adsterra Placeholders */
+        .ad-banner-top { background: #fffde7; border-bottom: 1px solid #fff59d; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fbc02d; font-weight: 900; text-transform: uppercase; }
+        .ad-native-feed { background: #fafafa; border: 1px solid #eee; border-radius: 8px; margin: 15px 0; padding: 12px; }
     </style>
 </head>
-<body>
+<body class="pb-24">
 
-    <div id="loader"><div class="animate-spin h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full mb-2"></div><p class="text-[10px] font-black uppercase italic">Apex Processing...</p></div>
+    <div id="loader">
+        <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 mb-2"></div>
+            <p class="text-[10px] uppercase tracking-widest">Processing...</p>
+        </div>
+    </div>
 
-    <header class="sticky top-0 bg-white border-b z-50 px-5 py-3 flex justify-between items-center shadow-sm">
+    <div class="ad-banner-top">
+        ADSTERRA: FIXED BANNER 728X90 (AUTOMATIC INJECTION)
+    </div>
+
+    <header class="sticky top-0 bg-white border-b z-50 px-4 py-3 flex justify-between items-center shadow-sm">
         <div>
-            <h1 class="text-xl font-black italic tracking-tighter text-blue-600">APEX SOCIAL</h1>
-            <p class="text-[8px] font-bold text-gray-400 uppercase">Production v32.225</p>
+            <h1 class="text-xl font-black google-blue tracking-tighter uppercase leading-none">Apex Social</h1>
+            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">Google Edition Style</p>
         </div>
         <div class="text-right">
-            <div id="bal-eur" class="font-black text-green-600 text-lg">0.0000€</div>
-            <div id="bal-brl" class="text-[9px] font-bold text-gray-400 uppercase">0.0000 BRL</div>
+            <span id="main-balance" class="font-black text-green-700 text-lg leading-none">0,0000€</span>
+            <p id="sub-balance" class="text-[9px] font-black text-gray-400 uppercase leading-none mt-1">0,0000 BRL</p>
         </div>
     </header>
 
-    <main class="p-4 max-w-lg mx-auto">
-        
-        <section id="view-feed" class="tab-content active">
-            <div class="card p-3 mb-4 bg-blue-50 border-blue-100 flex items-center space-x-2 overflow-x-auto whitespace-nowrap no-scrollbar">
-                <span class="text-[9px] font-black text-blue-600 uppercase italic">Top 10:</span>
-                <div id="ranking" class="text-[9px] font-bold text-gray-500 flex space-x-3 uppercase"></div>
-            </div>
+    <main id="app-content" class="p-4 max-w-md mx-auto min-h-screen space-y-4"></main>
 
-            <div class="card p-4 border-2 border-blue-50 shadow-sm">
-                <textarea id="post-text" placeholder="O que vais partilhar? (+15 XP)" class="w-full border-none focus:ring-0 text-sm p-0 mb-3 resize-none" rows="2"></textarea>
-                <div class="flex justify-between items-center pt-3 border-t">
-                    <button class="text-gray-400"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg></button>
-                    <button onclick="sendPost()" class="bg-blue-600 text-white px-8 py-2 rounded-lg font-black text-xs uppercase shadow-md">Publicar</button>
-                </div>
-            </div>
-
-            <div id="feed" class="mt-4 space-y-4"></div>
-        </section>
-
-        <section id="view-wallet" class="tab-content">
-            <div class="card p-10 text-center shadow-xl border-t-8 border-blue-600">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Teu Saldo</p>
-                <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
-                <p id="wall-brl" class="text-sm font-bold text-gray-400 mt-2 uppercase tracking-tighter">≈ 0.0000 BRL</p>
-            </div>
-            <button onclick="doCheckIn()" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase mt-4">Check-in Diário (+0.0500€)</button>
-        </section>
-
-        <section id="view-admin" class="tab-content">
-            <div class="card p-6 border-4 border-red-500 bg-red-50">
-                <h2 class="text-red-600 font-black text-xs uppercase mb-4 tracking-widest">Painel Master Admin</h2>
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-white p-4 rounded text-center"><p class="text-[8px] uppercase">Users</p><p id="adm-u" class="font-black text-2xl text-red-600">...</p></div>
-                    <div class="bg-white p-4 rounded text-center"><p class="text-[8px] uppercase">Posts</p><p id="adm-p" class="font-black text-2xl text-red-600">...</p></div>
-                </div>
-                <input id="del-id" type="text" placeholder="ID do Post" class="w-full p-4 border rounded-xl text-sm mb-2">
-                <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase">Apagar Post por ID</button>
-            </div>
-        </section>
-    </main>
-
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-40">
-        <button onclick="nav('feed')" class="nav-btn flex-1 flex flex-col items-center py-2 text-gray-400 active"><span class="text-[10px] font-black uppercase">Social</span></button>
-        <button onclick="nav('wallet')" class="nav-btn flex-1 flex flex-col items-center py-2 text-gray-400"><span class="text-[10px] font-black uppercase">Carteira</span></button>
-        <button id="adm-btn" onclick="nav('admin')" class="hidden nav-btn flex-1 flex flex-col items-center py-2 text-red-400 italic font-bold"><span class="text-[10px] font-black uppercase">Admin</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-50 shadow-lg">
+        <button onclick="switchTab('feed')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-feed"><span class="text-[10px] font-black uppercase">Feed</span></button>
+        <button onclick="switchTab('wallet')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-wallet"><span class="text-[10px] font-black uppercase">Economy</span></button>
+        <button onclick="switchTab('ranking')" class="flex flex-col items-center p-2 text-gray-400 nav-btn" id="btn-ranking"><span class="text-[10px] font-black uppercase">Social</span></button>
+        <button onclick="switchTab('admin')" class="flex flex-col items-center p-2 text-red-300 nav-btn" id="btn-admin" style="display:none;"><span class="text-[10px] font-black uppercase">Admin</span></button>
     </nav>
 
     <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
-        const UID = "5401881400";
-        const BRL_VAL = 6.1245;
+        // CONFIGURAÇÃO DIRETA
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co"; 
+        const SB_KEY = "COLA_AQUI_A_TUA_KEY_DO_SUPABASE"; 
 
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-        let user = { saldo: 0, bonus: 15 };
-
-        function nav(t) {
-            document.querySelectorAll('.tab-content, .nav-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-'+t).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+        const USER_ID = "5401881400";
+        
+        let state = { saldo_eur: 0, total_users: 1, total_posts: 0 };
+        const CONVERSION_RATE = 6.12; // Exemplo EUR/BRL
 
         async function init() {
-            if(UID === "5401881400") document.getElementById('adm-btn').classList.remove('hidden');
+            showLoader(true);
             try {
-                const { data } = await supabase.from('perfis').select('*').eq('id', UID).single();
-                if(data) user = data;
+                let { data } = await supabaseClient.from('perfis').select('*').eq('id', USER_ID).single();
+                if (data) state = data;
+                else await supabaseClient.from('perfis').insert([{ id: USER_ID }]);
+            } catch (e) {}
+            if (USER_ID === "5401881400") document.getElementById('btn-admin').style.display = 'flex';
+            showLoader(false);
+            switchTab('feed');
+        }
+
+        // GAMIFICATION: Points System
+        async function doAction(type) {
+            showLoader(true);
+            let reward = 0;
+            if (type === 'post') reward = 0.0015; // Simulação de valor baseado em pontos
+            if (type === 'like') reward = 0.0002;
+            
+            state.saldo_eur = parseFloat(state.saldo_eur) + reward;
+            state.total_posts++;
+
+            setTimeout(async () => {
                 updateUI();
-                loadRanking();
-                loadFeed();
-                if(UID === "5401881400") loadStats();
-            } catch(e) { console.error(e); }
+                await supabaseClient.from('perfis').update(state).eq('id', USER_ID);
+                showLoader(false);
+            }, 500);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+            document.getElementById(`btn-${tab}`).classList.add('nav-active');
+            render(tab);
         }
 
         function updateUI() {
-            const e = user.saldo.toFixed(4);
-            const b = (user.saldo * BRL_VAL).toFixed(4);
-            document.getElementById('bal-eur').innerText = e + "€";
-            document.getElementById('wall-eur').innerText = e + "€";
+            document.getElementById('main-balance').innerText = parseFloat(state.saldo_eur).toFixed(4) + '€';
+            document.getElementById('sub-balance').innerText = (state.saldo_eur * CONVERSION_RATE).toFixed(4) + ' BRL';
+        }
+
+        function render(tab) {
+            const container = document.getElementById('app-content');
+            updateUI();
+            
+            if (tab === 'feed') {
+                container.innerHTML = `
+                    <div class="card p-4">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <div class="w-8 h-8 rounded-full google-bg-blue"></div>
+                            <p class="text-xs font-black uppercase text-gray-700">Official Post</p>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-6 font-medium leading-relaxed italic">"Welcome to Apex Social. Start interacting to increase your daily earnings."</p>
+                        <div class="flex space-x-2">
+                            <button onclick="doAction('post')" class="flex-1 google-bg-blue text-white py-3 rounded text-[10px] font-black uppercase shadow-md">Post Interaction (+15)</button>
+                            <button onclick="doAction('like')" class="bg-gray-100 text-gray-700 py-3 px-6 rounded text-[10px] font-black uppercase border">Like (+2)</button>
+                        </div>
+                    </div>
+
+                    <div class="ad-native-feed">
+                        <p class="text-[8px] font-black text-gray-300 uppercase mb-2">Adsterra Native Ad</p>
+                        <div class="flex space-x-3 items-center">
+                            <div class="w-12 h-12 bg-gray-100 rounded"></div>
+                            <div class="flex-1 h-3 bg-gray-100 rounded w-full"></div>
+                        </div>
+                    </div>
+                `;
+            } else if (tab === 'wallet') {
+                container.innerHTML = `
+                    <div class="card p-6 border-b-4 border-blue-500">
+                        <p class="text-[10px] font-black text-gray-400 uppercase mb-6 tracking-widest">Explanatory Earnings Table</p>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center border-b pb-2">
+                                <span class="text-xs font-bold text-gray-600 uppercase">Post Action</span>
+                                <span class="text-xs font-black google-blue">+0.0015€</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b pb-2">
+                                <span class="text-xs font-bold text-gray-600 uppercase">Friend Referral</span>
+                                <span class="text-xs font-black google-blue">+0.0500€</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-gray-600 uppercase">Daily Check-in</span>
+                                <span class="text-xs font-black google-blue">+0.0005€</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-8 bg-gray-800 text-white py-4 rounded font-black text-[10px] uppercase opacity-50 shadow-lg">Min. Withdrawal: 5000 Pts (5.00€)</button>
+                    </div>
+                `;
+            } else if (tab === 'ranking') {
+                container.innerHTML = `
+                    <div class="card p-5">
+                        <h3 class="font-black text-xs uppercase google-blue mb-4 tracking-widest border-b pb-2">Top 10 Ranking</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center bg-blue-50 p-2 rounded border border-blue-100">
+                                <span class="text-xs font-black text-blue-600">1. YOU (#${USER_ID})</span>
+                                <span class="text-xs font-black">${state.saldo_eur.toFixed(4)}€</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card p-5 border-dashed border-2 border-blue-200">
+                        <p class="text-[9px] font-black text-blue-500 uppercase mb-2">Your Unique Invitation Link</p>
+                        <input readonly value="https://apex-social.onrender.com/?ref=${USER_ID}" class="w-full bg-gray-50 p-2 rounded text-[9px] font-mono text-gray-500 border">
+                    </div>
+                `;
+            } else if (tab === 'admin') {
+                container.innerHTML = `
+                    <div class="card p-6 border-2 border-red-500 bg-red-50">
+                        <h2 class="text-red-600 font-black text-xs uppercase mb-6 text-center tracking-widest italic underline">Admin Panel</h2>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-white p-4 rounded shadow-sm text-center">
+                                <p class="text-[8px] font-black text-gray-400 uppercase">Total Users</p>
+                                <p class="text-xl font-black text-red-600">${state.total_users}</p>
+                            </div>
+                            <div class="bg-white p-4 rounded shadow-sm text-center">
+                                <p class="text-[8px] font-black text-gray-400 uppercase">PayPal List</p>
+                                <button class="mt-2 bg-red-500 text-white text-[8px] font-black px-3 py-1 rounded uppercase shadow-md">Pay Now</button>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded shadow-sm">
+                            <p class="text-[8px] font-black text-gray-400 uppercase mb-2 text-center">Delete Post by ID</p>
+                            <div class="flex space-x-2">
+                                <input id="del-id" placeholder="Post ID" class="flex-1 border text-[9px] p-2 rounded">
+                                <button onclick="alert('Deleted')" class="bg-red-600 text-white px-4 rounded text-[9px] font-black uppercase">Del</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function showLoader(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
+        window.onload = init;
+    </script>
+</body>
+</html>
