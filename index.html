@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v34.505 - Layout & Ad Logic Fix</title>
+    <title>Apex Social v34.508</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; font-weight: 700; -webkit-tap-highlight-color: transparent; }
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; }
         
-        /* FEEDBACK VISUAL - NÚMEROS GRANDES */
-        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 4000; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
+        /* Efeito de Ganhos */
+        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5000; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
         @keyframes popUp {
             0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
             20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
@@ -21,19 +21,16 @@
         }
         .earning-text { font-size: 4rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52, 168, 83, 0.4); -webkit-text-stroke: 2px white; }
 
-        /* CORREÇÃO DE LAYOUT DAS INTERAÇÕES */
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 12px 0; border: none; background: transparent; }
-        .interaction-badge { position: absolute; top: 4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: 900; border: 2px solid white; z-index: 10; min-width: 20px; text-align: center; }
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; position: relative; border: none; background: none; }
+        .interaction-badge { position: absolute; top: 4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; border: 2px solid white; }
         
-        .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #eee; width: 100%; }
-        .comment-section.active { display: flex; flex-direction: column; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
-        
-        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 5000; align-items: center; justify-content: center; padding: 20px; }
+        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 6000; align-items: center; justify-content: center; padding: 20px; }
         .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 100; background: #f1f3f4; padding: 12px 16px; }
-        #feed-container { margin-top: 150px; }
+        #feed-container { margin-top: 165px; }
+        
+        /* Correção de Imagem */
+        .post-image-container { width: 100%; background: #f8f9fa; display: flex; align-items: center; justify-content: center; min-h-[180px]; margin-bottom: 12px; border-radius: 8px; overflow: hidden; }
+        .post-image-container img { width: 100%; height: auto; object-fit: contain; max-height: 400px; }
     </style>
 </head>
 <body class="pb-24">
@@ -41,33 +38,30 @@
     <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
 
     <div id="ad-overlay">
-        <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl border-4 border-blue-600 p-8 text-center">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-8 text-center border-4 border-blue-600 shadow-2xl">
             <div id="ad-decision-ui">
-                <h3 class="text-xl font-black uppercase text-blue-600 mb-2">Limite Atingido</h3>
-                <p class="text-[10px] font-black uppercase mb-6 text-gray-400">Vê um anúncio para manter 100% dos ganhos.</p>
-                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl shadow-xl uppercase text-xs mb-3 font-black">Ver Anúncio (15 seg)</button>
-                <button onclick="degradeAndContinue()" class="w-full p-4 bg-white border-2 text-gray-300 rounded-2xl uppercase text-[9px] font-black">Ignorar (-20% de bónus)</button>
+                <h3 class="text-xl font-black text-blue-600 mb-2 uppercase">Atenção</h3>
+                <p class="text-[10px] text-gray-400 font-black mb-6 uppercase">Vê o anúncio completo para validar os teus ganhos.</p>
+                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs shadow-lg mb-3">Ver Anúncio (15 seg)</button>
+                <button onclick="degradeAndContinue()" class="w-full p-4 text-gray-400 font-black uppercase text-[9px]">Pular (-20% bónus)</button>
             </div>
             <div id="ad-player-ui" class="hidden">
                 <div class="aspect-video bg-black rounded-xl mb-6 flex items-center justify-center relative overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400" class="absolute inset-0 w-full h-full object-cover opacity-50">
-                    <div id="ad-timer-circle" class="relative z-10 text-white font-black text-2xl">15</div>
+                    <div class="absolute inset-0 bg-blue-900 opacity-20 animate-pulse"></div>
+                    <p id="ad-timer" class="text-white font-black text-4xl z-10">15</p>
                 </div>
-                <button id="close-ad-btn" disabled class="w-full py-5 bg-gray-200 text-gray-400 rounded-xl uppercase text-xs font-black">Visualização Obrigatória...</button>
+                <button id="close-ad-btn" disabled class="w-full py-5 bg-gray-100 text-gray-400 rounded-xl font-black uppercase text-xs">Visualização Obrigatória</button>
             </div>
         </div>
     </div>
 
     <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">A</div>
-            <div>
-                <h1 class="text-sm font-black uppercase text-blue-600">Apex Social</h1>
-                <span id="multiplier-tag" class="text-[8px] font-black text-green-500 uppercase italic">STATUS: 100% OK</span>
-            </div>
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-md">A</div>
+            <h1 class="text-sm font-black uppercase text-blue-600">Apex Social</h1>
         </div>
         <div class="text-right">
-            <div id="main-eur" class="font-black text-green-600 text-base">0.0000€</div>
+            <div id="main-eur" class="font-black text-green-600 text-lg leading-none">0.0000€</div>
             <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase italic">0.0000 BRL</div>
         </div>
     </header>
@@ -76,10 +70,10 @@
         <section id="view-social" class="tab-content active">
             <div class="sticky-publisher">
                 <div class="google-card p-4 border-t-8 border-blue-600 shadow-xl">
-                    <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none uppercase font-black" rows="1"></textarea>
+                    <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none text-xs font-black uppercase focus:ring-0" rows="1"></textarea>
                     <div id="expanded-post" class="hidden">
-                        <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-100 border-none text-[10px] p-3 rounded-xl mb-4 font-black uppercase outline-none">
-                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase shadow-lg">Publicar Agora</button>
+                        <input id="post-url" type="text" placeholder="URL DA IMAGEM (JPG/PNG)" class="w-full bg-gray-50 p-4 rounded-xl mb-4 text-[10px] font-black uppercase outline-none border border-gray-100">
+                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[11px] shadow-lg">Publicar Agora</button>
                     </div>
                 </div>
             </div>
@@ -88,9 +82,8 @@
 
         <section id="view-info" class="tab-content">
             <div class="google-card p-12 text-center border-t-[10px] border-blue-600 mt-4 shadow-2xl">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2 italic">Saldo em Carteira</p>
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2 italic">Saldo Disponível</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
-                <p id="wall-brl" class="text-xs font-black text-gray-500 mt-2 uppercase italic">≈ 0.0000 BRL</p>
             </div>
         </section>
     </main>
@@ -119,9 +112,6 @@
             document.getElementById('main-eur').innerText = user.saldo.toFixed(4) + "€";
             document.getElementById('wall-eur').innerText = user.saldo.toFixed(4) + "€";
             document.getElementById('main-brl').innerText = (user.saldo * 6.12).toFixed(4) + " BRL";
-            const tag = document.getElementById('multiplier-tag');
-            tag.innerText = `STATUS: ${Math.round(user.multiplier * 100)}% OK`;
-            tag.className = user.multiplier < 1.0 ? "text-[8px] font-black text-red-500 uppercase italic" : "text-[8px] font-black text-green-500 uppercase italic";
         }
 
         function showBigNumber(val) {
@@ -131,26 +121,22 @@
             setTimeout(() => { container.style.display = 'none'; }, 800);
         }
 
-        // LÓGICA DE INTERAÇÃO COM BLOQUEIO RIGOROSO
         async function reagir(val) {
-            if(user.interactions >= 3) { // Reduzi para 3 para testar a frequência
+            if(user.interactions >= 4) {
                 pendingVal = val;
                 document.getElementById('ad-overlay').style.display = 'flex';
                 return;
             }
-            
             user.interactions++;
             const ganhar = val * user.multiplier;
             user.saldo += ganhar;
-            showBigNumber(ganhar);
-            updateUI();
+            showBigNumber(ganhar); updateUI();
             await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
         }
 
         async function loadFeed() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const container = document.getElementById('feed-container');
-            if(!posts) return;
             container.innerHTML = "";
             
             posts.forEach((p, idx) => {
@@ -159,39 +145,33 @@
                 card.innerHTML = `
                     <div class="p-5">
                         <p class="text-[13px] font-black uppercase text-gray-800 mb-4">${p.content}</p>
-                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 border border-gray-100">` : ''}
+                        ${p.image_url ? `
+                            <div class="post-image-container">
+                                <img src="${p.image_url}" onerror="this.closest('.post-image-container').style.display='none'">
+                            </div>
+                        ` : ''}
                         <div class="flex border-t pt-2">
                             <button onclick="reagir(0.0006)" class="interaction-btn">
-                                <div class="interaction-badge">${Math.floor(Math.random()*50)}</div>
-                                <span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-400 uppercase mt-1">Gostar</span>
+                                <div class="interaction-badge">${Math.floor(Math.random()*99)}</div>
+                                <span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-400 mt-1 uppercase">Gostar</span>
                             </button>
-                            <button onclick="toggleComments('${p.id}')" class="interaction-btn border-x border-gray-100">
-                                <div class="interaction-badge" id="badge-${p.id}">0</div>
-                                <span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-400 uppercase mt-1">Comentar</span>
+                            <button onclick="reagir(0.0010)" class="interaction-btn border-x border-gray-100">
+                                <div class="interaction-badge">0</div>
+                                <span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-400 mt-1 uppercase">Comentar</span>
                             </button>
                             <button onclick="reagir(0.0020)" class="interaction-btn">
-                                <div class="interaction-badge">${Math.floor(Math.random()*15)}</div>
-                                <span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-400 uppercase mt-1">Partilhar</span>
+                                <div class="interaction-badge">${Math.floor(Math.random()*20)}</div>
+                                <span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-400 mt-1 uppercase">Partilhar</span>
                             </button>
-                        </div>
-                    </div>
-                    <div id="comments-${p.id}" class="comment-section">
-                        <div id="list-${p.id}" class="p-4 space-y-2 max-h-48 overflow-y-auto bg-gray-50"></div>
-                        <div class="p-3 bg-white border-t flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="A TUA MENSAGEM..." class="flex-1 bg-gray-100 rounded-xl p-3 text-[10px] font-black uppercase border-none">
-                            <button onclick="addComment('${p.id}')" class="bg-blue-600 text-white px-5 rounded-xl font-black text-[10px] uppercase">OK</button>
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
-                updateCommentCount(p.id);
-
                 if((idx + 1) % 3 === 0) {
                     const ad = document.createElement('div');
-                    ad.className = "google-card p-6 border-2 border-blue-100 bg-blue-50 text-center mb-6";
-                    ad.innerHTML = `<p class="text-[8px] font-black text-blue-600 uppercase mb-2 italic">Publicidade Apex</p>
-                                    <h4 class="text-[11px] font-black uppercase mb-4">Ganhe o Dobro com Anúncios</h4>
-                                    <button onclick="startAdFlow()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md">Ver Agora</button>`;
+                    ad.className = "google-card p-6 bg-blue-50 border-2 border-blue-200 text-center mb-6";
+                    ad.innerHTML = `<h4 class="text-[10px] font-black uppercase text-blue-600 mb-4 italic">Publicidade Parceira</h4>
+                                    <button onclick="startAdFlow()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md">Ver Anúncio e Ganhar</button>`;
                     container.appendChild(ad);
                 }
             });
@@ -200,18 +180,14 @@
         function startAdFlow() {
             document.getElementById('ad-decision-ui').classList.add('hidden');
             document.getElementById('ad-player-ui').classList.remove('hidden');
-            let time = 15;
+            let t = 15;
+            const timerText = document.getElementById('ad-timer');
             const btn = document.getElementById('close-ad-btn');
-            const timerText = document.getElementById('ad-timer-circle');
-            
-            const timer = setInterval(() => {
-                time--;
-                timerText.innerText = time;
-                btn.innerText = `Aguarde ${time}s...`;
-                if(time <= 0) {
-                    clearInterval(timer);
-                    btn.disabled = false;
-                    btn.innerText = "VALIDAR E CONTINUAR";
+            const interval = setInterval(() => {
+                t--; timerText.innerText = t;
+                if(t <= 0) {
+                    clearInterval(interval);
+                    btn.disabled = false; btn.innerText = "VALIDAR RECOMPENSA";
                     btn.className = "w-full py-5 bg-green-600 text-white rounded-xl font-black uppercase text-xs shadow-xl";
                     btn.onclick = () => { user.multiplier = 1.0; user.interactions = 0; finalize(); };
                 }
@@ -224,31 +200,9 @@
             document.getElementById('ad-overlay').style.display = 'none';
             document.getElementById('ad-decision-ui').classList.remove('hidden');
             document.getElementById('ad-player-ui').classList.add('hidden');
-            const bonus = pendingVal * user.multiplier;
-            user.saldo += bonus;
-            showBigNumber(bonus);
-            updateUI();
+            const b = pendingVal * user.multiplier;
+            user.saldo += b; showBigNumber(b); updateUI();
             await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
-        }
-
-        async function addComment(pid) {
-            const input = document.getElementById(`in-${pid}`);
-            if(!input.value) return;
-            const { error } = await sb.from('comentarios').insert([{ post_id: pid, user_id: MASTER_ID, content: input.value }]);
-            if(!error) { input.value = ""; await reagir(0.0010); updateCommentList(pid); }
-        }
-
-        async function updateCommentList(pid) {
-            const { data } = await sb.from('comentarios').select('*').eq('post_id', pid).order('created_at', {ascending: true});
-            const list = document.getElementById(`list-${pid}`);
-            list.innerHTML = data.length ? data.map(c => `<div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm"><p class="text-[7px] text-blue-600 font-black italic">ID..${String(c.user_id).slice(-4)}</p><p class="text-[10px] font-black uppercase text-gray-700">${c.content}</p></div>`).join('') : '<p class="text-[8px] text-gray-400 text-center font-black py-4 uppercase">Sem comentários</p>';
-            updateCommentCount(pid);
-        }
-
-        async function updateCommentCount(pid) {
-            const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', pid);
-            const badge = document.getElementById(`badge-${pid}`);
-            if(badge) badge.innerText = count || 0;
         }
 
         async function publish() {
@@ -259,9 +213,8 @@
             if(!error) { user.saldo += 0.0150; showBigNumber(0.0150); updateUI(); await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID); document.getElementById('post-input').value = ""; loadFeed(); }
         }
 
-        function toggleComments(id) { document.getElementById(`comments-${id}`).classList.toggle('active'); updateCommentList(id); }
-        function nav(t) { document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active')); document.getElementById('view-'+t).classList.add('active'); event.currentTarget.classList.add('active'); }
         function expandPublisher() { document.getElementById('expanded-post').classList.remove('hidden'); document.getElementById('post-input').rows = 3; }
+        function nav(t) { document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active')); document.getElementById('view-'+t).classList.add('active'); event.currentTarget.classList.add('active'); }
 
         window.onload = init;
     </script>
