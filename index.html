@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v39.2</title>
+    <title>Apex Social v39.3</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -12,7 +12,6 @@
         
         header { position: fixed; top: 0; width: 100%; height: 55px; background: white; border-bottom: 1px solid #ddd; z-index: 9999; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
 
-        /* CONTENTOR DO FEED */
         #feed { display: flex; flex-direction: column; gap: 12px; padding: 10px; max-width: 450px; margin: 0 auto; }
 
         /* CARTÃO OTIMIZADO: Texto e Imagem em harmonia */
@@ -26,28 +25,26 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        /* REDUÇÃO DA IMAGEM: Agora com moldura e tamanho controlado */
-        .post-img-frame { 
-            width: 92%; 
-            margin: 12px auto 0 auto;
-            max-height: 220px; /* Redução drástica para caber tudo no ecrã */
-            border-radius: 10px;
+        /* AJUSTE INTELIGENTE: Limita a altura para telemóvel */
+        .post-img-box { 
+            width: 100%; 
+            max-height: 250px; /* Resolve o problema 'muito comprida na vertical' */
             overflow: hidden;
             background: #f1f3f4;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-bottom: 1px solid #f0f0f0;
         }
-        .post-img-frame img { 
+        .post-img { 
             width: 100%; 
             height: 100%; 
-            object-fit: cover; /* Foca no centro da imagem sem a deformar */
+            object-fit: contain; /* Mostra a foto inteira centralizada sem esticar */
         }
 
         .post-body { padding: 12px 16px; }
         .post-text { font-size: 15px; font-weight: 700; color: #1c1e21; line-height: 1.4; margin-bottom: 8px; }
         
-        /* Ações compactas */
         .post-actions { 
             display: flex; 
             justify-content: space-around;
@@ -138,13 +135,14 @@
                 const card = document.createElement('div');
                 card.className = "post-card";
                 
-                let imgPart = p.image_url ? `
-                    <div class="post-img-frame">
-                        <img src="${p.image_url}" loading="lazy">
+                // Contentor que isola a imagem e impede que transborde
+                let imgHtml = p.image_url ? `
+                    <div class="post-img-box">
+                        <img src="${p.image_url}" class="post-img" loading="lazy">
                     </div>` : "";
 
                 card.innerHTML = `
-                    ${imgPart}
+                    ${imgHtml}
                     <div class="post-body">
                         ${p.content ? `<p class="post-text">${p.content}</p>` : ''}
                         <div class="post-actions">
