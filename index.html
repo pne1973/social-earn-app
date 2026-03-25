@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex v35.200 - Admin Intelligence</title>
+    <title>Apex v35.300 - Admin & Feed</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; font-weight: 900; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
-        .card { background: white; border: 1px solid #dadce0; border-radius: 16px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; font-weight: 900; text-transform: uppercase; }
+        .card { background: white; border: 1px solid #dadce0; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .comment-box { display: none; background: #f9fafb; border-top: 2px solid #f3f4f6; padding: 15px; }
+        .comment-box { display: none; background: #f8f9fa; border-top: 1px solid #eee; padding: 12px; }
         .comment-box.active { display: block; }
-        .badge { position: absolute; top: -5px; right: 15%; background: #ef4444; color: white; font-size: 10px; padding: 2px 7px; border-radius: 99px; border: 2px solid white; }
-        #feed { margin-top: 160px; }
-        .sticky-header { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 10px 16px; }
-        .admin-stat { border-left: 4px solid #4285F4; padding-left: 10px; }
+        #feed { margin-top: 165px; min-height: 300px; }
+        .sticky-pub { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 10px 16px; }
+        .admin-line { border-left: 4px solid #4285F4; padding-left: 10px; background: #f8f9fa; margin-bottom: 8px; border-radius: 4px; }
     </style>
 </head>
 <body class="pb-24">
@@ -32,57 +31,39 @@
 
     <main class="max-w-lg mx-auto p-4">
         <section id="rede" class="tab-content active">
-            <div class="sticky-header">
+            <div class="sticky-pub">
                 <div class="card p-4 border-t-8 border-blue-600">
-                    <textarea id="post-txt" onclick="this.rows=3; document.getElementById('post-btn').classList.remove('hidden')" placeholder="PARTILHAR... (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none" rows="1"></textarea>
+                    <textarea id="post-txt" onclick="this.rows=3; document.getElementById('post-btn').classList.remove('hidden')" placeholder="PARTILHAR ALGO..." class="w-full border-none focus:ring-0 text-xs mb-2 resize-none" rows="1"></textarea>
                     <button id="post-btn" onclick="novoPost()" class="hidden w-full bg-blue-600 text-white py-3 rounded-xl text-xs">PUBLICAR</button>
                 </div>
             </div>
-            <div id="feed"></div>
+            <div id="feed">
+                <p class="text-center text-gray-400 mt-10">A LIGAR À REDE...</p>
+            </div>
         </section>
 
         <section id="ganhos" class="tab-content">
             <div class="card p-12 text-center border-t-[10px] border-blue-600 mt-4">
                 <h1 id="saldo-wall" class="text-5xl text-blue-600">0.0000€</h1>
-                <p class="text-gray-400 mt-4 text-xs">O TEU SALDO</p>
+                <p class="text-gray-400 mt-4 text-xs italic">VALOR ACUMULADO</p>
             </div>
         </section>
 
         <section id="admin" class="tab-content">
             <div class="card p-6 border-t-[10px] border-red-600 mt-4">
-                <h2 class="text-red-600 mb-6 text-center">Painel de Controlo Master</h2>
+                <h2 class="text-red-600 mb-4 text-center">CONTROLO FINANCEIRO & OPS</h2>
                 
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="admin-stat bg-gray-50 p-3 rounded">
-                        <p class="text-[9px] text-gray-500">UTILIZADORES</p>
-                        <h3 id="stat-users" class="text-lg">0</h3>
-                    </div>
-                    <div class="admin-stat bg-gray-50 p-3 rounded">
-                        <p class="text-[9px] text-gray-500">POSTS TOTAIS</p>
-                        <h3 id="stat-posts" class="text-lg">0</h3>
-                    </div>
-                    <div class="admin-stat bg-gray-50 p-3 rounded border-green-500">
-                        <p class="text-[9px] text-gray-500">DÍVIDA TOTAL (EUR)</p>
-                        <h3 id="stat-eur" class="text-lg text-green-600">0.00€</h3>
-                    </div>
-                    <div class="admin-stat bg-gray-50 p-3 rounded border-green-500">
-                        <p class="text-[9px] text-gray-500">DÍVIDA TOTAL (BRL)</p>
-                        <h3 id="stat-brl" class="text-lg text-green-600">0.00</h3>
-                    </div>
+                <div class="grid grid-cols-1 gap-2 mb-6">
+                    <div class="admin-line p-3"><p class="text-[9px] text-gray-500">DÍVIDA EM EUR</p><h3 id="stat-eur" class="text-xl text-green-600">0.00€</h3></div>
+                    <div class="admin-line p-3 border-green-500"><p class="text-[9px] text-gray-500">DÍVIDA EM BRL (x6.12)</p><h3 id="stat-brl" class="text-xl text-green-600">R$ 0.00</h3></div>
+                    <div class="admin-line p-3 border-gray-400"><p class="text-[9px] text-gray-500">TOTAL DE UTILIZADORES</p><h3 id="stat-users" class="text-xl">0</h3></div>
                 </div>
 
                 <div class="border-t pt-4">
-                    <p class="text-[10px] mb-2">Eliminar Post por ID</p>
-                    <div class="flex gap-2 mb-6">
-                        <input id="del-id" type="text" placeholder="ID DO POST" class="flex-1 p-2 border-2 rounded-lg text-xs">
-                        <button onclick="adminDelPost()" class="bg-red-600 text-white px-4 rounded-lg text-[10px]">APAGAR</button>
-                    </div>
-                </div>
-
-                <div class="border-t pt-4">
-                    <p class="text-[10px] mb-2">Pedidos de Levantamento (PayPal)</p>
-                    <div id="payout-list" class="text-[9px] space-y-2">
-                        <p class="text-gray-400">Nenhum pedido pendente.</p>
+                    <p class="text-[10px] mb-2">MODERAÇÃO: APAGAR POR ID</p>
+                    <div class="flex gap-2">
+                        <input id="del-id" type="text" placeholder="ID DO POST" class="flex-1 p-2 border rounded text-xs">
+                        <button onclick="adminDelPost()" class="bg-red-600 text-white px-4 rounded text-[10px]">APAGAR</button>
                     </div>
                 </div>
             </div>
@@ -90,8 +71,8 @@
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-50">
-        <button onclick="mudarTab('rede')" class="flex-1 text-[10px]">REDE</button>
-        <button onclick="mudarTab('ganhos')" class="flex-1 text-[10px]">GANHOS</button>
+        <button onclick="mudarTab('rede')" class="flex-1 text-[10px] text-blue-600">REDE</button>
+        <button onclick="mudarTab('ganhos')" class="flex-1 text-[10px] text-gray-400">GANHOS</button>
         <button id="nav-admin" onclick="mudarTab('admin')" class="hidden flex-1 text-[10px] text-red-600">GESTÃO</button>
     </nav>
 
@@ -104,106 +85,126 @@
         let saldoAtual = 0;
 
         async function iniciar() {
+            // Verifica se és o Admin
             if(MASTER_ID === "5401881400") {
                 document.getElementById('nav-admin').classList.remove('hidden');
                 carregarStats();
             }
-            const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) saldoAtual = Number(data.saldo);
+
+            // Carrega Saldo do utilizador
+            const { data: perfil } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if(perfil) saldoAtual = Number(perfil.saldo);
+            
             atualizarValores();
             carregarFeed();
         }
 
         async function carregarStats() {
-            const { count: users } = await sb.from('perfis').select('*', { count: 'exact', head: true });
-            const { count: posts } = await sb.from('posts').select('*', { count: 'exact', head: true });
-            const { data: saldos } = await sb.from('perfis').select('saldo');
+            const { data: todos } = await sb.from('perfis').select('saldo');
+            const { count: totalPosts } = await sb.from('posts').select('*', { count: 'exact', head: true });
             
-            let totalDevido = saldos.reduce((acc, curr) => acc + (Number(curr.saldo) || 0), 0);
-            
-            document.getElementById('stat-users').innerText = users;
-            document.getElementById('stat-posts').innerText = posts;
-            document.getElementById('stat-eur').innerText = totalDevido.toFixed(2) + "€";
-            document.getElementById('stat-brl').innerText = (totalDevido * 6.12).toFixed(2);
-        }
-
-        async function adminDelPost() {
-            const id = document.getElementById('del-id').value;
-            if(!id) return;
-            const { error } = await sb.from('posts').delete().eq('id', id);
-            if(!error) { alert("POST ELIMINADO"); location.reload(); }
-        }
-
-        function atualizarValores() {
-            document.getElementById('saldo-top').innerText = saldoAtual.toFixed(4) + "€";
-            document.getElementById('saldo-wall').innerText = saldoAtual.toFixed(4) + "€";
+            if(todos) {
+                let divida = todos.reduce((a, b) => a + (Number(b.saldo) || 0), 0);
+                document.getElementById('stat-eur').innerText = divida.toFixed(2) + "€";
+                document.getElementById('stat-brl').innerText = "R$ " + (divida * 6.12).toFixed(2);
+                document.getElementById('stat-users').innerText = todos.length;
+            }
         }
 
         async function carregarFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const feed = document.getElementById('feed');
-            feed.innerHTML = "";
+            const feedDiv = document.getElementById('feed');
+            const { data: posts, error } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            
+            if(error) {
+                feedDiv.innerHTML = `<p class="text-center text-red-500 p-10 text-[10px]">ERRO NO FEED: ${error.message}</p>`;
+                return;
+            }
+
+            if(!posts || posts.length === 0) {
+                feedDiv.innerHTML = `<p class="text-center text-gray-400 p-10 text-[10px]">AINDA NÃO HÁ POSTS NA REDE.</p>`;
+                return;
+            }
+
+            feedDiv.innerHTML = "";
             for (const p of posts) {
-                const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
-                const div = document.createElement('div');
-                div.className = "card p-6";
-                div.innerHTML = `
-                    <div class="text-[8px] text-gray-400 mb-2">POST ID: ${p.id}</div>
-                    <div class="text-sm text-gray-800 mb-4">${p.content}</div>
-                    <div class="flex justify-between border-t pt-4 relative">
-                        <button onclick="ganhar(0.0005)" class="flex-1 text-center"><span class="text-xl">👍</span></button>
-                        <button onclick="abrirCmt('${p.id}')" class="flex-1 text-center border-x relative">
-                            <div id="count-${p.id}" class="badge">${count || 0}</div>💬
-                        </button>
-                        <button onclick="ganhar(0.0005)" class="flex-1 text-center"><span class="text-xl">🔗</span></button>
+                const card = document.createElement('div');
+                card.className = "card p-6";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-[9px] text-blue-600 font-black">ID: ${p.id}</span>
+                        <span class="text-[8px] text-gray-400 italic">POR: ..${String(p.user_id).slice(-4)}</span>
                     </div>
-                    <div id="box-${p.id}" class="comment-box">
-                        <div id="lista-${p.id}" class="space-y-2 mb-4 max-h-40 overflow-y-auto text-[10px]"></div>
+                    <div class="text-sm text-gray-800 mb-4 leading-tight">${p.content}</div>
+                    
+                    <div class="flex border-t pt-4">
+                        <button onclick="reagir(0.0005)" class="flex-1 text-center text-xl">👍</button>
+                        <button onclick="toggleCmt('${p.id}')" class="flex-1 text-center border-x text-xl relative">💬</button>
+                        <button onclick="reagir(0.0005)" class="flex-1 text-center text-xl">🔗</button>
+                    </div>
+
+                    <div id="box-${p.id}" class="comment-box mt-3">
+                        <div id="list-${p.id}" class="text-[10px] space-y-2 mb-3 max-h-32 overflow-y-auto"></div>
                         <div class="flex gap-2">
-                            <input id="input-${p.id}" type="text" class="flex-1 p-2 border rounded-lg text-[10px]">
-                            <button onclick="enviarCmt('${p.id}')" class="bg-blue-600 text-white px-4 rounded-lg text-[10px]">OK</button>
+                            <input id="in-${p.id}" type="text" placeholder="COMENTAR..." class="flex-1 p-2 border rounded text-[10px]">
+                            <button onclick="postCmt('${p.id}')" class="bg-blue-600 text-white px-3 rounded text-[10px]">OK</button>
                         </div>
                     </div>
                 `;
-                feed.appendChild(div);
+                feedDiv.appendChild(card);
             }
         }
 
-        async function abrirCmt(id) {
+        async function toggleCmt(id) {
             const box = document.getElementById(`box-${id}`);
-            const lista = document.getElementById(`lista-${id}`);
+            const list = document.getElementById(`list-${id}`);
             box.classList.toggle('active');
+            
             if(box.classList.contains('active')) {
-                lista.innerHTML = "CARREGANDO...";
+                list.innerHTML = "A BUSCAR...";
                 const { data } = await sb.from('comentarios').select('*').eq('post_id', id).order('created_at', {ascending: true});
-                lista.innerHTML = data.map(c => `<div class="p-1 border-b">ID..${String(c.user_id).slice(-4)}: ${c.content}</div>`).join('') || "SEM COMENTÁRIOS.";
+                list.innerHTML = data.map(c => `<div class="p-1 border-b"><b>..${String(c.user_id).slice(-4)}:</b> ${c.content}</div>`).join('') || "SEM COMENTÁRIOS.";
             }
         }
 
-        async function enviarCmt(id) {
-            const campo = document.getElementById(`input-${id}`);
-            const texto = campo.value.trim();
-            if(!texto) return;
-            const { error } = await sb.from('comentarios').insert([{ post_id: id, user_id: MASTER_ID, content: texto }]);
+        async function postCmt(id) {
+            const input = document.getElementById(`in-${id}`);
+            const val = input.value.trim();
+            if(!val) return;
+            
+            const { error } = await sb.from('comentarios').insert([{ post_id: id, user_id: MASTER_ID, content: val }]);
             if(!error) {
-                const b = document.getElementById(`count-${id}`);
-                b.innerText = parseInt(b.innerText) + 1;
-                campo.value = "";
-                abrirCmt(id); // Refresh na lista
-                ganhar(0.0010);
+                input.value = "";
+                toggleCmt(id); // Recarrega a lista
+                reagir(0.0010);
             }
         }
 
-        async function ganhar(v) {
-            saldoAtual += v; atualizarValores();
+        async function reagir(v) {
+            saldoAtual += v;
+            atualizarValores();
             await sb.from('perfis').update({ saldo: saldoAtual }).eq('id', MASTER_ID);
         }
 
         async function novoPost() {
             const t = document.getElementById('post-txt').value;
             if(!t) return;
-            await sb.from('posts').insert([{ user_id: MASTER_ID, content: t }]);
-            location.reload();
+            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: t }]);
+            if(error) alert("Erro ao postar: " + error.message);
+            else location.reload();
+        }
+
+        async function adminDelPost() {
+            const id = document.getElementById('del-id').value;
+            if(confirm("Deseja apagar este post?")) {
+                await sb.from('posts').delete().eq('id', id);
+                location.reload();
+            }
+        }
+
+        function atualizarValores() {
+            const v = saldoAtual.toFixed(4) + "€";
+            document.getElementById('saldo-top').innerText = v;
+            document.getElementById('saldo-wall').innerText = v;
         }
 
         function mudarTab(t) {
