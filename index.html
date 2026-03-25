@@ -3,58 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v37.3</title>
+    <title>Apex Social v37.4 - Layout Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; padding-top: 60px; padding-bottom: 80px; }
-        .card { background: white; border-radius: 12px; border: 1px solid #ddd; margin: 10px; overflow: hidden; }
+        :root { --blue: #4285F4; --bg: #f8f9fa; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding-top: 65px; padding-bottom: 80px; }
         
-        /* Ajuste de tamanho da imagem no feed */
-        .post-img-container { 
+        /* Header Clean */
+        header { position: fixed; top: 0; width: 100%; height: 60px; background: white; border-bottom: 1px solid #eee; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; }
+        
+        /* Feed & Cartões */
+        .card { background: white; border-radius: 20px; border: 1px solid #eaebed; margin: 0 15px 20px 15px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        
+        /* Contentor de Imagem Organizado */
+        .feed-img-box { 
             width: 100%; 
-            max-height: 350px; /* Limita a altura para não ficar gigante */
+            max-height: 250px; /* Limite Estrito: Resolve o 'muito grande' */
             overflow: hidden; 
-            background: #f8f8f8;
+            background: #f1f3f4;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-bottom: 1px solid #eee;
         }
-        .post-img { width: 100%; height: auto; object-fit: cover; }
+        .feed-img { width: 100%; height: auto; object-fit: cover; display: block; }
         
-        .btn-blue { background: #4285F4; color: white; border-radius: 8px; font-weight: 900; font-size: 11px; text-transform: uppercase; }
+        /* Botões */
+        .btn-pub { background: var(--blue); color: white; border-radius: 12px; font-weight: 800; font-size: 11px; text-transform: uppercase; padding: 14px 0; }
+        .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #888; text-transform: uppercase; }
+        .tab-btn.active { color: var(--blue); border-top: 3px solid var(--blue); }
     </style>
 </head>
 <body>
 
-    <header class="fixed top-0 w-full h-[55px] bg-white border-b flex items-center justify-between px-4 z-50">
-        <div style="font-weight: 900; color: #4285F4; font-size: 18px;">APEX SOCIAL</div>
-        <div id="u-saldo" style="color: #34A853; font-weight: 900;">0.0000€</div>
+    <header>
+        <div style="font-weight: 900; color: var(--blue); font-size: 18px;">APEX</div>
+        <div id="u-saldo" style="color: #34A853; font-weight: 900; font-size: 16px;">0.0000€</div>
     </header>
 
     <main class="max-w-md mx-auto">
-        <div class="card p-4" style="border-top: 4px solid #4285F4;">
-            <textarea id="in-txt" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
+        <div class="card p-5" style="border-top: 10px solid var(--blue);">
+            <textarea id="in-txt" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none focus:ring-0 font-black text-sm mb-4" rows="2"></textarea>
             
-            <div id="msg-status" class="hidden text-center text-[10px] font-black mb-2 text-blue-500 uppercase">A processar...</div>
+            <div id="status" class="hidden text-center text-[10px] font-black mb-3 uppercase text-blue-600">A processar...</div>
             
-            <div class="flex gap-2">
-                <label for="in-file" class="flex-1 bg-gray-100 p-3 rounded-lg text-center text-[10px] font-black cursor-pointer uppercase">📸 Foto</label>
-                <input type="file" id="in-file" accept="image/*" class="hidden" onchange="processarFoto()">
+            <div class="flex gap-3">
+                <label for="in-file" class="flex-1 bg-gray-100 p-4 rounded-2xl text-center text-[10px] font-black cursor-pointer uppercase text-gray-700">📸 FOTO</label>
+                <input type="file" id="in-file" accept="image/*" class="hidden" onchange="processarFotoAgressiva()">
                 
-                <button onclick="publicar()" id="btn-pub" class="flex-[2] btn-blue p-3">Publicar</button>
+                <button onclick="enviarPublicacao()" id="btn-pub" class="flex-[2] btn-pub shadow-lg shadow-blue-100">Publicar agora</button>
             </div>
         </div>
 
         <div id="feed"></div>
     </main>
 
+    <nav class="fixed bottom-0 w-full h-[65px] bg-white border-t flex z-50">
+        <div class="tab-btn active">Rede</div>
+        <div class="tab-btn">Ganhos</div>
+    </nav>
+
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const _sb = window.supabase.createClient(SB_URL, SB_KEY);
         const MASTER_ID = "5401881400";
-        let fotoBase64 = "";
+        let fotoString = "";
 
         async function init() {
             const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
@@ -62,12 +77,13 @@
             carregarFeed();
         }
 
-        function processarFoto() {
+        // Compressão Agressiva para respeitar os 50MB
+        function processarFotoAgressiva() {
             const file = document.getElementById('in-file').files[0];
             if (!file) return;
 
-            document.getElementById('msg-status').classList.remove('hidden');
-            document.getElementById('msg-status').innerText = "✅ Foto pronta";
+            document.getElementById('status').classList.remove('hidden');
+            document.getElementById('status').innerText = "✅ Imagem Leve Pronta";
 
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -76,57 +92,58 @@
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     
-                    // Comprime para 600px (mais pequeno para ecrãs de telemóvel)
-                    const maxW = 600;
+                    // Reduzimos drasticamente a largura para 500px (Metade do Instagram)
+                    // Fica leve, ocupa pouco espaço na base de dados e vê-se bem no telemóvel.
+                    const maxW = 500;
                     const scale = maxW / img.width;
                     canvas.width = maxW;
                     canvas.height = img.height * scale;
                     
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    fotoBase64 = canvas.toDataURL('image/jpeg', 0.6); // Qualidade 0.6 para poupar espaço
+                    fotoString = canvas.toDataURL('image/jpeg', 0.5); // Qualidade 0.5: Super Compressão
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        async function publicar() {
+        async function enviarPublicacao() {
             const txt = document.getElementById('in-txt').value;
             const btn = document.getElementById('btn-pub');
             if(!txt) return;
 
             btn.disabled = true;
-            btn.innerText = "A ENVIAR...";
+            btn.innerText = "A GRAVAR...";
 
             const { error } = await _sb.from('posts').insert([
-                { user_id: MASTER_ID, content: txt, image_url: fotoBase64 }
+                { user_id: MASTER_ID, content: txt, image_url: fotoString }
             ]);
 
             if(!error) window.location.reload();
-            else { btn.disabled = false; btn.innerText = "ERRO"; }
+            else { btn.disabled = false; btn.innerText = "ERRO NA TABELA"; }
         }
 
         async function carregarFeed() {
             const { data: posts } = await _sb.from('posts').select('*').order('created_at', { ascending: false });
-            const container = document.getElementById('feed');
-            container.innerHTML = "";
+            const feedDiv = document.getElementById('feed');
+            feedDiv.innerHTML = "";
 
             posts?.forEach(p => {
                 const div = document.createElement('div');
                 div.className = "card";
                 
                 const imgHtml = p.image_url ? `
-                    <div class="post-img-container">
-                        <img src="${p.image_url}" class="post-img">
+                    <div class="feed-img-box">
+                        <img src="${p.image_url}" class="feed-img" loading="lazy">
                     </div>` : "";
 
                 div.innerHTML = `
                     ${imgHtml}
-                    <div class="p-4">
-                        <p class="text-[12px] font-bold text-gray-800 uppercase leading-snug">${p.content}</p>
+                    <div class="p-5">
+                        <p class="text-[12px] font-black text-gray-800 uppercase leading-snug">${p.content}</p>
                     </div>
                 `;
-                container.appendChild(div);
+                feedDiv.appendChild(div);
             });
         }
 
