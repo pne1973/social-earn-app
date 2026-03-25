@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v32.200</title>
+    <title>Apex Social v32 Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
+        :root { --blue: #4285F4; --red: #EA4335; --green: #34A853; }
         body { font-family: 'Roboto', sans-serif; background: #f8f9fa; margin: 0; overflow-x: hidden; }
         .tab-content { display: none; }
         .tab-content.active { display: block; padding-bottom: 100px; }
-        .nav-btn.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); background: #fff; }
+        .nav-btn.active { color: var(--blue); border-top: 4px solid var(--blue); background: #fff; font-weight: 900; }
         .card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 12px; }
-        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div><p class="text-[10px] font-black uppercase">Sincronizando...</p></div>
+    <div id="loader"><div class="animate-spin h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full mb-2"></div><p class="text-[10px] font-black uppercase italic">Processing...</p></div>
 
-    <header class="sticky top-0 bg-white border-b z-50 px-5 py-3 flex justify-between items-center">
+    <header class="sticky top-0 bg-white border-b z-50 px-5 py-3 flex justify-between items-center shadow-sm">
         <div>
             <h1 class="text-xl font-black italic tracking-tighter text-blue-600">APEX SOCIAL</h1>
-            <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest text-center">Production v32</p>
+            <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Production v32.210</p>
         </div>
         <div class="text-right">
             <div id="bal-eur" class="font-black text-green-600 text-lg">0.0000€</div>
@@ -36,22 +36,18 @@
         <section id="view-social" class="tab-content active">
             <div class="card p-3 mb-4 bg-blue-50 border-blue-100 flex items-center space-x-2 overflow-x-auto whitespace-nowrap">
                 <span class="text-[9px] font-black text-blue-600 uppercase italic">Top 10:</span>
-                <div id="ranking" class="text-[9px] font-bold text-gray-500 uppercase flex space-x-3"></div>
+                <div id="ranking" class="text-[9px] font-bold text-gray-500 uppercase flex space-x-3">A carregar...</div>
             </div>
 
-            <div class="card p-4 shadow-sm border-2 border-blue-50">
-                <textarea id="post-text" placeholder="O que queres partilhar? (+15 XP)" class="w-full border-none focus:ring-0 text-sm p-0 mb-3" rows="2"></textarea>
+            <div class="card p-4 shadow-sm border-2 border-blue-100">
+                <textarea id="post-text" placeholder="No que estás a pensar? (+15 XP)" class="w-full border-none focus:ring-0 text-sm p-0 mb-3" rows="2"></textarea>
                 <div class="flex justify-between items-center pt-3 border-t">
-                    <label class="cursor-pointer text-gray-400">
-                        <input type="file" class="hidden" accept="image/*">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg>
-                    </label>
-                    <button onclick="sendPost()" class="bg-blue-600 text-white px-8 py-2 rounded-lg font-black text-xs uppercase">Publicar</button>
+                    <button class="text-gray-400"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg></button>
+                    <button onclick="sendPost()" class="bg-blue-600 text-white px-8 py-2 rounded-lg font-black text-xs uppercase shadow-md">Publicar</button>
                 </div>
             </div>
 
             <div id="feed" class="mt-4 space-y-4"></div>
-            <div id="status-feed" class="text-center py-10 text-[10px] font-black text-gray-300 uppercase italic">A carregar rede...</div>
         </section>
 
         <section id="view-wallet" class="tab-content">
@@ -61,26 +57,38 @@
                 <p id="wall-brl" class="text-sm font-bold text-gray-400 mt-2 uppercase">≈ 0.0000 BRL</p>
             </div>
             
-            <button onclick="syncAd()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic mt-6">Sincronizar Bónus (Ad)</button>
-            <button onclick="doCheckIn()" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase mt-3">Check-in Diário (+0.0500€)</button>
+            <div class="card p-4 mt-4 grid grid-cols-2 gap-2 text-[10px] font-bold uppercase">
+                <div class="bg-gray-50 p-2 rounded">Post: +15 XP</div>
+                <div class="bg-gray-50 p-2 rounded">Friend: +100 XP</div>
+            </div>
+
+            <button onclick="syncBonus()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic mt-6 shadow-xl">Sincronizar (Ad Injection)</button>
+            <button onclick="doCheckIn()" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase mt-3 shadow-md">Check-in Diário (+0.0500€)</button>
+            <p class="text-[8px] text-center font-black text-gray-300 uppercase mt-6 tracking-tighter">Mínimo de Saque: 5000 XP (10,00€)</p>
         </section>
 
         <section id="view-admin" class="tab-content">
-            <div class="card p-6 border-4 border-red-500 bg-red-50">
-                <h2 class="text-red-600 font-black text-xs uppercase mb-4 tracking-widest">Painel Admin Master</h2>
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="bg-white p-4 rounded border text-center"><p class="text-[8px] uppercase text-gray-400">Users</p><p id="adm-u" class="font-black text-red-600 text-2xl">...</p></div>
-                    <div class="bg-white p-4 rounded border text-center"><p class="text-[8px] uppercase text-gray-400">Posts</p><p id="adm-p" class="font-black text-red-600 text-2xl">...</p></div>
+            <div class="card p-6 border-4 border-red-500 bg-red-50 shadow-xl">
+                <h2 class="text-red-600 font-black text-sm uppercase italic mb-6 border-b-2 border-red-200 pb-2">Admin Panel (ID 5401881400)</h2>
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-white p-4 rounded-xl border border-red-100 text-center">
+                        <p class="text-[9px] font-bold text-gray-400 uppercase">Users</p>
+                        <p id="adm-u" class="font-black text-red-600 text-3xl italic">...</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-red-100 text-center">
+                        <p class="text-[9px] font-bold text-gray-400 uppercase">Posts</p>
+                        <p id="adm-p" class="font-black text-red-600 text-3xl italic">...</p>
+                    </div>
                 </div>
-                <input id="del-id" type="text" placeholder="ID do Post" class="w-full p-3 border mb-2 rounded text-sm">
-                <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-3 rounded font-black text-[10px] uppercase">Eliminar Post</button>
+                <input id="del-id" type="text" placeholder="ID do Post para deletar" class="w-full p-4 rounded-xl border-2 mb-3 text-sm focus:outline-none focus:border-red-500">
+                <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg">Deletar Post por ID</button>
             </div>
         </section>
 
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-40">
-        <button onclick="nav('social')" class="nav-btn flex-1 flex flex-col items-center py-2 text-gray-400 active"><span class="text-[10px] font-black uppercase">Social</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 z-40 shadow-2xl">
+        <button onclick="nav('social')" class="nav-btn flex-1 flex flex-col items-center py-2 text-gray-400 active"><span class="text-[10px] font-black uppercase">Feed</span></button>
         <button onclick="nav('wallet')" class="nav-btn flex-1 flex flex-col items-center py-2 text-gray-400"><span class="text-[10px] font-black uppercase">Carteira</span></button>
         <button id="adm-btn" onclick="nav('admin')" class="hidden nav-btn flex-1 flex flex-col items-center py-2 text-red-400 italic font-bold"><span class="text-[10px] font-black uppercase">Admin</span></button>
     </nav>
@@ -89,32 +97,33 @@
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
         const UID = "5401881400";
-        const BRL = 6.1245;
+        const BRL_CONV = 6.1245;
 
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-        let user = { saldo: 0, bonus: 15 };
+        let uData = { saldo: 0, bonus: 15 };
 
         function nav(t) {
             document.querySelectorAll('.tab-content, .nav-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('view-'+t).classList.add('active');
             event.currentTarget.classList.add('active');
+            window.scrollTo(0,0);
         }
 
         async function init() {
             if(UID === "5401881400") document.getElementById('adm-btn').classList.remove('hidden');
             try {
                 const { data } = await supabase.from('perfis').select('*').eq('id', UID).single();
-                if(data) user = data;
+                if(data) uData = data;
                 updateUI();
                 loadRanking();
                 loadFeed();
-                if(UID === "5401881400") loadStats();
-            } catch(e) { console.error(e); }
+                if(UID === "5401881400") loadAdmin();
+            } catch(e) { console.error("Init Error", e); }
         }
 
         function updateUI() {
-            const e = user.saldo.toFixed(4);
-            const b = (user.saldo * BRL).toFixed(4);
+            const e = uData.saldo.toFixed(4);
+            const b = (uData.saldo * BRL_CONV).toFixed(4);
             document.getElementById('bal-eur').innerText = e + "€";
             document.getElementById('wall-eur').innerText = e + "€";
             document.getElementById('bal-brl').innerText = b + " BRL";
@@ -122,22 +131,21 @@
         }
 
         async function loadFeed() {
-            const { data, error } = await supabase.from('posts').select('*').order('created_at', {ascending: false});
+            const { data } = await supabase.from('posts').select('*').order('created_at', {ascending: false}).limit(20);
             if(data) {
-                document.getElementById('status-feed').style.display = 'none';
                 document.getElementById('feed').innerHTML = data.map((p, i) => `
                     <div class="card p-4 shadow-sm">
                         <div class="flex justify-between text-[9px] font-bold text-gray-300 uppercase mb-2">
                             <span>User #${p.user_id.slice(-4)}</span>
                             <span>ID: ${p.id}</span>
                         </div>
-                        <p class="text-sm text-gray-700">${p.content}</p>
-                        <div class="mt-4 pt-3 border-t flex justify-between">
-                            <button onclick="doLike()" class="text-[9px] font-black text-gray-400 uppercase">Like (+2 XP)</button>
-                            <button class="text-[9px] font-black text-red-300 uppercase italic">Report</button>
+                        <p class="text-sm text-gray-700 leading-relaxed">${p.content}</p>
+                        <div class="mt-4 pt-3 border-t flex space-x-6">
+                            <button onclick="doLike()" class="text-[10px] font-black text-gray-400 uppercase">Like (+2 XP)</button>
+                            <button class="text-[10px] font-black text-red-200 uppercase italic">Report</button>
                         </div>
                     </div>
-                    ${i % 3 === 2 ? '<div class="bg-yellow-50 text-center py-4 text-[9px] font-black text-yellow-600 border-dashed border border-yellow-200 rounded-lg mb-4 uppercase">Ad Slot (v32)</div>' : ''}
+                    ${i % 3 === 2 ? '<div class="bg-blue-50 text-center py-4 text-[9px] font-black text-blue-600 border-dashed border border-blue-200 rounded-lg mb-4 uppercase italic tracking-widest">Sponsored Content (Ad)</div>' : ''}
                 `).join('');
             }
         }
@@ -148,8 +156,8 @@
             document.getElementById('loader').style.display = 'flex';
             const { error } = await supabase.from('posts').insert([{ user_id: UID, content: txt }]);
             if(!error) {
-                user.saldo += 0.0150;
-                await supabase.from('perfis').upsert({ id: UID, saldo: user.saldo });
+                uData.saldo += 0.0150; // +15 XP
+                await supabase.from('perfis').upsert({ id: UID, saldo: uData.saldo });
                 document.getElementById('post-text').value = "";
                 init();
             }
@@ -157,9 +165,9 @@
         }
 
         async function doCheckIn() {
-            user.saldo += 0.0500;
+            uData.saldo += 0.0500; // +50 XP
             updateUI();
-            await supabase.from('perfis').upsert({ id: UID, saldo: user.saldo });
+            await supabase.from('perfis').upsert({ id: UID, saldo: uData.saldo });
         }
 
         async function loadRanking() {
@@ -167,11 +175,18 @@
             if(data) document.getElementById('ranking').innerHTML = data.map((u, i) => `<span>#${i+1} User..${u.id.slice(-3)}</span>`).join(' • ');
         }
 
-        async function loadStats() {
+        async function loadAdmin() {
             const { count: u } = await supabase.from('perfis').select('*', { count: 'exact', head: true });
             const { count: p } = await supabase.from('posts').select('*', { count: 'exact', head: true });
             document.getElementById('adm-u').innerText = u;
             document.getElementById('adm-p').innerText = p;
+        }
+
+        async function adminDelete() {
+            const id = document.getElementById('del-id').value;
+            if(!id) return;
+            const { error } = await supabase.from('posts').delete().eq('id', id);
+            if(!error) { alert("Removido!"); init(); }
         }
 
         window.onload = init;
