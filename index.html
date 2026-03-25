@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v34.503 - Visual Earnings Update</title>
+    <title>Apex Social v34.504 - Ad Retention Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
@@ -12,33 +12,14 @@
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; }
         
-        /* SISTEMA DE FEEDBACK VISUAL (NÚMEROS GRANDES) */
-        #floating-earning {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 3000;
-            pointer-events: none;
-            display: none;
-            animation: popUp 0.8s ease-out forwards;
-        }
-
+        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3000; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
         @keyframes popUp {
             0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
             20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
             80% { opacity: 1; transform: translate(-50%, -70%) scale(1); }
             100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
         }
-
-        .earning-text {
-            font-size: 4rem;
-            font-weight: 900;
-            color: var(--g-green);
-            text-shadow: 0 4px 20px rgba(52, 168, 83, 0.4);
-            -webkit-text-stroke: 2px white;
-        }
-        /* -------------------------------------------- */
+        .earning-text { font-size: 4rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52, 168, 83, 0.4); -webkit-text-stroke: 2px white; }
 
         .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #eee; width: 100%; flex-direction: column; }
         .comment-section.active { display: flex; }
@@ -52,6 +33,7 @@
         .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 40; background: #f1f3f4; padding: 12px 16px; transition: transform 0.3s; }
         #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
         #feed-container { margin-top: 140px; }
+        .ad-card { border: 2px solid var(--g-blue); background: #f0f7ff; }
     </style>
 </head>
 <body class="pb-24">
@@ -64,15 +46,19 @@
         <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl border-4 border-blue-600 p-8 text-center">
             <div id="ad-decision-ui">
                 <h3 class="text-xl font-black uppercase text-blue-600 mb-4">Sincronização Necessária</h3>
-                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl shadow-xl uppercase text-xs mb-3">Ver Anúncio (100% Ganhos)</button>
-                <button onclick="degradeAndContinue()" class="w-full p-4 bg-white border-2 text-gray-400 rounded-2xl uppercase text-[10px]">Pular (-20%)</button>
+                <p class="text-[10px] font-black uppercase mb-6 text-gray-400">Valide os seus ganhos para continuar a 100%.</p>
+                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl shadow-xl uppercase text-xs mb-3">Ver Anúncio (15s)</button>
+                <button onclick="degradeAndContinue()" class="w-full p-4 bg-white border-2 text-gray-400 rounded-2xl uppercase text-[10px]">Pular (-20% Ganhos)</button>
             </div>
             <div id="ad-player-ui" class="hidden">
                 <div class="aspect-video bg-black rounded-xl mb-4 flex items-center justify-center relative overflow-hidden">
-                    <img id="ad-img-fs" src="" class="absolute inset-0 w-full h-full object-cover opacity-50">
-                    <p id="ad-timer" class="relative text-white font-black uppercase text-xs">A carregar...</p>
+                    <img id="ad-img-fs" src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400" class="absolute inset-0 w-full h-full object-cover opacity-60">
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div id="ad-spinner" class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                        <p id="ad-timer" class="text-white font-black uppercase text-xs tracking-widest">A validar...</p>
+                    </div>
                 </div>
-                <button id="close-ad-btn" disabled class="w-full py-5 bg-gray-100 text-gray-400 rounded-xl uppercase text-xs">Aguarde...</button>
+                <button id="close-ad-btn" disabled class="w-full py-5 bg-gray-100 text-gray-400 rounded-xl uppercase text-xs font-black">Aguarde 15s...</button>
             </div>
         </div>
     </div>
@@ -98,7 +84,7 @@
                     <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none uppercase font-black" rows="1"></textarea>
                     <div id="expanded-post" class="hidden">
                         <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-100 border-none text-[10px] p-3 rounded-xl mb-4 outline-none uppercase font-black">
-                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase">Publicar</button>
+                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase">Publicar na Rede</button>
                     </div>
                 </div>
             </div>
@@ -116,9 +102,9 @@
         <section id="view-admin" class="tab-content">
             <div class="google-card border-t-[8px] border-red-600 p-6 mt-4 shadow-2xl text-center">
                 <h2 class="text-red-600 font-black text-xs uppercase mb-6 underline">ADMIN PANEL</h2>
-                <div id="adm-debt" class="font-black text-2xl text-blue-700 mb-2">0.00€</div>
+                <div id="adm-debt" class="font-black text-2xl text-blue-700 mb-4">0.00€</div>
                 <input id="del-id" type="text" placeholder="ID DO POST" class="w-full p-4 border-2 rounded-xl mb-4 font-black uppercase text-[10px]">
-                <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase">Eliminar</button>
+                <button onclick="adminDelete()" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase">Eliminar Post</button>
             </div>
         </section>
     </main>
@@ -126,7 +112,7 @@
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-50">
         <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase">REDE</span></button>
         <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase">GANHOS</span></button>
-        <button id="adm-btn" onclick="nav('admin')" class="hidden flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase italic">ADMIN</span></button>
+        <button id="adm-btn" onclick="nav('admin')" class="hidden flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase italic text-red-400">ADMIN</span></button>
     </nav>
 
     <script>
@@ -156,7 +142,6 @@
             tag.className = pct < 100 ? "text-[8px] font-black text-red-500 italic uppercase" : "text-[8px] font-black text-green-500 italic uppercase";
         }
 
-        // NOVA FUNÇÃO DE FEEDBACK VISUAL
         function showBigNumber(val) {
             const container = document.getElementById('floating-earning');
             const text = document.getElementById('earning-val');
@@ -173,7 +158,7 @@
                 user.interactions++;
                 const vFinal = Number(val) * user.multiplier;
                 user.saldo += vFinal;
-                showBigNumber(vFinal); // Dispara os números grandes
+                showBigNumber(vFinal);
                 updateUI();
                 await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
             }
@@ -184,9 +169,8 @@
             const container = document.getElementById('feed-container');
             if(!posts) return;
             container.innerHTML = "";
-            for(let i=0; i<posts.length; i++) {
-                const p = posts[i];
-                const { count: cCount } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
+            
+            posts.forEach((p, index) => {
                 const card = document.createElement('div');
                 card.className = "google-card shadow-sm mb-6";
                 card.innerHTML = `
@@ -194,9 +178,9 @@
                         <p class="text-[13px] font-black uppercase text-gray-800 mb-4">${p.content}</p>
                         ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 border">` : ''}
                         <div class="flex justify-between border-t pt-4">
-                            <button onclick="reagir(0.0006)" class="flex-1 flex flex-col items-center relative"><div class="interaction-badge">${Math.floor(Math.random()*20)}</div><span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-500">GOSTAR</span></button>
-                            <button onclick="toggleComments('${p.id}')" class="flex-1 flex flex-col items-center relative border-x border-gray-100"><div class="interaction-badge">${cCount || 0}</div><span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-500">COMENTAR</span></button>
-                            <button onclick="reagir(0.0020)" class="flex-1 flex flex-col items-center relative"><div class="interaction-badge">${Math.floor(Math.random()*5)}</div><span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-500">PARTILHAR</span></button>
+                            <button onclick="reagir(0.0006)" class="flex-1 flex flex-col items-center relative"><span class="text-xl">👍</span><span class="text-[8px] font-black text-gray-500 uppercase">Gostar</span></button>
+                            <button onclick="toggleComments('${p.id}')" class="flex-1 flex flex-col items-center relative border-x border-gray-100"><span class="text-xl">💬</span><span class="text-[8px] font-black text-gray-500 uppercase">Comentar</span></button>
+                            <button onclick="reagir(0.0020)" class="flex-1 flex flex-col items-center relative"><span class="text-xl">🔗</span><span class="text-[8px] font-black text-gray-500 uppercase">Partilhar</span></button>
                         </div>
                     </div>
                     <div id="comments-${p.id}" class="comment-section">
@@ -208,7 +192,45 @@
                     </div>
                 `;
                 container.appendChild(card);
-            }
+
+                // RESTAURADO: INJEÇÃO DE ANÚNCIOS DE 3 EM 3 POSTS
+                if ((index + 1) % 3 === 0) {
+                    const adCard = document.createElement('div');
+                    adCard.className = "google-card p-6 ad-card shadow-lg mb-6 text-center";
+                    adCard.innerHTML = `
+                        <span class="bg-blue-600 text-white text-[8px] font-black px-2 py-1 rounded uppercase mb-2 inline-block">Patrocinado</span>
+                        <h4 class="text-xs font-black uppercase text-blue-700 mb-3">Anúncio Apex: Clique para Bónus</h4>
+                        <div class="w-full h-32 bg-gray-200 rounded-xl mb-4 overflow-hidden">
+                             <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400" class="w-full h-full object-cover opacity-80">
+                        </div>
+                        <button onclick="startAdFlow()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Ver e Ganhar 100%</button>
+                    `;
+                    container.appendChild(adCard);
+                }
+            });
+        }
+
+        function startAdFlow() {
+            document.getElementById('ad-decision-ui').classList.add('hidden');
+            document.getElementById('ad-player-ui').classList.remove('hidden');
+            let timeLeft = 15; // ALTERADO PARA 15 SEGUNDOS
+            const btn = document.getElementById('close-ad-btn');
+            
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('ad-timer').innerText = "Validando em " + timeLeft + "s...";
+                btn.innerText = "Aguarde " + timeLeft + "s...";
+                
+                if(timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('ad-spinner').style.display = 'none';
+                    document.getElementById('ad-timer').innerText = "CONCLUÍDO";
+                    btn.disabled = false;
+                    btn.innerText = "RECOLHER GANHOS";
+                    btn.className = "w-full py-5 bg-green-600 text-white rounded-xl font-black uppercase text-xs shadow-xl";
+                    btn.onclick = () => { user.multiplier = 1.0; user.interactions = 0; finalize(); };
+                }
+            }, 1000);
         }
 
         async function addComment(postId) {
@@ -216,9 +238,8 @@
             if(!input.value) return;
             const { error } = await sb.from('comentarios').insert([{ post_id: postId, user_id: MASTER_ID, content: input.value }]);
             if(!error) {
-                const val = 0.0010; // Valor por comentário
                 input.value = "";
-                await reagir(val);
+                await reagir(0.0010);
                 updateCommentList(postId);
             }
         }
@@ -236,36 +257,13 @@
             if(!t) return;
             const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: t, image_url: i }]);
             if(!error) {
-                const val = 0.0150; // Valor por post
-                user.saldo += val;
-                showBigNumber(val);
+                user.saldo += 0.0150;
+                showBigNumber(0.0150);
                 updateUI();
                 await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
                 document.getElementById('post-input').value = "";
                 loadFeed();
             }
-        }
-
-        function toggleComments(id) { 
-            const s = document.getElementById(`comments-${id}`); 
-            s.classList.toggle('active'); 
-            if(s.classList.contains('active')) updateCommentList(id); 
-        }
-
-        function startAdFlow() {
-            document.getElementById('ad-decision-ui').classList.add('hidden');
-            document.getElementById('ad-player-ui').classList.remove('hidden');
-            document.getElementById('ad-img-fs').src = "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400";
-            let c = 5;
-            const i = setInterval(() => {
-                c--; document.getElementById('ad-timer').innerText = "Validando em " + c + "s...";
-                if(c <= 0) {
-                    clearInterval(i);
-                    const b = document.getElementById('close-ad-btn');
-                    b.disabled = false; b.innerText = "Concluído"; b.className = "w-full py-5 bg-green-600 text-white rounded-xl font-black uppercase text-xs";
-                    b.onclick = () => { user.multiplier = 1.0; user.interactions = 0; finalize(); };
-                }
-            }, 1000);
         }
 
         function degradeAndContinue() { user.multiplier = Math.max(0.1, user.multiplier - 0.20); user.interactions++; finalize(); }
@@ -278,6 +276,12 @@
             updateUI(); 
             await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID); 
             loadFeed();
+        }
+
+        function toggleComments(id) { 
+            const s = document.getElementById(`comments-${id}`); 
+            s.classList.toggle('active'); 
+            if(s.classList.contains('active')) updateCommentList(id); 
         }
 
         function nav(t) {
