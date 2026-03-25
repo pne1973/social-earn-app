@@ -12,20 +12,19 @@
             --text-dark: #202124;
             --text-gray: #70757a;
             --border: #dadce0;
+            --success: #1e8e3e;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
             background-color: var(--google-bg);
             margin: 0;
-            padding: 0;
-            color: var(--text-dark);
             display: flex;
             flex-direction: column;
             height: 100vh;
+            color: var(--text-dark);
         }
 
-        /* Header Consertado */
         header {
             background: #fff;
             padding: 15px 20px;
@@ -33,25 +32,25 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border);
-            box-shadow: 0 1px 2px rgba(60,64,67,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .logo {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: var(--google-blue);
             font-weight: 700;
-            font-size: 1.1rem;
+            color: var(--google-blue);
         }
 
         .balance {
-            color: #1e8e3e;
+            color: var(--success);
             font-weight: 700;
             font-size: 1.2rem;
         }
 
-        /* Feed e Cards Restaurados */
         .container {
             flex: 1;
             overflow-y: auto;
@@ -68,7 +67,6 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .post-meta {
@@ -79,65 +77,53 @@
             margin-bottom: 15px;
         }
 
-        .post-text {
+        .post-content {
             font-size: 1.1rem;
             font-weight: 500;
-            margin-bottom: 20px;
             line-height: 1.4;
+            margin-bottom: 20px;
         }
 
-        /* Área de Ações Simétrica */
         .actions {
             display: flex;
             justify-content: space-around;
             border-top: 1px solid #eee;
             padding-top: 15px;
-            margin-bottom: 15px;
         }
 
         .action-item {
             text-align: center;
-            cursor: pointer;
             color: var(--text-gray);
             font-size: 0.75rem;
-            font-weight: 500;
-            transition: color 0.2s;
+            font-weight: 700;
+            cursor: pointer;
         }
 
-        .action-item:hover { color: var(--google-blue); }
-
-        .icon {
-            font-size: 1.4rem;
+        .icon-large {
             display: block;
-            margin-bottom: 4px;
+            font-size: 1.4rem;
+            margin-bottom: 5px;
         }
 
-        /* Seção de Comentários Organizada */
-        .comment-box {
+        .comment-section {
             background: #f8f9fa;
             border-radius: 8px;
             padding: 15px;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
-        .processing-label {
+        .status {
             color: var(--google-blue);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             margin-bottom: 10px;
-            display: block;
-        }
-
-        .comment-item {
-            font-size: 0.95rem;
-            padding: 8px 0;
-            border-bottom: 1px solid #e8eaed;
+            text-transform: uppercase;
         }
 
         .input-group {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         input {
@@ -146,7 +132,6 @@
             border: 1px solid var(--border);
             border-radius: 20px;
             outline: none;
-            font-size: 0.9rem;
         }
 
         button {
@@ -155,28 +140,30 @@
             border: none;
             padding: 0 20px;
             border-radius: 20px;
-            font-weight: 500;
+            font-weight: 700;
             cursor: pointer;
         }
 
-        /* Footer Nav Clean */
         nav {
             background: white;
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-around;
-            padding: 12px 0;
+            padding: 15px 0;
+            position: sticky;
+            bottom: 0;
         }
 
         .nav-link {
             text-decoration: none;
             color: var(--text-gray);
-            font-weight: 700;
             font-size: 0.8rem;
-            letter-spacing: 0.5px;
+            font-weight: 700;
         }
 
-        .nav-link.active { color: var(--google-blue); }
+        .nav-link.active {
+            color: var(--google-blue);
+        }
     </style>
 </head>
 <body>
@@ -195,22 +182,22 @@
             <span>ID: #79</span>
             <span>Utilizador #1400</span>
         </div>
-        <div class="post-text">TYHHHHH</div>
+        <div class="post-content">TYHHHHH</div>
         
         <div class="actions">
-            <div class="action-item"><span class="icon">👍</span>GOSTAR</div>
-            <div class="action-item"><span class="icon">💬</span>COMENTAR</div>
-            <div class="action-item"><span class="icon">🔗</span>PARTILHAR</div>
+            <div class="action-item"><span class="icon-large">👍</span>GOSTAR</div>
+            <div class="action-item"><span class="icon-large">💬</span>COMENTAR</div>
+            <div class="action-item"><span class="icon-large">🔗</span>PARTILHAR</div>
         </div>
 
-        <div class="comment-box">
-            <span class="processing-label">PROCESSING...</span>
+        <div class="comment-section">
+            <div class="status">Processing...</div>
             <div id="comments-79">
-                <div class="comment-item">Ttgggyy</div>
+                <div style="padding: 5px 0; font-size: 0.95rem;">Ttgggyy</div>
             </div>
             <div class="input-group">
-                <input type="text" placeholder="A tua mensagem..." id="input-79">
-                <button onclick="sendComment(79)">OK</button>
+                <input type="text" placeholder="Escreve um comentário..." id="in-79">
+                <button onclick="addComment(79)">OK</button>
             </div>
         </div>
     </div>
@@ -223,14 +210,15 @@
 </nav>
 
 <script>
-    function sendComment(id) {
-        const input = document.getElementById(`input-${id}`);
-        const list = document.getElementById(`comments-${id}`);
+    function addComment(id) {
+        const input = document.getElementById(`in-${id}`);
+        const box = document.getElementById(`comments-${id}`);
         if(input.value.trim() !== "") {
             const div = document.createElement('div');
-            div.className = 'comment-item';
+            div.style.padding = "5px 0";
+            div.style.fontSize = "0.95rem";
             div.innerText = input.value;
-            list.appendChild(div);
+            box.appendChild(div);
             input.value = "";
         }
     }
