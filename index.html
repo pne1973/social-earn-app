@@ -3,165 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v34.516 - Real Stats</title>
+    <title>Apex Social v34.520</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; }
-        .publisher-area { background: #f1f3f4; padding: 12px 16px; margin-top: 72px; }
-        #feed-container { padding: 0 16px 100px 16px; }
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; position: relative; }
-        .interaction-badge { position: absolute; top: 4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 2px 6px; border-radius: 10px; border: 2px solid white; min-width: 22px; text-align: center; }
-        .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #eee; }
-        .comment-section.active { display: flex; flex-direction: column; }
-        .post-img { width: 100%; max-height: 400px; object-fit: cover; background: #000; }
-        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 4000; display: none; animation: popUp 0.8s ease-out; }
-        @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; padding-bottom: 80px; }
+        
+        /* Header Fixo */
+        header { position: fixed; top: 0; width: 100%; height: 65px; background: white; border-bottom: 2px solid #dadce0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
+        
+        /* Publisher Area */
+        .publisher { margin-top: 80px; padding: 15px; }
+        .card { background: white; border-radius: 12px; border: 1px solid #dadce0; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        /* Feed */
+        #feed-container { padding: 0 15px; }
+        .post-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 20px; overflow: hidden; }
+        .post-img { width: 100%; display: block; background: #eee; min-height: 200px; object-fit: cover; }
+        
+        /* Interações Estilo Google */
+        .btn-interact { flex: 1; padding: 12px 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; color: #5f6368; border: none; background: transparent; }
+        .badge { background: var(--g-red); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; }
+
+        /* Tabs */
+        nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; border-top: 2px solid #dadce0; display: flex; z-index: 1000; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
+        .nav-btn.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
     </style>
 </head>
-<body class="pb-24">
+<body>
 
-    <div id="floating-earning"><div class="text-4xl font-black text-green-600 shadow-white" id="earning-val">+0.0000€</div></div>
-
-    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
-        <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black">A</div>
-            <h1 class="text-sm font-black uppercase text-blue-600">Apex Social</h1>
+    <header>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="background: var(--g-blue); color: white; padding: 8px 12px; border-radius: 8px; font-weight: 900;">A</div>
+            <span style="color: var(--g-blue); font-weight: 900; font-size: 14px;">APEX SOCIAL</span>
         </div>
-        <div class="text-right">
-            <div id="main-eur" class="font-black text-green-600 text-base">0.0000€</div>
-        </div>
+        <div id="saldo-header" style="color: var(--g-green); font-weight: 900; font-size: 16px;">0.0000€</div>
     </header>
 
-    <main class="max-w-lg mx-auto">
-        <section id="view-social">
-            <div class="publisher-area">
-                <div class="google-card p-4 border-t-8 border-blue-600 shadow-lg">
-                    <textarea id="post-input" onclick="this.rows=3; document.getElementById('pub-actions').classList.remove('hidden')" placeholder="PARTILHAR ALGO... (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 uppercase font-black" rows="1"></textarea>
-                    <div id="pub-actions" class="hidden">
-                        <input id="file-upload" type="file" accept="image/*" class="hidden" onchange="document.getElementById('lab').innerText='✅ FOTO OK'">
-                        <label id="lab" for="file-upload" class="block p-3 bg-gray-50 border-2 border-dashed rounded-xl text-center text-[10px] mb-3">📸 ADICIONAR FOTO</label>
-                        <button id="btn-pub" onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-xs uppercase">Publicar</button>
-                    </div>
+    <main id="tab-rede">
+        <div class="publisher">
+            <div class="card p-4" style="border-top: 8px solid var(--g-blue);">
+                <textarea id="post-text" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 font-black uppercase text-xs mb-3" rows="2"></textarea>
+                <div id="upload-preview" class="hidden mb-3 text-[10px] text-green-600 font-bold text-center">✅ IMAGEM PRONTA</div>
+                <div class="flex gap-2">
+                    <label for="file-in" class="flex-1 bg-gray-100 p-3 rounded-lg text-center text-[10px] font-black cursor-pointer uppercase">📸 FOTO</label>
+                    <input type="file" id="file-in" accept="image/*" class="hidden" onchange="document.getElementById('upload-preview').classList.remove('hidden')">
+                    <button onclick="enviarPost()" id="btn-envio" class="flex-[2] bg-blue-600 text-white rounded-lg font-black text-[10px] uppercase">Publicar (+0.0150€)</button>
                 </div>
             </div>
-            <div id="feed-container" class="space-y-6"></div>
-        </section>
+        </div>
+
+        <div id="feed-container">
+            </div>
     </main>
+
+    <main id="tab-ganhos" class="hidden p-10 mt-20 text-center">
+        <div class="card p-10 border-t-[10px] border-blue-600">
+            <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Carteira Total</p>
+            <h1 id="saldo-total" class="text-4xl font-black text-blue-600">0.0000€</h1>
+        </div>
+    </main>
+
+    <nav>
+        <button onclick="mudarTab('rede')" id="nav-rede" class="nav-btn active">Rede</button>
+        <button onclick="mudarTab('ganhos')" id="nav-ganhos" class="nav-btn">Ganhos</button>
+    </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const MASTER_ID = "5401881400";
-        const sb = window.supabase.createClient(SB_URL, SB_KEY);
-        
-        let userSaldo = 0;
+        const _sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+        let saldo = 0;
 
         async function init() {
-            const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) userSaldo = data.saldo;
-            updateUI(); loadFeed();
+            const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if(data) saldo = data.saldo;
+            atualizarUI();
+            carregarFeed();
         }
 
-        async function publish() {
-            const content = document.getElementById('post-input').value;
-            const file = document.getElementById('file-upload').files[0];
-            if(!content) return;
+        async function enviarPost() {
+            const txt = document.getElementById('post-text').value;
+            const file = document.getElementById('file-in').files[0];
+            const btn = document.getElementById('btn-envio');
+            if(!txt) return;
 
-            let imgUrl = "";
+            btn.disabled = true;
+            btn.innerText = "A ENVIAR...";
+
+            let url = "";
             if(file) {
-                const formData = new FormData();
-                formData.append("image", file);
-                const res = await fetch("https://api.imgbb.com/1/upload?key=90868f06f74304629e474585642d627c", { method: "POST", body: formData });
-                const json = await res.json();
-                imgUrl = json.data.url;
+                const fd = new FormData();
+                fd.append("image", file);
+                try {
+                    const res = await fetch("https://api.imgbb.com/1/upload?key=90868f06f74304629e474585642d627c", { method: "POST", body: fd });
+                    const resJ = await res.json();
+                    url = resJ.data.url;
+                } catch(e) { console.log("Erro no ImgBB"); }
             }
 
-            await sb.from('posts').insert([{ user_id: MASTER_ID, content, image_url: imgUrl, likes: 0, shares: 0 }]);
-            userSaldo += 0.0150;
-            await sb.from('perfis').update({ saldo: userSaldo }).eq('id', MASTER_ID);
-            location.reload();
+            const { error } = await _sb.from('posts').insert([{ user_id: MASTER_ID, content: txt, image_url: url, likes: 0, shares: 0 }]);
+            
+            if(!error) {
+                saldo += 0.0150;
+                await _sb.from('perfis').update({ saldo: saldo }).eq('id', MASTER_ID);
+                location.reload(); // Recarrega para limpar tudo e mostrar o post
+            }
         }
 
-        async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+        async function carregarFeed() {
+            const { data: posts } = await _sb.from('posts').select('*').order('created_at', {ascending: false});
             const container = document.getElementById('feed-container');
             container.innerHTML = "";
-            
+
             for(const p of posts) {
-                // Contagem real de comentários da tabela comentarios
-                const { count: cCount } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
+                const { count } = await _sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
                 
                 const card = document.createElement('div');
-                card.className = "google-card shadow-md";
+                card.className = "post-card shadow-sm";
                 card.innerHTML = `
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    <div class="p-5">
-                        <p class="text-xs font-black uppercase mb-4">${p.content}</p>
-                        <div class="flex border-t pt-2">
-                            <button onclick="interact('${p.id}', 'likes', 0.0006)" class="interaction-btn">
-                                <div class="interaction-badge">${p.likes || 0}</div><span>👍</span>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img" loading="lazy">` : ''}
+                    <div class="p-4">
+                        <p class="text-xs font-black uppercase text-gray-800 mb-4">${p.content}</p>
+                        <div class="flex border-t pt-2 gap-1">
+                            <button onclick="reagir('${p.id}', 'likes', 0.0006)" class="btn-interact">
+                                <span>👍</span> <div class="badge">${p.likes || 0}</div>
                             </button>
-                            <button onclick="toggleComments('${p.id}')" class="interaction-btn border-x border-gray-100">
-                                <div class="interaction-badge">${cCount || 0}</div><span>💬</span>
+                            <button class="btn-interact" style="border-left: 1px solid #eee; border-right: 1px solid #eee;">
+                                <span>💬</span> <div class="badge">${count || 0}</div>
                             </button>
-                            <button onclick="interact('${p.id}', 'shares', 0.0020)" class="interaction-btn">
-                                <div class="interaction-badge">${p.shares || 0}</div><span>🔗</span>
+                            <button onclick="reagir('${p.id}', 'shares', 0.0020)" class="btn-interact">
+                                <span>🔗</span> <div class="badge">${p.shares || 0}</div>
                             </button>
                         </div>
-                    </div>
-                    <div id="comments-${p.id}" class="comment-section p-4">
-                        <div id="list-${p.id}" class="space-y-2 mb-3"></div>
-                        <input id="in-${p.id}" type="text" placeholder="COMENTAR..." class="w-full p-2 text-[10px] border rounded-lg">
-                        <button onclick="addComment('${p.id}')" class="w-full mt-2 bg-blue-600 text-white py-2 rounded-lg text-[9px]">ENVIAR</button>
                     </div>
                 `;
                 container.appendChild(card);
             }
         }
 
-        async function interact(postId, type, valor) {
-            // 1. Vai buscar o valor atual
-            const { data } = await sb.from('posts').select(type).eq('id', postId).single();
-            const novoValor = (data[type] || 0) + 1;
+        async function reagir(id, tipo, valor) {
+            const { data } = await _sb.from('posts').select(tipo).eq('id', id).single();
+            const novo = (data[tipo] || 0) + 1;
+            await _sb.from('posts').update({ [tipo]: novo }).eq('id', id);
             
-            // 2. Atualiza na Supabase
-            await sb.from('posts').update({ [type]: novoValor }).eq('id', postId);
-            
-            // 3. Paga ao utilizador
-            userSaldo += valor;
-            await sb.from('perfis').update({ saldo: userSaldo }).eq('id', MASTER_ID);
-            
-            showEarn(valor);
-            updateUI();
-            loadFeed(); // Atualiza os balões visualmente
+            saldo += valor;
+            await _sb.from('perfis').update({ saldo: saldo }).eq('id', MASTER_ID);
+            atualizarUI();
+            carregarFeed(); // Atualiza os números no ecrã
         }
 
-        async function addComment(pid) {
-            const val = document.getElementById(`in-${pid}`).value;
-            if(!val) return;
-            await sb.from('comentarios').insert([{ post_id: pid, user_id: MASTER_ID, content: val }]);
-            userSaldo += 0.0010;
-            await sb.from('perfis').update({ saldo: userSaldo }).eq('id', MASTER_ID);
-            loadFeed();
+        function atualizarUI() {
+            document.getElementById('saldo-header').innerText = saldo.toFixed(4) + "€";
+            document.getElementById('saldo-total').innerText = saldo.toFixed(4) + "€";
         }
 
-        function toggleComments(id) { 
-            const el = document.getElementById(`comments-${id}`);
-            el.classList.toggle('active');
-            if(el.classList.contains('active')) fetchComments(id);
+        function mudarTab(tab) {
+            document.getElementById('tab-rede').classList.toggle('hidden', tab !== 'rede');
+            document.getElementById('tab-ganhos').classList.toggle('hidden', tab !== 'ganhos');
+            document.getElementById('nav-rede').classList.toggle('active', tab === 'rede');
+            document.getElementById('nav-ganhos').classList.toggle('active', tab === 'ganhos');
         }
-
-        async function fetchComments(pid) {
-            const { data } = await sb.from('comentarios').select('content').eq('post_id', pid);
-            document.getElementById(`list-${pid}`).innerHTML = data.map(c => `<div class="text-[9px] bg-white p-2 rounded border">${c.content}</div>`).join('');
-        }
-
-        function updateUI() { document.getElementById('main-eur').innerText = userSaldo.toFixed(4) + "€"; }
-        function showEarn(v) { const e = document.getElementById('floating-earning'); document.getElementById('earning-val').innerText = "+"+v.toFixed(4)+"€"; e.style.display='block'; setTimeout(()=>e.style.display='none', 800); }
 
         window.onload = init;
     </script>
