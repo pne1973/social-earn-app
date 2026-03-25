@@ -3,34 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v35.9</title>
+    <title>Apex Social v37.0</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --blue: #4285F4; }
-        body { font-family: sans-serif; background: #f0f2f5; padding-top: 60px; padding-bottom: 70px; }
-        .header { position: fixed; top: 0; width: 100%; height: 55px; background: white; border-bottom: 1px solid #ddd; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; }
-        .card { background: white; border-radius: 10px; border: 1px solid #ddd; margin: 10px; overflow: hidden; }
-        .img-feed { width: 100%; height: auto; max-height: 300px; object-fit: cover; background: #f9f9f9; display: block; }
+        body { font-family: sans-serif; background: #f0f2f5; padding-top: 60px; padding-bottom: 80px; }
+        .header { position: fixed; top: 0; width: 100%; height: 55px; background: white; border-bottom: 1px solid #ddd; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
+        .card { background: white; border-radius: 12px; border: 1px solid #ddd; margin: 10px; overflow: hidden; }
+        .post-img { width: 100%; height: auto; display: block; background: #f9f9f9; }
+        .btn-blue { background: #4285F4; color: white; border-radius: 8px; font-weight: 900; font-size: 11px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <div style="font-weight: 900; color: var(--blue);">APEX SOCIAL</div>
+        <div style="font-weight: 900; color: #4285F4; font-size: 18px;">APEX SOCIAL</div>
         <div id="u-saldo" style="color: #34A853; font-weight: 900;">0.0000€</div>
     </header>
 
     <main>
-        <div class="card p-4">
-            <textarea id="in-txt" placeholder="NOVA PUBLICAÇÃO..." class="w-full border-none focus:ring-0 text-sm font-bold mb-3" rows="2"></textarea>
-            <div id="loading" class="hidden text-[10px] text-center font-black text-blue-600 mb-2">A ENVIAR...</div>
+        <div class="card p-4" style="border-top: 4px solid #4285F4;">
+            <textarea id="in-txt" placeholder="NOVA PUBLICAÇÃO..." class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
+            
+            <div id="msg-status" class="hidden text-center text-[10px] font-black mb-2 text-blue-500 uppercase">A COMPRIMIR IMAGEM...</div>
+            
             <div class="flex gap-2">
                 <label for="in-file" class="flex-1 bg-gray-100 p-3 rounded-lg text-center text-[10px] font-black cursor-pointer uppercase">📸 FOTO</label>
-                <input type="file" id="in-file" accept="image/*" class="hidden" onchange="document.getElementById('loading').classList.remove('hidden'); document.getElementById('loading').innerText='✅ FOTO PRONTA'">
-                <button onclick="publicarAgora()" id="btn-pub" class="flex-[2] bg-blue-600 text-white rounded-lg font-black text-[10px] uppercase">Publicar</button>
+                <input type="file" id="in-file" accept="image/*" class="hidden" onchange="previewImage()">
+                
+                <button onclick="publicarPost()" id="btn-pub" class="flex-[2] btn-blue p-3">Publicar agora</button>
             </div>
         </div>
+
         <div id="feed"></div>
     </main>
 
@@ -38,51 +42,83 @@
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const _sb = window.supabase.createClient(SB_URL, SB_KEY);
-        const USER_ID = "5401881400";
+        const MASTER_ID = "5401881400";
+        let imagemBase64 = "";
 
         async function init() {
-            const { data } = await _sb.from('perfis').select('saldo').eq('id', USER_ID).single();
+            const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
             if(data) document.getElementById('u-saldo').innerText = data.saldo.toFixed(4) + "€";
-            carregarPosts();
+            carregarFeed();
         }
 
-        async function publicarAgora() {
-            const txt = document.getElementById('in-txt').value;
+        // Função para ler e comprimir a imagem "normal"
+        function previewImage() {
             const file = document.getElementById('in-file').files[0];
+            if (!file) return;
+
+            document.getElementById('msg-status').classList.remove('hidden');
+            document.getElementById('msg-status').innerText = "✅ FOTO CARREGADA";
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Comprime para no máximo 800px de largura para não sobrecarregar a base de dados
+                    const scale = 800 / img.width;
+                    canvas.width = 800;
+                    canvas.height = img.height * scale;
+                    
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    // Transforma em texto (Base64) com qualidade 0.7
+                    imagemBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function publicarPost() {
+            const txt = document.getElementById('in-txt').value;
             const btn = document.getElementById('btn-pub');
-            if(!txt) return;
+            if (!txt) return;
 
             btn.disabled = true;
-            document.getElementById('loading').classList.remove('hidden');
+            btn.innerText = "A GRAVAR...";
 
-            let url = "";
-            if(file) {
-                const fName = `${Date.now()}_post.jpg`;
-                // Tenta enviar para o bucket 'images' que vimos no seu print
-                const { error: upErr } = await _sb.storage.from('images').upload(fName, file);
-                if(!upErr) {
-                    const { data } = _sb.storage.from('images').getPublicUrl(fName);
-                    url = data.publicUrl;
-                }
+            // Grava o texto da imagem diretamente na coluna image_url
+            const { error } = await _sb.from('posts').insert([
+                { user_id: MASTER_ID, content: txt, image_url: imagemBase64 }
+            ]);
+
+            if (!error) {
+                window.location.reload();
+            } else {
+                btn.disabled = false;
+                btn.innerText = "ERRO NA TABELA";
+                console.error(error);
             }
-
-            // Garante que envia apenas a URL para a coluna da tabela
-            await _sb.from('posts').insert([{ user_id: USER_ID, content: txt, image_url: url }]);
-            window.location.reload();
         }
 
-        async function carregarPosts() {
-            const { data: posts } = await _sb.from('posts').select('*').order('created_at', {ascending: false});
+        async function carregarFeed() {
+            const { data: posts } = await _sb.from('posts').select('*').order('created_at', { ascending: false });
             const feed = document.getElementById('feed');
             feed.innerHTML = "";
 
             posts?.forEach(p => {
                 const div = document.createElement('div');
                 div.className = "card";
-                // Só mostra a imagem se a URL existir e não for nula
+                
+                // Se for Base64, o navegador lê o texto como imagem automaticamente
+                const imgHtml = p.image_url ? `<img src="${p.image_url}" class="post-img">` : "";
+
                 div.innerHTML = `
-                    ${(p.image_url && p.image_url.length > 10) ? `<img src="${p.image_url}" class="img-feed">` : ''}
-                    <div class="p-4"><p class="text-xs font-bold uppercase text-gray-700">${p.content}</p></div>
+                    ${imgHtml}
+                    <div class="p-4">
+                        <p class="text-xs font-bold text-gray-800 uppercase">${p.content}</p>
+                    </div>
                 `;
                 feed.appendChild(div);
             });
