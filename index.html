@@ -3,97 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v180</title>
+    <title>Apex Social v32.185</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --google-blue: #4285F4; --google-red: #EA4335; --google-yellow: #FBBC05; --google-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f8f9fa; color: #202124; margin: 0; -webkit-tap-highlight-color: transparent; }
+        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; }
+        body { font-family: 'Roboto', sans-serif; background: #f8f9fa; color: #202124; margin: 0; }
         .tab-content { display: none; }
         .tab-content.active { display: block; padding-bottom: 120px; }
-        .nav-btn.active { color: var(--google-blue); border-top: 3px solid var(--google-blue); font-weight: 900; background: #f1f3f4; }
+        .nav-btn.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); font-weight: 900; background: #f1f3f4; }
         .card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; }
-        .btn-google { transition: all 0.2s; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
-        .btn-google:active { transform: scale(0.98); box-shadow: none; }
-        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 10000; align-items: center; justify-content: center; }
+        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.7); z-index: 9999; align-items: center; justify-content: center; font-weight: 900; color: var(--g-blue); text-transform: uppercase; font-size: 10px; }
+        .ad-unit { background: #fffde7; border: 1px dashed #fbc02d; text-align: center; padding: 12px; font-[9px]; font-weight: 900; color: #856404; margin: 10px 0; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500"></div></div>
+    <div id="loader"><span>Processing...</span></div>
 
-    <header class="sticky top-0 bg-white border-b z-50 px-5 py-3 flex justify-between items-center">
+    <header class="sticky top-0 bg-white border-b z-50 px-5 py-3 flex justify-between items-center shadow-sm">
         <div>
-            <h1 class="text-xl font-black tracking-tighter uppercase italic" style="color: var(--google-blue)">Apex Social</h1>
-            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Production v32.180</p>
+            <h1 class="text-xl font-black italic tracking-tighter" style="color: var(--g-blue)">APEX SOCIAL</h1>
+            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Production 1.0</p>
         </div>
         <div class="text-right">
             <span id="bal-eur" class="font-black text-green-600 text-lg">0.0000€</span>
-            <p id="bal-brl" class="text-[9px] font-bold text-gray-400 uppercase">0.0000 BRL</p>
+            <p id="bal-brl" class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">0.0000 BRL</p>
         </div>
     </header>
 
     <main class="p-4 max-w-md mx-auto">
         
         <section id="view-feed" class="tab-content active">
-            <div class="card p-4 mb-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white flex justify-between items-center shadow-lg">
-                <div>
-                    <p class="text-[9px] font-black uppercase opacity-80">Ações Disponíveis</p>
-                    <p id="bonus-display" class="text-lg font-black italic">🔥 15 Ações Turbo</p>
-                </div>
-                <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-2 rounded-full text-[10px] font-black uppercase btn-google">Recarregar</button>
+            <div class="card p-4 bg-gradient-to-br from-blue-600 to-blue-400 text-white flex justify-between items-center mb-4">
+                <div><p class="text-[9px] font-black uppercase opacity-75">Sessão Ativa</p><p id="bonus-display" class="font-black italic">🔥 15 Ações Turbo</p></div>
+                <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-2 rounded-full text-[10px] font-black uppercase">Recarregar</button>
             </div>
 
-            <div class="card p-4 border-2 border-blue-100">
-                <textarea id="post-text" placeholder="No que estás a pensar? (+15 XP)" class="w-full text-sm border-none focus:ring-0 p-0 mb-3 resize-none" rows="2"></textarea>
+            <div class="card p-4">
+                <textarea id="post-input" placeholder="Partilha algo novo... (+15 XP)" class="w-full text-sm border-none focus:ring-0 p-0 mb-3 resize-none" rows="2"></textarea>
                 <div class="flex justify-between items-center border-t pt-3">
-                    <span class="text-[10px] font-black text-gray-400 uppercase">Ganha: 0.0150€</span>
-                    <button onclick="sendPost()" class="bg-blue-600 text-white px-8 py-2 rounded-lg font-black text-[11px] uppercase btn-google">Publicar</button>
+                    <span class="text-[9px] font-black text-gray-300 uppercase">Ganha 0.0150€</span>
+                    <button onclick="handlePost()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-black text-[10px] uppercase">Publicar</button>
                 </div>
             </div>
 
-            <div id="posts-list" class="mt-4 space-y-4"></div>
+            <div id="feed-container" class="mt-4 space-y-4"></div>
         </section>
 
         <section id="view-wallet" class="tab-content">
-            <div class="card p-8 text-center mb-4 border-b-4 shadow-sm" style="border-color: var(--google-blue)">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Saldo Convertido</p>
-                <h1 id="wall-eur" class="text-5xl font-black tracking-tighter" style="color: var(--google-blue)">0.0000€</h1>
-                <p id="wall-brl" class="text-sm font-bold text-gray-400 mt-1 uppercase">≈ 0.0000 BRL</p>
+            <div class="card p-8 text-center border-b-4 shadow-md" style="border-color: var(--g-blue)">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Saldo Atualizado</p>
+                <h1 id="wall-eur" class="text-5xl font-black tracking-tighter text-blue-600">0.0000€</h1>
+                <p id="wall-brl" class="text-sm font-bold text-gray-400 mt-2 uppercase tracking-tighter">≈ 0.0000 BRL</p>
             </div>
             
-            <div class="card p-4 mb-4">
-                <h3 class="text-[10px] font-black uppercase text-gray-400 mb-3">Tabela de Ganhos (XP)</h3>
-                <div class="grid grid-cols-2 gap-2 text-[10px] font-bold uppercase">
-                    <div class="p-2 bg-gray-50 rounded">Post: +15 XP</div>
-                    <div class="p-2 bg-gray-50 rounded">Friend: +100 XP</div>
-                    <div class="p-2 bg-gray-50 rounded">Like: +2 XP</div>
-                    <div class="p-2 bg-gray-50 rounded">Check-in: +5 XP</div>
-                </div>
+            <div class="grid grid-cols-2 gap-2 mt-4">
+                <div class="card p-3 text-center"><p class="text-[8px] font-black text-gray-400 uppercase">Post</p><p class="text-xs font-black">+15 XP</p></div>
+                <div class="card p-3 text-center"><p class="text-[8px] font-black text-gray-400 uppercase">Check-in</p><p class="text-xs font-black">+5 XP</p></div>
             </div>
 
-            <button onclick="syncBonus()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic mb-3 btn-google">Sincronizar Bónus (Publicidade)</button>
-            <button onclick="doCheckIn()" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase btn-google">Check-in Diário (+0.0500€)</button>
-            <p class="text-[8px] text-center font-black text-gray-300 uppercase mt-4">Mínimo de Saque: 5000 XP (10,00€)</p>
+            <button onclick="syncAd()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic my-4">Sincronizar Ganhos (Ad)</button>
+            <button onclick="doCheckIn()" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase">Check-in Diário (+0.0500€)</button>
         </section>
 
         <section id="view-admin" class="tab-content">
-            <div class="card p-6 border-2 border-red-500 bg-red-50">
-                <h2 class="text-red-600 font-black text-xs uppercase mb-4 italic">Painel do Administrador</h2>
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="bg-white p-3 rounded-lg border border-red-100">
-                        <p class="text-[8px] font-bold text-gray-400 uppercase italic leading-none">Total Users</p>
-                        <p id="adm-users" class="font-black text-red-600 text-xl tracking-tighter">...</p>
+            <div class="card p-5 border-2 border-red-500 bg-red-50">
+                <h2 class="text-red-600 font-black text-xs uppercase italic mb-4 tracking-widest">Master Admin Panel</h2>
+                <div class="space-y-3">
+                    <div class="flex justify-between bg-white p-3 rounded border border-red-100">
+                        <span class="text-[10px] font-bold uppercase text-gray-400 tracking-tighter">Total Users</span>
+                        <span id="adm-u" class="font-black text-red-600">...</span>
                     </div>
-                    <div class="bg-white p-3 rounded-lg border border-red-100">
-                        <p class="text-[8px] font-bold text-gray-400 uppercase italic leading-none">Total Posts</p>
-                        <p id="adm-posts" class="font-black text-red-600 text-xl tracking-tighter">...</p>
+                    <div class="flex justify-between bg-white p-3 rounded border border-red-100">
+                        <span class="text-[10px] font-bold uppercase text-gray-400 tracking-tighter">Total Posts</span>
+                        <span id="adm-p" class="font-black text-red-600">...</span>
                     </div>
-                </div>
-                <button class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-[10px] uppercase mb-2">Lista de Saques PayPal</button>
-                <div class="mt-4">
-                    <input id="del-id" type="text" placeholder="ID do Post" class="w-full text-[10px] p-2 rounded border mb-2">
-                    <button onclick="adminDelete()" class="w-full border border-red-600 text-red-600 py-2 rounded font-black text-[9px] uppercase">Apagar Post por ID</button>
                 </div>
             </div>
         </section>
@@ -101,113 +86,88 @@
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-1 z-40 shadow-2xl">
-        <button onclick="nav('feed')" id="btn-feed" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400 active"><span class="text-[10px] font-black uppercase">Social</span></button>
-        <button onclick="nav('wallet')" id="btn-wallet" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Carteira</span></button>
-        <button onclick="nav('friends')" id="btn-friends" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Rede</span></button>
-        <button onclick="nav('admin')" id="btn-admin" class="nav-btn hidden flex-1 flex flex-col items-center p-3 text-red-300 italic"><span class="text-[10px] font-black uppercase font-bold">Admin</span></button>
+        <button onclick="nav('feed')" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400 active"><span class="text-[9px] font-black uppercase">Social</span></button>
+        <button onclick="nav('wallet')" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[9px] font-black uppercase">Carteira</span></button>
+        <button id="adm-btn" onclick="nav('admin')" class="hidden nav-btn flex-1 flex flex-col items-center p-3 text-red-300 italic"><span class="text-[9px] font-black uppercase">Admin</span></button>
     </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
         const UID = "5401881400";
-        const BRL_RATE = 6.1245;
+        const RATE = 6.1245;
 
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-        let userLocal = { saldo: 0, bonus: 15 };
+        let user = { saldo: 0, bonus: 15 };
 
-        function nav(tab) {
+        function nav(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('view-' + tab).classList.add('active');
-            document.getElementById('btn-' + tab).classList.add('active');
-            window.scrollTo(0, 0);
+            document.getElementById('view-'+t).classList.add('active');
         }
 
         async function init() {
-            if (UID === "5401881400") document.getElementById('btn-admin').classList.remove('hidden');
-            
-            try {
-                const { data } = await supabase.from('perfis').select('*').eq('id', UID).single();
-                if (data) userLocal = data;
-                
-                loadPosts();
-                if (UID === "5401881400") loadAdminStats();
-            } catch (e) { console.warn("Modo Estático"); }
-            refresh();
+            if(UID === "5401881400") document.getElementById('adm-btn').classList.remove('hidden');
+            const { data } = await supabase.from('perfis').select('*').eq('id', UID).single();
+            if(data) user = data;
+            loadFeed();
+            refreshUI();
+            if(UID === "5401881400") loadStats();
         }
 
-        function refresh() {
-            const eur = userLocal.saldo.toFixed(4);
-            const brl = (userLocal.saldo * BRL_RATE).toFixed(4);
-            
-            document.getElementById('bal-eur').innerText = eur + "€";
-            document.getElementById('wall-eur').innerText = eur + "€";
-            document.getElementById('bal-brl').innerText = brl + " BRL";
-            document.getElementById('wall-brl').innerText = "≈ " + brl + " BRL";
-            document.getElementById('bonus-display').innerText = `🔥 ${userLocal.bonus} Ações Turbo`;
+        function refreshUI() {
+            const e = user.saldo.toFixed(4);
+            const b = (user.saldo * RATE).toFixed(4);
+            document.getElementById('bal-eur').innerText = e + "€";
+            document.getElementById('wall-eur').innerText = e + "€";
+            document.getElementById('bal-brl').innerText = b + " BRL";
+            document.getElementById('wall-brl').innerText = "≈ " + b + " BRL";
+            document.getElementById('bonus-display').innerText = `🔥 ${user.bonus} Ações Turbo`;
         }
 
-        async function loadPosts() {
-            const { data } = await supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(15);
-            const list = document.getElementById('posts-list');
-            if (data) {
-                list.innerHTML = data.map((p, index) => `
+        async function loadFeed() {
+            const { data } = await supabase.from('posts').select('*').order('created_at', {ascending: false});
+            const cont = document.getElementById('feed-container');
+            if(data) {
+                cont.innerHTML = data.map((p, i) => `
                     <div class="card p-4">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase">User #${p.user_id.slice(-4)}</span>
-                            <span class="text-[8px] font-bold text-gray-300 uppercase">${new Date(p.created_at).toLocaleTimeString()}</span>
-                        </div>
-                        <p class="text-sm text-gray-700 leading-relaxed">${p.content}</p>
-                        <div class="mt-4 pt-3 border-t flex space-x-4">
-                            <button onclick="addCash(0.0020)" class="text-[10px] font-black text-gray-400 uppercase">Like (+2 XP)</button>
-                            <button class="text-[10px] font-black text-gray-400 uppercase italic">Reportar</button>
+                        <p class="text-[9px] font-black text-blue-500 mb-2 uppercase tracking-widest">User #${p.user_id.slice(-4)}</p>
+                        <p class="text-sm text-gray-700">${p.content}</p>
+                        <div class="mt-4 pt-2 border-t flex space-x-4">
+                            <button onclick="doLike()" class="text-[9px] font-black text-gray-400 uppercase">Like (+2 XP)</button>
+                            <button class="text-[9px] font-black text-red-300 uppercase italic">Report</button>
                         </div>
                     </div>
-                    ${index % 3 === 2 ? '<div class="ad-slot bg-yellow-50 border-dashed border border-yellow-200 text-center py-4 text-[9px] font-black text-yellow-600 uppercase mb-4 rounded-lg italic">Anúncio Google AdSense</div>' : ''}
+                    ${i % 3 === 2 ? '<div class="ad-unit">PUBLICIDADE AUTOMÁTICA ADSTERRA/GOOGLE</div>' : ''}
                 `).join('');
             }
         }
 
-        async function sendPost() {
-            const txt = document.getElementById('post-text').value;
-            if (!txt || userLocal.bonus <= 0) return alert("Sem bónus disponível!");
-            
+        async function handlePost() {
+            const t = document.getElementById('post-input').value;
+            if(!t || user.bonus <= 0) return;
             document.getElementById('loader').style.display = 'flex';
-            const { error } = await supabase.from('posts').insert([{ user_id: UID, content: txt }]);
-            
-            if (!error) {
-                document.getElementById('post-text').value = "";
-                userLocal.saldo += 0.0150;
-                userLocal.bonus--;
-                await supabase.from('perfis').upsert({ id: UID, saldo: userLocal.saldo, bonus: userLocal.bonus });
+            const { error } = await supabase.from('posts').insert([{ user_id: UID, content: t }]);
+            if(!error) {
+                user.saldo += 0.0150;
+                user.bonus--;
+                await supabase.from('perfis').upsert({ id: UID, saldo: user.saldo, bonus: user.bonus });
+                document.getElementById('post-input').value = "";
                 init();
             }
             document.getElementById('loader').style.display = 'none';
         }
 
         async function doCheckIn() {
-            userLocal.saldo += 0.0500;
-            refresh();
-            await supabase.from('perfis').upsert({ id: UID, saldo: userLocal.saldo });
+            user.saldo += 0.0500;
+            refreshUI();
+            await supabase.from('perfis').upsert({ id: UID, saldo: user.saldo });
         }
 
-        async function syncBonus() {
-            document.getElementById('loader').style.display = 'flex';
-            setTimeout(async () => {
-                userLocal.bonus = 15;
-                refresh();
-                await supabase.from('perfis').upsert({ id: UID, bonus: 15 });
-                document.getElementById('loader').style.display = 'none';
-                nav('feed');
-            }, 2000);
-        }
-
-        async function loadAdminStats() {
+        async function loadStats() {
             const { count: u } = await supabase.from('perfis').select('*', { count: 'exact', head: true });
             const { count: p } = await supabase.from('posts').select('*', { count: 'exact', head: true });
-            document.getElementById('adm-users').innerText = u;
-            document.getElementById('adm-posts').innerText = p;
+            document.getElementById('adm-u').innerText = u;
+            document.getElementById('adm-p').innerText = p;
         }
 
         window.onload = init;
