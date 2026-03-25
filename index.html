@@ -3,125 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v175</title>
+    <title>Apex Social v180</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?v=175"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: 'Roboto', sans-serif; background: #f8f9fa; margin: 0; -webkit-tap-highlight-color: transparent; }
+        :root { --google-blue: #4285F4; --google-red: #EA4335; --google-yellow: #FBBC05; --google-green: #34A853; }
+        body { font-family: 'Roboto', sans-serif; background: #f8f9fa; color: #202124; margin: 0; -webkit-tap-highlight-color: transparent; }
         .tab-content { display: none; }
         .tab-content.active { display: block; padding-bottom: 120px; }
-        .nav-btn.active { color: #4285F4; border-top: 3px solid #4285F4; font-weight: 900; background: #f1f3f4; }
-        .card { background: white; border-radius: 14px; border: 1px solid #dadce0; margin-bottom: 12px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .nav-btn.active { color: var(--google-blue); border-top: 3px solid var(--google-blue); font-weight: 900; background: #f1f3f4; }
+        .card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; }
+        .btn-google { transition: all 0.2s; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
+        .btn-google:active { transform: scale(0.98); box-shadow: none; }
+        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 10000; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <header class="sticky top-0 bg-white border-b z-50 px-5 py-4 flex justify-between items-center shadow-sm">
+    <div id="loader"><div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500"></div></div>
+
+    <header class="sticky top-0 bg-white border-b z-50 px-5 py-3 flex justify-between items-center">
         <div>
-            <h1 class="text-xl font-black text-blue-600 italic uppercase">Apex Social</h1>
-            <p class="text-[10px] font-black text-orange-500 uppercase italic">Vercel Force v175</p>
+            <h1 class="text-xl font-black tracking-tighter uppercase italic" style="color: var(--google-blue)">Apex Social</h1>
+            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Production v32.180</p>
         </div>
         <div class="text-right">
             <span id="bal-eur" class="font-black text-green-600 text-lg">0.0000€</span>
+            <p id="bal-brl" class="text-[9px] font-bold text-gray-400 uppercase">0.0000 BRL</p>
         </div>
     </header>
 
     <main class="p-4 max-w-md mx-auto">
         
         <section id="view-feed" class="tab-content active">
-            <div class="card bg-blue-600 text-white flex justify-between items-center mb-4">
-                <div><p class="text-[9px] font-bold uppercase opacity-80">Ações Turbo</p><p id="bonus-display" class="font-black italic text-sm">🔥 15 Restantes</p></div>
-                <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-1 rounded-full text-[10px] font-black uppercase">Recarregar</button>
+            <div class="card p-4 mb-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white flex justify-between items-center shadow-lg">
+                <div>
+                    <p class="text-[9px] font-black uppercase opacity-80">Ações Disponíveis</p>
+                    <p id="bonus-display" class="text-lg font-black italic">🔥 15 Ações Turbo</p>
+                </div>
+                <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-2 rounded-full text-[10px] font-black uppercase btn-google">Recarregar</button>
             </div>
-            <div id="posts-list" class="space-y-4">
-                <div class="card text-center"><p class="text-[10px] text-gray-400 font-black uppercase italic py-4">A atualizar rede...</p></div>
+
+            <div class="card p-4 border-2 border-blue-100">
+                <textarea id="post-text" placeholder="No que estás a pensar? (+15 XP)" class="w-full text-sm border-none focus:ring-0 p-0 mb-3 resize-none" rows="2"></textarea>
+                <div class="flex justify-between items-center border-t pt-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase">Ganha: 0.0150€</span>
+                    <button onclick="sendPost()" class="bg-blue-600 text-white px-8 py-2 rounded-lg font-black text-[11px] uppercase btn-google">Publicar</button>
+                </div>
             </div>
+
+            <div id="posts-list" class="mt-4 space-y-4"></div>
         </section>
 
         <section id="view-wallet" class="tab-content">
-            <div class="card text-center border-b-4 border-blue-500">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Saldo</p>
-                <h1 id="wall-eur" class="text-5xl font-black text-blue-600 tracking-tighter">0.0000€</h1>
+            <div class="card p-8 text-center mb-4 border-b-4 shadow-sm" style="border-color: var(--google-blue)">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Saldo Convertido</p>
+                <h1 id="wall-eur" class="text-5xl font-black tracking-tighter" style="color: var(--google-blue)">0.0000€</h1>
+                <p id="wall-brl" class="text-sm font-bold text-gray-400 mt-1 uppercase">≈ 0.0000 BRL</p>
             </div>
-            <div class="mt-4 space-y-3">
-                <button onclick="sync()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic">Sincronizar Bónus</button>
-                <button onclick="add(0.05)" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase">Check-in (+0,0500€)</button>
+            
+            <div class="card p-4 mb-4">
+                <h3 class="text-[10px] font-black uppercase text-gray-400 mb-3">Tabela de Ganhos (XP)</h3>
+                <div class="grid grid-cols-2 gap-2 text-[10px] font-bold uppercase">
+                    <div class="p-2 bg-gray-50 rounded">Post: +15 XP</div>
+                    <div class="p-2 bg-gray-50 rounded">Friend: +100 XP</div>
+                    <div class="p-2 bg-gray-50 rounded">Like: +2 XP</div>
+                    <div class="p-2 bg-gray-50 rounded">Check-in: +5 XP</div>
+                </div>
             </div>
+
+            <button onclick="syncBonus()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic mb-3 btn-google">Sincronizar Bónus (Publicidade)</button>
+            <button onclick="doCheckIn()" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase btn-google">Check-in Diário (+0.0500€)</button>
+            <p class="text-[8px] text-center font-black text-gray-300 uppercase mt-4">Mínimo de Saque: 5000 XP (10,00€)</p>
         </section>
 
-        <section id="view-friends" class="tab-content">
-            <div class="card border-l-4 border-blue-500">
-                <h2 class="font-black text-sm uppercase text-blue-600">O Teu Link</h2>
-                <div class="bg-gray-100 p-4 rounded-xl my-4 text-[10px] font-mono break-all text-center" id="ref-box">Gerando link...</div>
-                <button onclick="share()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase">Convidar no WhatsApp</button>
+        <section id="view-admin" class="tab-content">
+            <div class="card p-6 border-2 border-red-500 bg-red-50">
+                <h2 class="text-red-600 font-black text-xs uppercase mb-4 italic">Painel do Administrador</h2>
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="bg-white p-3 rounded-lg border border-red-100">
+                        <p class="text-[8px] font-bold text-gray-400 uppercase italic leading-none">Total Users</p>
+                        <p id="adm-users" class="font-black text-red-600 text-xl tracking-tighter">...</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-red-100">
+                        <p class="text-[8px] font-bold text-gray-400 uppercase italic leading-none">Total Posts</p>
+                        <p id="adm-posts" class="font-black text-red-600 text-xl tracking-tighter">...</p>
+                    </div>
+                </div>
+                <button class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-[10px] uppercase mb-2">Lista de Saques PayPal</button>
+                <div class="mt-4">
+                    <input id="del-id" type="text" placeholder="ID do Post" class="w-full text-[10px] p-2 rounded border mb-2">
+                    <button onclick="adminDelete()" class="w-full border border-red-600 text-red-600 py-2 rounded font-black text-[9px] uppercase">Apagar Post por ID</button>
+                </div>
             </div>
         </section>
 
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-1 z-40 shadow-2xl">
-        <button onclick="nav('feed')" id="btn-feed" class="nav-btn flex-1 p-3 text-gray-400 active"><span class="text-[10px] font-black">FEED</span></button>
-        <button onclick="nav('wallet')" id="btn-wallet" class="nav-btn flex-1 p-3 text-gray-400"><span class="text-[10px] font-black">GANHOS</span></button>
-        <button onclick="nav('friends')" id="btn-friends" class="nav-btn flex-1 p-3 text-gray-400"><span class="text-[10px] font-black">REDE</span></button>
+        <button onclick="nav('feed')" id="btn-feed" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400 active"><span class="text-[10px] font-black uppercase">Social</span></button>
+        <button onclick="nav('wallet')" id="btn-wallet" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Carteira</span></button>
+        <button onclick="nav('friends')" id="btn-friends" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Rede</span></button>
+        <button onclick="nav('admin')" id="btn-admin" class="nav-btn hidden flex-1 flex flex-col items-center p-3 text-red-300 italic"><span class="text-[10px] font-black uppercase font-bold">Admin</span></button>
     </nav>
 
     <script>
-        // Usei nomes de variáveis diferentes para evitar conflito com o cache antigo
-        const URL_DB = "https://fickstyevektwbgimapy.supabase.co";
-        const KEY_DB = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
-        const USER_ID = "5401881400";
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
+        const UID = "5401881400";
+        const BRL_RATE = 6.1245;
 
-        const db = window.supabase.createClient(URL_DB, KEY_DB);
-        let wallet = { saldo: 0, bonus: 15 };
+        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+        let userLocal = { saldo: 0, bonus: 15 };
 
-        function nav(t) {
+        function nav(tab) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('view-' + t).classList.add('active');
-            document.getElementById('btn-' + t).classList.add('active');
+            document.getElementById('view-' + tab).classList.add('active');
+            document.getElementById('btn-' + tab).classList.add('active');
+            window.scrollTo(0, 0);
         }
 
-        async function setup() {
-            document.getElementById('ref-box').innerText = window.location.origin + "/?ref=" + USER_ID;
+        async function init() {
+            if (UID === "5401881400") document.getElementById('btn-admin').classList.remove('hidden');
+            
             try {
-                const { data } = await db.from('perfis').select('*').eq('id', USER_ID).single();
-                if (data) wallet = data;
+                const { data } = await supabase.from('perfis').select('*').eq('id', UID).single();
+                if (data) userLocal = data;
                 
-                const { data: ps } = await db.from('posts').select('*').limit(3);
-                if (ps) {
-                    document.getElementById('posts-list').innerHTML = ps.map(p => `
-                        <div class="card"><p class="text-xs text-gray-700">${p.content}</p></div>
-                    `).join('');
-                }
-            } catch (e) { console.log("Offline"); }
-            ui();
+                loadPosts();
+                if (UID === "5401881400") loadAdminStats();
+            } catch (e) { console.warn("Modo Estático"); }
+            refresh();
         }
 
-        function ui() {
-            const s = wallet.saldo.toFixed(4);
-            document.getElementById('bal-eur').innerText = s + "€";
-            document.getElementById('wall-eur').innerText = s + "€";
-            document.getElementById('bonus-display').innerText = "🔥 " + wallet.bonus + " Restantes";
+        function refresh() {
+            const eur = userLocal.saldo.toFixed(4);
+            const brl = (userLocal.saldo * BRL_RATE).toFixed(4);
+            
+            document.getElementById('bal-eur').innerText = eur + "€";
+            document.getElementById('wall-eur').innerText = eur + "€";
+            document.getElementById('bal-brl').innerText = brl + " BRL";
+            document.getElementById('wall-brl').innerText = "≈ " + brl + " BRL";
+            document.getElementById('bonus-display').innerText = `🔥 ${userLocal.bonus} Ações Turbo`;
         }
 
-        async function add(n) {
-            wallet.saldo += n;
-            ui();
-            await db.from('perfis').upsert({ id: USER_ID, saldo: wallet.saldo });
+        async function loadPosts() {
+            const { data } = await supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(15);
+            const list = document.getElementById('posts-list');
+            if (data) {
+                list.innerHTML = data.map((p, index) => `
+                    <div class="card p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase">User #${p.user_id.slice(-4)}</span>
+                            <span class="text-[8px] font-bold text-gray-300 uppercase">${new Date(p.created_at).toLocaleTimeString()}</span>
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed">${p.content}</p>
+                        <div class="mt-4 pt-3 border-t flex space-x-4">
+                            <button onclick="addCash(0.0020)" class="text-[10px] font-black text-gray-400 uppercase">Like (+2 XP)</button>
+                            <button class="text-[10px] font-black text-gray-400 uppercase italic">Reportar</button>
+                        </div>
+                    </div>
+                    ${index % 3 === 2 ? '<div class="ad-slot bg-yellow-50 border-dashed border border-yellow-200 text-center py-4 text-[9px] font-black text-yellow-600 uppercase mb-4 rounded-lg italic">Anúncio Google AdSense</div>' : ''}
+                `).join('');
+            }
         }
 
-        function sync() {
-            wallet.bonus = 15;
-            ui();
-            alert("Sincronizado!");
+        async function sendPost() {
+            const txt = document.getElementById('post-text').value;
+            if (!txt || userLocal.bonus <= 0) return alert("Sem bónus disponível!");
+            
+            document.getElementById('loader').style.display = 'flex';
+            const { error } = await supabase.from('posts').insert([{ user_id: UID, content: txt }]);
+            
+            if (!error) {
+                document.getElementById('post-text').value = "";
+                userLocal.saldo += 0.0150;
+                userLocal.bonus--;
+                await supabase.from('perfis').upsert({ id: UID, saldo: userLocal.saldo, bonus: userLocal.bonus });
+                init();
+            }
+            document.getElementById('loader').style.display = 'none';
         }
 
-        function share() {
-            const m = "Ganha comigo: " + window.location.origin + "/?ref=" + USER_ID;
-            window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(m));
+        async function doCheckIn() {
+            userLocal.saldo += 0.0500;
+            refresh();
+            await supabase.from('perfis').upsert({ id: UID, saldo: userLocal.saldo });
         }
 
-        window.onload = setup;
+        async function syncBonus() {
+            document.getElementById('loader').style.display = 'flex';
+            setTimeout(async () => {
+                userLocal.bonus = 15;
+                refresh();
+                await supabase.from('perfis').upsert({ id: UID, bonus: 15 });
+                document.getElementById('loader').style.display = 'none';
+                nav('feed');
+            }, 2000);
+        }
+
+        async function loadAdminStats() {
+            const { count: u } = await supabase.from('perfis').select('*', { count: 'exact', head: true });
+            const { count: p } = await supabase.from('posts').select('*', { count: 'exact', head: true });
+            document.getElementById('adm-users').innerText = u;
+            document.getElementById('adm-posts').innerText = p;
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>
