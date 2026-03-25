@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v34.509</title>
+    <title>Apex Social v34.510</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; font-weight: 700; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
+        
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; }
         
-        /* Floating Earnings */
+        /* Sistema de Ganhos Flutuantes */
         #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5000; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
         @keyframes popUp {
             0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
@@ -21,60 +22,44 @@
         }
         .earning-text { font-size: 4rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52, 168, 83, 0.4); -webkit-text-stroke: 2px white; }
 
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; position: relative; }
-        .interaction-badge { position: absolute; top: 4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; border: 2px solid white; }
-        
-        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 6000; align-items: center; justify-content: center; padding: 20px; }
+        /* Navegação e Abas */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
+
+        /* Publicador Fixo */
         .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 100; background: #f1f3f4; padding: 12px 16px; }
         #feed-container { margin-top: 165px; }
 
-        /* Estilo da Imagem no Feed */
-        .post-img-frame { width: 100%; background: #f8f9fa; border-radius: 8px; overflow: hidden; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; min-height: 150px; border: 1px solid #eee; }
-        .post-img-frame img { width: 100%; height: auto; object-fit: contain; max-height: 450px; }
+        /* Estilo dos Botões de Interação */
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; position: relative; }
+        .interaction-badge { position: absolute; top: 4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; border: 2px solid white; }
     </style>
 </head>
 <body class="pb-24">
 
     <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
 
-    <div id="ad-overlay">
-        <div class="bg-white w-full max-w-sm rounded-3xl p-8 text-center border-4 border-blue-600 shadow-2xl">
-            <div id="ad-decision-ui">
-                <h3 class="text-xl font-black text-blue-600 mb-2 uppercase text-xs">Verificação Necessária</h3>
-                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs mb-3 shadow-lg">Ver Vídeo (15s)</button>
-                <button onclick="degradeAndContinue()" class="w-full p-4 text-gray-400 font-black uppercase text-[9px]">Pular Recompensa</button>
-            </div>
-            <div id="ad-player-ui" class="hidden text-center">
-                <div class="aspect-video bg-black rounded-xl mb-4 flex items-center justify-center">
-                    <p id="ad-timer" class="text-white font-black text-4xl">15</p>
-                </div>
-                <button id="close-ad-btn" disabled class="w-full py-4 bg-gray-100 text-gray-400 rounded-xl font-black uppercase text-xs">Aguarde...</button>
-            </div>
-        </div>
-    </div>
-
     <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">A</div>
-            <h1 class="text-sm font-black uppercase text-blue-600">Apex Social</h1>
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-sm">A</div>
+            <h1 class="text-sm font-black uppercase text-blue-600 tracking-tighter">Apex Social</h1>
         </div>
         <div class="text-right">
-            <div id="main-eur" class="font-black text-green-600">0.0000€</div>
+            <div id="main-eur" class="font-black text-green-600 text-lg">0.0000€</div>
             <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase italic">0.0000 BRL</div>
         </div>
     </header>
 
     <main class="max-w-lg mx-auto p-4 mt-[72px]">
+        
         <section id="view-social" class="tab-content active">
             <div class="sticky-publisher">
-                <div class="google-card p-4 border-t-8 border-blue-600 shadow-xl">
-                    <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none text-xs font-black uppercase outline-none" rows="1"></textarea>
+                <div class="google-card p-4 border-t-8 border-blue-600 shadow-lg">
+                    <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none text-xs font-black uppercase outline-none focus:ring-0" rows="1"></textarea>
                     <div id="expanded-post" class="hidden mt-4">
-                        <input id="post-url" type="text" oninput="previewImage(this.value)" placeholder="COLE O LINK DA IMAGEM AQUI" class="w-full bg-gray-50 p-4 rounded-xl mb-2 text-[10px] font-black uppercase border border-gray-100 outline-none">
-                        <div id="image-preview" class="hidden w-full h-24 bg-gray-100 rounded-lg mb-4 overflow-hidden flex items-center justify-center">
-                            <img id="preview-img" class="h-full w-auto object-contain">
-                        </div>
-                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[11px] shadow-lg">Publicar Agora</button>
+                        <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full bg-gray-50 p-4 rounded-xl mb-4 text-[10px] font-black border border-gray-100 outline-none">
+                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[11px]">Publicar Agora</button>
                     </div>
                 </div>
             </div>
@@ -82,77 +67,13 @@
         </section>
 
         <section id="view-info" class="tab-content">
-            <div class="google-card p-12 text-center border-t-[10px] border-blue-600 mt-4">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Carteira</p>
+            <div class="google-card p-12 text-center border-t-[10px] border-blue-600 mt-4 shadow-xl">
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Carteira de Utilizador</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
             </div>
         </section>
+
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200]">
-        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase">REDE</span></button>
-        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[10px] font-black uppercase">GANHOS</span></button>
-    </nav>
-
-    <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const MASTER_ID = "5401881400";
-        const sb = window.supabase.createClient(SB_URL, SB_KEY);
-        
-        let user = { saldo: 0, interactions: 0, multiplier: 1.0 };
-        let pendingVal = 0;
-
-        async function init() {
-            const { data } = await sb.from('perfis').select('*').eq('id', MASTER_ID).single();
-            if(data) user.saldo = Number(data.saldo) || 0;
-            updateUI(); loadFeed();
-        }
-
-        function updateUI() {
-            document.getElementById('main-eur').innerText = user.saldo.toFixed(4) + "€";
-            document.getElementById('wall-eur').innerText = user.saldo.toFixed(4) + "€";
-            document.getElementById('main-brl').innerText = (user.saldo * 6.12).toFixed(4) + " BRL";
-        }
-
-        function showBigNumber(val) {
-            const container = document.getElementById('floating-earning');
-            document.getElementById('earning-val').innerText = "+" + val.toFixed(4) + "€";
-            container.style.display = 'block';
-            setTimeout(() => { container.style.display = 'none'; }, 800);
-        }
-
-        function previewImage(url) {
-            const prev = document.getElementById('image-preview');
-            const img = document.getElementById('preview-img');
-            if(url.length > 10) {
-                img.src = url;
-                prev.classList.remove('hidden');
-                img.onerror = () => prev.classList.add('hidden');
-            } else { prev.classList.add('hidden'); }
-        }
-
-        async function reagir(val) {
-            if(user.interactions >= 4) {
-                pendingVal = val;
-                document.getElementById('ad-overlay').style.display = 'flex';
-                return;
-            }
-            user.interactions++;
-            const ganhar = val * user.multiplier;
-            user.saldo += ganhar;
-            showBigNumber(ganhar); updateUI();
-            await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
-        }
-
-        async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const container = document.getElementById('feed-container');
-            container.innerHTML = "";
-            
-            posts.forEach((p, idx) => {
-                const card = document.createElement('div');
-                card.className = "google-card shadow-sm mb-6";
-                card.innerHTML = `
-                    <div class="p-5">
-                        <p class="text-[13px] font-black uppercase text-gray-800 mb-4">${p
+        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-
