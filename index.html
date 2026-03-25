@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v108</title>
+    <title>Apex Social v110</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -11,19 +11,23 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .nav-btn.active { color: #4285F4; border-top: 3px solid #4285F4; font-weight: 900; background: #f1f3f4; }
-        .card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; }
+        .card { background: white; border-radius: 14px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; }
+        .google-blue { color: #4285F4; }
         .ad-slot { background: #fffde7; border: 1px dashed #fbc02d; text-align: center; padding: 15px; border-radius: 10px; margin: 10px 0; font-size: 10px; font-weight: 900; color: #856404; }
-        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 10000; align-items: center; justify-content: center; }
+        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 10000; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body class="pb-24">
 
-    <div id="loader"><div class="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500"></div></div>
+    <div id="loader">
+        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500 mb-2"></div>
+        <p class="text-[9px] font-black uppercase text-blue-600">A processar...</p>
+    </div>
 
     <header class="sticky top-0 bg-white border-b z-50 px-5 py-4 flex justify-between items-center shadow-sm">
         <div>
-            <h1 class="text-xl font-black text-blue-600 italic tracking-tighter">APEX SOCIAL</h1>
-            <p class="text-[9px] font-black text-gray-400 uppercase">Production v108</p>
+            <h1 class="text-xl font-black google-blue italic tracking-tighter">APEX SOCIAL</h1>
+            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Master Production v60</p>
         </div>
         <div class="text-right">
             <span id="bal-eur" class="font-black text-green-600 text-lg">0.0000€</span>
@@ -34,51 +38,51 @@
     <main class="p-4 max-w-md mx-auto">
         
         <section id="view-feed" class="tab-content active">
-            <div class="card p-4 bg-blue-600 text-white flex justify-between items-center mb-4">
-                <div><p class="text-[9px] font-black uppercase opacity-70">Sessão Ativa</p><p id="bonus-display" class="text-sm font-black italic">🔥 15 Ações Turbo</p></div>
+            <div class="card p-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white flex justify-between items-center mb-4 shadow-md">
+                <div><p class="text-[9px] font-black uppercase opacity-80">Saldo de Ações</p><p id="bonus-display" class="text-sm font-black italic">🔥 15 Ações Turbo</p></div>
                 <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-1 rounded-full text-[10px] font-black uppercase">Recarregar</button>
             </div>
             
             <div class="card p-4">
                 <textarea id="post-text" placeholder="No que estás a pensar? (+0,0150€)" class="w-full text-sm border-none focus:ring-0 p-0 mb-3" rows="2"></textarea>
                 <div class="flex space-x-2">
-                    <button onclick="sendPost()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Publicar</button>
-                    <button onclick="shareLink()" class="bg-gray-100 px-4 rounded-xl font-black text-[10px] uppercase border text-gray-600">Partilhar</button>
+                    <button onclick="sendPost()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md">Publicar</button>
+                    <button onclick="shareLink()" class="bg-gray-50 px-4 rounded-xl font-black text-[10px] uppercase border text-gray-500">Partilhar</button>
                 </div>
             </div>
 
-            <div class="ad-slot">[ ADSTERRA NATIVE FEED ]</div>
+            <div class="ad-slot">[ NATIVE ADSTERRA FEED ]</div>
             <div id="posts-list" class="space-y-4"></div>
         </section>
 
         <section id="view-wallet" class="tab-content">
-            <div class="card p-10 text-center mb-4 border-b-4 border-blue-500 shadow-sm">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">O Teu Saldo</p>
-                <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
+            <div class="card p-10 text-center mb-4 border-b-4 border-blue-500">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Total Acumulado</p>
+                <h1 id="wall-eur" class="text-5xl font-black google-blue tracking-tighter">0.0000€</h1>
             </div>
             <div class="card p-5 space-y-4 text-center">
                 <button onclick="syncBonus()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase shadow-xl italic">Sincronizar (Ver Vídeo)</button>
-                <button onclick="addCash(0.0500)" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase">Check-in (+0,0500€)</button>
+                <button onclick="addCash(0.0500)" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase">Check-in Diário (+0,0500€)</button>
                 <div class="ad-slot">[ BANNER ADSTERRA 320X50 ]</div>
             </div>
         </section>
 
         <section id="view-friends" class="tab-content">
-            <div class="card p-6 border-l-4 border-blue-500 shadow-sm">
-                <h2 class="font-black text-sm uppercase text-blue-600 mb-1">Convida e Ganha 10%</h2>
-                <p class="text-[10px] font-bold text-gray-400 uppercase mb-6 leading-tight">Ganha comissões sobre os ganhos da tua rede.</p>
-                <div class="bg-gray-50 p-4 rounded-xl border border-dashed mb-6 text-[9px] font-mono text-blue-600 italic break-all" id="ref-box">...</div>
-                <button onclick="shareLink()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-lg">Convidar Amigos</button>
+            <div class="card p-6 border-l-4 border-blue-500">
+                <h2 class="font-black text-sm uppercase google-blue mb-1">Rede de Afiliados</h2>
+                <p class="text-[10px] font-bold text-gray-400 uppercase mb-6 leading-tight">Ganha 10% de tudo o que os teus amigos faturarem.</p>
+                <div class="bg-gray-50 p-4 rounded-xl border border-dashed mb-6 text-[9px] font-mono text-blue-600 italic break-all" id="ref-box">https://apex-social.onrender.com/?ref=5401881400</div>
+                <button onclick="shareLink()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase">Convidar Agora</button>
             </div>
         </section>
 
         <section id="view-profile" class="tab-content">
-            <div class="card p-6 text-center shadow-sm">
-                <div class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center font-black text-gray-300">#</div>
-                <p class="font-black text-[12px] uppercase mb-8">ID: 5401881400</p>
+            <div class="card p-6 text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 border-2 border-blue-400 flex items-center justify-center font-black text-gray-300">#</div>
+                <p class="font-black text-[12px] uppercase mb-8">Utilizador #5401881400</p>
                 <div class="space-y-3">
-                    <button onclick="nav('wallet')" class="w-full bg-white py-4 border rounded-xl text-[9px] font-black uppercase shadow-sm">Ativar Autopost</button>
-                    <button onclick="nav('wallet')" class="w-full bg-white py-4 border rounded-xl text-[9px] font-black uppercase shadow-sm">Reset Diário</button>
+                    <button onclick="nav('wallet')" class="w-full bg-white py-4 border rounded-xl text-[9px] font-black uppercase">Ativar Autopost</button>
+                    <button onclick="nav('wallet')" class="w-full bg-white py-4 border rounded-xl text-[9px] font-black uppercase">Reset de Nível</button>
                 </div>
             </div>
         </section>
@@ -86,7 +90,7 @@
         <section id="view-admin" class="tab-content">
             <div class="card p-6 border-2 border-red-500 bg-red-50 text-center shadow-lg">
                 <h2 class="text-red-600 font-black text-xs uppercase mb-6 tracking-widest italic">Painel Admin Master</h2>
-                <button class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-[10px] uppercase shadow-lg">Ver Pedidos PayPal</button>
+                <button class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-[10px] uppercase shadow-lg">Lista de Saques PayPal</button>
             </div>
         </section>
 
@@ -97,18 +101,19 @@
         <button onclick="nav('wallet')" id="btn-wallet" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Carteira</span></button>
         <button onclick="nav('friends')" id="btn-friends" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Amigos</span></button>
         <button onclick="nav('profile')" id="btn-profile" class="nav-btn flex-1 flex flex-col items-center p-3 text-gray-400"><span class="text-[10px] font-black uppercase">Perfil</span></button>
-        <button onclick="nav('admin')" id="btn-admin" class="nav-btn hidden flex-1 flex flex-col items-center p-3 text-red-300 italic"><span class="text-[10px] font-black uppercase tracking-tighter">Admin</span></button>
+        <button onclick="nav('admin')" id="btn-admin" class="nav-btn hidden flex-1 flex flex-col items-center p-3 text-red-300 italic"><span class="text-[10px] font-black uppercase">Admin</span></button>
     </nav>
 
     <script>
+        // CONFIGURAÇÃO SUPABASE
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
+        const SB_KEY = "COLA_AQUI_A_TUA_KEY"; 
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
         const UID = "5401881400";
 
-        let localUser = { saldo: 0, bonus: 15 };
+        let localData = { saldo: 0, bonus: 15 };
 
-        // NAVEGAÇÃO IMEDIATA (Não espera por nada)
+        // 1. NAVEGAÇÃO IMEDIATA (Não depende do Supabase)
         function nav(tab) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -117,46 +122,46 @@
             window.scrollTo(0, 0);
         }
 
-        async function init() {
+        // 2. BOOT DA APP
+        async function start() {
             if (UID === "5401881400") document.getElementById('btn-admin').classList.remove('hidden');
-            document.getElementById('ref-box').innerText = `https://apex-social.onrender.com/?ref=${UID}`;
             
             try {
-                const { data: p } = await supabase.from('perfis').select('*').eq('id', UID).single();
-                if (p) localUser = p;
+                const { data: profile } = await supabase.from('perfis').select('*').eq('id', UID).single();
+                if (profile) localData = profile;
                 
                 const { data: posts } = await supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(10);
                 renderPosts(posts || []);
-            } catch (e) { console.warn("Modo Offline"); }
+            } catch (e) { console.warn("Modo Offline Ativo"); }
             
-            updateUI();
+            refreshUI();
         }
 
-        function updateUI() {
-            const eur = localUser.saldo.toFixed(4);
-            document.getElementById('bal-eur').innerText = eur + "€";
-            document.getElementById('wall-eur').innerText = eur + "€";
-            document.getElementById('bal-brl').innerText = (localUser.saldo * 6.12).toFixed(4) + " BRL";
-            document.getElementById('bonus-display').innerText = `🔥 ${localUser.bonus} Ações Turbo`;
+        function refreshUI() {
+            const val = localData.saldo.toFixed(4);
+            document.getElementById('bal-eur').innerText = val + "€";
+            document.getElementById('wall-eur').innerText = val + "€";
+            document.getElementById('bal-brl').innerText = (localData.saldo * 6.1245).toFixed(4) + " BRL";
+            document.getElementById('bonus-display').innerText = `🔥 ${localData.bonus} Ações Turbo`;
         }
 
         function renderPosts(data) {
             const list = document.getElementById('posts-list');
             list.innerHTML = data.map(p => `
-                <div class="card p-4">
-                    <p class="text-[9px] font-black text-gray-400 uppercase mb-2">User #${p.user_id.slice(-4)}</p>
+                <div class="card p-4 shadow-sm">
+                    <p class="text-[9px] font-black text-gray-400 uppercase mb-2">Utilizador #${p.user_id.slice(-4)}</p>
                     <p class="text-xs text-gray-700 font-medium mb-4">${p.content}</p>
                     <button onclick="addCash(0.0015)" class="w-full border py-2 rounded-lg text-[9px] font-black uppercase text-blue-500 italic">Gostar (+0,0015€)</button>
                 </div>
-            `).join('<div class="ad-slot py-3">ADSTERRA IN-FEED</div>');
+            `).join('<div class="ad-slot py-3">PUBLICIDADE ADSTERRA</div>');
         }
 
         async function addCash(amt) {
-            if (localUser.bonus <= 0) return alert("Bónus expirado! Sincronize na Carteira.");
-            localUser.saldo += amt;
-            localUser.bonus--;
-            updateUI();
-            await supabase.from('perfis').upsert({ id: UID, saldo: localUser.saldo, bonus: localUser.bonus });
+            if (localData.bonus <= 0) return alert("Sessão Expirada! Recarrega na Carteira.");
+            localData.saldo += amt;
+            localData.bonus--;
+            refreshUI();
+            await supabase.from('perfis').upsert({ id: UID, saldo: localData.saldo, bonus: localData.bonus });
         }
 
         async function sendPost() {
@@ -167,29 +172,29 @@
             if (!error) {
                 document.getElementById('post-text').value = "";
                 await addCash(0.0150);
-                init();
+                start();
             }
             document.getElementById('loader').style.display = 'none';
         }
 
         function shareLink() {
-            const msg = `Estou a faturar no Apex Social! Regista-te: https://apex-social.onrender.com/?ref=${UID}`;
-            if (navigator.share) navigator.share({ title: 'Apex', text: msg });
-            else window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`);
+            const m = `Vem ganhar dinheiro no Apex Social! Regista-te: https://apex-social.onrender.com/?ref=${UID}`;
+            if (navigator.share) navigator.share({ title: 'Apex', text: m });
+            else window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(m)}`);
         }
 
         function syncBonus() {
             document.getElementById('loader').style.display = 'flex';
             setTimeout(async () => {
-                localUser.bonus = 15;
-                updateUI();
+                localData.bonus = 15;
+                refreshUI();
                 await supabase.from('perfis').upsert({ id: UID, bonus: 15 });
                 document.getElementById('loader').style.display = 'none';
                 nav('feed');
             }, 2000);
         }
 
-        window.onload = init;
+        window.onload = start;
     </script>
 </body>
 </html>
