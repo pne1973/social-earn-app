@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v35.7</title>
+    <title>Apex Social v35.8</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root { --blue: #4285F4; --green: #34A853; }
         body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding-top: 65px; padding-bottom: 80px; }
         .header { position: fixed; top: 0; width: 100%; height: 60px; background: white; border-bottom: 1px solid #ddd; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
-        .post-card { background: white; border-radius: 12px; border: 1px solid #ddd; margin: 10px; overflow: hidden; }
-        /* Garante que a imagem tenha espaço mesmo antes de carregar */
-        .img-wrapper { width: 100%; background: #eee; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .img-wrapper img { width: 100%; height: auto; display: block; }
-        .btn-pub { background: var(--blue); color: white; border-radius: 8px; font-weight: 900; font-size: 11px; text-transform: uppercase; }
+        .post-card { background: white; border-radius: 12px; border: 1px solid #ddd; margin: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .img-container { width: 100%; background: #eee; min-height: 200px; }
+        .img-container img { width: 100%; height: auto; display: block; }
+        .btn-main { background: var(--blue); color: white; border-radius: 8px; font-weight: 900; font-size: 11px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -26,87 +25,85 @@
 
     <main>
         <div class="post-card p-4" style="border-top: 6px solid var(--blue);">
-            <textarea id="in-txt" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
-            <div id="status-envio" class="hidden text-center text-[10px] font-black mb-2 text-orange-500 uppercase">Processando...</div>
+            <textarea id="in-txt" placeholder="NOVA PUBLICAÇÃO..." class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
+            <div id="in-msg" class="hidden text-center text-[10px] font-black mb-2 text-blue-600 uppercase">A preparar imagem...</div>
             <div class="flex gap-2">
-                <label for="in-img" class="flex-1 bg-gray-100 p-3 rounded-lg text-center text-[10px] font-black cursor-pointer uppercase">📸 FOTO</label>
-                <input type="file" id="in-img" accept="image/*" class="hidden" onchange="document.getElementById('status-envio').classList.remove('hidden'); document.getElementById('status-envio').innerText='✅ FOTO PRONTA'">
-                <button onclick="publicarPost()" id="btn-envio" class="flex-[2] btn-pub p-3">Publicar agora</button>
+                <label for="in-file" class="flex-1 bg-gray-100 p-3 rounded-lg text-center text-[10px] font-black cursor-pointer uppercase text-gray-600">📸 FOTO</label>
+                <input type="file" id="in-file" accept="image/*" class="hidden" onchange="document.getElementById('in-msg').classList.remove('hidden'); document.getElementById('in-msg').innerText='✅ PRONTA'">
+                <button onclick="uploadEPost()" id="in-btn" class="flex-[2] btn-main p-3">Publicar Agora</button>
             </div>
         </div>
-        <div id="feed-social"></div>
+        <div id="feed"></div>
     </main>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const _sb = window.supabase.createClient(SB_URL, SB_KEY);
         const MASTER_ID = "5401881400";
-        const _client = window.supabase.createClient(SB_URL, SB_KEY);
-        let saldoAtual = 0;
+        let meuSaldo = 0;
 
         async function init() {
-            const { data } = await _client.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) saldoAtual = data.saldo;
-            document.getElementById('u-saldo').innerText = saldoAtual.toFixed(4) + "€";
+            const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if(data) meuSaldo = data.saldo;
+            document.getElementById('u-saldo').innerText = meuSaldo.toFixed(4) + "€";
             carregarFeed();
         }
 
-        async function publicarPost() {
+        async function uploadEPost() {
             const txt = document.getElementById('in-txt').value;
-            const file = document.getElementById('in-img').files[0];
-            const btn = document.getElementById('btn-envio');
+            const file = document.getElementById('in-file').files[0];
+            const btn = document.getElementById('in-btn');
             if(!txt) return;
 
             btn.disabled = true;
             btn.innerText = "A ENVIAR...";
 
-            let urlFinal = "";
+            let urlPublica = "";
+
             if(file) {
-                const extensao = file.name.split('.').pop();
-                const nomeFicheiro = `${Date.now()}.${extensao}`;
+                // No seu print o bucket parece chamar-se 'p..' ou 'posts'
+                // Vou usar o nome padrão 'images'. Se mudar o nome no painel, mude aqui:
+                const bucketName = 'images'; 
+                const fileName = `${Date.now()}_${file.name}`;
                 
-                // 1. Upload para o Storage
-                const { data: uploadData, error: uploadErr } = await _client.storage.from('images').upload(nomeFicheiro, file);
+                const { data: upData, error: upErr } = await _sb.storage.from(bucketName).upload(fileName, file);
                 
-                if(!uploadErr) {
-                    // 2. Obter URL oficial
-                    const { data: urlData } = _client.storage.from('images').getPublicUrl(nomeFicheiro);
-                    urlFinal = urlData.publicUrl;
+                if(!upErr) {
+                    const { data: urlData } = _sb.storage.from(bucketName).getPublicUrl(fileName);
+                    urlPublica = urlData.publicUrl;
                 }
             }
 
-            // 3. Gravar na tabela com a URL corrigida
-            const { error: dbErr } = await _client.from('posts').insert([{ 
-                user_id: MASTER_ID, 
-                content: txt, 
-                image_url: urlFinal 
+            const { error: dbErr } = await _sb.from('posts').insert([{ 
+                user_id: MASTER_ID, content: txt, image_url: urlPublica 
             }]);
 
             if(!dbErr) {
-                saldoAtual += 0.0150;
-                await _client.from('perfis').update({ saldo: saldoAtual }).eq('id', MASTER_ID);
+                meuSaldo += 0.0150;
+                await _sb.from('perfis').update({ saldo: meuSaldo }).eq('id', MASTER_ID);
                 window.location.reload();
             } else {
                 btn.disabled = false;
-                btn.innerText = "ERRO DE TABELA";
+                btn.innerText = "ERRO NO POST";
             }
         }
 
         async function carregarFeed() {
-            const { data: posts } = await _client.from('posts').select('*').order('created_at', {ascending: false});
-            const feed = document.getElementById('feed-social');
-            feed.innerHTML = "";
+            const { data: posts } = await _sb.from('posts').select('*').order('created_at', {ascending: false});
+            const feedDiv = document.getElementById('feed');
+            feedDiv.innerHTML = "";
 
             posts?.forEach(p => {
                 const card = document.createElement('div');
                 card.className = "post-card";
                 card.innerHTML = `
-                    ${p.image_url ? `<div class="img-wrapper"><img src="${p.image_url}" onerror="this.parentElement.style.display='none'"></div>` : ''}
+                    ${p.image_url ? `<div class="img-container"><img src="${p.image_url}" onerror="this.src='https://placehold.co/600x400?text=Aguardando+Bucket'"></div>` : ''}
                     <div class="p-4">
-                        <p class="text-[12px] font-bold uppercase text-gray-800">${p.content}</p>
+                        <p class="text-[12px] font-bold text-gray-800 uppercase mb-3">${p.content}</p>
                     </div>
                 `;
-                feed.appendChild(card);
+                feedDiv.appendChild(card);
             });
         }
 
