@@ -3,21 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v35.2</title>
+    <title>Apex Social v35.6</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root { --blue: #4285F4; --green: #34A853; }
-        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding-top: 70px; padding-bottom: 80px; }
+        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding-top: 65px; padding-bottom: 80px; }
         .header { position: fixed; top: 0; width: 100%; height: 60px; background: white; border-bottom: 1px solid #ddd; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
-        .post-card { background: white; border-radius: 12px; border: 1px solid #ddd; margin: 0 10px 15px 10px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .img-container { background: #eee; width: 100%; min-height: 200px; display: flex; align-items: center; justify-content: center; }
-        .img-container img { width: 100%; height: auto; display: block; }
-        .btn-act { flex: 1; padding: 12px 0; display: flex; align-items: center; justify-content: center; gap: 5px; font-weight: 800; color: #65676b; font-size: 11px; text-transform: uppercase; }
-        .badge { background: #fa3e3e; color: white; padding: 1px 6px; border-radius: 10px; font-size: 10px; }
-        nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; border-top: 1px solid #ddd; display: flex; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #888; }
-        .nav-item.active { color: var(--blue); border-top: 3px solid var(--blue); }
+        .post-card { background: white; border-radius: 12px; border: 1px solid #ddd; margin: 10px; overflow: hidden; }
+        .img-feed { width: 100%; max-height: 350px; object-fit: cover; display: block; background: #eee; }
+        .btn-blue { background: var(--blue); color: white; border-radius: 8px; font-weight: 900; font-size: 11px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -29,110 +24,84 @@
 
     <main>
         <div class="post-card p-4" style="border-top: 6px solid var(--blue);">
-            <textarea id="in-text" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
-            <div id="status" class="hidden text-center text-[10px] font-black mb-2 uppercase"></div>
+            <textarea id="in-txt" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
+            
+            <div id="in-info" class="hidden text-center text-[10px] font-black mb-2 text-blue-500 uppercase">Otimizando para poupar espaço...</div>
+
             <div class="flex gap-2">
-                <label for="in-file" class="flex-1 bg-gray-100 p-3 rounded-lg text-center text-[10px] font-black cursor-pointer uppercase">📸 FOTO</label>
-                <input type="file" id="in-file" accept="image/*" class="hidden" onchange="showReady()">
-                <button onclick="enviarPost()" id="btn-pub" class="flex-[2] bg-blue-600 text-white rounded-lg font-black text-[10px] uppercase">Publicar</button>
+                <label for="in-img" class="flex-1 bg-gray-100 p-3 rounded-lg text-center text-[10px] font-black cursor-pointer uppercase">📸 FOTO</label>
+                <input type="file" id="in-img" accept="image/*" class="hidden" onchange="document.getElementById('in-info').classList.remove('hidden'); document.getElementById('in-info').innerText='✅ FOTO PRONTA'">
+                <button onclick="enviarApenasUrl()" id="btn-pub" class="flex-[2] btn-blue p-3">Publicar agora</button>
             </div>
         </div>
-        
         <div id="feed"></div>
     </main>
-
-    <nav>
-        <div class="nav-item active">Rede</div>
-        <div class="nav-item">Ganhos</div>
-    </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const MASTER_ID = "5401881400";
-        const sb = window.supabase.createClient(SB_URL, SB_KEY);
-
-        let saldo = 0;
+        const MASTER_ID = "5401881400"; //
+        const _sb = window.supabase.createClient(SB_URL, SB_KEY);
+        let sld = 0;
 
         async function init() {
-            try {
-                const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-                if(data) saldo = data.saldo;
-                document.getElementById('u-saldo').innerText = saldo.toFixed(4) + "€";
-                loadFeed();
-            } catch(e) { console.error(e); }
+            const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if(data) sld = data.saldo;
+            document.getElementById('u-saldo').innerText = sld.toFixed(4) + "€";
+            render();
         }
 
-        function showReady() {
-            const s = document.getElementById('status');
-            s.innerText = "✅ Foto Selecionada";
-            s.className = "text-center text-[10px] font-black mb-2 uppercase text-green-600";
-            s.classList.remove('hidden');
-        }
-
-        async function enviarPost() {
-            const txt = document.getElementById('in-text').value;
-            const file = document.getElementById('in-file').files[0];
+        async function enviarApenasUrl() {
+            const txt = document.getElementById('in-txt').value;
+            const file = document.getElementById('in-img').files[0];
             const btn = document.getElementById('btn-pub');
-            const s = document.getElementById('status');
-
             if(!txt) return;
+
             btn.disabled = true;
-            btn.innerText = "A ENVIAR...";
-            
-            let url = "";
+            btn.innerText = "A PROCESSAR...";
+
+            let publicUrl = "";
+
             if(file) {
-                const fName = `img_${Date.now()}.jpg`;
-                const { error: upErr } = await sb.storage.from('images').upload(fName, file);
+                // 1. Upload do ficheiro para o STORAGE (Balde de ficheiros)
+                const fileName = `post_${Date.now()}.jpg`;
+                const { data: upData, error: upErr } = await _sb.storage.from('images').upload(fileName, file);
+                
                 if(!upErr) {
-                    const { data } = sb.storage.from('images').getPublicUrl(fName);
-                    url = data.publicUrl;
+                    // 2. Gerar a URL pública do ficheiro que acabámos de enviar
+                    const { data: urlData } = _sb.storage.from('images').getPublicUrl(fileName);
+                    publicUrl = urlData.publicUrl; // Aqui temos apenas o TEXTO do link
                 }
             }
 
-            const { error } = await sb.from('posts').insert([{ 
-                user_id: MASTER_ID, content: txt, image_url: url 
+            // 3. Enviar apenas a URL (Texto) para a TABELA posts
+            const { error: dbErr } = await _sb.from('posts').insert([{ 
+                user_id: MASTER_ID, 
+                content: txt, 
+                image_url: publicUrl // Enviando apenas a string da URL
             }]);
 
-            if(!error) {
-                saldo += 0.0150;
-                await sb.from('perfis').update({ saldo: saldo }).eq('id', MASTER_ID);
+            if(!dbErr) {
+                sld += 0.0150;
+                await _sb.from('perfis').update({ saldo: sld }).eq('id', MASTER_ID);
                 window.location.reload();
             } else {
                 btn.disabled = false;
-                btn.innerText = "Tentar Novamente";
-                s.innerText = "Erro ao gravar. Verifique o SQL.";
-                s.className = "text-center text-[10px] font-black mb-2 uppercase text-red-600";
-                s.classList.remove('hidden');
+                btn.innerText = "ERRO NA TABELA";
             }
         }
 
-        async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const feed = document.getElementById('feed');
-            feed.innerHTML = "";
-
-            if(!posts || posts.length === 0) {
-                feed.innerHTML = "<p class='text-center text-xs font-bold text-gray-400 mt-10'>NENHUM POST NO FEED</p>";
-                return;
-            }
-
-            posts.forEach(p => {
-                const card = document.createElement('div');
-                card.className = "post-card";
-                card.innerHTML = `
-                    ${p.image_url ? `<div class="img-container"><img src="${p.image_url}" loading="lazy"></div>` : ''}
+        async function render() {
+            const { data } = await _sb.from('posts').select('*').order('created_at', {ascending: false});
+            const f = document.getElementById('feed');
+            f.innerHTML = data?.map(p => `
+                <div class="post-card">
+                    ${p.image_url ? `<img src="${p.image_url}" class="img-feed">` : ''}
                     <div class="p-4">
-                        <p class="text-[12px] font-bold text-gray-800 uppercase mb-3">${p.content}</p>
-                        <div class="flex border-t pt-2">
-                            <button class="btn-act">👍 <span class="badge">0</span></button>
-                            <button class="btn-act" style="border-left:1px solid #eee; border-right:1px solid #eee;">💬 <span class="badge">0</span></button>
-                            <button class="btn-act">🔗 <span class="badge">0</span></button>
-                        </div>
+                        <p class="text-xs font-bold uppercase text-gray-800">${p.content}</p>
                     </div>
-                `;
-                feed.appendChild(card);
-            });
+                </div>
+            `).join('') || "";
         }
 
         window.onload = init;
