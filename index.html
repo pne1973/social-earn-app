@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v125</title>
+    <title>Apex Social v126</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -11,9 +11,9 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; padding-bottom: 120px; }
         .nav-btn.active { color: #4285F4; border-top: 3px solid #4285F4; font-weight: 900; background: #f1f3f4; }
-        .card { background: white; border-radius: 14px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; }
+        .card { background: white; border-radius: 14px; border: 1px solid #dadce0; margin-bottom: 12px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .ad-slot { background: #fffde7; border: 1px dashed #fbc02d; text-align: center; padding: 15px; border-radius: 10px; margin: 10px 0; font-size: 10px; font-weight: 900; color: #856404; }
-        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 10000; align-items: center; justify-content: center; }
+        #loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 10000; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -22,8 +22,8 @@
 
     <header class="sticky top-0 bg-white border-b z-50 px-5 py-4 flex justify-between items-center shadow-sm">
         <div>
-            <h1 class="text-xl font-black text-blue-600 italic uppercase">Apex Social</h1>
-            <p class="text-[9px] font-black text-gray-400">PRODUCTION V60</p>
+            <h1 class="text-xl font-black text-blue-600 italic tracking-tighter uppercase">Apex Social</h1>
+            <p class="text-[9px] font-black text-gray-400 uppercase">v60 Production</p>
         </div>
         <div class="text-right">
             <span id="bal-eur" class="font-black text-green-600 text-lg">0.0000€</span>
@@ -34,58 +34,57 @@
     <main class="p-4 max-w-md mx-auto">
         
         <section id="view-feed" class="tab-content active">
-            <div class="card p-4 bg-blue-600 text-white flex justify-between items-center mb-4 shadow-lg">
-                <div><p class="text-[9px] font-black uppercase opacity-80">Ações Disponíveis</p><p id="bonus-display" class="text-sm font-black italic">🔥 15 Ações Turbo</p></div>
-                <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-1 rounded-full text-[10px] font-black uppercase">Recarregar</button>
+            <div class="card p-4 bg-blue-600 text-white flex justify-between items-center mb-4">
+                <div><p class="text-[9px] font-black uppercase opacity-80">Ganhos Disponíveis</p><p id="bonus-display" class="text-sm font-black italic">🔥 15 Ações Turbo</p></div>
+                <button onclick="nav('wallet')" class="bg-white text-blue-600 px-4 py-1 rounded-full text-[10px] font-black uppercase font-bold">Recarregar</button>
             </div>
             
-            <div class="card p-4 shadow-sm border-blue-100">
-                <textarea id="post-text" placeholder="Escreve algo para ganhar 0,0150€..." class="w-full text-sm border-none focus:ring-0 p-0 mb-3" rows="2"></textarea>
+            <div class="card p-4">
+                <textarea id="post-text" placeholder="Publica agora e ganha 0,0150€" class="w-full text-sm border-none focus:ring-0 p-0 mb-3" rows="2"></textarea>
                 <div class="flex space-x-2">
-                    <button onclick="sendPost()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Publicar Post</button>
-                    <button onclick="shareLink()" class="bg-gray-50 px-4 rounded-xl font-black text-[10px] uppercase border">Partilhar</button>
+                    <button onclick="sendPost()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md">Publicar</button>
+                    <button onclick="shareLink()" class="bg-gray-100 px-4 rounded-xl font-black text-[10px] uppercase border text-gray-500">Partilhar</button>
                 </div>
             </div>
 
-            <div class="ad-slot">ADSTERRA NATIVE ADS FEED</div>
-            <div id="posts-list" class="space-y-4 mt-4">
-                </div>
+            <div class="ad-slot">ADSTERRA NATIVE FEED</div>
+            <div id="posts-list" class="space-y-4">
+                <p class="text-center text-gray-300 text-[10px] py-10 uppercase font-black">A carregar posts...</p>
+            </div>
         </section>
 
         <section id="view-wallet" class="tab-content">
-            <div class="card p-10 text-center mb-4 border-b-4 border-blue-500 shadow-md">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">O Teu Saldo</p>
+            <div class="card p-10 text-center mb-4 border-b-4 border-blue-500 shadow-sm">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Saldo em Carteira</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600 tracking-tighter">0.0000€</h1>
             </div>
-            <div class="card p-5 space-y-4">
-                <button onclick="syncBonus()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic shadow-lg">Sincronizar Ações (Ver Vídeo)</button>
-                <button onclick="addCash(0.0500)" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase font-bold">Check-in Diário (+0,0500€)</button>
+            <div class="card p-5 space-y-4 text-center">
+                <button onclick="syncBonus()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase italic">Sincronizar (Ver Vídeo)</button>
+                <button onclick="addCash(0.0500)" class="w-full border-2 border-green-500 text-green-600 py-4 rounded-2xl font-black text-[10px] uppercase">Check-in Diário (+0,0500€)</button>
                 <div class="ad-slot">BANNER ADSTERRA 320X50</div>
-                <div class="p-4 bg-gray-50 rounded-xl text-center">
-                    <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Mínimo de Saque: 10,0000€ (via PayPal)</p>
-                </div>
+                <p class="text-[8px] font-black text-gray-300 uppercase tracking-widest">Mínimo de Saque: 10,0000€</p>
             </div>
         </section>
 
         <section id="view-friends" class="tab-content">
             <div class="card p-6 border-l-4 border-blue-500 shadow-sm">
-                <h2 class="font-black text-sm uppercase text-blue-600 mb-2">Convidar e Ganhar</h2>
-                <p class="text-[10px] font-bold text-gray-400 uppercase mb-6 leading-tight">Recebe 10% de comissão vitalícia sobre os lucros da tua rede.</p>
-                <div class="bg-blue-50 p-4 rounded-xl border border-dashed border-blue-200 mb-6 text-[10px] font-mono text-blue-700 italic break-all" id="ref-box">
+                <h2 class="font-black text-sm uppercase text-blue-600 mb-1">A Tua Rede (10%)</h2>
+                <p class="text-[10px] font-bold text-gray-400 uppercase mb-6 leading-tight">Ganha comissão sobre os lucros da tua rede.</p>
+                <div class="bg-gray-50 p-4 rounded-xl border border-dashed mb-6 text-[9px] font-mono text-blue-600 italic break-all" id="ref-box">
                     https://social-earn-app.vercel.app/?ref=5401881400
                 </div>
-                <button onclick="shareLink()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-md">Enviar Convite WhatsApp</button>
+                <button onclick="shareLink()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase">Enviar Convite</button>
             </div>
         </section>
 
         <section id="view-admin" class="tab-content">
             <div class="card p-6 border-2 border-red-500 bg-red-50 text-center shadow-lg">
-                <h2 class="text-red-600 font-black text-xs uppercase mb-6 italic">Painel de Controlo Master</h2>
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-white p-3 rounded-lg border"><p class="text-[8px] font-bold text-gray-400 uppercase">Users</p><p id="adm-users" class="font-black text-red-600">...</p></div>
-                    <div class="bg-white p-3 rounded-lg border"><p class="text-[8px] font-bold text-gray-400 uppercase">Posts</p><p id="adm-posts" class="font-black text-red-600">...</p></div>
+                <h2 class="text-red-600 font-black text-xs uppercase mb-6 italic">Admin Master</h2>
+                <div class="text-left space-y-2 mb-6">
+                    <p class="text-[10px] font-bold uppercase text-gray-600">Users: <span id="adm-users" class="text-red-600">...</span></p>
+                    <p class="text-[10px] font-bold uppercase text-gray-600">Posts: <span id="adm-posts" class="text-red-600">...</span></p>
                 </div>
-                <button class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-[10px] uppercase">Gerir Saques PayPal</button>
+                <button class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-[10px] uppercase">Lista de Saques</button>
             </div>
         </section>
 
@@ -99,12 +98,13 @@
     </nav>
 
     <script>
+        // CONFIGURAÇÕES VERCEL E SUPABASE
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY"; 
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-        const UID = "5401881400";
         const VERCEL_URL = "https://social-earn-app.vercel.app";
+        const UID = "5401881400";
 
+        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
         let localData = { saldo: 0, bonus: 15 };
 
         function nav(tab) {
@@ -117,13 +117,14 @@
 
         async function init() {
             if (UID === "5401881400") document.getElementById('btn-admin').classList.remove('hidden');
+            document.getElementById('ref-box').innerText = `${VERCEL_URL}/?ref=${UID}`;
             
             try {
                 const { data: profile } = await supabase.from('perfis').select('*').eq('id', UID).single();
                 if (profile) localData = profile;
                 
                 const { data: posts } = await supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(10);
-                renderPosts(posts || []);
+                render(posts || []);
 
                 if (UID === "5401881400") {
                     const { count: uC } = await supabase.from('perfis').select('*', { count: 'exact', head: true });
@@ -136,27 +137,27 @@
         }
 
         function refresh() {
-            const v = localData.saldo.toFixed(4);
-            document.getElementById('bal-eur').innerText = v + "€";
-            document.getElementById('wall-eur').innerText = v + "€";
+            const val = localData.saldo.toFixed(4);
+            document.getElementById('bal-eur').innerText = val + "€";
+            document.getElementById('wall-eur').innerText = val + "€";
             document.getElementById('bal-brl').innerText = (localData.saldo * 6.1245).toFixed(4) + " BRL";
             document.getElementById('bonus-display').innerText = `🔥 ${localData.bonus} Ações Turbo`;
         }
 
-        function renderPosts(data) {
+        function render(data) {
             const list = document.getElementById('posts-list');
-            if (!data.length) { list.innerHTML = "<p class='text-center text-gray-400 text-[10px] uppercase py-10'>Sem posts no momento</p>"; return; }
+            if (data.length === 0) { list.innerHTML = "<p class='text-center text-gray-400 text-[10px] py-10 uppercase'>Sem posts ainda</p>"; return; }
             list.innerHTML = data.map(p => `
-                <div class="card p-4 border-l-4 border-blue-400">
+                <div class="card p-4">
                     <p class="text-[9px] font-black text-gray-400 uppercase mb-2">User #${p.user_id.slice(-4)}</p>
                     <p class="text-xs text-gray-700 font-medium mb-4">${p.content}</p>
                     <button onclick="addCash(0.0015)" class="w-full border py-2 rounded-lg text-[9px] font-black uppercase text-blue-500 italic">Gostar (+0,0015€)</button>
                 </div>
-            `).join('<div class="ad-slot">PUBLICIDADE</div>');
+            `).join('<div class="ad-slot py-3">ADSTERRA IN-FEED</div>');
         }
 
         async function addCash(amt) {
-            if (localData.bonus <= 0) return alert("Limite de ações atingido! Sincronize o bónus.");
+            if (localData.bonus <= 0) return alert("Limite atingido!");
             localData.saldo += amt;
             localData.bonus--;
             refresh();
@@ -190,7 +191,7 @@
                 await supabase.from('perfis').upsert({ id: UID, bonus: 15 });
                 document.getElementById('loader').style.display = 'none';
                 nav('feed');
-            }, 1500);
+            }, 2000);
         }
 
         window.onload = init;
