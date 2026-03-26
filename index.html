@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v34.505 - Layout & Ad Logic Fix</title>
+    <title>Social Earn Network</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
@@ -12,16 +12,14 @@
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; }
         
-        /* FEEDBACK VISUAL - NÚMEROS GRANDES */
         #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 4000; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
         @keyframes popUp {
             0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
             20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
             100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
         }
-        .earning-text { font-size: 4rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52, 168, 83, 0.4); -webkit-text-stroke: 2px white; }
+        .earning-text { font-size: 3rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52, 168, 83, 0.4); -webkit-text-stroke: 1.5px white; }
 
-        /* CORREÇÃO DE LAYOUT DAS INTERAÇÕES */
         .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 12px 0; border: none; background: transparent; }
         .interaction-badge { position: absolute; top: 4px; right: 15%; background: var(--g-red); color: white; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: 900; border: 2px solid white; z-index: 10; min-width: 20px; text-align: center; }
         
@@ -31,9 +29,12 @@
         .tab-content.active { display: block; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
         
-        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 5000; align-items: center; justify-content: center; padding: 20px; }
-        .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 100; background: #f1f3f4; padding: 12px 16px; }
-        #feed-container { margin-top: 150px; }
+        /* Modais de 300x250 conforme solicitado */
+        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 5000; align-items: center; justify-content: center; }
+        .modal-300-250 { width: 300px; height: 250px; background: white; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; position: relative; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+
+        .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 100; background: #f1f3f4; padding: 8px 16px; }
+        #feed-container { margin-top: 120px; }
     </style>
 </head>
 <body class="pb-24">
@@ -41,28 +42,34 @@
     <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
 
     <div id="ad-overlay">
-        <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl border-4 border-blue-600 p-8 text-center">
-            <div id="ad-decision-ui">
-                <h3 class="text-xl font-black uppercase text-blue-600 mb-2">Limite Atingido</h3>
-                <p class="text-[10px] font-black uppercase mb-6 text-gray-400">Vê um anúncio para manter 100% dos ganhos.</p>
-                <button onclick="startAdFlow()" class="w-full p-5 bg-blue-600 text-white rounded-2xl shadow-xl uppercase text-xs mb-3 font-black">Ver Anúncio (15 seg)</button>
-                <button onclick="degradeAndContinue()" class="w-full p-4 bg-white border-2 text-gray-300 rounded-2xl uppercase text-[9px] font-black">Ignorar (-20% de bónus)</button>
+        <div id="ad-decision-ui" class="modal-300-250 p-6 text-center">
+            <h3 class="text-sm font-black uppercase text-blue-600 mb-2">Limite de Interações</h3>
+            <p class="text-[10px] leading-tight font-bold mb-4 text-gray-500">Vê um anúncio para manter 100% dos teus ganhos por interação.</p>
+            <button onclick="startAdFlow()" class="w-full py-3 bg-blue-600 text-white rounded-lg shadow-md uppercase text-[10px] mb-2 font-black">Ver Anúncio (15s)</button>
+            <button onclick="degradeAndContinue()" class="w-full py-2 bg-gray-100 text-gray-400 rounded-lg uppercase text-[9px] font-black">Não, reduzir ganhos 50%</button>
+        </div>
+
+        <div id="ad-player-ui" class="modal-300-250 hidden">
+            <div class="flex-1 bg-black flex items-center justify-center relative">
+                <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=300" class="absolute inset-0 w-full h-full object-cover opacity-40">
+                <div id="ad-timer-circle" class="relative z-10 text-white font-black text-3xl">15</div>
             </div>
-            <div id="ad-player-ui" class="hidden">
-                <div class="aspect-video bg-black rounded-xl mb-6 flex items-center justify-center relative overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400" class="absolute inset-0 w-full h-full object-cover opacity-50">
-                    <div id="ad-timer-circle" class="relative z-10 text-white font-black text-2xl">15</div>
-                </div>
-                <button id="close-ad-btn" disabled class="w-full py-5 bg-gray-200 text-gray-400 rounded-xl uppercase text-xs font-black">Visualização Obrigatória...</button>
-            </div>
+            <button id="close-ad-btn" disabled class="h-12 bg-gray-200 text-gray-400 uppercase text-[10px] font-black">Aguarde o fim...</button>
+        </div>
+
+        <div id="ad-penalty-ui" class="modal-300-250 p-6 text-center hidden">
+            <div class="text-3xl mb-2">⚠️</div>
+            <h3 class="text-sm font-black uppercase text-red-500 mb-2">Ganhos Reduzidos</h3>
+            <p class="text-[10px] leading-tight font-bold mb-6 text-gray-500">Como optaste por não ver o anúncio, o valor das tuas interações foi reduzido em 50%.</p>
+            <button onclick="closePenalty()" class="w-full py-3 bg-gray-800 text-white rounded-lg uppercase text-[10px] font-black">Entendido</button>
         </div>
     </div>
 
     <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">A</div>
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">S</div>
             <div>
-                <h1 class="text-sm font-black uppercase text-blue-600">Apex Social</h1>
+                <h1 class="text-sm font-black uppercase text-blue-600">Social Earn</h1>
                 <span id="multiplier-tag" class="text-[8px] font-black text-green-500 uppercase italic">STATUS: 100% OK</span>
             </div>
         </div>
@@ -75,11 +82,11 @@
     <main class="max-w-lg mx-auto p-4 mt-[72px]">
         <section id="view-social" class="tab-content active">
             <div class="sticky-publisher">
-                <div class="google-card p-4 border-t-8 border-blue-600 shadow-xl">
-                    <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none uppercase font-black" rows="1"></textarea>
+                <div class="google-card p-3 border-t-4 border-blue-600 shadow-lg">
+                    <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 text-[11px] mb-1 resize-none uppercase font-black" rows="1"></textarea>
                     <div id="expanded-post" class="hidden">
-                        <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-100 border-none text-[10px] p-3 rounded-xl mb-4 font-black uppercase outline-none">
-                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] uppercase shadow-lg">Publicar Agora</button>
+                        <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full bg-gray-50 border-none text-[9px] p-2 rounded-lg mb-2 font-black uppercase outline-none">
+                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-black text-[10px] uppercase">Publicar</button>
                     </div>
                 </div>
             </div>
@@ -88,7 +95,7 @@
 
         <section id="view-info" class="tab-content">
             <div class="google-card p-12 text-center border-t-[10px] border-blue-600 mt-4 shadow-2xl">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2 italic">Saldo em Carteira</p>
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2 italic">Saldo Disponível</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
                 <p id="wall-brl" class="text-xs font-black text-gray-500 mt-2 uppercase italic">≈ 0.0000 BRL</p>
             </div>
@@ -131,11 +138,14 @@
             setTimeout(() => { container.style.display = 'none'; }, 800);
         }
 
-        // LÓGICA DE INTERAÇÃO COM BLOQUEIO RIGOROSO
         async function reagir(val) {
-            if(user.interactions >= 3) { // Reduzi para 3 para testar a frequência
+            // Limite de 2 interações antes de pedir anúncio
+            if(user.interactions >= 2) {
                 pendingVal = val;
                 document.getElementById('ad-overlay').style.display = 'flex';
+                document.getElementById('ad-decision-ui').classList.remove('hidden');
+                document.getElementById('ad-player-ui').classList.add('hidden');
+                document.getElementById('ad-penalty-ui').classList.add('hidden');
                 return;
             }
             
@@ -143,6 +153,51 @@
             const ganhar = val * user.multiplier;
             user.saldo += ganhar;
             showBigNumber(ganhar);
+            updateUI();
+            await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
+        }
+
+        function startAdFlow() {
+            document.getElementById('ad-decision-ui').classList.add('hidden');
+            document.getElementById('ad-player-ui').classList.remove('hidden');
+            let time = 15;
+            const btn = document.getElementById('close-ad-btn');
+            const timerText = document.getElementById('ad-timer-circle');
+            
+            const timer = setInterval(() => {
+                time--;
+                timerText.innerText = time;
+                btn.innerText = `Aguarde ${time}s...`;
+                if(time <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.innerText = "FECHAR E RECEBER 100%";
+                    btn.className = "h-12 bg-green-600 text-white font-black uppercase text-[10px]";
+                    btn.onclick = () => { 
+                        user.multiplier = 1.0; 
+                        user.interactions = 0; 
+                        finalize(); 
+                    };
+                }
+            }, 1000);
+        }
+
+        function degradeAndContinue() { 
+            user.multiplier = 0.5; // Redução de 50%
+            document.getElementById('ad-decision-ui').classList.add('hidden');
+            document.getElementById('ad-penalty-ui').classList.remove('hidden');
+        }
+
+        function closePenalty() {
+            user.interactions = 0;
+            finalize();
+        }
+
+        async function finalize() {
+            document.getElementById('ad-overlay').style.display = 'none';
+            const bonus = pendingVal * user.multiplier;
+            user.saldo += bonus;
+            showBigNumber(bonus);
             updateUI();
             await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
         }
@@ -178,57 +233,14 @@
                     <div id="comments-${p.id}" class="comment-section">
                         <div id="list-${p.id}" class="p-4 space-y-2 max-h-48 overflow-y-auto bg-gray-50"></div>
                         <div class="p-3 bg-white border-t flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="A TUA MENSAGEM..." class="flex-1 bg-gray-100 rounded-xl p-3 text-[10px] font-black uppercase border-none">
+                            <input id="in-${p.id}" type="text" placeholder="MENSAGEM..." class="flex-1 bg-gray-100 rounded-xl p-3 text-[10px] font-black uppercase border-none">
                             <button onclick="addComment('${p.id}')" class="bg-blue-600 text-white px-5 rounded-xl font-black text-[10px] uppercase">OK</button>
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
                 updateCommentCount(p.id);
-
-                if((idx + 1) % 3 === 0) {
-                    const ad = document.createElement('div');
-                    ad.className = "google-card p-6 border-2 border-blue-100 bg-blue-50 text-center mb-6";
-                    ad.innerHTML = `<p class="text-[8px] font-black text-blue-600 uppercase mb-2 italic">Publicidade Apex</p>
-                                    <h4 class="text-[11px] font-black uppercase mb-4">Ganhe o Dobro com Anúncios</h4>
-                                    <button onclick="startAdFlow()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md">Ver Agora</button>`;
-                    container.appendChild(ad);
-                }
             });
-        }
-
-        function startAdFlow() {
-            document.getElementById('ad-decision-ui').classList.add('hidden');
-            document.getElementById('ad-player-ui').classList.remove('hidden');
-            let time = 15;
-            const btn = document.getElementById('close-ad-btn');
-            const timerText = document.getElementById('ad-timer-circle');
-            
-            const timer = setInterval(() => {
-                time--;
-                timerText.innerText = time;
-                btn.innerText = `Aguarde ${time}s...`;
-                if(time <= 0) {
-                    clearInterval(timer);
-                    btn.disabled = false;
-                    btn.innerText = "VALIDAR E CONTINUAR";
-                    btn.className = "w-full py-5 bg-green-600 text-white rounded-xl font-black uppercase text-xs shadow-xl";
-                    btn.onclick = () => { user.multiplier = 1.0; user.interactions = 0; finalize(); };
-                }
-            }, 1000);
-        }
-
-        function degradeAndContinue() { user.multiplier = Math.max(0.2, user.multiplier - 0.2); user.interactions++; finalize(); }
-
-        async function finalize() {
-            document.getElementById('ad-overlay').style.display = 'none';
-            document.getElementById('ad-decision-ui').classList.remove('hidden');
-            document.getElementById('ad-player-ui').classList.add('hidden');
-            const bonus = pendingVal * user.multiplier;
-            user.saldo += bonus;
-            showBigNumber(bonus);
-            updateUI();
-            await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
         }
 
         async function addComment(pid) {
@@ -256,7 +268,16 @@
             const i = document.getElementById('post-url').value;
             if(!c) return;
             const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: c, image_url: i }]);
-            if(!error) { user.saldo += 0.0150; showBigNumber(0.0150); updateUI(); await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID); document.getElementById('post-input').value = ""; loadFeed(); }
+            if(!error) { 
+                user.saldo += 0.0150; 
+                showBigNumber(0.0150); 
+                updateUI(); 
+                await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID); 
+                document.getElementById('post-input').value = ""; 
+                document.getElementById('expanded-post').classList.add('hidden');
+                document.getElementById('post-input').rows = 1;
+                loadFeed(); 
+            }
         }
 
         function toggleComments(id) { document.getElementById(`comments-${id}`).classList.toggle('active'); updateCommentList(id); }
