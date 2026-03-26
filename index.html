@@ -2,18 +2,21 @@
 <html lang="pt-pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Earn Network - Global Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Apex Social - Sistema de Interações Real</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; }
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 12px; }
-        .status-header { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px; display: flex; justify-content: center; }
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; position: relative; }
-        .count-badge { position: absolute; top: 2px; right: 28%; background: var(--g-red); color: white; font-size: 9px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1.5px solid white; }
+        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; position: relative; cursor: pointer; transition: background 0.2s; }
+        .interaction-btn:active { background: #f8f9fa; }
+        .count-badge { position: absolute; top: 2px; right: 28%; background: var(--g-red); color: white; font-size: 9px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1.5px solid white; font-weight: 900; }
+        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body class="pb-24">
@@ -21,88 +24,157 @@
     <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">S</div>
-            <h1 class="text-[12px] font-black uppercase text-blue-600">Social Earn Network</h1>
+            <h1 class="text-[12px] font-black uppercase text-blue-600 text-left leading-tight">Social Earn<br>Network</h1>
         </div>
-        <div id="main-eur" class="font-black text-green-600 text-lg">0.0000€</div>
+        <div class="text-right">
+            <div id="main-eur" class="font-black text-green-600 text-lg">0.0000€</div>
+            <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase">0.0000 BRL</div>
+        </div>
     </header>
 
-    <div class="status-header">
-        <button onclick="massiveInjection()" class="bg-red-600 text-white text-[10px] px-4 py-2 rounded-full font-black uppercase shadow-lg">
-            🔥 Injetar 100 Users & Ranks
-        </button>
-    </div>
+    <main class="max-w-lg mx-auto pt-24 px-4">
+        <section id="view-social" class="tab-content active">
+            <div id="feed-container"></div>
+        </section>
 
-    <main class="max-w-lg mx-auto mt-[130px] px-4">
-        <div id="feed-container"></div>
+        <section id="view-info" class="tab-content">
+            <div class="google-card p-10 text-center border-t-[10px] border-blue-600">
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Carteira Acumulada</p>
+                <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
+            </div>
+        </section>
     </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200]">
+        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center font-black text-[11px]">REDE</button>
+        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[11px]">GANHOS</button>
+    </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const MASTER_ID = 5401881400; // ID Numérico (BigInt)
+        const MASTER_ID = 5401881400;
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
+        
+        let userSaldo = 0;
 
         async function init() {
+            // Carregar saldo inicial real do Supabase
             const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) document.getElementById('main-eur').innerText = parseFloat(data.saldo).toFixed(4) + "€";
+            if(data) userSaldo = parseFloat(data.saldo);
+            
+            updateUI();
             loadFeed();
-        }
-
-        async function massiveInjection() {
-            if(!confirm("Isto irá apagar os dados atuais e criar 100 perfis e 100 posts. Continuar?")) return;
-
-            // 1. Limpar tabelas
-            await sb.from('comentarios').delete().neq('user_id', 0);
-            await sb.from('posts').delete().neq('user_id', 0);
-            await sb.from('perfis').delete().neq('id', MASTER_ID);
-
-            const perfis = [];
-            const posts = [];
-
-            for(let i=1; i<=100; i++) {
-                const fakeId = 1000 + i; // IDs numéricos para evitar o erro de sintaxe
-                perfis.push({ id: fakeId, saldo: (Math.random() * 50).toFixed(4) });
-                posts.push({ 
-                    user_id: fakeId, 
-                    content: `TESTE GLOBAL DE UTILIZADOR #${i}`,
-                    image_url: `https://picsum.photos/seed/${i}/400/300`
-                });
-            }
-
-            // 2. Inserir perfis e posts massivamente
-            await sb.from('perfis').insert(perfis);
-            const { error } = await sb.from('posts').insert(posts);
-
-            if(!error) {
-                alert("Rede de 100 utilizadores criada!");
-                loadFeed();
-            }
         }
 
         async function loadFeed() {
             const container = document.getElementById('feed-container');
-            container.innerHTML = "<p class='text-center font-black animate-pulse'>A CARREGAR REDE REAL...</p>";
+            container.innerHTML = "<p class='text-center py-10 font-black uppercase text-gray-400 animate-pulse text-[10px]'>Sincronizando interações...</p>";
 
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             
-            if(posts) {
-                container.innerHTML = "";
-                for (const p of posts) {
-                    const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
+            if(!posts) return;
+
+            container.innerHTML = "";
+            for (const p of posts) {
+                // Busca contagem real de comentários para o badge
+                const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
+                
+                container.innerHTML += `
+                <div class="google-card shadow-sm p-4">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-[9px]">ID</div>
+                        <span class="text-[9px] font-black uppercase text-gray-400">User: ${p.user_id}</span>
+                    </div>
+                    <p class="text-[13px] font-black uppercase mb-4">${p.content}</p>
+                    ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-4 border">` : ''}
                     
-                    container.innerHTML += `
-                    <div class="google-card p-4 shadow-sm">
-                        <div class="text-[10px] text-gray-400 mb-2 font-black">USER ID: ${p.user_id}</div>
-                        <p class="text-[13px] font-black uppercase mb-4">${p.content}</p>
-                        <img src="${p.image_url}" class="w-full rounded-lg mb-4">
-                        <div class="flex border-t pt-2">
-                            <div class="interaction-btn"><div class="count-badge">0</div>👍</div>
-                            <div class="interaction-btn border-x"><div class="count-badge">${count || 0}</div>💬</div>
-                            <div class="interaction-btn"><div class="count-badge">0</div>🔗</div>
+                    <div class="flex border-t pt-2">
+                        <button onclick="handleAction(0.0006, '${p.id}', 'like')" class="interaction-btn">
+                            <div class="count-badge">0</div><span class="text-xl">👍</span>
+                            <span class="text-[8px] uppercase text-gray-400">Gostar</span>
+                        </button>
+                        <button onclick="toggleCommentSection('${p.id}')" class="interaction-btn border-x">
+                            <div class="count-badge" id="badge-${p.id}">${count || 0}</div><span class="text-xl">💬</span>
+                            <span class="text-[8px] uppercase text-gray-400">Comentar</span>
+                        </button>
+                        <button onclick="handleAction(0.0020, '${p.id}', 'share')" class="interaction-btn">
+                            <div class="count-badge">0</div><span class="text-xl">🔗</span>
+                            <span class="text-[8px] uppercase text-gray-400">Partilhar</span>
+                        </button>
+                    </div>
+
+                    <div id="section-${p.id}" class="hidden mt-2 p-2 bg-gray-50 rounded-lg">
+                        <div id="list-${p.id}" class="text-[9px] uppercase font-bold space-y-1 mb-2 max-h-32 overflow-y-auto"></div>
+                        <div class="flex gap-2">
+                            <input id="in-${p.id}" type="text" placeholder="ESCREVE..." class="flex-1 text-[10px] p-2 border rounded font-black uppercase">
+                            <button onclick="sendComment('${p.id}')" class="bg-blue-600 text-white px-4 rounded font-black text-[10px]">OK</button>
                         </div>
-                    </div>`;
-                }
+                    </div>
+                </div>`;
             }
+        }
+
+        // FUNÇÃO CENTRAL DE GANHOS (Soma e persiste no Supabase)
+        async function handleAction(valor, postId, tipo) {
+            userSaldo += valor;
+            updateUI();
+            
+            // Persistir o novo saldo acumulado no Supabase
+            await sb.from('perfis').update({ saldo: userSaldo }).eq('id', MASTER_ID);
+            
+            // Feedback visual rápido
+            console.log(`Ganhou ${valor} por ${tipo} no post ${postId}`);
+        }
+
+        async function sendComment(pid) {
+            const input = document.getElementById(`in-${pid}`);
+            if(!input.value) return;
+
+            const content = input.value;
+            input.value = "";
+
+            // 1. Grava comentário no Supabase
+            const { error } = await sb.from('comentarios').insert([
+                { post_id: pid, user_id: MASTER_ID, content: content }
+            ]);
+
+            if(!error) {
+                // 2. Aplica ganho de comentário
+                await handleAction(0.0010, pid, 'comment');
+                // 3. Atualiza apenas a seção de comentários do post
+                renderComments(pid);
+            }
+        }
+
+        async function renderComments(pid) {
+            const { data } = await sb.from('comentarios').select('content').eq('post_id', pid);
+            const list = document.getElementById(`list-${pid}`);
+            const badge = document.getElementById(`badge-${pid}`);
+            
+            if(data) {
+                list.innerHTML = data.map(c => `<div class="bg-white p-2 rounded border shadow-sm">${c.content}</div>`).join('');
+                badge.innerText = data.length;
+            }
+        }
+
+        function toggleCommentSection(pid) {
+            const sec = document.getElementById(`section-${pid}`);
+            sec.classList.toggle('hidden');
+            if(!sec.classList.contains('hidden')) renderComments(pid);
+        }
+
+        function updateUI() {
+            const eur = userSaldo.toFixed(4);
+            document.getElementById('main-eur').innerText = eur + "€";
+            document.getElementById('wall-eur').innerText = eur + "€";
+            document.getElementById('main-brl').innerText = (userSaldo * 6.12).toFixed(4) + " BRL";
+        }
+
+        function nav(t) {
+            document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
+            document.getElementById('view-'+t).classList.add('active');
+            event.currentTarget.classList.add('active');
         }
 
         window.onload = init;
