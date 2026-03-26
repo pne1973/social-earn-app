@@ -3,118 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Social v32.6</title>
+    <title>Apex Social v32.7 - Production Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #1a73e8; --success: #1e8e3e; --bg: #f8f9fa; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #202124; }
+        :root { --google-blue: #1a73e8; --google-red: #ea4335; --google-yellow: #fbbc04; --google-green: #34a853; --bg: #f8f9fa; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); margin: 0; color: #202124; padding-bottom: 60px; }
         
-        /* LOGIN */
-        #auth-screen { position: fixed; inset: 0; background: white; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .login-card { text-align: center; padding: 30px; border: 1px solid #dadce0; border-radius: 12px; width: 320px; }
-        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #dadce0; border-radius: 8px; box-sizing: border-box; }
-        .btn-blue { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        /* AUTH & TUTORIAL */
+        #auth-screen, #tutorial { position: fixed; inset: 0; background: white; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 20px; text-align: center; }
+        
+        /* HEADER STYLE GOOGLE */
+        header { background: white; padding: 12px; border-bottom: 1px solid #dadce0; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 2px rgba(60,64,67,0.1); }
+        .nav-container { max-width: 500px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .balance-box { text-align: center; flex-grow: 1; }
+        .main-balance { font-size: 1.6rem; font-weight: 700; color: var(--google-green); }
+        
+        /* FEED & POSTS */
+        .feed { max-width: 500px; margin: 15px auto; padding: 0 10px; }
+        .post { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 15px; overflow: hidden; transition: 0.2s; }
+        .post-content { padding: 15px; font-size: 1rem; line-height: 1.5; }
+        .post img { width: 100%; display: block; border-top: 1px solid #f1f3f4; }
+        
+        /* GAMIFICATION BUTTONS */
+        .actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #f1f3f4; }
+        .btn-act { padding: 12px; border: none; background: white; cursor: pointer; font-weight: 500; color: #5f6368; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-act:active { background: #f1f3f4; }
+        .btn-act.like { color: var(--google-blue); }
 
-        /* HEADER */
-        header { background: white; padding: 15px; border-bottom: 1px solid #dadce0; position: sticky; top: 0; text-align: center; z-index: 99; }
-        .balance { font-size: 1.8rem; font-weight: 700; color: var(--success); }
-        .user-info { font-size: 0.7rem; color: #70757a; margin-top: 5px; font-weight: bold; }
-        .logout { position: absolute; right: 15px; top: 20px; font-size: 0.75rem; color: #d93025; cursor: pointer; font-weight: bold; }
-
-        .feed { max-width: 500px; margin: 20px auto; padding: 0 10px; }
-        .post { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 15px; padding: 15px; }
-        .post img { width: 100%; border-radius: 8px; margin-top: 10px; }
-        .btn-action { width: 100%; margin-top: 15px; padding: 12px; border: 1px solid #dadce0; border-radius: 8px; background: #fff; cursor: pointer; font-weight: bold; color: var(--primary); }
+        /* EARNINGS TABLE */
+        .earnings-info { font-size: 0.75rem; color: #70757a; margin-top: 4px; }
+        .logout-btn { font-size: 0.7rem; color: var(--google-red); cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div id="auth-screen" style="display:none;">
-    <div class="login-card">
-        <h2 style="color:var(--primary); margin:0;">Apex Social</h2>
-        <p style="color:#5f6368; font-size:0.9rem;">Insira o seu ID para carregar saldo</p>
-        <input type="text" id="user-field" placeholder="Ex: joao_123">
-        <button class="btn-blue" onclick="doLogin()">ENTRAR</button>
-    </div>
+    <h1 style="color:var(--google-blue); margin-bottom:10px;">Apex Social</h1>
+    <p>Introduza o seu ID Único</p>
+    <input type="text" id="uid-input" placeholder="ID ou Username" style="padding:12px; border-radius:8px; border:1px solid #dadce0; width:280px; margin-bottom:15px;">
+    <button onclick="login()" style="background:var(--google-blue); color:white; border:none; padding:12px 40px; border-radius:24px; font-weight:bold; cursor:pointer;">ACEDER</button>
 </div>
 
-<header id="app-header" style="display:none;">
-    <span class="logout" onclick="doLogout()">SAIR</span>
-    <div class="balance" id="val-saldo">0.0000€</div>
-    <div class="user-info" id="val-user">A CONECTAR...</div>
+<header id="main-header" style="display:none;">
+    <div class="nav-container">
+        <div class="logout-btn" onclick="logout()">SAIR</div>
+        <div class="balance-box">
+            <div class="main-balance" id="balance-display">0.0000€</div>
+            <div class="earnings-info" id="conversion-display">R$ 0.00</div>
+        </div>
+        <div style="width:30px;"></div> 
+    </div>
 </header>
 
-<div class="feed" id="app-feed" style="display:none;"></div>
+<div class="feed" id="main-feed" style="display:none;">
+    </div>
 
 <script>
+    // CONFIGURAÇÃO MASTER
     const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
     const sb = supabase.createClient(SB_URL, SB_KEY);
 
+    const GAMIFICATION = { POST: 0.0015, LIKE: 0.0002, SHARE: 0.0005, CHECKIN: 0.0005 }; //
+    const RATE_BRL = 6.1245; // 4 casas decimais conforme especificação
+    
     let currentUID = localStorage.getItem('apex_uid');
-    let account = { saldo: 0.0000 };
+    let user = { saldo: 0.0000 };
 
-    function doLogin() {
-        const id = document.getElementById('user-field').value.trim();
-        if(id) { localStorage.setItem('apex_uid', id); location.reload(); }
+    function login() {
+        const val = document.getElementById('uid-input').value.trim();
+        if(val) { localStorage.setItem('apex_uid', val); location.reload(); }
     }
-    function doLogout() { localStorage.removeItem('apex_uid'); location.reload(); }
+    function logout() { localStorage.removeItem('apex_uid'); location.reload(); }
 
-    async function start() {
+    async function init() {
         if (!currentUID) { document.getElementById('auth-screen').style.display = 'flex'; return; }
-        document.getElementById('app-header').style.display = 'block';
-        document.getElementById('app-feed').style.display = 'block';
-
-        // Tenta buscar ou criar perfil (Upsert silencioso)
-        const { data } = await sb.from('perfis').select('saldo').eq('id', currentUID).single();
         
+        document.getElementById('main-header').style.display = 'block';
+        document.getElementById('main-feed').style.display = 'block';
+
+        // Sincronização com Supabase (v32.6 fix)
+        const { data } = await sb.from('perfis').select('saldo').eq('id', currentUID).single();
         if (data) {
-            account.saldo = parseFloat(data.saldo) || 0;
+            user.saldo = parseFloat(data.saldo) || 0;
         } else {
-            // Se for ID novo, cria imediatamente no banco
             await sb.from('perfis').insert([{ id: currentUID, saldo: 0.0000 }]);
         }
-        
-        updateUI();
-        loadPosts();
+
+        updateDisplay();
+        loadContent();
     }
 
-    function updateUI() {
-        const locale = navigator.language || "pt-PT";
-        const isBR = locale.includes("BR");
-        const val = isBR ? (account.saldo * 6.12) : account.saldo;
-        
-        document.getElementById('val-saldo').innerText = new Intl.NumberFormat(locale, {
-            style: 'currency', currency: isBR ? "BRL" : "EUR", minimumFractionDigits: isBR ? 2 : 4
-        }).format(val);
-        
-        document.getElementById('val-user').innerText = "UTILIZADOR: " + currentUID;
+    function updateDisplay() {
+        const brl = (user.saldo * RATE_BRL).toFixed(2);
+        document.getElementById('balance-display').innerText = user.saldo.toFixed(4) + "€";
+        document.getElementById('conversion-display').innerText = "R$ " + brl + " • ID: " + currentUID;
     }
 
-    async function earn(amt) {
-        account.saldo = parseFloat((account.saldo + amt).toFixed(4));
-        updateUI();
+    async function applyGain(type) {
+        const value = GAMIFICATION[type] || 0;
+        user.saldo = parseFloat((user.saldo + value).toFixed(4));
+        updateDisplay();
         
-        // UPSERT garante que o saldo seja guardado para o ID ativo
-        const { error } = await sb.from('perfis').upsert({ id: currentUID, saldo: account.saldo });
-        if(error) console.error("Erro ao guardar:", error.message);
+        // Gravação garantida via Upsert
+        await sb.from('perfis').upsert({ id: currentUID, saldo: user.saldo });
     }
 
-    async function loadPosts() {
-        const { data: list } = await sb.from('posts').select('*').order('id', { ascending: false }).limit(10);
-        const feed = document.getElementById('app-feed');
-        if (list) {
-            feed.innerHTML = list.map(p => `
+    async function loadContent() {
+        const { data: posts } = await sb.from('posts').select('*').order('id', { ascending: false }).limit(10);
+        const feed = document.getElementById('main-feed');
+        
+        if (posts) {
+            feed.innerHTML = posts.map(p => `
                 <div class="post">
-                    <p>${p.content || ''}</p>
-                    ${p.image_url ? `<img src="${p.image_url}">` : ''}
-                    <button class="btn-action" onclick="earn(0.0015)">👍 CURTIR (+0.0015€)</button>
+                    <div class="post-content">${p.content || ''}</div>
+                    ${p.image_url ? `<img src="${p.image_url}" alt="Post Image">` : ''}
+                    <div class="actions">
+                        <button class="btn-act like" onclick="applyGain('LIKE')">👍 Like (+0.0002€)</button>
+                        <button class="btn-act" onclick="applyGain('SHARE')">💬 Share (+0.0005€)</button>
+                    </div>
                 </div>
             `).join('');
         }
     }
 
-    start();
+    init();
 </script>
 </body>
 </html>
