@@ -6,13 +6,13 @@
     <title>Social Earn Network v33.12 - Production Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=EUR"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; --g-yellow: #FBBC05; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin-bottom: 12px; transition: transform 0.2s; }
         
-        /* ANIMAÇÃO DE GANHOS */
         #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes popUp {
             0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
@@ -21,18 +21,14 @@
         }
         .earning-text { font-size: 3.5rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52,168,83,0.4); -webkit-text-stroke: 1.5px white; }
 
-        /* UI DE ANÚNCIOS */
         #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
         .modal-300-250 { width: 310px; background: white; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
 
-        /* STATUS E HEADER */
         .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; }
         
-        /* PUBLICADOR FIXO REDUZIDO */
         .publisher-fixed { position: fixed; top: 120px; left: 0; right: 0; z-index: 280; background: #f1f3f4; padding: 8px 16px; border-bottom: 1px solid #dadce0; }
         .mini-input-box { background: white; border: 1px solid #dadce0; border-radius: 24px; padding: 8px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
 
-        /* NAVEGAÇÃO E FEED */
         #feed-container { margin-top: 185px; padding: 0 16px; }
         .nav-item { transition: all 0.3s; color: #5f6368; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
@@ -40,11 +36,9 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ADMIN STYLES */
         .profit-card { background: #1a0b2e; color: white; border-radius: 16px; padding: 24px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); }
         .admin-stat-card { background: white; border-radius: 12px; padding: 16px; text-align: center; border-bottom: 4px solid #eee; }
         
-        /* INTERAÇÕES */
         .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0; position: relative; border: none; background: transparent; cursor: pointer; border-radius: 8px; }
         .interaction-btn:active { background: #f8f9fa; transform: scale(0.95); }
         .count-badge { position: absolute; top: 4px; right: 25%; background: var(--g-red); color: white; font-size: 10px; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 900; border: 2px solid white; }
@@ -132,9 +126,9 @@
                 <h1 id="wall-eur" class="text-6xl font-black text-blue-600 tracking-tighter mb-2">0.0000€</h1>
                 <p id="wall-brl-sub" class="text-xs font-black text-gray-300 uppercase mb-8">0.0000 BRL</p>
                 
-                <div id="withdraw-area" class="mt-4 hidden animate-bounce">
-                    <input id="pp-email" type="email" placeholder="TEU EMAIL PAYPAL" class="w-full border-2 border-blue-100 rounded-xl p-4 text-center mb-3 font-black uppercase text-xs outline-none focus:border-blue-600">
-                    <button onclick="requestWithdraw()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-[11px] uppercase shadow-lg">Solicitar Levantamento PayPal</button>
+                <div id="withdraw-area" class="mt-4 hidden">
+                    <p class="text-[10px] font-black text-blue-600 uppercase mb-4 tracking-tighter">Levantamento Disponível via PayPal</p>
+                    <div id="paypal-button-container"></div>
                 </div>
 
                 <div id="progress-container" class="pt-6 border-t border-dashed">
@@ -230,27 +224,15 @@
             if(activeID === ADMIN_MASTER) {
                 document.getElementById('nav-admin-btn').classList.remove('hidden');
                 document.getElementById('nav-wallet-btn').classList.add('hidden');
-                
-                // OCULTAR ELEMENTOS SELECIONADOS NAS IMAGENS (SOMENTE PARA ADMIN MASTER)
-                // Imagem 3: Área de publicação grande (azul com botão Publicar)
-                // No código base, esta área já está oculta no estado inicial pelo 'mini-pub'.
-                // Vamos garantir que ela não abra para o Admin.
-                const originalExpand = window.expandPublisher;
-                window.expandPublisher = function() {
-                    console.log("Acesso bloqueado para Admin.");
-                    return; // Impede a abertura
-                };
-                
-                // Imagem 4/5: Faixa de status (Verde ou Vermelha com botão Restaurar)
-                // A faixa inteira e o botão de restaurar devem sumir.
                 const statusBox = document.getElementById('status-text');
                 const restoreBtn = document.getElementById('restore-btn');
                 if(statusBox) statusBox.style.display = 'none';
                 if(restoreBtn) restoreBtn.style.display = 'none';
-                
-                // Ajustar CSS para preencher o espaço vazio no topo
                 document.getElementById('pub-fixed-container').style.top = '72px';
                 document.getElementById('feed-container').style.marginTop = '135px';
+            } else {
+                // INICIALIZA PAYPAL SE NÃO FOR ADMIN
+                initPayPal();
             }
 
             const { data } = await sb.from('perfis').select('*').eq('id', activeID).single();
@@ -259,6 +241,27 @@
 
             updateUI(); loadFeed();
             setInterval(updateUI, 1000);
+        }
+
+        function initPayPal() {
+            paypal.Buttons({
+                style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'paypal' },
+                createOrder: function(data, actions) {
+                    if(user.saldo < 5.0) return alert("SALDO INSUFICIENTE");
+                    return actions.order.create({
+                        purchase_units: [{ amount: { currency_code: 'EUR', value: user.saldo.toFixed(2) } }]
+                    });
+                },
+                onApprove: async function(data, actions) {
+                    return actions.order.capture().then(async function(details) {
+                        alert('Levantamento solicitado por: ' + details.payer.name.given_name);
+                        // Zera o saldo após o "pagamento" de levantamento
+                        user.saldo = 0;
+                        await sb.from('perfis').update({ saldo: 0 }).eq('id', activeID);
+                        updateUI();
+                    });
+                }
+            }).render('#paypal-button-container');
         }
 
         function updateUI() {
@@ -271,7 +274,7 @@
             const progress = (curSaldo / 5.0) * 100;
             document.getElementById('withdraw-progress').style.width = Math.min(progress, 100) + "%";
 
-            if(curSaldo >= 5.0) {
+            if(curSaldo >= 5.0 && activeID !== ADMIN_MASTER) {
                 document.getElementById('withdraw-area').classList.remove('hidden');
                 document.getElementById('progress-container').classList.add('hidden');
             } else {
@@ -279,11 +282,9 @@
                 document.getElementById('progress-container').classList.remove('hidden');
             }
 
-            // Apenas atualiza o status se não for o Admin Master (pois ocultamos a box no init)
             if (activeID !== ADMIN_MASTER) {
                 const statusBox = document.getElementById('status-text');
                 const restoreBtn = document.getElementById('restore-btn');
-                
                 if (user.multiplier < 1.0 && user.penaltyExpiry) {
                     const diff = new Date(user.penaltyExpiry) - new Date();
                     if (diff > 0) {
@@ -322,12 +323,6 @@
                     <td class="p-4 text-right"><button class="text-red-500 border border-red-100 px-3 py-1 rounded-lg text-[8px] font-black">BAN</button></td>
                 </tr>
             `).join('');
-        }
-
-        async function requestWithdraw() {
-            const email = document.getElementById('pp-email').value;
-            if(!email.includes('@')) return alert("INSIRA UM EMAIL PAYPAL VÁLIDO");
-            alert("SOLICITAÇÃO ENVIADA!");
         }
 
         function handleInteraction(type, val = 0, pid = null) {
@@ -482,6 +477,7 @@
         }
 
         function expandPublisher() { 
+            if(activeID === ADMIN_MASTER) return;
             document.getElementById('mini-pub').classList.add('hidden');
             document.getElementById('expanded-post').classList.remove('hidden');
         }
