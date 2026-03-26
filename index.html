@@ -3,170 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v41.2</title>
+    <title>Apex Social v37.2</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #2d6df6; --g-red: #ea4335; --bg-gray: #f8f9fa; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg-gray); margin: 0; padding-top: 180px; padding-bottom: 70px; }
-
-        /* HEADER SUPERIOR */
-        header { position: fixed; top: 0; width: 100%; height: 75px; background: white; border-bottom: 1px solid #e0e0e0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; }
-        .user-badge { width: 45px; height: 45px; background: var(--g-blue); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 900; font-style: italic; }
-        .status-tag { font-size: 10px; font-weight: 900; font-style: italic; }
-
-        /* PAINEL DE PUBLICAÇÃO FIXO */
-        .publisher-area { position: fixed; top: 75px; left: 0; right: 0; background: var(--bg-gray); padding: 12px 15px; z-index: 999; border-bottom: 1px solid #eee; }
-        .pub-card { background: white; border: 2.5px solid var(--g-blue); border-radius: 24px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-
-        /* FEED E CARDS */
-        #feed { padding: 10px 15px; display: flex; flex-direction: column; gap: 15px; }
-        .post-card { background: white; border-radius: 18px; border: 1px solid #dadce0; overflow: hidden; position: relative; }
-        .post-info { padding: 8px 12px; display: flex; justify-content: space-between; font-size: 9px; color: #bdc1c6; text-transform: uppercase; font-style: italic; border-bottom: 1px solid #f8f9fa; }
-        .post-text { padding: 15px; font-size: 13px; font-weight: 900; color: #3c4043; text-transform: uppercase; }
-
-        /* INTERAÇÕES COM BADGES (CONFORME SCREENSHOT) */
-        .interaction-row { display: flex; border-top: 1px solid #f1f3f4; }
-        .inter-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; cursor: pointer; position: relative; border-right: 1px solid #f1f3f4; }
-        .inter-item:last-child { border-right: none; }
-        .badge-red { position: absolute; top: 6px; right: 22%; background: var(--g-red); color: white; font-size: 10px; padding: 2px 7px; border-radius: 10px; border: 2.5px solid white; font-weight: 900; }
-        .inter-label { font-size: 9px; color: #70757a; font-weight: 900; text-transform: uppercase; margin-top: 4px; }
-
-        /* NAVEGAÇÃO INFERIOR */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; border-top: 1px solid #ddd; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
-        .nav-tab { font-size: 11px; font-weight: 900; color: #70757a; text-transform: uppercase; }
-        .nav-tab.active { color: var(--g-blue); border-bottom: 3px solid var(--g-blue); padding-bottom: 3px; }
-
-        /* MODAL DE ANÚNCIO */
-        #ad-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10001; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-box { background: white; border-radius: 28px; width: 100%; max-width: 360px; overflow: hidden; }
+        body { font-family: sans-serif; background: #f0f2f5; padding-top: 60px; }
+        .post-card { background: white; border-radius: 15px; margin: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
+        .img-container { width: 100%; background: #f8f8f8; display: flex; align-items: center; justify-content: center; }
+        .img-container img { width: 100%; height: auto; display: block; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="flex items-center gap-3">
-            <div class="user-badge shadow-sm">A</div>
-            <div>
-                <div class="text-[13px] font-black uppercase text-blue-600 leading-tight">Apex Social</div>
-                <div id="status-display" class="status-tag text-green-500">STATUS: 100% OK</div>
-            </div>
-        </div>
-        <div class="text-right">
-            <div id="val-eur" class="text-xl font-black text-green-600 leading-tight">0.0000€</div>
-            <div id="val-brl" class="text-[10px] font-black text-gray-400 italic">0.0000 BRL</div>
-        </div>
+    <header class="fixed top-0 w-full h-[55px] bg-white border-b flex items-center justify-between px-4 z-50">
+        <div class="font-black text-blue-600 uppercase tracking-taller">APEX SOCIAL</div>
+        <div id="u-saldo" class="font-black text-green-600">0.0000€</div>
     </header>
 
-    <div class="publisher-area">
-        <div class="pub-card">
-            <textarea id="post-input" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none text-[12px] font-black uppercase outline-none resize-none mb-3" rows="1"></textarea>
-            <button onclick="document.getElementById('file-up').click()" class="w-full border-2 border-dashed border-gray-200 py-3 rounded-xl text-[10px] font-black text-gray-400 mb-3 flex justify-center items-center gap-2 uppercase">
-                📸 Anexar Foto da Galeria
-            </button>
-            <input type="file" id="file-up" class="hidden" onchange="previewFile()">
-            <button onclick="publish()" id="btn-pub" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[11px] shadow-lg">Publicar Agora (+0.0150€)</button>
+    <main class="max-w-md mx-auto">
+        <div class="post-card p-4 border-t-4 border-blue-500">
+            <textarea id="txt-input" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none focus:ring-0 font-bold text-sm mb-3" rows="2"></textarea>
+            
+            <div id="status-lab" class="hidden text-center text-[10px] font-black mb-2 text-blue-500 uppercase">A preparar foto...</div>
+            
+            <div class="flex gap-2">
+                <label for="file-input" class="flex-1 bg-gray-100 p-3 rounded-xl text-center text-[10px] font-black cursor-pointer uppercase">📸 Foto</label>
+                <input type="file" id="file-input" accept="image/*" class="hidden" onchange="processarFoto()">
+                
+                <button onclick="enviarPublicacao()" id="btn-post" class="flex-[2] bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase shadow-lg shadow-blue-200">Publicar Agora</button>
+            </div>
         </div>
-    </div>
 
-    <main id="feed"></main>
-
-    <nav class="bottom-nav">
-        <div class="nav-tab active">Rede</div>
-        <div class="nav-tab">Ganhos</div>
-        <div class="nav-tab">Gestão</div>
-    </nav>
-
-    <div id="ad-modal">
-        <div class="modal-box p-6 text-center">
-            <h2 class="text-xl font-black text-blue-600 italic mb-4">VALIDAÇÃO OBRIGATÓRIA</h2>
-            <p class="text-[11px] font-black uppercase text-gray-400 mb-6">Aceite o anúncio patrocinado para manter o seu <span class="text-green-500">Status 100% OK</span> e garantir ganhos totais.</p>
-            <button onclick="handleAd(true)" class="w-full bg-green-500 text-white py-4 rounded-xl font-black uppercase text-xs mb-3 shadow-md">✅ MANTER STATUS: 100% OK</button>
-            <button onclick="handleAd(false)" class="text-[10px] font-black text-gray-300 uppercase">Ignorar e reduzir ganhos</button>
-        </div>
-    </div>
+        <div id="feed"></div>
+    </main>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6I..." // Chave Supabase
-        const _sb = window.supabase.createClient(SB_URL, SB_KEY);
-        const MASTER_ID = "5401881400";
-
-        let saldo = 0;
-        let cliques = 0;
-        let is100 = true;
-        let currentImg = "";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const _supabase = window.supabase.createClient(SB_URL, SB_KEY);
+        const USER_ID = "5401881400";
+        let stringImagem = "";
 
         async function init() {
-            const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) saldo = data.saldo;
-            renderAll(); loadPosts();
+            const { data } = await _supabase.from('perfis').select('saldo').eq('id', USER_ID).single();
+            if(data) document.getElementById('u-saldo').innerText = data.saldo.toFixed(4) + "€";
+            carregarPosts();
         }
 
-        function renderAll() {
-            document.getElementById('val-eur').innerText = saldo.toFixed(4) + "€";
-            document.getElementById('val-brl').innerText = (saldo * 6.1245).toFixed(4) + " BRL";
-            const st = document.getElementById('status-display');
-            st.innerText = is100 ? "STATUS: 100% OK" : "STATUS: 60% OK (BAIXO)";
-            st.className = `status-tag ${is100 ? 'text-green-500' : 'text-red-500'}`;
-        }
+        function processarFoto() {
+            const file = document.getElementById('file-input').files[0];
+            if (!file) return;
 
-        async function interaction(gain) {
-            cliques++;
-            if(cliques % 2 === 0) {
-                document.getElementById('ad-modal').style.display = 'flex';
-                return;
-            }
-            saldo += is100 ? gain : gain * 0.6;
-            renderAll();
-            await _sb.from('perfis').update({ saldo }).eq('id', MASTER_ID);
-        }
+            document.getElementById('status-lab').classList.remove('hidden');
+            document.getElementById('status-lab').innerText = "✅ Foto Processada";
 
-        function handleAd(accept) {
-            is100 = accept;
-            document.getElementById('ad-modal').style.display = 'none';
-            saldo += is100 ? 0.0005 : 0.0005 * 0.6;
-            renderAll();
-        }
-
-        function previewFile() {
-            const file = document.getElementById('file-up').files[0];
             const reader = new FileReader();
-            reader.onload = (e) => currentImg = e.target.result;
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Comprimir para 800px de largura mantendo proporção
+                    const larguraAlvo = 800;
+                    const escala = larguraAlvo / img.width;
+                    canvas.width = larguraAlvo;
+                    canvas.height = img.height * escala;
+                    
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // Converter para string de texto (JPEG 0.7 de qualidade)
+                    stringImagem = canvas.toDataURL('image/jpeg', 0.7);
+                };
+                img.src = e.target.result;
+            };
             reader.readAsDataURL(file);
         }
 
-        async function loadPosts() {
-            const { data } = await _sb.from('posts').select('*').order('created_at', { ascending: false });
+        async function enviarPublicacao() {
+            const texto = document.getElementById('txt-input').value;
+            const btn = document.getElementById('btn-post');
+            if(!texto) return;
+
+            btn.disabled = true;
+            btn.innerText = "A ENVIAR...";
+
+            // Enviamos a string da imagem diretamente para a coluna image_url
+            const { error } = await _supabase.from('posts').insert([{ 
+                user_id: USER_ID, 
+                content: texto, 
+                image_url: stringImagem 
+            }]);
+
+            if(!error) {
+                window.location.reload();
+            } else {
+                alert("Erro ao publicar. Verifique a sua ligação.");
+                btn.disabled = false;
+                btn.innerText = "Tentar Novamente";
+            }
+        }
+
+        async function carregarPosts() {
+            const { data } = await _supabase.from('posts').select('*').order('created_at', {ascending: false});
             const feed = document.getElementById('feed');
-            feed.innerHTML = "";
-            data?.forEach(p => {
-                const img = p.image_url ? `<img src="${p.image_url}" class="w-full border-b">` : "";
-                feed.innerHTML += `
-                    <div class="post-card shadow-sm">
-                        <div class="post-info"><span>Utilizador Master</span><span>#101</span></div>
-                        ${img}
-                        <div class="post-text">${p.content || ''}</div>
-                        <div class="interaction-row">
-                            <div class="inter-item" onclick="interaction(0.0002)"><div class="badge-red">4</div><span class="text-xl">👍</span><div class="inter-label">Gostar</div></div>
-                            <div class="inter-item" onclick="interaction(0.0005)"><div class="badge-red">0</div><span class="text-xl">💬</span><div class="inter-label">Comentar</div></div>
-                            <div class="inter-item" onclick="interaction(0.0010)"><div class="badge-red">0</div><span class="text-xl">🔗</span><div class="inter-label">Partilhar</div></div>
-                        </div>
-                    </div>`;
-            });
+            feed.innerHTML = data?.map(p => `
+                <div class="post-card">
+                    ${p.image_url ? `<div class="img-container"><img src="${p.image_url}"></div>` : ''}
+                    <div class="p-4 text-xs font-bold text-gray-700 uppercase leading-relaxed">${p.content}</div>
+                </div>
+            `).join('') || "";
         }
 
-        async function publish() {
-            const txt = document.getElementById('post-input').value;
-            if(!txt && !currentImg) return;
-            document.getElementById('btn-pub').innerText = "A PROCESSAR...";
-            await _sb.from('posts').insert([{ user_id: MASTER_ID, content: txt, image_url: currentImg }]);
-            saldo += is100 ? 0.0150 : 0.0150 * 0.6;
-            window.location.reload();
-        }
-
-        window.onload = init;
+        init();
     </script>
 </body>
 </html>
