@@ -11,39 +11,20 @@
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
-        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
-        @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
-        .earning-text { font-size: 3rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52,168,83,0.4); -webkit-text-stroke: 1.5px white; }
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; position: relative; border: none; background: transparent; cursor: pointer; }
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; position: relative; }
         .count-badge { position: absolute; top: 2px; right: 28%; background: var(--g-red); color: white; font-size: 9px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 900; border: 1.5px solid white; }
-        .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #eee; width: 100%; }
-        .comment-section.active { display: flex; flex-direction: column; }
-        .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 45px; }
-        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 5000; align-items: center; justify-content: center; }
-        .modal-300-250 { width: 300px; background: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+        .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px 16px; display: flex; align-items: center; justify-content: center; min-height: 45px; }
         .publisher-area { margin-top: 130px; padding: 0 16px; margin-bottom: 12px; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
+        @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
     </style>
 </head>
 <body class="pb-24">
-    <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
-    <div id="ad-overlay">
-        <div id="ad-decision-ui" class="modal-300-250 p-6 text-center">
-            <h3 class="text-[11px] font-black uppercase text-blue-600 mb-2">Manter Ganhos a 100%</h3>
-            <p class="text-[10px] leading-tight font-bold mb-6 text-gray-400">Vê um anúncio para não perderes o multiplicador de ganhos atual.</p>
-            <button onclick="startAdFlow()" class="w-full py-4 bg-blue-600 text-white rounded-lg shadow-md uppercase text-[11px] mb-2 font-black">Ver Anúncio (15s)</button>
-            <button onclick="degradeGains()" class="w-full py-2 text-gray-300 uppercase text-[9px] font-black italic">Reduzir ganhos temporariamente</button>
-        </div>
-        <div id="ad-player-ui" class="modal-300-250 hidden">
-            <div class="flex-1 bg-black flex flex-col items-center justify-center text-white">
-                <div id="ad-timer-circle" class="font-black text-5xl mb-1">15</div>
-                <p class="text-[8px] text-gray-500 uppercase font-black">Anúncio em curso</p>
-            </div>
-            <button id="close-ad-btn" disabled class="h-14 bg-gray-200 text-gray-400 uppercase text-[10px] font-black">A carregar prémio...</button>
-        </div>
-    </div>
+
+    <div id="floating-earning"><div class="text-3xl font-black text-green-600" id="earning-val">+0.0000€</div></div>
 
     <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
@@ -57,27 +38,27 @@
     </header>
 
     <div class="status-header-fixed">
-        <div id="status-text" class="text-[9px] font-black uppercase text-green-600 text-center leading-none">100% de Ganhos Ativos</div>
-        <button id="restore-btn" onclick="startAdFlow(true)" class="hidden bg-red-600 text-white px-3 py-1.5 rounded-lg text-[8px] font-black uppercase animate-pulse">Restaurar 100%</button>
+        <div id="status-text" class="text-[9px] font-black uppercase text-green-600">Sincronizado com Supabase</div>
     </div>
 
     <main class="max-w-lg mx-auto">
         <section id="view-social" class="tab-content active">
             <div class="publisher-area">
                 <div class="google-card p-3 border-t-4 border-blue-600">
-                    <textarea id="post-input" onclick="expandPublisher()" placeholder="PARTILHE ALGO COM A REDE..." class="w-full border-none focus:ring-0 text-[11px] mb-1 resize-none uppercase font-black" rows="1"></textarea>
+                    <textarea id="post-input" placeholder="PARTILHE ALGO COM A REDE..." class="w-full border-none focus:ring-0 text-[11px] mb-1 resize-none uppercase font-black" rows="1" onclick="this.rows=3; document.getElementById('expanded-post').classList.remove('hidden')"></textarea>
                     <div id="expanded-post" class="hidden">
-                        <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-50 border-none text-[10px] p-2 rounded-lg mb-2 font-black uppercase">
-                        <button onclick="handleInteraction('post')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black text-[11px] uppercase">Publicar Post</button>
+                        <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full bg-gray-50 border-none text-[10px] p-2 rounded-lg mb-2 font-black">
+                        <button onclick="publishPost()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black text-[11px] uppercase">Publicar</button>
                     </div>
                 </div>
             </div>
-            <div id="feed-container" class="px-4"></div>
+            <div id="feed-container" class="px-4">
+                </div>
         </section>
 
         <section id="view-info" class="tab-content px-4 mt-24">
             <div class="google-card p-10 text-center border-t-[10px] border-blue-600">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Saldo em Carteira</p>
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Saldo Total Real</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
             </div>
         </section>
@@ -93,158 +74,95 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const MASTER_ID = "5401881400";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
-        
-        let user = { saldo: 0, interactions: 0, postsToday: 0, multiplier: 1.0, penaltyExpiry: null };
-        let pendingAction = null;
+
+        let userSaldo = 0.0000;
 
         async function init() {
-            // Sincronização Real de Saldo
+            console.log("A iniciar ligação ao Supabase...");
+            // Buscar Saldo Real
             const { data, error } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) user.saldo = parseFloat(data.saldo);
-            updateUI(); 
-            loadFeed();
-            setInterval(updateUI, 1000);
+            if (error) console.error("Erro ao ler saldo:", error);
+            if (data) userSaldo = parseFloat(data.saldo);
+            
+            updateUI();
+            fetchFeed();
         }
 
         function updateUI() {
-            document.getElementById('main-eur').innerText = user.saldo.toFixed(4) + "€";
-            document.getElementById('wall-eur').innerText = user.saldo.toFixed(4) + "€";
-            document.getElementById('main-brl').innerText = (user.saldo * 6.12).toFixed(4) + " BRL";
+            const val = userSaldo.toFixed(4);
+            document.getElementById('main-eur').innerText = val + "€";
+            document.getElementById('wall-eur').innerText = val + "€";
+            document.getElementById('main-brl').innerText = (userSaldo * 6.12).toFixed(4) + " BRL";
+        }
+
+        async function fetchFeed() {
+            const { data: posts, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+            if (error) console.error("Erro ao ler feed:", error);
             
-            const statusBox = document.getElementById('status-text');
-            const restoreBtn = document.getElementById('restore-btn');
-            
-            if (user.multiplier < 1.0 && user.penaltyExpiry) {
-                const now = new Date();
-                const diff = user.penaltyExpiry - now;
-                if (diff > 0) {
-                    statusBox.innerText = `${user.multiplier * 100}% DE GANHOS ATÉ ${new Date(user.penaltyExpiry).toLocaleTimeString()}`;
-                    statusBox.className = "text-[9px] font-black uppercase text-red-600";
-                    restoreBtn.classList.remove('hidden');
-                } else { resetState(); }
-            } else {
-                statusBox.innerText = "100% de Ganhos Ativos";
-                statusBox.className = "text-[9px] font-black uppercase text-green-600";
-                restoreBtn.classList.add('hidden');
-            }
-        }
-
-        async function handleInteraction(type, val = 0, pid = null) {
-            if ((user.interactions >= 2 || user.postsToday >= 3) && user.multiplier === 1.0) {
-                pendingAction = { type, val, pid };
-                document.getElementById('ad-overlay').style.display = 'flex';
-            } else { executeAction(type, val, pid); }
-        }
-
-        async function executeAction(type, val, pid) {
-            if (type === 'post') await publish();
-            else if (type === 'comment') { user.interactions++; await addComment(pid); }
-            else { user.interactions++; applyGain(val); }
-        }
-
-        async function applyGain(val) {
-            const final = val * user.multiplier;
-            user.saldo += final;
-            showBigNumber(final);
-            updateUI();
-            await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
-        }
-
-        async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const container = document.getElementById('feed-container');
-            if(!posts) return;
-            container.innerHTML = posts.map(p => `
-                <div class="google-card shadow-sm">
-                    <div class="p-5">
-                        <p class="text-[13px] font-black uppercase text-gray-800 mb-4">${p.content}</p>
-                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 border">` : ''}
-                        <div class="flex border-t pt-2">
-                            <button onclick="handleInteraction('like', 0.0006)" class="interaction-btn">
-                                <div class="count-badge">0</div><span class="text-lg">👍</span><span class="text-[8px] uppercase font-black text-gray-400">Gostar</span>
-                            </button>
-                            <button onclick="toggleComments('${p.id}')" class="interaction-btn border-x">
-                                <div class="count-badge" id="badge-${p.id}">0</div><span class="text-lg">💬</span><span class="text-[8px] uppercase font-black text-gray-400">Comentar</span>
-                            </button>
-                            <button onclick="handleInteraction('share', 0.0020)" class="interaction-btn">
-                                <div class="count-badge">0</div><span class="text-lg">🔗</span><span class="text-[8px] uppercase font-black text-gray-400">Partilhar</span>
-                            </button>
+            container.innerHTML = ""; // Limpa dados de exemplo
+
+            if (posts) {
+                for (const post of posts) {
+                    // Buscar contagem real de comentários para este post
+                    const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', post.id);
+                    
+                    const card = `
+                        <div class="google-card shadow-sm p-5">
+                            <p class="text-[13px] font-black uppercase text-gray-800 mb-4">${post.content}</p>
+                            ${post.image_url ? `<img src="${post.image_url}" class="w-full rounded-xl mb-4 border">` : ''}
+                            <div class="flex border-t pt-2">
+                                <button onclick="addGain(0.0006)" class="interaction-btn">
+                                    <div class="count-badge">0</div><span>👍</span><span class="text-[8px] uppercase text-gray-400">Gostar</span>
+                                </button>
+                                <button class="interaction-btn border-x">
+                                    <div class="count-badge">${count || 0}</div><span>💬</span><span class="text-[8px] uppercase text-gray-400">Comentar</span>
+                                </button>
+                                <button onclick="addGain(0.0020)" class="interaction-btn">
+                                    <div class="count-badge">0</div><span>🔗</span><span class="text-[8px] uppercase text-gray-400">Partilhar</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div id="comments-${p.id}" class="comment-section">
-                        <div id="list-${p.id}" class="p-4 space-y-2 max-h-40 overflow-y-auto text-[10px] font-bold uppercase"></div>
-                        <div class="p-2 bg-white border-t flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="ESCREVE..." class="flex-1 bg-gray-50 rounded p-2 text-[10px] font-black border-none outline-none">
-                            <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-3 rounded font-black text-[10px]">OK</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            posts.forEach(p => updateCount(p.id));
-        }
-
-        async function addComment(pid) {
-            const input = document.getElementById(`in-${pid}`);
-            const val = input.value;
-            if(!val) return;
-            const { error } = await sb.from('comentarios').insert([{ post_id: pid, user_id: MASTER_ID, content: val }]);
-            if(!error) { 
-                input.value = ""; 
-                applyGain(0.0010); 
-                updateComments(pid); 
-            }
-        }
-
-        async function updateComments(pid) {
-            const { data } = await sb.from('comentarios').select('*').eq('post_id', pid).order('created_at', {ascending: true});
-            if(data) {
-                document.getElementById(`list-${pid}`).innerHTML = data.map(c => `<div class="bg-white p-2 rounded border shadow-sm">${c.content}</div>`).join('');
-                updateCount(pid);
-            }
-        }
-
-        async function updateCount(pid) {
-            const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', pid);
-            const badge = document.getElementById(`badge-${pid}`);
-            if(badge) badge.innerText = count || 0;
-        }
-
-        async function publish() {
-            const content = document.getElementById('post-input').value;
-            if(!content) return;
-            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content, image_url: document.getElementById('post-url').value }]);
-            if(!error) { 
-                user.postsToday++; 
-                applyGain(0.0150); 
-                document.getElementById('post-input').value = ""; 
-                document.getElementById('expanded-post').classList.add('hidden'); 
-                loadFeed(); 
-            }
-        }
-
-        // Funções de UI e Anúncios (Mantidas conforme base)
-        function startAdFlow(direct = false) {
-            document.getElementById('ad-decision-ui').classList.add('hidden');
-            document.getElementById('ad-player-ui').classList.remove('hidden');
-            let time = 15;
-            const timer = setInterval(() => {
-                time--; document.getElementById('ad-timer-circle').innerText = time;
-                if(time <= 0) {
-                    clearInterval(timer);
-                    const btn = document.getElementById('close-ad-btn');
-                    btn.disabled = false; btn.innerText = "RECOMPENSA ATIVA";
-                    btn.className = "h-14 bg-green-600 text-white font-black uppercase text-[10px]";
-                    btn.onclick = () => { resetState(); if (!direct && pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid); closeAd(); };
+                    `;
+                    container.innerHTML += card;
                 }
-            }, 1000);
+            }
         }
-        function degradeGains() { user.multiplier = user.multiplier > 0.5 ? 0.5 : 0.05; user.penaltyExpiry = new Date(Date.now() + 86400000); if (pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid); closeAd(); }
-        function closeAd() { document.getElementById('ad-overlay').style.display = 'none'; document.getElementById('close-ad-btn').disabled = true; pendingAction = null; }
-        function resetState() { user.multiplier = 1.0; user.penaltyExpiry = null; user.interactions = 0; updateUI(); }
-        function toggleComments(id) { document.getElementById(`comments-${id}`).classList.toggle('active'); updateComments(id); }
-        function showBigNumber(val) { const c = document.getElementById('floating-earning'); document.getElementById('earning-val').innerText = "+" + val.toFixed(4) + "€"; c.style.display = 'block'; setTimeout(() => c.style.display = 'none', 800); }
-        function nav(t) { document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active')); document.getElementById('view-'+t).classList.add('active'); event.currentTarget.classList.add('active'); }
-        function expandPublisher() { document.getElementById('expanded-post').classList.remove('hidden'); document.getElementById('post-input').rows = 3; }
+
+        async function addGain(val) {
+            userSaldo += val;
+            updateUI();
+            showPopup(val);
+            await sb.from('perfis').update({ saldo: userSaldo }).eq('id', MASTER_ID);
+        }
+
+        async function publishPost() {
+            const content = document.getElementById('post-input').value;
+            const img = document.getElementById('post-url').value;
+            if (!content) return;
+
+            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content, image_url: img }]);
+            if (!error) {
+                document.getElementById('post-input').value = "";
+                document.getElementById('expanded-post').classList.add('hidden');
+                addGain(0.0150);
+                fetchFeed();
+            }
+        }
+
+        function showPopup(val) {
+            const p = document.getElementById('floating-earning');
+            document.getElementById('earning-val').innerText = "+" + val.toFixed(4) + "€";
+            p.style.display = 'block';
+            setTimeout(() => p.style.display = 'none', 800);
+        }
+
+        function nav(t) {
+            document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
+            document.getElementById('view-' + t).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
         window.onload = init;
     </script>
 </body>
