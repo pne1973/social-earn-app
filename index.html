@@ -11,7 +11,7 @@
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
         
-        /* FIX: Estrutura de Card Flexível para Textos Longos */
+        /* FIX DE LAYOUT PARA TEXTOS LONGOS */
         .google-card { 
             background: white; 
             border: 1px solid #dadce0; 
@@ -21,12 +21,11 @@
             display: flex; 
             flex-direction: column; 
             width: 100%;
-            transition: transform 0.2s;
         }
 
         .post-text-container {
             padding: 20px;
-            word-break: break-word; /* Resolve o problema do texto desorganizado */
+            word-break: break-word; /* Resolve a quebra de layout de textos gigantes */
             overflow-wrap: break-word;
             font-size: 14px;
             line-height: 1.5;
@@ -43,11 +42,10 @@
         }
         .earning-text { font-size: 3rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52,168,83,0.4); -webkit-text-stroke: 1.5px white; }
 
-        .interaction-row { display: flex; border-top: 1px solid #f1f3f4; margin-top: auto; }
+        .interaction-row { display: flex; border-top: 1px solid #f1f3f4; }
         .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0; border: none; background: transparent; cursor: pointer; position: relative; }
         .interaction-badge { position: absolute; top: 5px; right: 20%; background: var(--g-red); color: white; font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 900; border: 2px solid white; }
 
-        /* Barra de Status e Modais */
         .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; }
         #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; }
         .modal-300-250 { width: 300px; background: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
@@ -57,7 +55,6 @@
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
         .comment-section { background: #f8f9fa; border-top: 1px solid #eee; display: none; }
         .comment-section.active { display: block; }
     </style>
@@ -68,18 +65,17 @@
 
     <div id="ad-overlay">
         <div id="ad-decision-ui" class="modal-300-250 p-6 text-center">
-            <h3 class="text-[11px] font-black uppercase text-blue-600 mb-2">Bónus de Ganhos</h3>
-            <p class="text-[10px] leading-tight font-bold mb-6 text-gray-400">Assiste a um anúncio para manteres os teus ganhos a 100%.</p>
+            <h3 class="text-[11px] font-black uppercase text-blue-600 mb-2">Manter Ganhos a 100%</h3>
+            <p class="text-[10px] leading-tight font-bold mb-6 text-gray-400">Vê um anúncio para não perderes o bónus de ganhos atual.</p>
             <button onclick="startAdFlow()" class="w-full py-4 bg-blue-600 text-white rounded-lg shadow-md uppercase text-[11px] mb-2 font-black">Ver Anúncio (15s)</button>
-            <button onclick="degradeGains()" class="w-full py-2 text-gray-300 uppercase text-[9px] font-black italic">Aceito redução de ganhos</button>
+            <button onclick="degradeGains()" class="w-full py-2 text-gray-300 uppercase text-[9px] font-black italic">Aceito a redução</button>
         </div>
-
         <div id="ad-player-ui" class="modal-300-250 hidden">
-            <div class="flex-1 bg-black flex flex-col items-center justify-center text-white p-4">
+            <div class="flex-1 bg-black flex flex-col items-center justify-center text-white p-4 text-center">
                 <div id="ad-timer-circle" class="font-black text-5xl mb-2">15</div>
-                <p class="text-[8px] text-gray-400 uppercase font-black tracking-widest">Publicidade</p>
+                <p class="text-[8px] text-gray-400 uppercase font-black">A carregar publicidade...</p>
             </div>
-            <button id="close-ad-btn" disabled class="h-14 bg-gray-200 text-gray-400 uppercase text-[10px] font-black italic">A carregar...</button>
+            <button id="close-ad-btn" disabled class="h-14 bg-gray-200 text-gray-400 uppercase text-[10px] font-black italic">Aguarde...</button>
         </div>
     </div>
 
@@ -95,7 +91,7 @@
     </header>
 
     <div class="status-header-fixed">
-        <div id="status-text" class="text-[9px] font-black uppercase text-green-600 text-center leading-tight">100% de Ganhos Ativos</div>
+        <div id="status-text" class="text-[9px] font-black uppercase text-green-600 text-center">100% de Ganhos Ativos</div>
         <button id="restore-btn" onclick="startAdFlow(true)" class="hidden bg-red-600 text-white px-4 py-2 rounded-lg text-[9px] font-black uppercase animate-pulse shadow-md">Restaurar 100%</button>
     </div>
 
@@ -105,8 +101,8 @@
                 <div class="google-card p-3 border-t-4 border-blue-600 shadow-md">
                     <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 text-[12px] mb-1 resize-none uppercase font-black" rows="1"></textarea>
                     <div id="expanded-post" class="hidden">
-                        <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full bg-gray-50 border-none text-[10px] p-2 rounded-lg mb-2 font-black uppercase outline-none">
-                        <button onclick="handleInteraction('post')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black text-[11px] uppercase shadow-sm">Publicar Agora</button>
+                        <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-50 border-none text-[10px] p-2 rounded-lg mb-2 font-black uppercase outline-none">
+                        <button onclick="handleInteraction('post')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black text-[11px] uppercase shadow-sm">Publicar</button>
                     </div>
                 </div>
             </div>
@@ -115,15 +111,15 @@
 
         <section id="view-info" class="tab-content px-4 mt-24">
             <div class="google-card p-10 text-center border-t-[10px] border-blue-600 shadow-xl">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">O Teu Saldo Atual</p>
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Carteira</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
             </div>
         </section>
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200]">
-        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black uppercase">Rede</span></button>
-        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black uppercase">Ganhos</span></button>
+        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black uppercase">REDE</span></button>
+        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black uppercase">GANHOS</span></button>
     </nav>
 
     <script>
@@ -167,16 +163,15 @@
             }
         }
 
-        // LÓGICA DE GANHOS ACUMULADOS
         async function applyGain(val) {
             const gain = val * user.multiplier;
-            user.saldo = parseFloat((user.saldo + gain).toFixed(4)); // FIX: Acumulação precisa
+            // FIX: Acumulação forçada com precisão de 4 casas decimais
+            user.saldo = parseFloat((user.saldo + gain).toFixed(4));
             showBigNumber(gain);
             updateUI();
             await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
         }
 
-        // FLUXO DE INTERAÇÃO
         function handleInteraction(type, val = 0, pid = null) {
             if ((user.interactions >= 2 || user.postsToday >= 3) && user.multiplier === 1.0) {
                 pendingAction = { type, val, pid };
@@ -195,7 +190,6 @@
             }
         }
 
-        // SISTEMA SOCIAL
         async function loadFeed() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const container = document.getElementById('feed-container');
@@ -219,7 +213,7 @@
                     <div id="comments-${p.id}" class="comment-section">
                         <div id="list-${p.id}" class="p-4 space-y-2 max-h-40 overflow-y-auto text-[10px] uppercase font-bold bg-gray-50"></div>
                         <div class="p-2 bg-white border-t flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="ESCREVE UM COMENTÁRIO..." class="flex-1 bg-gray-100 rounded-lg p-2 text-[10px] font-black outline-none">
+                            <input id="in-${p.id}" type="text" placeholder="COMENTAR..." class="flex-1 bg-gray-100 rounded-lg p-2 text-[10px] font-black outline-none">
                             <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-4 rounded-lg font-black text-[10px]">OK</button>
                         </div>
                     </div>
@@ -241,14 +235,6 @@
             }
         }
 
-        async function processComment(pid) {
-            const input = document.getElementById(`in-${pid}`);
-            if(!input.value) return;
-            await sb.from('comentarios').insert([{ post_id: pid, user_id: MASTER_ID, content: input.value }]);
-            input.value = ""; await applyGain(0.0010); updateCommentList(pid);
-        }
-
-        // AUXILIARES
         function startAdFlow(isDirect = false) {
             document.getElementById('ad-overlay').style.display = 'flex';
             document.getElementById('ad-decision-ui').classList.add('hidden');
@@ -260,7 +246,7 @@
                 time--; timerText.innerText = time;
                 if(time <= 0) {
                     clearInterval(countdown);
-                    btn.disabled = false; btn.innerText = "CONCLUIR RECOMPENSA";
+                    btn.disabled = false; btn.innerText = "CONCLUIR";
                     btn.className = "h-14 bg-green-600 text-white font-black uppercase text-[10px]";
                     btn.onclick = () => {
                         resetMultiplier();
@@ -282,20 +268,23 @@
 
         function closeAd() { document.getElementById('ad-overlay').style.display = 'none'; pendingAction = null; }
         function resetMultiplier() { user.multiplier = 1.0; user.penaltyExpiry = null; user.interactions = 0; updateUI(); }
-        
+        async function processComment(pid) {
+            const input = document.getElementById(`in-${pid}`);
+            if(!input.value) return;
+            await sb.from('comentarios').insert([{ post_id: pid, user_id: MASTER_ID, content: input.value }]);
+            input.value = ""; await applyGain(0.0010); updateCommentList(pid);
+        }
         async function updateCommentList(pid) {
             const { data } = await sb.from('comentarios').select('*').eq('post_id', pid).order('created_at', {ascending: true});
             const list = document.getElementById(`list-${pid}`);
             if(list) list.innerHTML = data.map(c => `<div class="bg-white p-2 rounded-lg border shadow-sm mb-1">${c.content}</div>`).join('');
             updateCommentCount(pid);
         }
-
         async function updateCommentCount(pid) {
             const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', pid);
             const badge = document.getElementById(`badge-${pid}`);
             if(badge) badge.innerText = count || 0;
         }
-
         function toggleComments(id) { document.getElementById(`comments-${id}`).classList.toggle('active'); updateCommentList(id); }
         function showBigNumber(val) {
             const container = document.getElementById('floating-earning');
