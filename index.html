@@ -1,186 +1,123 @@
-<!DOCTYPE html>
-<html lang="pt-pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network - Stress Test</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
-    <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; position: relative; border: none; background: transparent; cursor: pointer; }
-        .count-badge { position: absolute; top: 2px; right: 28%; background: var(--g-red); color: white; font-size: 9px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 900; border: 1.5px solid white; }
-        .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #eee; width: 100%; }
-        .comment-section.active { display: flex; flex-direction: column; }
-        .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px 16px; display: flex; align-items: center; justify-content: center; min-height: 45px; }
-        .publisher-area { margin-top: 130px; padding: 0 16px; margin-bottom: 12px; }
-        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-    </style>
-</head>
-<body class="pb-24">
+<script>
+    const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+    const MASTER_ID = "5401881400"; // Este é um BIGINT
+    const sb = window.supabase.createClient(SB_URL, SB_KEY);
+    
+    let userSaldo = 0;
 
-    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
-        <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">S</div>
-            <h1 class="text-[12px] font-black uppercase text-blue-600">Social Earn Network</h1>
-        </div>
-        <div class="text-right">
-            <div id="main-eur" class="font-black text-green-600 text-lg">0.0000€</div>
-            <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase">0.0000 BRL</div>
-        </div>
-    </header>
+    async function init() {
+        const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+        if(data) userSaldo = parseFloat(data.saldo);
+        updateUI(); 
+        loadFeed();
+    }
 
-    <div class="status-header-fixed">
-        <button onclick="injectMassiveTest()" class="bg-red-600 text-white text-[10px] px-4 py-2 rounded-full font-black uppercase shadow-lg animate-bounce">
-            Injetar 100 Users & Posts
-        </button>
-    </div>
-
-    <main class="max-w-lg mx-auto">
-        <section id="view-social" class="tab-content active">
-            <div class="publisher-area">
-                <div class="google-card p-3 border-t-4 border-blue-600">
-                    <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none focus:ring-0 text-[11px] mb-1 resize-none uppercase font-black" rows="1"></textarea>
-                    <div id="expanded-post" class="hidden">
-                        <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black text-[11px] uppercase">Publicar</button>
-                    </div>
-                </div>
-            </div>
-            <div id="feed-container"></div>
-        </section>
-
-        <section id="view-info" class="tab-content px-4 mt-24">
-            <div class="google-card p-10 text-center border-t-[10px] border-blue-600">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Carteira em Tempo Real</p>
-                <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
-            </div>
-        </section>
-    </main>
-
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200]">
-        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center font-black text-[11px]">REDE</button>
-        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[11px]">GANHOS</button>
-    </nav>
-
-    <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const MASTER_ID = "5401881400";
-        const sb = window.supabase.createClient(SB_URL, SB_KEY);
+    // --- GERADOR CORRIGIDO: IDS SÃO NÚMEROS ---
+    async function injectMassiveTest() {
+        if(!confirm("AVISO: Vou criar 100 posts com IDs numéricos (1001 a 1100). Continuar?")) return;
         
-        let userSaldo = 0;
+        // Limpeza prévia
+        await sb.from('comentarios').delete().neq('user_id', 0);
+        await sb.from('posts').delete().neq('user_id', 0);
 
-        async function init() {
-            const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) userSaldo = parseFloat(data.saldo);
-            updateUI(); 
-            loadFeed();
-        }
-
-        // --- GERADOR DE 100 UTILIZADORES ---
-        async function injectMassiveTest() {
-            if(!confirm("AVISO: Isto irá limpar a base de dados e criar 100 utilizadores reais. Continuar?")) return;
-            
-            // 1. Limpeza total
-            await sb.from('comentarios').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-            await sb.from('posts').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-
-            // 2. Gerar 100 Posts de 100 Users
-            const massivePosts = [];
-            const frases = ["Bom dia rede!", "A ganhar dinheiro com a Apex!", "Melhor app de 2026", "Portugal no topo!", "Alguém para trocar likes?"];
-            
-            for(let i=1; i<=100; i++) {
-                massivePosts.push({
-                    user_id: `USER_${i}`,
-                    content: `${frases[Math.floor(Math.random() * frases.length)]} (POST #${i})`,
-                    image_url: `https://picsum.photos/seed/${i}/400/300`
-                });
-            }
-
-            const { error } = await sb.from('posts').insert(massivePosts);
-            
-            if(!error) {
-                alert("Sucesso! 100 Posts e 100 Users criados.");
-                loadFeed();
-            } else {
-                alert("Erro ao injetar: " + error.message);
-            }
-        }
-
-        async function loadFeed() {
-            const container = document.getElementById('feed-container');
-            container.innerHTML = "<div class='p-10 text-center font-black animate-pulse'>A CARREGAR 100 UTILIZADORES...</div>";
-
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            if(!posts) return;
-
-            container.innerHTML = "";
-            posts.forEach(async (p) => {
-                const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
-                
-                const card = `
-                <div class="google-card shadow-sm p-4">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-black text-blue-600 text-[10px]">${p.user_id.slice(-2)}</div>
-                        <span class="text-[10px] font-black uppercase text-gray-400">${p.user_id}</span>
-                    </div>
-                    <p class="text-[13px] font-black uppercase mb-4">${p.content}</p>
-                    <img src="${p.image_url}" class="w-full rounded-lg mb-4 border">
-                    <div class="flex border-t pt-2">
-                        <button onclick="earn(0.0006)" class="interaction-btn">
-                            <div class="count-badge">0</div><span>👍</span>
-                        </button>
-                        <button onclick="toggleComments('${p.id}')" class="interaction-btn border-x">
-                            <div class="count-badge" id="badge-${p.id}">${count || 0}</div><span>💬</span>
-                        </button>
-                        <button onclick="earn(0.0020)" class="interaction-btn">
-                            <div class="count-badge">0</div><span>🔗</span>
-                        </button>
-                    </div>
-                    <div id="comments-${p.id}" class="comment-section p-2">
-                        <div id="list-${p.id}" class="text-[9px] font-bold uppercase space-y-1 mb-2"></div>
-                        <input id="in-${p.id}" type="text" placeholder="COMENTAR..." class="w-full bg-gray-100 p-2 rounded text-[10px] border-none">
-                        <button onclick="addComment('${p.id}')" class="w-full bg-blue-600 text-white text-[9px] py-2 mt-1 rounded font-black">ENVIAR</button>
-                    </div>
-                </div>`;
-                container.innerHTML += card;
+        const massivePosts = [];
+        const frases = ["Olá a todos!", "Apex Social é o futuro.", "A testar o feed massivo.", "Ganhos em tempo real!", "Braga, Portugal!"];
+        
+        for(let i=1; i<=100; i++) {
+            massivePosts.push({
+                user_id: 1000 + i, // RESULTADO: 1001, 1002... (Válido para bigint)
+                content: `${frases[Math.floor(Math.random() * frases.length)]} (Post Global #${i})`,
+                image_url: `https://picsum.photos/seed/${i}/400/300`
             });
         }
 
-        async function earn(val) {
-            userSaldo += val;
-            updateUI();
-            await sb.from('perfis').update({ saldo: userSaldo }).eq('id', MASTER_ID);
+        const { error } = await sb.from('posts').insert(massivePosts);
+        
+        if(!error) {
+            alert("Sucesso! 100 utilizadores numéricos criados.");
+            loadFeed();
+        } else {
+            console.error(error);
+            alert("Erro: " + error.message);
+        }
+    }
+
+    async function loadFeed() {
+        const container = document.getElementById('feed-container');
+        container.innerHTML = "<div class='p-10 text-center font-black animate-pulse'>A SINCRONIZAR 100 UTILIZADORES...</div>";
+
+        const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+        
+        if(!posts) {
+            container.innerHTML = "<div class='p-10 text-center text-red-500'>ERRO AO CARREGAR. VERIFIQUE A CONSOLA.</div>";
+            return;
         }
 
-        async function addComment(pid) {
-            const input = document.getElementById(`in-${pid}`);
-            if(!input.value) return;
-            const { error } = await sb.from('comentarios').insert([{ post_id: pid, user_id: MASTER_ID, content: input.value }]);
-            if(!error) { input.value = ""; loadFeed(); }
+        container.innerHTML = "";
+        // Usar for...of para garantir que os contadores carregam por ordem
+        for (const p of posts) {
+            const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
+            
+            container.innerHTML += `
+            <div class="google-card shadow-sm p-4">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-[10px]">
+                        ${String(p.user_id).slice(-2)}
+                    </div>
+                    <span class="text-[10px] font-black uppercase text-gray-400">User ID: ${p.user_id}</span>
+                </div>
+                <p class="text-[13px] font-black uppercase mb-4">${p.content}</p>
+                <img src="${p.image_url}" class="w-full rounded-lg mb-4 border shadow-sm">
+                <div class="flex border-t pt-2">
+                    <button onclick="earn(0.0006)" class="interaction-btn">
+                        <div class="count-badge">0</div><span class="text-xl">👍</span>
+                    </button>
+                    <button onclick="toggleComments('${p.id}')" class="interaction-btn border-x">
+                        <div class="count-badge" id="badge-${p.id}">${count || 0}</div><span class="text-xl">💬</span>
+                    </button>
+                    <button onclick="earn(0.0020)" class="interaction-btn">
+                        <div class="count-badge">0</div><span class="text-xl">🔗</span>
+                    </button>
+                </div>
+                <div id="comments-${p.id}" class="comment-section p-2">
+                    <div id="list-${p.id}" class="text-[9px] font-bold uppercase space-y-1 mb-2"></div>
+                    <input id="in-${p.id}" type="text" placeholder="COMENTAR..." class="w-full bg-gray-100 p-2 rounded text-[10px] font-black border-none">
+                    <button onclick="addComment('${p.id}')" class="w-full bg-blue-600 text-white text-[9px] py-2 mt-1 rounded font-black">ENVIAR</button>
+                </div>
+            </div>`;
         }
+    }
 
-        function updateUI() {
-            document.getElementById('main-eur').innerText = userSaldo.toFixed(4) + "€";
-            document.getElementById('wall-eur').innerText = userSaldo.toFixed(4) + "€";
-            document.getElementById('main-brl').innerText = (userSaldo * 6.12).toFixed(4) + " BRL";
-        }
+    async function earn(val) {
+        userSaldo += val;
+        updateUI();
+        await sb.from('perfis').update({ saldo: userSaldo }).eq('id', MASTER_ID);
+    }
 
-        function nav(t) {
-            document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
-            document.getElementById('view-'+t).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
+    async function addComment(pid) {
+        const input = document.getElementById(`in-${pid}`);
+        if(!input.value) return;
+        const { error } = await sb.from('comentarios').insert([{ 
+            post_id: pid, 
+            user_id: MASTER_ID, // Enviando MASTER_ID que é bigint
+            content: input.value 
+        }]);
+        if(!error) { input.value = ""; loadFeed(); }
+    }
 
-        function expandPublisher() { document.getElementById('expanded-post').classList.remove('hidden'); }
-        function toggleComments(id) { document.getElementById(`comments-${id}`).classList.toggle('active'); }
+    function updateUI() {
+        document.getElementById('main-eur').innerText = userSaldo.toFixed(4) + "€";
+        document.getElementById('wall-eur').innerText = userSaldo.toFixed(4) + "€";
+        document.getElementById('main-brl').innerText = (userSaldo * 6.12).toFixed(4) + " BRL";
+    }
 
-        window.onload = init;
-    </script>
-</body>
-</html>
+    function nav(t) {
+        document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
+        document.getElementById('view-'+t).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function toggleComments(id) { document.getElementById(`comments-${id}`).classList.toggle('active'); }
+    window.onload = init;
+</script>
