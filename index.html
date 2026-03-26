@@ -3,45 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social - Cross-Interaction Ecosystem</title>
+    <title>Apex Social - Persistence Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
+        :root { --g-blue: #4285F4; --g-green: #34A853; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; }
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .rank-row:nth-child(1) { color: #D4AF37; } /* Gold */
-        .rank-row:nth-child(2) { color: #C0C0C0; } /* Silver */
-        .rank-row:nth-child(3) { color: #CD7F32; } /* Bronze */
     </style>
 </head>
 <body class="pb-24">
 
     <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg">S</div>
-            <h1 class="text-[12px] font-black uppercase text-blue-600 leading-tight">Apex Social<br>v34.4</h1>
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg">S</div>
+            <h1 class="text-[12px] font-black uppercase text-blue-600 leading-tight">Apex Social<br>v34.5</h1>
         </div>
         <div class="text-right">
             <div id="display-eur" class="font-black text-green-600 text-xl tracking-tighter">0.0000€</div>
-            <div id="status-user" class="text-[9px] font-black text-gray-400 uppercase">Aguardando Login...</div>
+            <div id="status-user" class="text-[9px] font-black text-gray-400 uppercase">Sincronização: OFF</div>
         </div>
     </header>
 
     <div class="fixed top-[72px] left-0 right-0 bg-white border-b p-3 z-[150] flex gap-2 shadow-sm">
-        <input id="login-id" type="number" placeholder="ID (1001-1100)" class="flex-1 border p-2 rounded-lg text-[12px] font-black outline-none focus:border-blue-500">
-        <button id="btn-login" onclick="simularLogin()" class="bg-gray-800 text-white px-6 rounded-lg font-black text-[11px] uppercase transition-all">Conectar</button>
+        <input id="login-id" type="number" placeholder="TEU ID (1001-1100)" class="flex-1 border p-2 rounded-lg text-[12px] font-black outline-none focus:border-blue-500">
+        <button id="btn-login" onclick="simularLogin()" class="bg-blue-600 text-white px-6 rounded-lg font-black text-[11px] uppercase shadow-md">Conectar</button>
     </div>
 
     <main class="max-w-lg mx-auto pt-[150px] px-4">
-        
         <section id="view-social" class="tab-content active">
             <div class="google-card p-4 border-t-4 border-blue-600 mb-6">
-                <textarea id="post-text" placeholder="PARTILHE ALGO COM A REDE..." class="w-full border-none focus:ring-0 text-[12px] font-black uppercase mb-2" rows="2"></textarea>
+                <textarea id="post-text" placeholder="PARTILHE ALGO..." class="w-full border-none focus:ring-0 text-[12px] font-black uppercase mb-2" rows="2"></textarea>
                 <button onclick="fazerPost()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black text-[11px] uppercase shadow-md">Publicar (+0.0150€)</button>
             </div>
             <div id="feed" class="space-y-4"></div>
@@ -49,27 +45,24 @@
 
         <section id="view-rank" class="tab-content">
             <div class="google-card p-4 border-t-4 border-yellow-500">
-                <h2 class="text-center font-black text-gray-400 text-[10px] uppercase mb-4">Top 10 Utilizadores Ativos</h2>
-                <div id="ranking-list" class="divide-y">
-                    <p class="text-center py-4 text-[10px] uppercase animate-pulse">Calculando Riqueza...</p>
-                </div>
+                <h2 class="text-center font-black text-gray-400 text-[10px] uppercase mb-4 tracking-widest">Ranking em Tempo Real</h2>
+                <div id="ranking-list" class="divide-y"></div>
             </div>
         </section>
 
         <section id="view-info" class="tab-content pt-4">
             <div class="google-card p-10 text-center border-t-[10px] border-green-600 shadow-xl">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">O Teu Saldo Acumulado</p>
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Saldo em Base de Dados</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-green-600 tracking-tighter">0.0000€</h1>
                 <p id="wall-id" class="text-[10px] font-black text-gray-300 mt-2 uppercase">ID: DESCONHECIDO</p>
             </div>
         </section>
-
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200]">
-        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase">Rede</button>
-        <button onclick="nav('rank')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase">Ranking</button>
-        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase">Carteira</button>
+        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase text-gray-400">Rede</button>
+        <button onclick="nav('rank')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase text-gray-400">Ranking</button>
+        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase text-gray-400">Carteira</button>
     </nav>
 
     <script>
@@ -81,22 +74,33 @@
         let CURRENT_SALDO = 0;
 
         async function init() {
-            loadFeed();
-            loadRanking();
+            await loadFeed();
         }
 
         async function simularLogin() {
             const val = document.getElementById('login-id').value;
-            if(!val) return alert("INSIRA UM ID");
+            if(!val) return;
+            
+            document.getElementById('btn-login').innerText = "SINCRONIZANDO...";
             CURRENT_USER_ID = parseInt(val);
             
-            const { data } = await sb.from('perfis').select('saldo').eq('id', CURRENT_USER_ID).single();
-            CURRENT_SALDO = data ? parseFloat(data.saldo) : 0;
+            // BUSCA FORÇADA E AGUARDADA (AWAIT)
+            const { data, error } = await sb.from('perfis').select('saldo').eq('id', CURRENT_USER_ID).single();
+            
+            if (data) {
+                CURRENT_SALDO = parseFloat(data.saldo);
+                console.log("Saldo recuperado:", CURRENT_SALDO);
+            } else {
+                // Se não existir, cria com zero e garante a gravação
+                await sb.from('perfis').insert([{ id: CURRENT_USER_ID, saldo: 0 }]);
+                CURRENT_SALDO = 0;
+            }
 
-            document.getElementById('status-user').innerText = "ONLINE: ID " + CURRENT_USER_ID;
-            document.getElementById('status-user').classList.replace('text-gray-400', 'text-green-600');
+            // Atualiza UI apenas após ter o dado real
+            document.getElementById('status-user').innerText = "SINCRONIZADO: ID " + CURRENT_USER_ID;
+            document.getElementById('status-user').style.color = "#34A853";
             document.getElementById('btn-login').innerText = "CONECTADO";
-            document.getElementById('btn-login').className = "bg-green-600 text-white px-6 rounded-lg font-black text-[11px] uppercase";
+            document.getElementById('btn-login').style.backgroundColor = "#34A853";
             document.getElementById('wall-id').innerText = "ID: " + CURRENT_USER_ID;
             
             updateUI();
@@ -109,24 +113,31 @@
             container.innerHTML = "";
             posts?.forEach(p => {
                 container.innerHTML += `
-                <div class="google-card p-4 shadow-sm">
-                    <div class="text-[9px] text-gray-400 font-black mb-2 uppercase">Utilizador ID: ${p.user_id}</div>
-                    <p class="text-[12px] font-black uppercase text-gray-700 mb-4">${p.content}</p>
+                <div class="google-card p-4 shadow-sm border border-gray-100">
+                    <div class="text-[9px] text-gray-400 font-black mb-2 uppercase flex justify-between">
+                        <span>User ID: ${p.user_id}</span>
+                        <span>${new Date(p.created_at).toLocaleTimeString()}</span>
+                    </div>
+                    <p class="text-[13px] font-black uppercase text-gray-700 mb-4">${p.content}</p>
                     <div class="flex border-t pt-2 gap-1">
-                        <button onclick="interagir(0.0006)" class="flex-1 py-2 bg-gray-50 rounded font-black text-[9px] uppercase active:bg-blue-100">👍 Gostar</button>
-                        <button onclick="interagir(0.0010)" class="flex-1 py-2 bg-gray-50 rounded font-black text-[9px] uppercase active:bg-blue-100">💬 Comentar</button>
-                        <button onclick="interagir(0.0020)" class="flex-1 py-2 bg-gray-50 rounded font-black text-[9px] uppercase active:bg-blue-100">🔗 Partilhar</button>
+                        <button onclick="interagir(0.0006)" class="flex-1 py-3 bg-gray-50 rounded font-black text-[9px] uppercase active:bg-blue-100">👍 Gostar</button>
+                        <button onclick="interagir(0.0010)" class="flex-1 py-3 bg-gray-50 rounded font-black text-[9px] uppercase active:bg-blue-100">💬 Comentar</button>
+                        <button onclick="interagir(0.0020)" class="flex-1 py-3 bg-gray-50 rounded font-black text-[9px] uppercase active:bg-blue-100">🔗 Partilhar</button>
                     </div>
                 </div>`;
             });
         }
 
         async function interagir(valor) {
-            if(!CURRENT_USER_ID) return alert("CONECTE UM ID NO TOPO!");
+            if(!CURRENT_USER_ID) return alert("ERRO: CONECTE O SEU ID PRIMEIRO!");
+            
+            // 1. Atualiza localmente para resposta rápida
             CURRENT_SALDO += valor;
             updateUI();
-            await sb.from('perfis').update({ saldo: CURRENT_SALDO }).eq('id', CURRENT_USER_ID);
-            loadRanking(); // Atualiza o ranking para veres a subida
+            
+            // 2. Grava no Supabase imediatamente
+            const { error } = await sb.from('perfis').update({ saldo: CURRENT_SALDO }).eq('id', CURRENT_USER_ID);
+            if(error) console.error("Erro ao gravar:", error);
         }
 
         async function fazerPost() {
@@ -138,7 +149,7 @@
             if(!error) {
                 document.getElementById('post-text').value = "";
                 await interagir(0.0150);
-                loadFeed();
+                await loadFeed();
             }
         }
 
@@ -148,17 +159,17 @@
             list.innerHTML = "";
             data?.forEach((u, i) => {
                 list.innerHTML += `
-                <div class="flex justify-between items-center py-3 px-2 rank-row">
-                    <span class="text-[12px] font-black">#${i+1} ID ${u.id} ${u.id === CURRENT_USER_ID ? '(VOCÊ)' : ''}</span>
-                    <span class="text-[11px] font-black tracking-tighter">${u.saldo.toFixed(4)}€</span>
+                <div class="flex justify-between items-center py-4 px-2 ${u.id === CURRENT_USER_ID ? 'bg-blue-50' : ''}">
+                    <span class="text-[12px] font-black">#${i+1} ID ${u.id} ${u.id === CURRENT_USER_ID ? '(TU)' : ''}</span>
+                    <span class="text-[11px] font-black text-blue-600">${u.saldo.toFixed(4)}€</span>
                 </div>`;
             });
         }
 
         function updateUI() {
-            const eur = CURRENT_SALDO.toFixed(4) + "€";
-            document.getElementById('display-eur').innerText = eur;
-            document.getElementById('wall-eur').innerText = eur;
+            const val = CURRENT_SALDO.toFixed(4) + "€";
+            document.getElementById('display-eur').innerText = val;
+            document.getElementById('wall-eur').innerText = val;
         }
 
         function nav(t) {
