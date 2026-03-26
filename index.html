@@ -3,108 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Social v32 - Global Edition</title>
+    <title>Apex Social v32.1</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --primary: #1a73e8; --bg: #f8f9fa; --text: #202124; --success: #2e7d32; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
-        
-        header { 
-            background: white; padding: 15px; border-bottom: 1px solid #dadce0; 
-            position: sticky; top: 0; z-index: 100; text-align: center;
-        }
-        .balance-group { font-size: 1.5rem; font-weight: 700; color: var(--success); margin-bottom: 5px; }
-        .status-msg { font-size: 0.75rem; color: #70757a; text-transform: uppercase; letter-spacing: 1px; }
-
+        :root { --primary: #1a73e8; --bg: #f8f9fa; --success: #2e7d32; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
+        header { background: white; padding: 15px; border-bottom: 1px solid #dadce0; position: sticky; top: 0; z-index: 100; text-align: center; }
+        .balance-group { font-size: 1.5rem; font-weight: 700; color: var(--success); }
+        .status-msg { font-size: 0.75rem; color: #70757a; text-transform: uppercase; margin-top: 4px; }
         .feed { max-width: 500px; margin: 20px auto; padding: 0 10px; }
-        .post { 
-            background: white; border: 1px solid #dadce0; border-radius: 12px; 
-            margin-bottom: 20px; padding: 16px; box-shadow: 0 1px 2px rgba(60,64,67,0.3);
-        }
-        .post img { width: 100%; border-radius: 8px; margin-top: 12px; display: block; object-fit: cover; max-height: 400px; }
-        
-        .actions { 
-            display: flex; justify-content: space-around; 
-            margin-top: 15px; border-top: 1px solid #eee; padding-top: 12px; 
-        }
-        .btn-action { 
-            background: none; border: none; color: var(--primary); 
-            cursor: pointer; font-weight: 600; font-size: 0.9rem; padding: 10px;
-            display: flex; align-items: center; gap: 8px; border-radius: 8px;
-        }
-        .btn-action:hover { background: #f1f3f4; }
+        .post { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 20px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .post img { width: 100%; border-radius: 8px; margin-top: 12px; }
+        .actions { display: flex; justify-content: space-around; margin-top: 15px; border-top: 1px solid #eee; padding-top: 12px; }
+        .btn-action { background: none; border: none; color: var(--primary); cursor: pointer; font-weight: 600; padding: 10px; display: flex; align-items: center; gap: 8px; }
+        .error-box { background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; margin: 20px; text-align: center; border: 1px solid #ef9a9a; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="balance-group" id="balance-display">---</div>
-    <div class="status-msg" id="sync-status">Sincronizando...</div>
+    <div class="balance-group" id="balance-display">0.0000€</div>
+    <div class="status-msg" id="sync-status">A LIGAR...</div>
 </header>
 
 <div class="feed" id="feed">
-    <div style="text-align:center; padding:50px; color:#70757a;">Carregando conteúdo global...</div>
+    <div id="loading-state" style="text-align:center; padding:50px; color:#70757a;">
+        A carregar conteúdo global...
+    </div>
 </div>
 
 <script>
-    // 1. CREDENCIAIS SUPABASE (APEX V32)
+    // 1. CONFIGURAÇÃO (Verifique se não faltam letras aqui)
     const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
     const sb = supabase.createClient(SB_URL, SB_KEY);
 
-    // 2. CONFIGURAÇÃO DO UTILIZADOR MESTRE
     const MASTER_ID = "5401881400"; 
     let user = { saldo: 0.0000, multiplier: 1.0 };
+    const TAXAS = { "BRL": 6.12, "EUR": 1.00 };
 
-    // Taxas de câmbio baseadas em 1.00€
-    const TAXAS = { "BRL": 6.12, "USD": 1.08, "GBP": 0.84, "EUR": 1.00 };
-
-    // 3. INICIALIZAÇÃO
+    // 2. INICIALIZAÇÃO
     async function init() {
-        const { data, error } = await sb
-            .from('perfis')
-            .select('saldo')
-            .eq('id', MASTER_ID)
-            .single();
-
-        if (data) {
-            user.saldo = parseFloat(data.saldo) || 0;
+        try {
+            const { data, error } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if (error && error.code !== 'PGRST116') throw error; // Ignora erro de "não encontrado" para criar depois
+            if (data) user.saldo = parseFloat(data.saldo) || 0;
+            
+            updateUI();
+            await loadFeed();
+        } catch (err) {
+            showError("Erro de Conexão: " + err.message);
         }
-
-        updateUI();
-        loadFeed();
     }
 
-    // 4. INTERFACE INTELIGENTE (DETETA PAÍS E MOEDA)
+    // 3. INTERFACE (MOEDA AUTOMÁTICA)
     function updateUI() {
         const locale = navigator.language || "pt-PT";
         const region = new Intl.Locale(locale).region || "PT";
-        
-        // Seleção de Moeda Automática
-        let moeda = "EUR";
-        if (region === "BR") moeda = "BRL";
-        else if (region === "US") moeda = "USD";
-        else if (region === "GB") moeda = "GBP";
+        let moeda = (region === "BR") ? "BRL" : "EUR";
+        const valorConvertido = user.saldo * (TAXAS[moeda] || 1.0);
 
-        const taxa = TAXAS[moeda] || 1.0;
-        const valorConvertido = user.saldo * taxa;
-
-        // Formatação Internacional
         const formatador = new Intl.NumberFormat(locale, {
-            style: 'currency',
-            currency: moeda,
+            style: 'currency', currency: moeda,
             minimumFractionDigits: (moeda === 'EUR' ? 4 : 2)
         });
 
         document.getElementById('balance-display').innerText = formatador.format(valorConvertido);
-        document.getElementById('sync-status').innerText = "Sincronizado • " + region;
-        
-        // Atualizar textos dos botões no Feed
-        traduzirBotoes(region);
+        document.getElementById('sync-status').innerText = "SINCRONIZADO • " + region;
     }
 
-    function traduzirBotoes(region) {
-        document.querySelectorAll('.btn-like').forEach(b => {
-            if (region === "BR") b.innerHTML = "👍 Curtir";
-            else if (region === "US" || region === "GB") b.innerHTML = "👍 Like";
-            else b.innerHTML
+    // 4. CARREGAR POSTS (COM PROTEÇÃO)
+    async function loadFeed() {
+        const feedEl = document.getElementById('feed');
+        try {
+            const { data: posts, error } = await sb.from('posts').select('*').order('id', { ascending: false }).limit(20);
+            
+            if (error) throw error;
+            if (!posts || posts.length === 0) {
+                feedEl.innerHTML = '<div class="error-box">Nenhum post encontrado na tabela "posts".</div>';
+                return;
+            }
+
+            feedEl.innerHTML = ''; 
+            posts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'post';
+                card.innerHTML = `
+                    <small style="color:#70757a">ID: ${post.id}</small>
+                    <p style="margin:10px 0; font-size:1.1rem;">${post.content || ''}</p>
+                    ${post.image_url ? `<img src="${post.image_url}">` : ''}
+                    <div class="actions">
+                        <button class="btn-action" onclick="applyGain(0.0015)">👍 Like</button>
+                        <button class="btn-action" onclick="applyGain(0.0030)">💬 Share</button>
+                    </div>
+                `;
+                feedEl.appendChild(card);
+            });
+        } catch (err) {
+            showError("Erro ao carregar posts: " + err.message);
+        }
+    }
+
+    // 5. GANHAR SALDO
+    async function applyGain(val) {
+        user.saldo = parseFloat((user.saldo + val).toFixed(4));
+        updateUI();
+        await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
+    }
+
+    function showError(msg) {
+        document.getElementById('feed').innerHTML = `<div class="error-box">${msg}</div>`;
+        document.getElementById('sync-status').innerText = "ERRO DE REDE";
+    }
+
+    init();
+</script>
+</body>
+</html>
