@@ -20,19 +20,16 @@
         }
         .earning-text { font-size: 3rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52,168,83,0.4); -webkit-text-stroke: 1.5px white; }
 
-        /* Botões com Balões de Contagem */
         .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; position: relative; border: none; background: transparent; cursor: pointer; }
         .count-badge { position: absolute; top: 2px; right: 28%; background: var(--g-red); color: white; font-size: 9px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 900; border: 1.5px solid white; }
         
         .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #eee; width: 100%; }
         .comment-section.active { display: flex; flex-direction: column; }
 
-        /* Status e Modais */
         .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 45px; }
         #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 5000; align-items: center; justify-content: center; }
         .modal-300-250 { width: 300px; background: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* Espaçamento Reduzido */
         #feed-container { margin-top: 0px; padding: 0 16px; }
         .publisher-area { margin-top: 130px; padding: 0 16px; margin-bottom: 12px; }
         
@@ -93,7 +90,6 @@
                     </div>
                 </div>
             </div>
-            
             <div id="feed-container"></div>
         </section>
 
@@ -116,19 +112,26 @@
         const MASTER_ID = "5401881400";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
-        let user = { saldo: 0, interactions: 0, postsToday: 0, multiplier: 1.0, penaltyExpiry: null };
+        // Carrega saldo local para evitar 0.0000 visual no reload
+        let savedSaldo = localStorage.getItem('apex_saldo') || 0;
+        let user = { saldo: Number(savedSaldo), interactions: 0, postsToday: 0, multiplier: 1.0, penaltyExpiry: null };
         let pendingAction = null;
 
         async function init() {
-            const { data } = await sb.from('perfis').select('*').eq('id', MASTER_ID).single();
-            if(data) user.saldo = Number(data.saldo) || 0;
-            updateUI(); loadFeed();
+            const { data, error } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if(data) {
+                user.saldo = Number(data.saldo);
+                localStorage.setItem('apex_saldo', user.saldo);
+            }
+            updateUI(); 
+            loadFeed();
             setInterval(updateUI, 1000);
         }
 
         function updateUI() {
-            document.getElementById('main-eur').innerText = user.saldo.toFixed(4) + "€";
-            document.getElementById('wall-eur').innerText = user.saldo.toFixed(4) + "€";
+            const formatted = Number(user.saldo).toFixed(4);
+            document.getElementById('main-eur').innerText = formatted + "€";
+            document.getElementById('wall-eur').innerText = formatted + "€";
             document.getElementById('main-brl').innerText = (user.saldo * 6.12).toFixed(4) + " BRL";
             
             const statusBox = document.getElementById('status-text');
@@ -149,7 +152,6 @@
             }
         }
 
-        // --- SISTEMA DE ANÚNCIOS ---
         function handleInteraction(type, val = 0, pid = null) {
             if ((user.interactions >= 2 || user.postsToday >= 3) && user.multiplier === 1.0) {
                 pendingAction = { type, val, pid };
@@ -201,7 +203,6 @@
 
         function resetState() { user.multiplier = 1.0; user.penaltyExpiry = null; user.interactions = 0; updateUI(); }
 
-        // --- FEED E INTERAÇÕES ---
         async function executeAction(type, val, pid) {
             if (type === 'post') await publish();
             else if (type === 'comment') { user.interactions++; await addComment(pid); }
@@ -211,6 +212,7 @@
         async function applyGain(val) {
             const final = val * user.multiplier;
             user.saldo += final;
+            localStorage.setItem('apex_saldo', user.saldo);
             showBigNumber(final);
             updateUI();
             await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
@@ -258,7 +260,7 @@
 
         async function updateComments(pid) {
             const { data } = await sb.from('comentarios').select('*').eq('post_id', pid).order('created_at', {ascending: true});
-            document.getElementById(`list-${pid}`).innerHTML = data.map(c => `<div class="bg-white p-2 rounded border shadow-sm">${c.content}</div>`).join('');
+            if(data) document.getElementById(`list-${pid}`).innerHTML = data.map(c => `<div class="bg-white p-2 rounded border shadow-sm">${c.content}</div>`).join('');
             updateCount(pid);
         }
 
@@ -282,4 +284,3 @@
     </script>
 </body>
 </html>
-
