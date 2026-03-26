@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social - Multi-User System</title>
+    <title>Apex Social - Persistence Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
@@ -15,8 +15,7 @@
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; cursor: pointer; transition: all 0.2s; }
-        .interaction-btn:active { background: #f8f9fa; transform: scale(0.95); }
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; cursor: pointer; }
     </style>
 </head>
 <body class="pb-24">
@@ -24,7 +23,7 @@
     <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg">S</div>
-            <h1 class="text-[12px] font-black uppercase text-blue-600 leading-tight">Social Earn<br>Network</h1>
+            <h1 class="text-[12px] font-black uppercase text-blue-600 leading-tight text-left">Social Earn<br>Network</h1>
         </div>
         <div class="text-right">
             <div id="display-eur" class="font-black text-green-600 text-xl tracking-tighter">0.0000€</div>
@@ -33,36 +32,31 @@
     </header>
 
     <div class="login-bar">
-        <input id="login-id" type="number" placeholder="ID (EX: 1001)" class="flex-1 border-2 border-gray-100 p-2 rounded-lg text-[12px] font-black outline-none focus:border-blue-500 transition-colors">
-        <button id="btn-login" onclick="simularLogin()" class="bg-gray-800 text-white px-6 py-2 rounded-lg font-black text-[11px] uppercase shadow-md active:bg-blue-600 transition-all">Entrar</button>
+        <input id="login-id" type="number" placeholder="ID (EX: 1001)" class="flex-1 border-2 border-gray-100 p-2 rounded-lg text-[12px] font-black outline-none focus:border-blue-500">
+        <button id="btn-login" onclick="simularLogin()" class="bg-gray-800 text-white px-6 py-2 rounded-lg font-black text-[11px] uppercase shadow-md active:bg-blue-600">Entrar</button>
     </div>
 
     <main class="max-w-lg mx-auto pt-[145px] px-4">
-        
         <section id="view-social" class="tab-content active">
             <div class="google-card p-4 border-t-4 border-blue-600 mb-6">
                 <textarea id="post-text" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none focus:ring-0 text-[12px] font-black uppercase mb-2" rows="2"></textarea>
-                <button onclick="fazerPost()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black text-[11px] uppercase shadow-lg active:scale-95 transition-transform">Publicar Post (+0.0150€)</button>
+                <button onclick="fazerPost()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black text-[11px] uppercase shadow-lg">Publicar Post (+0.0150€)</button>
             </div>
-            
-            <div id="feed" class="space-y-4">
-                <p class="text-center py-10 text-[10px] font-black uppercase text-gray-400 animate-pulse">Sincronizando Rede Global...</p>
-            </div>
+            <div id="feed" class="space-y-4"></div>
         </section>
 
         <section id="view-info" class="tab-content px-4 pt-10">
             <div class="google-card p-12 text-center border-t-[10px] border-blue-600 shadow-xl">
-                <p class="text-[12px] font-black text-gray-400 uppercase mb-4 tracking-widest">Saldo na Nuvem</p>
+                <p class="text-[12px] font-black text-gray-400 uppercase mb-4 tracking-widest">Saldo Acumulado no ID</p>
                 <h1 id="wall-eur" class="text-6xl font-black text-blue-600 tracking-tighter">0.0000€</h1>
                 <div id="wall-brl" class="text-xl font-black text-green-500 mt-2">0.0000 BRL</div>
             </div>
         </section>
-
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200] shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center font-black text-[11px] uppercase tracking-tighter">Rede</button>
-        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[11px] uppercase tracking-tighter">Carteira</button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200]">
+        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center font-black text-[11px] uppercase">Rede</button>
+        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[11px] uppercase">Carteira</button>
     </nav>
 
     <script>
@@ -74,31 +68,31 @@
         let CURRENT_SALDO = 0;
 
         async function init() {
-            loadFeed(); // Carrega o feed imediatamente para o utilizador ver algo
+            await loadFeed();
         }
 
         async function simularLogin() {
             const idInput = document.getElementById('login-id').value;
             const btn = document.getElementById('btn-login');
-            if(!idInput) return alert("POR FAVOR, INSIRA UM ID NUMÉRICO (EX: 1001)");
+            if(!idInput) return alert("INSIRA UM ID (1001-1100)");
 
             CURRENT_USER_ID = parseInt(idInput);
             
-            // 1. Procurar ou Criar Perfil
-            let { data, error } = await sb.from('perfis').select('saldo').eq('id', CURRENT_USER_ID).single();
+            // Força a busca do saldo acumulado na base de dados real
+            const { data, error } = await sb.from('perfis').select('saldo').eq('id', CURRENT_USER_ID).single();
             
-            if (error && error.code === "PGRST116") { 
+            if (data) {
+                CURRENT_SALDO = parseFloat(data.saldo || 0);
+            } else {
+                // Se o ID não existir, cria-o com saldo zero
                 await sb.from('perfis').insert([{ id: CURRENT_USER_ID, saldo: 0 }]);
                 CURRENT_SALDO = 0;
-            } else {
-                CURRENT_SALDO = parseFloat(data.saldo || 0);
             }
 
-            // UI Feedback
             document.getElementById('status-user').innerText = "ONLINE: ID " + CURRENT_USER_ID;
-            document.getElementById('status-user').classList.replace('text-gray-400', 'text-blue-600');
+            document.getElementById('status-user').style.color = "#34A853";
             btn.innerText = "CONECTADO";
-            btn.classList.replace('bg-gray-800', 'bg-green-600');
+            btn.style.backgroundColor = "#34A853";
             
             updateUI();
         }
@@ -108,14 +102,13 @@
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             
             if(!posts) return;
-
             container.innerHTML = "";
             posts.forEach(p => {
                 container.innerHTML += `
                 <div class="google-card p-4 shadow-sm border border-gray-100">
                     <div class="flex items-center gap-2 mb-3">
                         <div class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-[10px] font-black">${String(p.user_id).slice(-2)}</div>
-                        <span class="text-[10px] font-black uppercase text-gray-400 italic">User ID: ${p.user_id}</span>
+                        <span class="text-[10px] font-black uppercase text-gray-400">User ID: ${p.user_id}</span>
                     </div>
                     <p class="text-[13px] font-black uppercase mb-4 text-gray-700 leading-tight">${p.content}</p>
                     <div class="flex border-t border-gray-50 pt-1">
@@ -128,20 +121,15 @@
         }
 
         async function addGain(val) {
-            if(!CURRENT_USER_ID) {
-                alert("ACESSO NEGADO: INSIRA O SEU ID NA BARRA SUPERIOR PARA COMEÇAR A GANHAR!");
-                return;
-            }
-            
+            if(!CURRENT_USER_ID) return alert("FAÇA LOGIN COM UM ID PRIMEIRO!");
             CURRENT_SALDO += val;
             updateUI();
-            
-            // Persistência real por ID
+            // Salva acumulando no Supabase para este ID específico
             await sb.from('perfis').update({ saldo: CURRENT_SALDO }).eq('id', CURRENT_USER_ID);
         }
 
         async function fazerPost() {
-            if(!CURRENT_USER_ID) return alert("LOGIN NECESSÁRIO PARA PUBLICAR!");
+            if(!CURRENT_USER_ID) return alert("FAÇA LOGIN PRIMEIRO!");
             const txt = document.getElementById('post-text').value;
             if(!txt) return;
 
