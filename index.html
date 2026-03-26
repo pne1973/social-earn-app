@@ -3,33 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Social v32.3</title>
+    <title>Apex Social v32.6</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --primary: #1a73e8; --bg: #f8f9fa; --success: #2e7d32; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
-        header { background: white; padding: 15px; border-bottom: 1px solid #dadce0; position: sticky; top: 0; z-index: 100; text-align: center; }
-        .balance-group { font-size: 1.5rem; font-weight: 700; color: var(--success); }
-        .btn-logout { position: absolute; right: 15px; top: 20px; font-size: 0.7rem; border: 1px solid #ddd; padding: 5px; border-radius: 4px; cursor: pointer; }
+        :root { --primary: #1a73e8; --success: #1e8e3e; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #202124; }
+        
+        /* LOGIN */
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .login-card { text-align: center; padding: 30px; border: 1px solid #dadce0; border-radius: 12px; width: 320px; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #dadce0; border-radius: 8px; box-sizing: border-box; }
+        .btn-blue { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* HEADER */
+        header { background: white; padding: 15px; border-bottom: 1px solid #dadce0; position: sticky; top: 0; text-align: center; z-index: 99; }
+        .balance { font-size: 1.8rem; font-weight: 700; color: var(--success); }
+        .user-info { font-size: 0.7rem; color: #70757a; margin-top: 5px; font-weight: bold; }
+        .logout { position: absolute; right: 15px; top: 20px; font-size: 0.75rem; color: #d93025; cursor: pointer; font-weight: bold; }
+
         .feed { max-width: 500px; margin: 20px auto; padding: 0 10px; }
-        .post { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 20px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .post img { width: 100%; border-radius: 8px; margin-top: 12px; }
-        .actions { display: flex; justify-content: space-around; margin-top: 15px; border-top: 1px solid #eee; padding-top: 12px; }
-        .btn-action { background: none; border: none; color: var(--primary); cursor: pointer; font-weight: 600; padding: 10px; }
+        .post { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 15px; padding: 15px; }
+        .post img { width: 100%; border-radius: 8px; margin-top: 10px; }
+        .btn-action { width: 100%; margin-top: 15px; padding: 12px; border: 1px solid #dadce0; border-radius: 8px; background: #fff; cursor: pointer; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
 
-<div id="auth-screen" style="display:none; text-align:center; padding-top:100px;">
-    <h2>Entrar no Apex Social</h2>
-    <input type="text" id="user-input" placeholder="Digite seu ID" style="padding:10px; border-radius:8px; border:1px solid #ccc; width:250px;"><br><br>
-    <button onclick="login()" style="padding:10px 30px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer;">Entrar</button>
+<div id="auth-screen" style="display:none;">
+    <div class="login-card">
+        <h2 style="color:var(--primary); margin:0;">Apex Social</h2>
+        <p style="color:#5f6368; font-size:0.9rem;">Insira o seu ID para carregar saldo</p>
+        <input type="text" id="user-field" placeholder="Ex: joao_123">
+        <button class="btn-blue" onclick="doLogin()">ENTRAR</button>
+    </div>
 </div>
 
 <header id="app-header" style="display:none;">
-    <button class="btn-logout" onclick="logout()">SAIR</button>
-    <div class="balance-group" id="balance-display">0.0000€</div>
-    <div id="sync-status" style="font-size:0.7rem; color:#777; margin-top:5px;">CONECTADO</div>
+    <span class="logout" onclick="doLogout()">SAIR</span>
+    <div class="balance" id="val-saldo">0.0000€</div>
+    <div class="user-info" id="val-user">A CONECTAR...</div>
 </header>
 
 <div class="feed" id="app-feed" style="display:none;"></div>
@@ -39,77 +51,70 @@
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
     const sb = supabase.createClient(SB_URL, SB_KEY);
 
-    let currentID = localStorage.getItem('apex_uid');
-    let user = { saldo: 0.0000 };
+    let currentUID = localStorage.getItem('apex_uid');
+    let account = { saldo: 0.0000 };
 
-    function login() {
-        const val = document.getElementById('user-input').value.trim();
-        if(val) { localStorage.setItem('apex_uid', val); location.reload(); }
+    function doLogin() {
+        const id = document.getElementById('user-field').value.trim();
+        if(id) { localStorage.setItem('apex_uid', id); location.reload(); }
     }
-    function logout() { localStorage.removeItem('apex_uid'); location.reload(); }
+    function doLogout() { localStorage.removeItem('apex_uid'); location.reload(); }
 
-    async function init() {
-        if (!currentID) {
-            document.getElementById('auth-screen').style.display = 'block';
-            return;
-        }
+    async function start() {
+        if (!currentUID) { document.getElementById('auth-screen').style.display = 'flex'; return; }
         document.getElementById('app-header').style.display = 'block';
         document.getElementById('app-feed').style.display = 'block';
 
-        // Tenta buscar saldo
-        let { data, error } = await sb.from('perfis').select('saldo').eq('id', currentID).single();
+        // Tenta buscar ou criar perfil (Upsert silencioso)
+        const { data } = await sb.from('perfis').select('saldo').eq('id', currentUID).single();
         
         if (data) {
-            user.saldo = parseFloat(data.saldo) || 0;
+            account.saldo = parseFloat(data.saldo) || 0;
         } else {
-            // SE O ID NÃO EXISTE, CRIA ELE AGORA
-            await sb.from('perfis').insert([{ id: currentID, saldo: 0.0000, nome: 'Teste' }]);
+            // Se for ID novo, cria imediatamente no banco
+            await sb.from('perfis').insert([{ id: currentUID, saldo: 0.0000 }]);
         }
         
         updateUI();
-        loadFeed();
+        loadPosts();
     }
 
     function updateUI() {
         const locale = navigator.language || "pt-PT";
         const isBR = locale.includes("BR");
-        const valor = isBR ? (user.saldo * 6.12) : user.saldo;
-        const moeda = isBR ? "BRL" : "EUR";
+        const val = isBR ? (account.saldo * 6.12) : account.saldo;
         
-        document.getElementById('balance-display').innerText = new Intl.NumberFormat(locale, {
-            style: 'currency', currency: moeda, minimumFractionDigits: isBR ? 2 : 4
-        }).format(valor);
+        document.getElementById('val-saldo').innerText = new Intl.NumberFormat(locale, {
+            style: 'currency', currency: isBR ? "BRL" : "EUR", minimumFractionDigits: isBR ? 2 : 4
+        }).format(val);
+        
+        document.getElementById('val-user').innerText = "UTILIZADOR: " + currentUID;
     }
 
-    async function applyGain(val) {
-        user.saldo = parseFloat((user.saldo + val).toFixed(4));
+    async function earn(amt) {
+        account.saldo = parseFloat((account.saldo + amt).toFixed(4));
         updateUI();
-        document.getElementById('sync-status').innerText = "A GUARDAR...";
-
-        // UPSERT: Se não existir cria, se existir atualiza (Garante que salve sempre)
-        const { error } = await sb.from('perfis').upsert({ id: currentID, saldo: user.saldo });
-
-        if (error) console.error("Erro ao salvar:", error.message);
-        setTimeout(() => document.getElementById('sync-status').innerText = "SINCRONIZADO: " + currentID, 1000);
+        
+        // UPSERT garante que o saldo seja guardado para o ID ativo
+        const { error } = await sb.from('perfis').upsert({ id: currentUID, saldo: account.saldo });
+        if(error) console.error("Erro ao guardar:", error.message);
     }
 
-    async function loadFeed() {
-        const { data: posts } = await sb.from('posts').select('*').order('id', { ascending: false }).limit(20);
-        const feedEl = document.getElementById('app-feed');
-        if (posts) {
-            feedEl.innerHTML = posts.map(post => `
+    async function loadPosts() {
+        const { data: list } = await sb.from('posts').select('*').order('id', { ascending: false }).limit(10);
+        const feed = document.getElementById('app-feed');
+        if (list) {
+            feed.innerHTML = list.map(p => `
                 <div class="post">
-                    <p>${post.content || ''}</p>
-                    ${post.image_url ? `<img src="${post.image_url}">` : ''}
-                    <div class="actions">
-                        <button class="btn-action" onclick="applyGain(0.0015)">👍 Like</button>
-                    </div>
+                    <p>${p.content || ''}</p>
+                    ${p.image_url ? `<img src="${p.image_url}">` : ''}
+                    <button class="btn-action" onclick="earn(0.0015)">👍 CURTIR (+0.0015€)</button>
                 </div>
             `).join('');
         }
     }
 
-    init();
+    start();
 </script>
 </body>
 </html>
