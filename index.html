@@ -1,123 +1,111 @@
-<script>
-    const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-    const MASTER_ID = "5401881400"; // Este é um BIGINT
-    const sb = window.supabase.createClient(SB_URL, SB_KEY);
-    
-    let userSaldo = 0;
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Earn Network - Global Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; }
+        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 12px; }
+        .status-header { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px; display: flex; justify-content: center; }
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; position: relative; }
+        .count-badge { position: absolute; top: 2px; right: 28%; background: var(--g-red); color: white; font-size: 9px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1.5px solid white; }
+    </style>
+</head>
+<body class="pb-24">
 
-    async function init() {
-        const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-        if(data) userSaldo = parseFloat(data.saldo);
-        updateUI(); 
-        loadFeed();
-    }
+    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">S</div>
+            <h1 class="text-[12px] font-black uppercase text-blue-600">Social Earn Network</h1>
+        </div>
+        <div id="main-eur" class="font-black text-green-600 text-lg">0.0000€</div>
+    </header>
 
-    // --- GERADOR CORRIGIDO: IDS SÃO NÚMEROS ---
-    async function injectMassiveTest() {
-        if(!confirm("AVISO: Vou criar 100 posts com IDs numéricos (1001 a 1100). Continuar?")) return;
-        
-        // Limpeza prévia
-        await sb.from('comentarios').delete().neq('user_id', 0);
-        await sb.from('posts').delete().neq('user_id', 0);
+    <div class="status-header">
+        <button onclick="massiveInjection()" class="bg-red-600 text-white text-[10px] px-4 py-2 rounded-full font-black uppercase shadow-lg">
+            🔥 Injetar 100 Users & Ranks
+        </button>
+    </div>
 
-        const massivePosts = [];
-        const frases = ["Olá a todos!", "Apex Social é o futuro.", "A testar o feed massivo.", "Ganhos em tempo real!", "Braga, Portugal!"];
-        
-        for(let i=1; i<=100; i++) {
-            massivePosts.push({
-                user_id: 1000 + i, // RESULTADO: 1001, 1002... (Válido para bigint)
-                content: `${frases[Math.floor(Math.random() * frases.length)]} (Post Global #${i})`,
-                image_url: `https://picsum.photos/seed/${i}/400/300`
-            });
-        }
+    <main class="max-w-lg mx-auto mt-[130px] px-4">
+        <div id="feed-container"></div>
+    </main>
 
-        const { error } = await sb.from('posts').insert(massivePosts);
-        
-        if(!error) {
-            alert("Sucesso! 100 utilizadores numéricos criados.");
+    <script>
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const MASTER_ID = 5401881400; // ID Numérico (BigInt)
+        const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+        async function init() {
+            const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if(data) document.getElementById('main-eur').innerText = parseFloat(data.saldo).toFixed(4) + "€";
             loadFeed();
-        } else {
-            console.error(error);
-            alert("Erro: " + error.message);
-        }
-    }
-
-    async function loadFeed() {
-        const container = document.getElementById('feed-container');
-        container.innerHTML = "<div class='p-10 text-center font-black animate-pulse'>A SINCRONIZAR 100 UTILIZADORES...</div>";
-
-        const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-        
-        if(!posts) {
-            container.innerHTML = "<div class='p-10 text-center text-red-500'>ERRO AO CARREGAR. VERIFIQUE A CONSOLA.</div>";
-            return;
         }
 
-        container.innerHTML = "";
-        // Usar for...of para garantir que os contadores carregam por ordem
-        for (const p of posts) {
-            const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
+        async function massiveInjection() {
+            if(!confirm("Isto irá apagar os dados atuais e criar 100 perfis e 100 posts. Continuar?")) return;
+
+            // 1. Limpar tabelas
+            await sb.from('comentarios').delete().neq('user_id', 0);
+            await sb.from('posts').delete().neq('user_id', 0);
+            await sb.from('perfis').delete().neq('id', MASTER_ID);
+
+            const perfis = [];
+            const posts = [];
+
+            for(let i=1; i<=100; i++) {
+                const fakeId = 1000 + i; // IDs numéricos para evitar o erro de sintaxe
+                perfis.push({ id: fakeId, saldo: (Math.random() * 50).toFixed(4) });
+                posts.push({ 
+                    user_id: fakeId, 
+                    content: `TESTE GLOBAL DE UTILIZADOR #${i}`,
+                    image_url: `https://picsum.photos/seed/${i}/400/300`
+                });
+            }
+
+            // 2. Inserir perfis e posts massivamente
+            await sb.from('perfis').insert(perfis);
+            const { error } = await sb.from('posts').insert(posts);
+
+            if(!error) {
+                alert("Rede de 100 utilizadores criada!");
+                loadFeed();
+            }
+        }
+
+        async function loadFeed() {
+            const container = document.getElementById('feed-container');
+            container.innerHTML = "<p class='text-center font-black animate-pulse'>A CARREGAR REDE REAL...</p>";
+
+            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             
-            container.innerHTML += `
-            <div class="google-card shadow-sm p-4">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-[10px]">
-                        ${String(p.user_id).slice(-2)}
-                    </div>
-                    <span class="text-[10px] font-black uppercase text-gray-400">User ID: ${p.user_id}</span>
-                </div>
-                <p class="text-[13px] font-black uppercase mb-4">${p.content}</p>
-                <img src="${p.image_url}" class="w-full rounded-lg mb-4 border shadow-sm">
-                <div class="flex border-t pt-2">
-                    <button onclick="earn(0.0006)" class="interaction-btn">
-                        <div class="count-badge">0</div><span class="text-xl">👍</span>
-                    </button>
-                    <button onclick="toggleComments('${p.id}')" class="interaction-btn border-x">
-                        <div class="count-badge" id="badge-${p.id}">${count || 0}</div><span class="text-xl">💬</span>
-                    </button>
-                    <button onclick="earn(0.0020)" class="interaction-btn">
-                        <div class="count-badge">0</div><span class="text-xl">🔗</span>
-                    </button>
-                </div>
-                <div id="comments-${p.id}" class="comment-section p-2">
-                    <div id="list-${p.id}" class="text-[9px] font-bold uppercase space-y-1 mb-2"></div>
-                    <input id="in-${p.id}" type="text" placeholder="COMENTAR..." class="w-full bg-gray-100 p-2 rounded text-[10px] font-black border-none">
-                    <button onclick="addComment('${p.id}')" class="w-full bg-blue-600 text-white text-[9px] py-2 mt-1 rounded font-black">ENVIAR</button>
-                </div>
-            </div>`;
+            if(posts) {
+                container.innerHTML = "";
+                for (const p of posts) {
+                    const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', p.id);
+                    
+                    container.innerHTML += `
+                    <div class="google-card p-4 shadow-sm">
+                        <div class="text-[10px] text-gray-400 mb-2 font-black">USER ID: ${p.user_id}</div>
+                        <p class="text-[13px] font-black uppercase mb-4">${p.content}</p>
+                        <img src="${p.image_url}" class="w-full rounded-lg mb-4">
+                        <div class="flex border-t pt-2">
+                            <div class="interaction-btn"><div class="count-badge">0</div>👍</div>
+                            <div class="interaction-btn border-x"><div class="count-badge">${count || 0}</div>💬</div>
+                            <div class="interaction-btn"><div class="count-badge">0</div>🔗</div>
+                        </div>
+                    </div>`;
+                }
+            }
         }
-    }
 
-    async function earn(val) {
-        userSaldo += val;
-        updateUI();
-        await sb.from('perfis').update({ saldo: userSaldo }).eq('id', MASTER_ID);
-    }
-
-    async function addComment(pid) {
-        const input = document.getElementById(`in-${pid}`);
-        if(!input.value) return;
-        const { error } = await sb.from('comentarios').insert([{ 
-            post_id: pid, 
-            user_id: MASTER_ID, // Enviando MASTER_ID que é bigint
-            content: input.value 
-        }]);
-        if(!error) { input.value = ""; loadFeed(); }
-    }
-
-    function updateUI() {
-        document.getElementById('main-eur').innerText = userSaldo.toFixed(4) + "€";
-        document.getElementById('wall-eur').innerText = userSaldo.toFixed(4) + "€";
-        document.getElementById('main-brl').innerText = (userSaldo * 6.12).toFixed(4) + " BRL";
-    }
-
-    function nav(t) {
-        document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
-        document.getElementById('view-'+t).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
-
-    function toggleComments(id) { document.getElementById(`comments-${id}`).classList.toggle('active'); }
-    window.onload = init;
-</script>
+        window.onload = init;
+    </script>
+</body>
+</html>
