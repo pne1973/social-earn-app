@@ -3,48 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network v34.01 - Production Master</title>
+    <title>Social Earn Network v34.15 - Production Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; --g-yellow: #FBBC05; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin-bottom: 12px; transition: transform 0.2s; }
+        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
         
-        /* ANIMAÇÃO DE GANHOS */
-        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes popUp {
-            0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
-            20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
-            100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
-        }
-        .earning-text { font-size: 3.5rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52,168,83,0.4); -webkit-text-stroke: 1.5px white; }
+        /* GANHOS E ADS */
+        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s forwards; }
+        @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
+        .earning-text { font-size: 3.5rem; font-weight: 900; color: var(--g-green); -webkit-text-stroke: 1.5px white; }
 
-        /* UI DE ANÚNCIOS INTERNOS */
         #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .modal-300-250 { width: 310px; background: white; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .modal-300-250 { width: 310px; background: white; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* BANNER PUBLICITÁRIO EXEMPLO */
+        /* PUBLICIDADE */
         .sponsored-slot { background: white; border: 1px dashed var(--g-blue); padding: 12px; border-radius: 12px; margin-bottom: 12px; text-align: center; }
-        .ad-badge { color: var(--g-blue); font-size: 8px; font-weight: 900; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .ad-badge { color: var(--g-blue); font-size: 8px; font-weight: 900; text-transform: uppercase; display: block; }
 
-        /* STATUS E HEADER */
-        .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; }
-        
-        /* PUBLICADOR FIXO REDUZIDO */
+        /* HEADER E STATUS */
+        .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px 16px; display: flex; align-items: center; justify-content: center; min-height: 48px; }
         .publisher-fixed { position: fixed; top: 120px; left: 0; right: 0; z-index: 280; background: #f1f3f4; padding: 8px 16px; border-bottom: 1px solid #dadce0; }
         .mini-input-box { background: white; border: 1px solid #dadce0; border-radius: 24px; padding: 8px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
 
-        /* NAVEGAÇÃO E FEED */
+        /* FEED E INTERAÇÕES */
         #feed-container { margin-top: 185px; padding: 0 16px; }
-        .nav-item { transition: all 0.3s; color: #5f6368; }
-        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; position: relative; }
+        .count-badge { position: absolute; top: 2px; right: 20%; background: var(--g-red); color: white; font-size: 10px; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 900; border: 2px solid white; }
+        .tab-content { display: none; }
         .tab-content.active { display: block; }
-
-        /* ADMIN STYLES */
-        .profit-card { background: #1a0b2e; color: white; border-radius: 16px; padding: 24px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); }
         
         #auth-screen { position: fixed; inset: 0; background: white; z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
     </style>
@@ -52,38 +42,34 @@
 <body class="pb-24">
 
     <div id="auth-screen" style="display:none;">
-        <div class="w-16 h-16 bg-blue-600 rounded-2xl mb-6 flex items-center justify-center text-white font-black italic text-3xl shadow-lg shadow-blue-200">S</div>
-        <h2 class="text-blue-600 font-black uppercase text-xs mb-8 tracking-[0.2em]">Social Earn Network</h2>
-        <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs border-2 border-gray-100 rounded-2xl p-5 text-center mb-4 uppercase font-black focus:border-blue-600 outline-none transition-all shadow-sm">
-        <button onclick="doLogin()" class="w-full max-w-xs bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl uppercase active:scale-95 transition-transform">Entrar no Sistema</button>
+        <div class="w-16 h-16 bg-blue-600 rounded-2xl mb-6 flex items-center justify-center text-white font-black italic text-3xl shadow-lg">S</div>
+        <h2 class="text-blue-600 font-black uppercase text-xs mb-8">Social Earn Network</h2>
+        <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs border-2 border-gray-100 rounded-2xl p-5 text-center mb-4 uppercase font-black outline-none">
+        <button onclick="doLogin()" class="w-full max-w-xs bg-blue-600 text-white font-black py-5 rounded-2xl uppercase active:scale-95 transition-transform">Entrar no Sistema</button>
     </div>
 
     <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
 
     <div id="ad-overlay">
         <div id="ad-decision-ui" class="modal-300-250 p-8 text-center">
-            <div class="w-12 h-12 bg-yellow-400 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl">⚡</div>
-            <h3 class="text-xs font-black uppercase text-blue-600 mb-3 tracking-tighter">Manter Multiplicador 1.0x</h3>
-            <p class="text-[10px] leading-relaxed font-bold mb-8 text-gray-400 uppercase">Vê um anúncio para manter ganhos máximos.</p>
-            <button onclick="startAdFlow()" class="w-full py-4 bg-blue-600 text-white rounded-xl shadow-lg uppercase text-[11px] font-black mb-3">Ver Anúncio (15s)</button>
-            <button onclick="degradeGains()" class="w-full py-2 text-gray-300 uppercase text-[9px] font-black italic">Recusar</button>
+            <h3 class="text-xs font-black uppercase text-blue-600 mb-3">Multiplicador 1.0x</h3>
+            <p class="text-[10px] font-bold mb-8 text-gray-400 uppercase">Vê um anúncio para manter ganhos no máximo.</p>
+            <button onclick="startAdFlow()" class="w-full py-4 bg-blue-600 text-white rounded-xl font-black uppercase text-[11px] mb-3">Ver Vídeo (15s)</button>
+            <button onclick="degradeGains()" class="w-full py-2 text-gray-300 uppercase text-[9px] font-black italic">Recusar Ganhos</button>
         </div>
         <div id="ad-player-ui" class="modal-300-250 hidden">
             <div class="flex-1 bg-black flex flex-col items-center justify-center text-white p-6">
                 <div id="ad-timer-circle" class="font-black text-6xl mb-2">15</div>
-                <p class="text-[9px] text-blue-400 uppercase font-black tracking-[0.3em]">Monetizando...</p>
+                <p class="text-[9px] text-blue-400 uppercase font-black">Monetizando...</p>
             </div>
-            <button id="close-ad-btn" disabled class="h-16 bg-gray-100 text-gray-400 uppercase text-[10px] font-black">Processando...</button>
+            <button id="close-ad-btn" disabled class="h-16 bg-gray-100 text-gray-400 uppercase text-[10px] font-black">Aguarde...</button>
         </div>
     </div>
 
     <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-5 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-md">S</div>
-            <div>
-                <h1 class="text-[11px] font-black uppercase text-blue-600 leading-none">Social Earn</h1>
-                <p class="text-[8px] font-black text-gray-300 uppercase tracking-widest mt-1">Official Network</p>
-            </div>
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">S</div>
+            <h1 class="text-[11px] font-black uppercase text-blue-600">Social Earn</h1>
         </div>
         <div class="text-right">
             <div id="main-eur" class="font-black text-green-600 text-xl tracking-tighter">0.0000€</div>
@@ -92,25 +78,21 @@
     </header>
 
     <div class="status-header-fixed">
-        <div id="status-text" class="text-[9px] font-black uppercase text-green-600 tracking-tight">Ganhos Ativos: 100% (Modo Normal)</div>
-        <button id="restore-btn" onclick="startAdFlow(true)" class="hidden bg-red-600 text-white px-3 py-1.5 rounded-lg text-[8px] font-black uppercase animate-pulse ml-2 shadow-sm">Restaurar</button>
-        <button onclick="doLogout()" class="ml-auto text-[8px] text-gray-300 uppercase font-black hover:text-red-500">Sair</button>
+        <div id="status-text" class="text-[9px] font-black uppercase text-green-600">Ganhos Ativos: 100%</div>
+        <button id="restore-btn" onclick="startAdFlow(true)" class="hidden bg-red-600 text-white px-2 py-1 rounded text-[8px] font-black uppercase ml-2">Restaurar</button>
+        <button onclick="doLogout()" class="ml-auto text-[8px] text-gray-300 uppercase font-black">Sair</button>
     </div>
 
     <div id="pub-fixed-container" class="publisher-fixed">
         <div id="mini-pub" onclick="expandPublisher()" class="mini-input-box shadow-sm">
-            <div class="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center text-[10px]">👤</div>
-            <div class="text-[10px] text-gray-300 font-black uppercase">Partilhe algo agora...</div>
+            <div class="text-[10px] text-gray-300 font-black uppercase">O que queres partilhar agora?</div>
         </div>
-        
         <div id="expanded-post" class="hidden google-card p-4 border-t-4 border-blue-600 shadow-md mt-2">
-            <textarea id="post-input" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none focus:ring-0 text-xs mb-2 resize-none uppercase font-black placeholder-gray-300" rows="3"></textarea>
-            <div class="border-t pt-4">
-                <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-50 border-none text-[10px] p-3 rounded-xl mb-3 font-black uppercase outline-none focus:bg-white">
-                <div class="flex gap-2">
-                    <button onclick="collapsePublisher()" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Cancelar</button>
-                    <button onclick="handleInteraction('post')" class="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-black text-[11px] uppercase shadow-lg">Publicar (+0.0150€)</button>
-                </div>
+            <textarea id="post-input" placeholder="ESCREVE AQUI..." class="w-full border-none text-xs mb-2 resize-none font-black outline-none" rows="3"></textarea>
+            <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-50 border-none text-[10px] p-3 rounded-xl mb-3 font-black outline-none">
+            <div class="flex gap-2">
+                <button onclick="collapsePublisher()" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Sair</button>
+                <button onclick="handleInteraction('post')" class="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-black text-[11px] uppercase shadow-lg">Publicar (+0.0150€)</button>
             </div>
         </div>
     </div>
@@ -123,56 +105,40 @@
         <section id="view-info" class="tab-content px-4 mt-32">
             <div class="sponsored-slot">
                 <span class="ad-badge">Sponsored Ad</span>
-                <p class="text-[10px] font-black uppercase text-gray-400">Oferta: Registe-se na Revolut e ganhe bónus de entrada.</p>
+                <p class="text-[10px] font-black uppercase text-gray-400">Levantamento rápido via Revolut Business.</p>
             </div>
             
-            <div class="google-card p-12 text-center border-t-[12px] border-blue-600 shadow-xl">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Utilizador ID: <span id="display-uid" class="text-blue-600">---</span></p>
+            <div class="google-card p-12 text-center border-t-[12px] border-blue-600">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-3">ID: <span id="display-uid" class="text-blue-600">---</span></p>
                 <h1 id="wall-eur" class="text-6xl font-black text-blue-600 tracking-tighter mb-2">0.0000€</h1>
                 <p id="wall-brl-sub" class="text-xs font-black text-gray-300 uppercase mb-8">0.0000 BRL</p>
-                <div id="withdraw-area" class="mt-4 hidden animate-bounce">
-                    <input id="pp-email" type="email" placeholder="TEU EMAIL PAYPAL" class="w-full border-2 border-blue-100 rounded-xl p-4 text-center mb-3 font-black uppercase text-xs">
-                    <button onclick="requestWithdraw()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-[11px] uppercase">Solicitar Levantamento</button>
+                
+                <div id="withdraw-area" class="mt-4 hidden">
+                    <input id="pp-email" type="email" placeholder="EMAIL PAYPAL" class="w-full border-2 border-blue-100 rounded-xl p-4 text-center mb-3 font-black uppercase text-xs outline-none">
+                    <button onclick="requestWithdraw()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-[11px] uppercase shadow-lg">Solicitar via PayPal</button>
                 </div>
+
                 <div id="progress-container" class="pt-6 border-t border-dashed">
                     <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-2">
                         <div id="withdraw-progress" class="bg-blue-600 h-full w-0 transition-all duration-1000"></div>
                     </div>
-                    <p class="text-[9px] text-gray-400 uppercase font-black">Mínimo: 5.0000€</p>
+                    <p class="text-[9px] text-gray-400 uppercase font-black">Mínimo para Levantamento: 5.0000€</p>
                 </div>
             </div>
         </section>
 
         <section id="view-admin" class="tab-content px-4 mt-32 pb-10">
-            <h2 class="font-black uppercase text-blue-600 mb-5 flex items-center gap-2 text-sm">
-                <span class="w-2 h-6 bg-blue-600 rounded-full"></span> Admin Business Intelligence
-            </h2>
-            <div class="profit-card shadow-2xl">
-                <div class="flex justify-between items-start mb-6">
-                    <div>
-                        <div class="text-[8px] mb-1 opacity-50 font-black uppercase">Receita Bruta</div>
-                        <div id="adm-gross-revenue" class="text-3xl font-black text-blue-400">0.0000€</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-[8px] mb-1 opacity-50 font-black uppercase">Dívida Utilizadores</div>
-                        <div id="adm-total-debt" class="text-3xl font-black text-red-400">0.0000€</div>
-                    </div>
+            <div class="bg-gray-800 p-6 rounded-2xl text-white shadow-xl">
+                <h2 class="text-blue-400 font-black uppercase text-xs mb-4">Business Stats</h2>
+                <div class="flex justify-between border-b border-white/10 pb-4 mb-4">
+                    <div><p class="text-[8px] opacity-50 uppercase font-black">Receita</p><p id="adm-gross-revenue" class="text-2xl font-black">0.0000€</p></div>
+                    <div class="text-right"><p class="text-[8px] opacity-50 uppercase font-black">Dívida</p><p id="adm-total-debt" class="text-2xl font-black text-red-400">0.0000€</p></div>
                 </div>
-                <div class="grid grid-cols-2 gap-2 border-t border-white/10 pt-5">
-                    <div class="text-center">
-                        <div class="text-[7px] uppercase opacity-50 font-black mb-1">Impressões</div>
-                        <div id="adm-total-impressions" class="text-xs font-black">0</div>
-                    </div>
-                    <div class="text-center border-l border-white/10">
-                        <div class="text-[7px] uppercase opacity-50 font-black mb-1">Lucro Estimado</div>
-                        <div id="adm-net-profit" class="text-xs font-black">0.0000€</div>
-                    </div>
-                </div>
+                <table class="w-full text-left text-[9px] font-black uppercase">
+                    <thead><tr class="opacity-50 border-b border-white/10"><th class="pb-2">User</th><th class="pb-2">Saldo</th></tr></thead>
+                    <tbody id="adm-user-list"></tbody>
+                </table>
             </div>
-            <table class="w-full bg-white rounded-xl overflow-hidden shadow-sm">
-                <thead class="bg-gray-50 text-[8px] uppercase font-black"><tr><th class="p-4">ID User</th><th class="p-4">Saldo</th><th class="p-4 text-right">Ação</th></tr></thead>
-                <tbody id="adm-user-list" class="text-[10px] font-bold uppercase"></tbody>
-            </table>
         </section>
     </main>
 
@@ -201,16 +167,13 @@
         async function init() {
             if (!activeID) { document.getElementById('auth-screen').style.display = 'flex'; return; }
             document.getElementById('display-uid').innerText = activeID;
-
             if(activeID === ADMIN_MASTER) {
                 document.getElementById('nav-admin-btn').classList.remove('hidden');
                 document.getElementById('nav-wallet-btn').classList.add('hidden');
             }
-
             const { data } = await sb.from('perfis').select('*').eq('id', activeID).single();
             if(data) user.saldo = Number(data.saldo) || 0;
             else await sb.from('perfis').insert([{ id: activeID, saldo: 0.0000 }]);
-
             updateUI(); loadFeed();
             setInterval(updateUI, 1000);
         }
@@ -221,19 +184,15 @@
             document.getElementById('wall-eur').innerText = curSaldo.toFixed(4) + "€";
             document.getElementById('main-brl').innerText = (curSaldo * 6.1245).toFixed(4) + " BRL";
             document.getElementById('wall-brl-sub').innerText = (curSaldo * 6.1245).toFixed(4) + " BRL";
-            
             const progress = (curSaldo / 5.0) * 100;
             document.getElementById('withdraw-progress').style.width = Math.min(progress, 100) + "%";
-
-            if(curSaldo >= 5.0) document.getElementById('withdraw-area').classList.remove('hidden');
-
+            if(curSaldo >= 5.0) { document.getElementById('withdraw-area').classList.remove('hidden'); document.getElementById('progress-container').classList.add('hidden'); }
+            
             const statusBox = document.getElementById('status-text');
             if (user.multiplier < 1.0) {
-                statusBox.innerText = `GANHOS REDUZIDOS ATÉ ${new Date(user.penaltyExpiry).toLocaleTimeString()}`;
                 statusBox.className = "text-[9px] font-black uppercase text-red-600 animate-pulse";
                 document.getElementById('restore-btn').classList.remove('hidden');
             } else {
-                statusBox.innerText = "100% DE GANHOS ATIVOS (MODO NORMAL)";
                 statusBox.className = "text-[9px] font-black uppercase text-green-600";
                 document.getElementById('restore-btn').classList.add('hidden');
             }
@@ -247,58 +206,74 @@
             let html = '';
             posts.forEach((p, index) => {
                 html += `
-                    <div class="google-card shadow-sm border border-gray-100">
+                    <div class="google-card shadow-sm border border-gray-100 mb-4">
                         <div class="p-5">
                             <p class="text-[13px] font-black uppercase text-gray-800 mb-5 tracking-tight">${p.content}</p>
                             ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-2xl mb-5 border border-gray-50 shadow-inner">` : ''}
                             <div class="flex border-t pt-2 gap-1">
-                                <button onclick="handleInteraction('like', 0.0006)" class="interaction-btn flex-1 py-2 flex flex-col items-center">
-                                    <span class="text-xl">👍</span><span class="text-[8px] uppercase font-black text-gray-400 mt-1">Gostar</span>
+                                <button onclick="handleInteraction('like', 0.0006)" class="interaction-btn hover:bg-gray-50 transition-colors">
+                                    <div class="count-badge">0</div><span class="text-xl">👍</span><span class="text-[8px] uppercase font-black text-gray-400 mt-1">Gostar</span>
                                 </button>
-                                <button onclick="handleInteraction('share', 0.0020)" class="interaction-btn flex-1 py-2 flex flex-col items-center">
-                                    <span class="text-xl">🔗</span><span class="text-[8px] uppercase font-black text-gray-400 mt-1">Partilhar</span>
+                                <button onclick="toggleComments('${p.id}')" class="interaction-btn border-x border-gray-50 hover:bg-gray-50 transition-colors">
+                                    <div class="count-badge" id="badge-${p.id}">0</div><span class="text-xl">💬</span><span class="text-[8px] uppercase font-black text-gray-400 mt-1">Comentar</span>
                                 </button>
+                                <button onclick="handleInteraction('share', 0.0020)" class="interaction-btn hover:bg-gray-50 transition-colors">
+                                    <div class="count-badge">0</div><span class="text-xl">🔗</span><span class="text-[8px] uppercase font-black text-gray-400 mt-1">Partilhar</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="comments-${p.id}" class="hidden bg-gray-50 border-t">
+                            <div id="list-${p.id}" class="p-5 space-y-2 text-[10px] font-bold uppercase text-gray-600"></div>
+                            <div class="p-4 bg-white border-t flex gap-3">
+                                <input id="in-${p.id}" type="text" placeholder="ESCREVE ALGO..." class="flex-1 bg-gray-50 rounded-xl p-3 text-[10px] font-black border-none outline-none">
+                                <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-5 rounded-xl font-black text-[10px] uppercase">OK</button>
                             </div>
                         </div>
                     </div>
                 `;
-                // Injeção de anúncio a cada 3 posts
                 if((index + 1) % 3 === 0) {
                     html += `
                         <div class="sponsored-slot border-solid bg-[#fafafa]">
                             <span class="ad-badge text-gray-400">Publicidade</span>
-                            <p class="text-[10px] font-black uppercase text-gray-400">Patrocínio Social Earn: Compre o seu Pack VIP Admin.</p>
+                            <p class="text-[10px] font-black uppercase text-gray-400">Oferta Social Earn: Convida amigos e ganha +100 XP por cada um.</p>
                         </div>
                     `;
                 }
             });
             container.innerHTML = html;
+            posts.forEach(p => updateComments(p.id));
         }
 
-        function handleInteraction(type, val = 0) {
+        async function updateComments(pid) {
+            const { data, count } = await sb.from('comentarios').select('*', { count: 'exact' }).eq('post_id', pid);
+            const list = document.getElementById(`list-${pid}`);
+            const badge = document.getElementById(`badge-${pid}`);
+            if(list && data) list.innerHTML = data.map(c => `<div class="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">${c.content}</div>`).join('');
+            if(badge) badge.innerText = count || 0;
+        }
+
+        async function toggleComments(id) {
+            const sec = document.getElementById(`comments-${id}`);
+            sec.classList.toggle('hidden');
+        }
+
+        async function handleInteraction(type, val = 0, pid = null) {
             if ((user.interactions >= 2 || user.postsToday >= 3) && user.multiplier === 1.0) {
-                pendingAction = { type, val };
+                pendingAction = { type, val, pid };
                 document.getElementById('ad-overlay').style.display = 'flex';
                 document.getElementById('ad-decision-ui').classList.remove('hidden');
-            } else { executeAction(type, val); }
+            } else { executeAction(type, val, pid); }
         }
 
-        function startAdFlow() {
-            document.getElementById('ad-decision-ui').classList.add('hidden');
-            document.getElementById('ad-player-ui').classList.remove('hidden');
-            let time = 15;
-            const timer = setInterval(() => {
-                time--;
-                document.getElementById('ad-timer-circle').innerText = time;
-                if(time <= 0) {
-                    clearInterval(timer);
-                    const btn = document.getElementById('close-ad-btn');
-                    btn.disabled = false;
-                    btn.innerText = "RESGATAR";
-                    btn.className = "h-16 bg-green-600 text-white font-black uppercase text-[10px]";
-                    btn.onclick = () => { resetState(); closeAd(); if(pendingAction) executeAction(pendingAction.type, pendingAction.val); };
-                }
-            }, 1000);
+        async function executeAction(type, val, pid) {
+            if (type === 'post') await publish();
+            else if (type === 'comment') {
+                const content = document.getElementById(`in-${pid}`).value;
+                if(!content) return;
+                await sb.from('comentarios').insert([{ post_id: pid, user_id: activeID, content }]);
+                document.getElementById(`in-${pid}`).value = "";
+                user.interactions++; applyGain(val); updateComments(pid);
+            } else { user.interactions++; applyGain(val); }
         }
 
         async function publish() {
@@ -306,27 +281,7 @@
             const url = document.getElementById('post-url').value;
             if(!content) return;
             const { error } = await sb.from('posts').insert([{ user_id: activeID, content, image_url: url }]);
-            if(!error) { 
-                user.postsToday++; 
-                applyGain(0.0150); 
-                document.getElementById('post-input').value = ""; 
-                collapsePublisher(); 
-                loadFeed(); 
-            }
-        }
-
-        function expandPublisher() { 
-            document.getElementById('mini-pub').classList.add('hidden');
-            document.getElementById('expanded-post').classList.remove('hidden');
-        }
-        function collapsePublisher() {
-            document.getElementById('mini-pub').classList.remove('hidden');
-            document.getElementById('expanded-post').classList.add('hidden');
-        }
-
-        async function executeAction(type, val) {
-            if (type === 'post') await publish();
-            else { user.interactions++; applyGain(val); }
+            if(!error) { user.postsToday++; applyGain(0.0150); collapsePublisher(); loadFeed(); }
         }
 
         async function applyGain(val) {
@@ -343,24 +298,43 @@
             c.style.display = 'block'; setTimeout(() => c.style.display = 'none', 800); 
         }
 
-        function nav(t) { 
-            document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active')); 
-            document.getElementById('view-'+t).classList.add('active'); 
-            event.currentTarget.classList.add('active'); 
+        function nav(t) {
+            document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
+            document.getElementById('view-'+t).classList.add('active');
+            event.currentTarget.classList.add('active');
             document.getElementById('pub-fixed-container').style.display = (t === 'social') ? 'block' : 'none';
             if(t === 'admin') loadAdminStats();
         }
 
         async function loadAdminStats() {
             const { data: users } = await sb.from('perfis').select('*');
-            document.getElementById('adm-user-list').innerHTML = users.map(u => `
-                <tr class="border-b"><td class="p-4 font-black text-blue-600">${u.id}</td><td class="p-4 font-black">${Number(u.saldo).toFixed(4)}€</td><td class="p-4 text-right">BAN</td></tr>
-            `).join('');
+            const debt = users.reduce((acc, u) => acc + (Number(u.saldo) || 0), 0);
+            document.getElementById('adm-total-debt').innerText = debt.toFixed(4) + "€";
+            document.getElementById('adm-gross-revenue').innerText = (debt * 1.5).toFixed(4) + "€";
+            document.getElementById('adm-user-list').innerHTML = users.map(u => `<tr class="border-b border-white/10"><td class="py-2 text-blue-400">${u.id}</td><td class="py-2">${Number(u.saldo).toFixed(4)}€</td></tr>`).join('');
         }
 
-        function degradeGains() { user.multiplier = 0.5; user.penaltyExpiry = new Date(Date.now() + 24*60*60*1000).toISOString(); closeAd(); }
-        function closeAd() { document.getElementById('ad-overlay').style.display = 'none'; pendingAction = null; }
-        function resetState() { user.multiplier = 1.0; user.penaltyExpiry = null; user.interactions = 0; updateUI(); }
+        function startAdFlow() {
+            document.getElementById('ad-decision-ui').classList.add('hidden');
+            document.getElementById('ad-player-ui').classList.remove('hidden');
+            let time = 15;
+            const timer = setInterval(() => {
+                time--; document.getElementById('ad-timer-circle').innerText = time;
+                if(time <= 0) {
+                    clearInterval(timer);
+                    const btn = document.getElementById('close-ad-btn');
+                    btn.disabled = false; btn.innerText = "RESGATAR";
+                    btn.onclick = () => { resetState(); closeAd(); if(pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid); };
+                }
+            }, 1000);
+        }
+
+        function degradeGains() { user.multiplier = 0.5; closeAd(); }
+        function resetState() { user.multiplier = 1.0; user.interactions = 0; }
+        function closeAd() { document.getElementById('ad-overlay').style.display = 'none'; }
+        function expandPublisher() { document.getElementById('mini-pub').classList.add('hidden'); document.getElementById('expanded-post').classList.remove('hidden'); }
+        function collapsePublisher() { document.getElementById('mini-pub').classList.remove('hidden'); document.getElementById('expanded-post').classList.add('hidden'); }
+        async function requestWithdraw() { alert("Solicitação de levantamento PayPal enviada para análise!"); }
 
         window.onload = init;
     </script>
