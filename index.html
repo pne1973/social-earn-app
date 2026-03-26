@@ -1,134 +1,312 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Social v32.7 - Production Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Social Earn Network v32.7</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --google-blue: #1a73e8; --google-red: #ea4335; --google-yellow: #fbbc04; --google-green: #34a853; --bg: #f8f9fa; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg); margin: 0; color: #202124; padding-bottom: 60px; }
+        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
+        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
         
-        /* AUTH & TUTORIAL */
-        #auth-screen, #tutorial { position: fixed; inset: 0; background: white; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 20px; text-align: center; }
-        
-        /* HEADER STYLE GOOGLE */
-        header { background: white; padding: 12px; border-bottom: 1px solid #dadce0; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 2px rgba(60,64,67,0.1); }
-        .nav-container { max-width: 500px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .balance-box { text-align: center; flex-grow: 1; }
-        .main-balance { font-size: 1.6rem; font-weight: 700; color: var(--google-green); }
-        
-        /* FEED & POSTS */
-        .feed { max-width: 500px; margin: 15px auto; padding: 0 10px; }
-        .post { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 15px; overflow: hidden; transition: 0.2s; }
-        .post-content { padding: 15px; font-size: 1rem; line-height: 1.5; }
-        .post img { width: 100%; display: block; border-top: 1px solid #f1f3f4; }
-        
-        /* GAMIFICATION BUTTONS */
-        .actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #f1f3f4; }
-        .btn-act { padding: 12px; border: none; background: white; cursor: pointer; font-weight: 500; color: #5f6368; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-act:active { background: #f1f3f4; }
-        .btn-act.like { color: var(--google-blue); }
+        /* ANIMAÇÃO DE GANHOS */
+        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
+        @keyframes popUp {
+            0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
+            20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
+        }
+        .earning-text { font-size: 3rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52,168,83,0.4); -webkit-text-stroke: 1.5px white; }
 
-        /* EARNINGS TABLE */
-        .earnings-info { font-size: 0.75rem; color: #70757a; margin-top: 4px; }
-        .logout-btn { font-size: 0.7rem; color: var(--google-red); cursor: pointer; font-weight: bold; }
+        /* INTERAÇÕES */
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; position: relative; border: none; background: transparent; cursor: pointer; }
+        .count-badge { position: absolute; top: 2px; right: 28%; background: var(--g-red); color: white; font-size: 9px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 900; border: 1.5px solid white; }
+        
+        .comment-section { display: none; background: #f8f9fa; border-top: 1px solid #eee; width: 100%; }
+        .comment-section.active { display: flex; flex-direction: column; }
+
+        /* STATUS E ADS */
+        .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 45px; }
+        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 5000; align-items: center; justify-content: center; }
+        .modal-300-250 { width: 300px; background: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* NAVEGAÇÃO */
+        .publisher-area { margin-top: 130px; padding: 0 16px; margin-bottom: 12px; }
+        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* AUTH SCREEN */
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
     </style>
 </head>
-<body>
+<body class="pb-24">
 
-<div id="auth-screen" style="display:none;">
-    <h1 style="color:var(--google-blue); margin-bottom:10px;">Apex Social</h1>
-    <p>Introduza o seu ID Único</p>
-    <input type="text" id="uid-input" placeholder="ID ou Username" style="padding:12px; border-radius:8px; border:1px solid #dadce0; width:280px; margin-bottom:15px;">
-    <button onclick="login()" style="background:var(--google-blue); color:white; border:none; padding:12px 40px; border-radius:24px; font-weight:bold; cursor:pointer;">ACEDER</button>
-</div>
+    <div id="auth-screen" style="display:none;">
+        <div class="w-12 h-12 bg-blue-600 rounded-xl mb-4 flex items-center justify-center text-white font-black italic text-2xl">S</div>
+        <h2 class="text-blue-600 font-black uppercase text-sm mb-6 tracking-widest">Social Earn Network</h2>
+        <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs border-2 border-gray-100 rounded-xl p-4 text-center mb-4 uppercase font-black focus:border-blue-600 outline-none transition-all">
+        <button onclick="doLogin()" class="w-full max-w-xs bg-blue-600 text-white font-black py-4 rounded-xl shadow-xl uppercase active:scale-95 transition-transform">Entrar</button>
+    </div>
 
-<header id="main-header" style="display:none;">
-    <div class="nav-container">
-        <div class="logout-btn" onclick="logout()">SAIR</div>
-        <div class="balance-box">
-            <div class="main-balance" id="balance-display">0.0000€</div>
-            <div class="earnings-info" id="conversion-display">R$ 0.00</div>
+    <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
+
+    <div id="ad-overlay">
+        <div id="ad-decision-ui" class="modal-300-250 p-6 text-center">
+            <h3 class="text-[11px] font-black uppercase text-blue-600 mb-2">Manter Ganhos a 100%</h3>
+            <p class="text-[10px] leading-tight font-bold mb-6 text-gray-400">Vê um anúncio para não perderes o multiplicador de ganhos atual.</p>
+            <button onclick="startAdFlow()" class="w-full py-4 bg-blue-600 text-white rounded-lg shadow-md uppercase text-[11px] mb-2 font-black">Ver Anúncio (15s)</button>
+            <button onclick="degradeGains()" class="w-full py-2 text-gray-300 uppercase text-[9px] font-black italic">Reduzir ganhos temporariamente</button>
         </div>
-        <div style="width:30px;"></div> 
+        <div id="ad-player-ui" class="modal-300-250 hidden">
+            <div class="flex-1 bg-black flex flex-col items-center justify-center text-white">
+                <div id="ad-timer-circle" class="font-black text-5xl mb-1">15</div>
+                <p class="text-[8px] text-gray-500 uppercase font-black tracking-widest">Anúncio em curso</p>
+            </div>
+            <button id="close-ad-btn" disabled class="h-14 bg-gray-200 text-gray-400 uppercase text-[10px] font-black">A carregar prémio...</button>
+        </div>
     </div>
-</header>
 
-<div class="feed" id="main-feed" style="display:none;">
+    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">S</div>
+            <h1 class="text-[12px] font-black uppercase text-blue-600">Social Network</h1>
+        </div>
+        <div class="text-right">
+            <div id="main-eur" class="font-black text-green-600 text-lg">0.0000€</div>
+            <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase">0.0000 BRL</div>
+        </div>
+    </header>
+
+    <div class="status-header-fixed">
+        <div id="status-text" class="text-[9px] font-black uppercase text-green-600 text-center leading-none tracking-tighter">100% de Ganhos Ativos</div>
+        <button id="restore-btn" onclick="startAdFlow(true)" class="hidden bg-red-600 text-white px-3 py-1.5 rounded-lg text-[8px] font-black uppercase animate-pulse">Restaurar</button>
+        <button onclick="doLogout()" class="ml-auto text-[8px] text-gray-300 uppercase font-black hover:text-red-500 transition-colors">Sair</button>
     </div>
 
-<script>
-    // CONFIGURAÇÃO MASTER
-    const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-    const sb = supabase.createClient(SB_URL, SB_KEY);
+    <main class="max-w-lg mx-auto">
+        <section id="view-social" class="tab-content active">
+            <div class="publisher-area">
+                <div class="google-card p-3 border-t-4 border-blue-600 shadow-sm">
+                    <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none focus:ring-0 text-[11px] mb-1 resize-none uppercase font-black" rows="1"></textarea>
+                    <div id="expanded-post" class="hidden border-t pt-3 mt-1">
+                        <input id="post-url" type="text" placeholder="URL DA IMAGEM (WEBURL)" class="w-full bg-gray-50 border-none text-[10px] p-2 rounded-lg mb-2 font-black uppercase outline-none">
+                        <button onclick="handleInteraction('post')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black text-[11px] uppercase shadow-md">Publicar</button>
+                    </div>
+                </div>
+            </div>
+            <div id="feed-container"></div>
+        </section>
 
-    const GAMIFICATION = { POST: 0.0015, LIKE: 0.0002, SHARE: 0.0005, CHECKIN: 0.0005 }; //
-    const RATE_BRL = 6.1245; // 4 casas decimais conforme especificação
-    
-    let currentUID = localStorage.getItem('apex_uid');
-    let user = { saldo: 0.0000 };
+        <section id="view-info" class="tab-content px-4 mt-24">
+            <div class="google-card p-10 text-center border-t-[10px] border-blue-600 shadow-lg">
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2 tracking-widest">ID Ativo: <span id="display-uid" class="text-blue-600">---</span></p>
+                <h1 id="wall-eur" class="text-5xl font-black text-blue-600 tracking-tighter">0.0000€</h1>
+                <div class="mt-4 pt-4 border-t text-[10px] text-gray-400 uppercase font-black">Mínimo de levantamento: 5.0000€</div>
+            </div>
+        </section>
+    </main>
 
-    function login() {
-        const val = document.getElementById('uid-input').value.trim();
-        if(val) { localStorage.setItem('apex_uid', val); location.reload(); }
-    }
-    function logout() { localStorage.removeItem('apex_uid'); location.reload(); }
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200]">
+        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center font-black text-[11px] uppercase tracking-widest">Feed</button>
+        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[11px] uppercase tracking-widest">Carteira</button>
+    </nav>
 
-    async function init() {
-        if (!currentUID) { document.getElementById('auth-screen').style.display = 'flex'; return; }
+    <script>
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
-        document.getElementById('main-header').style.display = 'block';
-        document.getElementById('main-feed').style.display = 'block';
+        let activeID = localStorage.getItem('apex_uid');
+        let user = { saldo: 0, interactions: 0, postsToday: 0, multiplier: 1.0, penaltyExpiry: null };
+        let pendingAction = null;
 
-        // Sincronização com Supabase (v32.6 fix)
-        const { data } = await sb.from('perfis').select('saldo').eq('id', currentUID).single();
-        if (data) {
-            user.saldo = parseFloat(data.saldo) || 0;
-        } else {
-            await sb.from('perfis').insert([{ id: currentUID, saldo: 0.0000 }]);
+        function doLogin() {
+            const id = document.getElementById('login-id').value.trim();
+            if(id) { localStorage.setItem('apex_uid', id); location.reload(); }
+        }
+        function doLogout() { localStorage.removeItem('apex_uid'); location.reload(); }
+
+        async function init() {
+            if (!activeID) {
+                document.getElementById('auth-screen').style.display = 'flex';
+                return;
+            }
+            document.getElementById('display-uid').innerText = activeID;
+
+            // Motor de Sincronização v32.7
+            const { data } = await sb.from('perfis').select('*').eq('id', activeID).single();
+            if(data) {
+                user.saldo = Number(data.saldo) || 0;
+            } else {
+                await sb.from('perfis').insert([{ id: activeID, saldo: 0.0000 }]);
+            }
+
+            updateUI(); loadFeed();
+            setInterval(updateUI, 1000);
         }
 
-        updateDisplay();
-        loadContent();
-    }
+        function updateUI() {
+            document.getElementById('main-eur').innerText = user.saldo.toFixed(4) + "€";
+            document.getElementById('wall-eur').innerText = user.saldo.toFixed(4) + "€";
+            document.getElementById('main-brl').innerText = (user.saldo * 6.1245).toFixed(4) + " BRL";
+            
+            const statusBox = document.getElementById('status-text');
+            const restoreBtn = document.getElementById('restore-btn');
+            
+            if (user.multiplier < 1.0 && user.penaltyExpiry) {
+                const now = new Date();
+                const diff = new Date(user.penaltyExpiry) - now;
+                if (diff > 0) {
+                    statusBox.innerText = `${user.multiplier * 100}% GANHOS ATÉ ${new Date(user.penaltyExpiry).toLocaleTimeString()}`;
+                    statusBox.className = "text-[9px] font-black uppercase text-red-600";
+                    restoreBtn.classList.remove('hidden');
+                } else { resetState(); }
+            } else {
+                statusBox.innerText = "100% de Ganhos Ativos";
+                statusBox.className = "text-[9px] font-black uppercase text-green-600";
+                restoreBtn.classList.add('hidden');
+            }
+        }
 
-    function updateDisplay() {
-        const brl = (user.saldo * RATE_BRL).toFixed(2);
-        document.getElementById('balance-display').innerText = user.saldo.toFixed(4) + "€";
-        document.getElementById('conversion-display').innerText = "R$ " + brl + " • ID: " + currentUID;
-    }
+        // Lógica de Anúncios e Interações
+        function handleInteraction(type, val = 0, pid = null) {
+            if ((user.interactions >= 2 || user.postsToday >= 3) && user.multiplier === 1.0) {
+                pendingAction = { type, val, pid };
+                document.getElementById('ad-overlay').style.display = 'flex';
+                document.getElementById('ad-decision-ui').classList.remove('hidden');
+            } else { executeAction(type, val, pid); }
+        }
 
-    async function applyGain(type) {
-        const value = GAMIFICATION[type] || 0;
-        user.saldo = parseFloat((user.saldo + value).toFixed(4));
-        updateDisplay();
-        
-        // Gravação garantida via Upsert
-        await sb.from('perfis').upsert({ id: currentUID, saldo: user.saldo });
-    }
+        function startAdFlow(direct = false) {
+            document.getElementById('ad-overlay').style.display = 'flex';
+            document.getElementById('ad-decision-ui').classList.add('hidden');
+            document.getElementById('ad-player-ui').classList.remove('hidden');
+            let time = 15;
+            const timer = setInterval(() => {
+                time--;
+                document.getElementById('ad-timer-circle').innerText = time;
+                if(time <= 0) {
+                    clearInterval(timer);
+                    const btn = document.getElementById('close-ad-btn');
+                    btn.disabled = false;
+                    btn.innerText = "RESGATAR RECOMPENSA";
+                    btn.className = "h-14 bg-green-600 text-white font-black uppercase text-[10px]";
+                    btn.onclick = () => {
+                        resetState();
+                        if (!direct && pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid);
+                        closeAd();
+                    };
+                }
+            }, 1000);
+        }
 
-    async function loadContent() {
-        const { data: posts } = await sb.from('posts').select('*').order('id', { ascending: false }).limit(10);
-        const feed = document.getElementById('main-feed');
-        
-        if (posts) {
-            feed.innerHTML = posts.map(p => `
-                <div class="post">
-                    <div class="post-content">${p.content || ''}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" alt="Post Image">` : ''}
-                    <div class="actions">
-                        <button class="btn-act like" onclick="applyGain('LIKE')">👍 Like (+0.0002€)</button>
-                        <button class="btn-act" onclick="applyGain('SHARE')">💬 Share (+0.0005€)</button>
+        function degradeGains() {
+            user.multiplier = user.multiplier > 0.5 ? 0.5 : (user.multiplier > 0.25 ? 0.25 : 0.05);
+            user.penaltyExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+            if (pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid);
+            closeAd();
+        }
+
+        function closeAd() {
+            document.getElementById('ad-overlay').style.display = 'none';
+            document.getElementById('close-ad-btn').disabled = true;
+            document.getElementById('close-ad-btn').className = "h-14 bg-gray-200 text-gray-400 uppercase text-[10px] font-black";
+            document.getElementById('ad-timer-circle').innerText = "15";
+            pendingAction = null;
+        }
+
+        function resetState() { user.multiplier = 1.0; user.penaltyExpiry = null; user.interactions = 0; updateUI(); }
+
+        async function executeAction(type, val, pid) {
+            if (type === 'post') await publish();
+            else if (type === 'comment') { user.interactions++; await addComment(pid); }
+            else { user.interactions++; applyGain(val); }
+        }
+
+        async function applyGain(val) {
+            const final = val * user.multiplier;
+            user.saldo = Number((user.saldo + final).toFixed(4));
+            showBigNumber(final);
+            updateUI();
+            // Salva no Supabase para o ID logado
+            await sb.from('perfis').upsert({ id: activeID, saldo: user.saldo });
+        }
+
+        async function loadFeed() {
+            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            const container = document.getElementById('feed-container');
+            if(!posts) return;
+            container.innerHTML = posts.map(p => `
+                <div class="google-card shadow-sm border-t border-gray-100">
+                    <div class="p-5">
+                        <p class="text-[13px] font-black uppercase text-gray-800 mb-4 tracking-tight">${p.content}</p>
+                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mb-4 border border-gray-50 shadow-inner">` : ''}
+                        <div class="flex border-t pt-2 gap-1">
+                            <button onclick="handleInteraction('like', 0.0006)" class="interaction-btn hover:bg-gray-50 rounded-lg transition-colors">
+                                <div class="count-badge">0</div><span class="text-lg">👍</span><span class="text-[8px] uppercase font-black text-gray-400">Gostar</span>
+                            </button>
+                            <button onclick="toggleComments('${p.id}')" class="interaction-btn border-x hover:bg-gray-50 transition-colors">
+                                <div class="count-badge" id="badge-${p.id}">0</div><span class="text-lg">💬</span><span class="text-[8px] uppercase font-black text-gray-400">Comentar</span>
+                            </button>
+                            <button onclick="handleInteraction('share', 0.0020)" class="interaction-btn hover:bg-gray-50 rounded-lg transition-colors">
+                                <div class="count-badge">0</div><span class="text-lg">🔗</span><span class="text-[8px] uppercase font-black text-gray-400">Partilhar</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="comments-${p.id}" class="comment-section">
+                        <div id="list-${p.id}" class="p-4 space-y-2 max-h-40 overflow-y-auto text-[10px] font-bold uppercase"></div>
+                        <div class="p-2 bg-white border-t flex gap-2">
+                            <input id="in-${p.id}" type="text" placeholder="DIGITE AQUI..." class="flex-1 bg-gray-50 rounded p-2 text-[10px] font-black border-none outline-none">
+                            <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-4 rounded-lg font-black text-[10px] uppercase">Enviar</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
+            posts.forEach(p => updateCount(p.id));
         }
-    }
 
-    init();
-</script>
+        async function addComment(pid) {
+            const val = document.getElementById(`in-${pid}`).value;
+            if(!val) return;
+            const { error } = await sb.from('comentarios').insert([{ post_id: pid, user_id: activeID, content: val }]);
+            if(!error) { document.getElementById(`in-${pid}`).value = ""; applyGain(0.0010); updateComments(pid); }
+        }
+
+        async function updateComments(pid) {
+            const { data } = await sb.from('comentarios').select('*').eq('post_id', pid).order('created_at', {ascending: true});
+            document.getElementById(`list-${pid}`).innerHTML = data.map(c => `<div class="bg-white p-3 rounded-lg border shadow-sm mb-1">${c.content}</div>`).join('');
+            updateCount(pid);
+        }
+
+        async function updateCount(pid) {
+            const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', pid);
+            if(document.getElementById(`badge-${pid}`)) document.getElementById(`badge-${pid}`).innerText = count || 0;
+        }
+
+        async function publish() {
+            const content = document.getElementById('post-input').value;
+            if(!content) return;
+            const { error } = await sb.from('posts').insert([{ user_id: activeID, content, image_url: document.getElementById('post-url').value }]);
+            if(!error) { 
+                user.postsToday++; 
+                applyGain(0.0150); 
+                document.getElementById('post-input').value = ""; 
+                document.getElementById('post-url').value = "";
+                document.getElementById('expanded-post').classList.add('hidden'); 
+                loadFeed(); 
+            }
+        }
+
+        function toggleComments(id) { document.getElementById(`comments-${id}`).classList.toggle('active'); updateComments(id); }
+        function showBigNumber(val) { const c = document.getElementById('floating-earning'); document.getElementById('earning-val').innerText = "+" + val.toFixed(4) + "€"; c.style.display = 'block'; setTimeout(() => c.style.display = 'none', 800); }
+        function nav(t) { document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active')); document.getElementById('view-'+t).classList.add('active'); event.currentTarget.classList.add('active'); }
+        function expandPublisher() { document.getElementById('expanded-post').classList.remove('hidden'); document.getElementById('post-input').rows = 3; }
+        
+        window.onload = init;
+    </script>
 </body>
 </html>
