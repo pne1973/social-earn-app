@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social - Persistence Fix</title>
+    <title>Apex Social - Full Persistence</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
@@ -11,11 +11,12 @@
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; }
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
-        .login-bar { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: #fff; border-bottom: 2px solid var(--g-blue); padding: 12px; display: flex; gap: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; cursor: pointer; transition: 0.2s; position: relative; }
+        .interaction-btn:active { background: #f1f3f4; transform: scale(0.95); }
+        .badge { position: absolute; top: 5px; right: 25%; background: var(--g-red); color: white; font-size: 9px; min-width: 15px; border-radius: 10px; padding: 0 4px; border: 1px solid white; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; cursor: pointer; }
     </style>
 </head>
 <body class="pb-24">
@@ -23,20 +24,20 @@
     <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg">S</div>
-            <h1 class="text-[12px] font-black uppercase text-blue-600 leading-tight text-left">Social Earn<br>Network</h1>
+            <h1 class="text-[12px] font-black uppercase text-blue-600 leading-tight">Social Earn<br>Network</h1>
         </div>
         <div class="text-right">
-            <div id="display-eur" class="font-black text-green-600 text-xl tracking-tighter">0.0000€</div>
-            <div id="status-user" class="text-[9px] font-black text-gray-400 uppercase">Aguardando ID...</div>
+            <div id="display-eur" class="font-black text-green-600 text-xl">0.0000€</div>
+            <div id="status-user" class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Aguardando ID...</div>
         </div>
     </header>
 
-    <div class="login-bar">
-        <input id="login-id" type="number" placeholder="ID (EX: 1001)" class="flex-1 border-2 border-gray-100 p-2 rounded-lg text-[12px] font-black outline-none focus:border-blue-500">
-        <button id="btn-login" onclick="simularLogin()" class="bg-gray-800 text-white px-6 py-2 rounded-lg font-black text-[11px] uppercase shadow-md active:bg-blue-600">Entrar</button>
+    <div class="fixed top-[72px] left-0 right-0 bg-white border-b p-3 z-[150] flex gap-2 shadow-sm">
+        <input id="login-id" type="number" placeholder="ID (ex: 1001)" class="flex-1 border p-2 rounded-lg text-[12px] font-black">
+        <button id="btn-login" onclick="simularLogin()" class="bg-gray-800 text-white px-6 rounded-lg font-black text-[11px] uppercase">Entrar</button>
     </div>
 
-    <main class="max-w-lg mx-auto pt-[145px] px-4">
+    <main class="max-w-lg mx-auto pt-[150px] px-4">
         <section id="view-social" class="tab-content active">
             <div class="google-card p-4 border-t-4 border-blue-600 mb-6">
                 <textarea id="post-text" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none focus:ring-0 text-[12px] font-black uppercase mb-2" rows="2"></textarea>
@@ -45,9 +46,9 @@
             <div id="feed" class="space-y-4"></div>
         </section>
 
-        <section id="view-info" class="tab-content px-4 pt-10">
-            <div class="google-card p-12 text-center border-t-[10px] border-blue-600 shadow-xl">
-                <p class="text-[12px] font-black text-gray-400 uppercase mb-4 tracking-widest">Saldo Acumulado no ID</p>
+        <section id="view-info" class="tab-content pt-10">
+            <div class="google-card p-12 text-center border-t-[10px] border-blue-600 shadow-xl mx-4">
+                <p class="text-[12px] font-black text-gray-400 uppercase mb-4">Saldo Acumulado no Supabase</p>
                 <h1 id="wall-eur" class="text-6xl font-black text-blue-600 tracking-tighter">0.0000€</h1>
                 <div id="wall-brl" class="text-xl font-black text-green-500 mt-2">0.0000 BRL</div>
             </div>
@@ -73,27 +74,22 @@
 
         async function simularLogin() {
             const idInput = document.getElementById('login-id').value;
-            const btn = document.getElementById('btn-login');
-            if(!idInput) return alert("INSIRA UM ID (1001-1100)");
-
+            if(!idInput) return;
             CURRENT_USER_ID = parseInt(idInput);
             
-            // Força a busca do saldo acumulado na base de dados real
-            const { data, error } = await sb.from('perfis').select('saldo').eq('id', CURRENT_USER_ID).single();
-            
+            // Buscar saldo real do ID
+            const { data } = await sb.from('perfis').select('saldo').eq('id', CURRENT_USER_ID).single();
             if (data) {
                 CURRENT_SALDO = parseFloat(data.saldo || 0);
             } else {
-                // Se o ID não existir, cria-o com saldo zero
                 await sb.from('perfis').insert([{ id: CURRENT_USER_ID, saldo: 0 }]);
                 CURRENT_SALDO = 0;
             }
 
             document.getElementById('status-user').innerText = "ONLINE: ID " + CURRENT_USER_ID;
             document.getElementById('status-user').style.color = "#34A853";
-            btn.innerText = "CONECTADO";
-            btn.style.backgroundColor = "#34A853";
-            
+            document.getElementById('btn-login').innerText = "CONECTADO";
+            document.getElementById('btn-login').style.backgroundColor = "#34A853";
             updateUI();
         }
 
@@ -105,38 +101,42 @@
             container.innerHTML = "";
             posts.forEach(p => {
                 container.innerHTML += `
-                <div class="google-card p-4 shadow-sm border border-gray-100">
+                <div class="google-card p-4 shadow-sm border">
                     <div class="flex items-center gap-2 mb-3">
                         <div class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-[10px] font-black">${String(p.user_id).slice(-2)}</div>
                         <span class="text-[10px] font-black uppercase text-gray-400">User ID: ${p.user_id}</span>
                     </div>
-                    <p class="text-[13px] font-black uppercase mb-4 text-gray-700 leading-tight">${p.content}</p>
-                    <div class="flex border-t border-gray-50 pt-1">
-                        <div onclick="addGain(0.0006)" class="interaction-btn">👍 <span class="text-[9px] mt-1">GOSTAR</span></div>
-                        <div onclick="addGain(0.0010)" class="interaction-btn border-x border-gray-50">💬 <span class="text-[9px] mt-1">COMENTAR</span></div>
-                        <div onclick="addGain(0.0020)" class="interaction-btn">🔗 <span class="text-[9px] mt-1">PARTILHAR</span></div>
+                    <p class="text-[13px] font-black uppercase mb-4 text-gray-700">${p.content}</p>
+                    <div class="flex border-t pt-1">
+                        <div onclick="addGain(0.0006, '${p.id}')" class="interaction-btn">👍 <span class="text-[9px] mt-1">GOSTAR</span></div>
+                        <div onclick="addGain(0.0010, '${p.id}')" class="interaction-btn border-x">💬 <span class="text-[9px] mt-1">COMENTAR</span></div>
+                        <div onclick="addGain(0.0020, '${p.id}')" class="interaction-btn">🔗 <span class="text-[9px] mt-1">PARTILHAR</span></div>
                     </div>
                 </div>`;
             });
         }
 
-        async function addGain(val) {
-            if(!CURRENT_USER_ID) return alert("FAÇA LOGIN COM UM ID PRIMEIRO!");
+        async function addGain(val, postId) {
+            if(!CURRENT_USER_ID) return alert("ACESSO NEGADO: FAÇA LOGIN NO TOPO!");
+            
             CURRENT_SALDO += val;
             updateUI();
-            // Salva acumulando no Supabase para este ID específico
-            await sb.from('perfis').update({ saldo: CURRENT_SALDO }).eq('id', CURRENT_USER_ID);
+            
+            // ATUALIZAÇÃO REAL NO SUPABASE
+            const { error } = await sb.from('perfis').update({ saldo: CURRENT_SALDO }).eq('id', CURRENT_USER_ID);
+            
+            if(error) console.error("Erro ao salvar saldo:", error);
         }
 
         async function fazerPost() {
-            if(!CURRENT_USER_ID) return alert("FAÇA LOGIN PRIMEIRO!");
+            if(!CURRENT_USER_ID) return alert("LOGIN NECESSÁRIO!");
             const txt = document.getElementById('post-text').value;
             if(!txt) return;
 
             const { error } = await sb.from('posts').insert([{ user_id: CURRENT_USER_ID, content: txt }]);
             if(!error) {
                 document.getElementById('post-text').value = "";
-                await addGain(0.0150);
+                await addGain(0.0150, 'new_post');
                 loadFeed();
             }
         }
