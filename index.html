@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social - Persistence Pro</title>
+    <title>Apex Social v34.6 - Anti-Data Loss</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; }
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+        body { font-family: 'Roboto', sans-serif; background: #f8f9fa; color: #3c4043; font-weight: 700; }
+        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 12px; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        #loader { display: none; }
     </style>
 </head>
 <body class="pb-24">
@@ -21,48 +22,44 @@
     <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
         <div class="flex items-center gap-2">
             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg">S</div>
-            <h1 class="text-[12px] font-black uppercase text-blue-600 leading-tight">Apex Social<br>v34.5</h1>
+            <h1 class="text-[12px] font-black uppercase text-blue-600 leading-tight">Apex Social<br>v34.6</h1>
         </div>
         <div class="text-right">
             <div id="display-eur" class="font-black text-green-600 text-xl tracking-tighter">0.0000€</div>
-            <div id="status-user" class="text-[9px] font-black text-gray-400 uppercase">Sincronização: OFF</div>
+            <div id="status-user" class="text-[9px] font-black text-gray-400 uppercase">Estado: Offline</div>
         </div>
     </header>
 
     <div class="fixed top-[72px] left-0 right-0 bg-white border-b p-3 z-[150] flex gap-2 shadow-sm">
-        <input id="login-id" type="number" placeholder="TEU ID (1001-1100)" class="flex-1 border p-2 rounded-lg text-[12px] font-black outline-none focus:border-blue-500">
-        <button id="btn-login" onclick="simularLogin()" class="bg-blue-600 text-white px-6 rounded-lg font-black text-[11px] uppercase shadow-md">Conectar</button>
+        <input id="login-id" type="number" placeholder="DIGITE ID (1001-1100)" class="flex-1 border p-2 rounded-lg text-[12px] font-black outline-none focus:border-blue-500">
+        <button id="btn-login" onclick="simularLogin()" class="bg-blue-600 text-white px-6 rounded-lg font-black text-[11px] uppercase transition-all">Entrar</button>
     </div>
 
     <main class="max-w-lg mx-auto pt-[150px] px-4">
         <section id="view-social" class="tab-content active">
-            <div class="google-card p-4 border-t-4 border-blue-600 mb-6">
-                <textarea id="post-text" placeholder="PARTILHE ALGO..." class="w-full border-none focus:ring-0 text-[12px] font-black uppercase mb-2" rows="2"></textarea>
-                <button onclick="fazerPost()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black text-[11px] uppercase shadow-md">Publicar (+0.0150€)</button>
-            </div>
             <div id="feed" class="space-y-4"></div>
         </section>
 
         <section id="view-rank" class="tab-content">
             <div class="google-card p-4 border-t-4 border-yellow-500">
-                <h2 class="text-center font-black text-gray-400 text-[10px] uppercase mb-4 tracking-widest">Ranking em Tempo Real</h2>
-                <div id="ranking-list" class="divide-y"></div>
+                <h2 class="text-center font-black text-gray-400 text-[10px] uppercase mb-4">Ranking de IDs</h2>
+                <div id="ranking-list" class="divide-y text-[12px]"></div>
             </div>
         </section>
 
         <section id="view-info" class="tab-content pt-4">
             <div class="google-card p-10 text-center border-t-[10px] border-green-600 shadow-xl">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Saldo em Base de Dados</p>
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Teu Saldo na Nuvem</p>
                 <h1 id="wall-eur" class="text-5xl font-black text-green-600 tracking-tighter">0.0000€</h1>
-                <p id="wall-id" class="text-[10px] font-black text-gray-300 mt-2 uppercase">ID: DESCONHECIDO</p>
+                <p id="wall-id" class="text-[10px] font-black text-gray-300 mt-2">AGUARDANDO CONEXÃO...</p>
             </div>
         </section>
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200]">
-        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase text-gray-400">Rede</button>
-        <button onclick="nav('rank')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase text-gray-400">Ranking</button>
-        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase text-gray-400">Carteira</button>
+        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase">Rede</button>
+        <button onclick="nav('rank')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase">Ranking</button>
+        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center font-black text-[10px] uppercase">Carteira</button>
     </nav>
 
     <script>
@@ -72,104 +69,89 @@
         
         let CURRENT_USER_ID = null;
         let CURRENT_SALDO = 0;
-
-        async function init() {
-            await loadFeed();
-        }
+        let SYNC_READY = false; // TRANCA DE SEGURANÇA
 
         async function simularLogin() {
             const val = document.getElementById('login-id').value;
             if(!val) return;
             
-            document.getElementById('btn-login').innerText = "SINCRONIZANDO...";
+            SYNC_READY = false; // Reseta a tranca
+            document.getElementById('btn-login').innerText = "A LER NUVEM...";
             CURRENT_USER_ID = parseInt(val);
             
-            // BUSCA FORÇADA E AGUARDADA (AWAIT)
-            const { data, error } = await sb.from('perfis').select('saldo').eq('id', CURRENT_USER_ID).single();
-            
-            if (data) {
-                CURRENT_SALDO = parseFloat(data.saldo);
-                console.log("Saldo recuperado:", CURRENT_SALDO);
-            } else {
-                // Se não existir, cria com zero e garante a gravação
-                await sb.from('perfis').insert([{ id: CURRENT_USER_ID, saldo: 0 }]);
-                CURRENT_SALDO = 0;
-            }
+            // BUSCA REAL COM TRATAMENTO DE ERRO
+            try {
+                const { data, error } = await sb.from('perfis').select('saldo').eq('id', CURRENT_USER_ID).maybeSingle();
+                
+                if (data) {
+                    CURRENT_SALDO = parseFloat(data.saldo);
+                    SYNC_READY = true; // Só libera se o dado existir
+                } else {
+                    // Se o ID não existir, cria um novo
+                    await sb.from('perfis').insert([{ id: CURRENT_USER_ID, saldo: 0 }]);
+                    CURRENT_SALDO = 0;
+                    SYNC_READY = true;
+                }
 
-            // Atualiza UI apenas após ter o dado real
-            document.getElementById('status-user').innerText = "SINCRONIZADO: ID " + CURRENT_USER_ID;
-            document.getElementById('status-user').style.color = "#34A853";
-            document.getElementById('btn-login').innerText = "CONECTADO";
-            document.getElementById('btn-login').style.backgroundColor = "#34A853";
-            document.getElementById('wall-id').innerText = "ID: " + CURRENT_USER_ID;
+                document.getElementById('status-user').innerText = "CONECTADO: ID " + CURRENT_USER_ID;
+                document.getElementById('status-user').style.color = "#34A853";
+                document.getElementById('btn-login').innerText = "OK";
+                document.getElementById('btn-login').className = "bg-green-600 text-white px-6 rounded-lg font-black text-[11px]";
+                document.getElementById('wall-id').innerText = "CONECTADO COMO ID " + CURRENT_USER_ID;
+                
+                updateUI();
+                loadRanking();
+            } catch (e) {
+                alert("Erro de conexão! Tenta novamente.");
+                document.getElementById('btn-login').innerText = "RECOMENTAR";
+            }
+        }
+
+        async function interagir(valor) {
+            if(!SYNC_READY) return alert("ERRO: AGUARDA A SINCRONIZAÇÃO COMPLETA!");
             
+            CURRENT_SALDO += valor;
             updateUI();
-            loadRanking();
+            
+            // GRAVAÇÃO IMEDIATA COM VERIFICAÇÃO
+            const { error } = await sb.from('perfis').update({ saldo: CURRENT_SALDO }).eq('id', CURRENT_USER_ID);
+            if(error) console.error("Falha ao salvar:", error);
         }
 
         async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            const { data } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const container = document.getElementById('feed');
             container.innerHTML = "";
-            posts?.forEach(p => {
+            data?.forEach(p => {
                 container.innerHTML += `
-                <div class="google-card p-4 shadow-sm border border-gray-100">
-                    <div class="text-[9px] text-gray-400 font-black mb-2 uppercase flex justify-between">
-                        <span>User ID: ${p.user_id}</span>
-                        <span>${new Date(p.created_at).toLocaleTimeString()}</span>
-                    </div>
-                    <p class="text-[13px] font-black uppercase text-gray-700 mb-4">${p.content}</p>
+                <div class="google-card p-4 shadow-sm">
+                    <div class="text-[9px] text-gray-400 font-black mb-1 uppercase">Postado por ID: ${p.user_id}</div>
+                    <p class="text-[13px] font-black uppercase text-gray-800 mb-4">${p.content}</p>
                     <div class="flex border-t pt-2 gap-1">
-                        <button onclick="interagir(0.0006)" class="flex-1 py-3 bg-gray-50 rounded font-black text-[9px] uppercase active:bg-blue-100">👍 Gostar</button>
-                        <button onclick="interagir(0.0010)" class="flex-1 py-3 bg-gray-50 rounded font-black text-[9px] uppercase active:bg-blue-100">💬 Comentar</button>
-                        <button onclick="interagir(0.0020)" class="flex-1 py-3 bg-gray-50 rounded font-black text-[9px] uppercase active:bg-blue-100">🔗 Partilhar</button>
+                        <button onclick="interagir(0.0006)" class="flex-1 py-3 bg-gray-50 rounded-lg font-black text-[9px] active:scale-95 transition-all">👍 GOSTAR</button>
+                        <button onclick="interagir(0.0010)" class="flex-1 py-3 bg-gray-50 rounded-lg font-black text-[9px] active:scale-95 transition-all">💬 COMENTAR</button>
                     </div>
                 </div>`;
             });
         }
 
-        async function interagir(valor) {
-            if(!CURRENT_USER_ID) return alert("ERRO: CONECTE O SEU ID PRIMEIRO!");
-            
-            // 1. Atualiza localmente para resposta rápida
-            CURRENT_SALDO += valor;
-            updateUI();
-            
-            // 2. Grava no Supabase imediatamente
-            const { error } = await sb.from('perfis').update({ saldo: CURRENT_SALDO }).eq('id', CURRENT_USER_ID);
-            if(error) console.error("Erro ao gravar:", error);
-        }
-
-        async function fazerPost() {
-            if(!CURRENT_USER_ID) return alert("LOGIN NECESSÁRIO!");
-            const txt = document.getElementById('post-text').value;
-            if(!txt) return;
-
-            const { error } = await sb.from('posts').insert([{ user_id: CURRENT_USER_ID, content: txt }]);
-            if(!error) {
-                document.getElementById('post-text').value = "";
-                await interagir(0.0150);
-                await loadFeed();
-            }
-        }
-
         async function loadRanking() {
-            const { data } = await sb.from('perfis').select('*').order('saldo', {ascending: false}).limit(10);
+            const { data } = await sb.from('perfis').select('id, saldo').order('saldo', {ascending: false}).limit(10);
             const list = document.getElementById('ranking-list');
             list.innerHTML = "";
             data?.forEach((u, i) => {
                 list.innerHTML += `
-                <div class="flex justify-between items-center py-4 px-2 ${u.id === CURRENT_USER_ID ? 'bg-blue-50' : ''}">
-                    <span class="text-[12px] font-black">#${i+1} ID ${u.id} ${u.id === CURRENT_USER_ID ? '(TU)' : ''}</span>
-                    <span class="text-[11px] font-black text-blue-600">${u.saldo.toFixed(4)}€</span>
+                <div class="flex justify-between items-center py-4 px-2 ${u.id === CURRENT_USER_ID ? 'bg-yellow-50 rounded-lg border-2 border-yellow-200' : ''}">
+                    <span class="font-black">#${i+1} ID ${u.id}</span>
+                    <span class="font-black text-blue-600">${u.saldo.toFixed(4)}€</span>
                 </div>`;
             });
         }
 
         function updateUI() {
-            const val = CURRENT_SALDO.toFixed(4) + "€";
-            document.getElementById('display-eur').innerText = val;
-            document.getElementById('wall-eur').innerText = val;
+            const v = CURRENT_SALDO.toFixed(4) + "€";
+            document.getElementById('display-eur').innerText = v;
+            document.getElementById('wall-eur').innerText = v;
         }
 
         function nav(t) {
@@ -179,7 +161,7 @@
             if(t === 'rank') loadRanking();
         }
 
-        window.onload = init;
+        window.onload = loadFeed;
     </script>
 </body>
 </html>
