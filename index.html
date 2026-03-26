@@ -3,301 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network</title>
+    <title>Social Earn Network - Apex Social v32</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
+        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --g-gray: #5f6368; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
         
-        /* FIX DE LAYOUT PARA TEXTOS LONGOS */
-        .google-card { 
-            background: white; 
-            border: 1px solid #dadce0; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            margin-bottom: 16px; 
-            display: flex; 
-            flex-direction: column; 
-            width: 100%;
-        }
-
-        .post-text-container {
-            padding: 20px;
-            word-break: break-word; /* Resolve a quebra de layout de textos gigantes */
-            overflow-wrap: break-word;
-            font-size: 14px;
-            line-height: 1.5;
-            color: #1f2937;
+        /* FIX: Prevenção de quebra de layout por textos longos */
+        .post-content-area { 
+            word-break: break-word; 
+            overflow-wrap: break-word; 
+            padding: 16px; 
+            font-size: 14px; 
+            line-height: 1.6;
             text-transform: uppercase;
             font-weight: 900;
         }
 
-        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
-        @keyframes popUp {
-            0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
-            20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
-            100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
-        }
-        .earning-text { font-size: 3rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52,168,83,0.4); -webkit-text-stroke: 1.5px white; }
+        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+        .btn-google { border-radius: 8px; font-weight: 900; text-transform: uppercase; transition: all 0.2s; }
+        
+        /* Header e Nav Fixos */
+        .fixed-header { position: fixed; top: 0; left: 0; right: 0; background: white; z-index: 1000; border-bottom: 1px solid #dadce0; }
+        .nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #dadce0; height: 70px; display: flex; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-[9px]; font-weight: 900; color: var(--g-gray); }
+        .nav-item.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); }
 
-        .interaction-row { display: flex; border-top: 1px solid #f1f3f4; }
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0; border: none; background: transparent; cursor: pointer; position: relative; }
-        .interaction-badge { position: absolute; top: 5px; right: 20%; background: var(--g-red); color: white; font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 900; border: 2px solid white; }
+        /* Animação de Ganhos */
+        #floating-gain { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; pointer-events: none; display: none; }
+        .gain-anim { animation: gainUp 0.8s ease-out forwards; font-size: 3.5rem; font-weight: 900; color: var(--g-green); text-shadow: 0 0 20px rgba(52,168,83,0.5); }
+        @keyframes gainUp { 0% { opacity:0; transform:scale(0.5); } 30% { opacity:1; transform:scale(1.2); } 100% { opacity:0; transform:translateY(-100px); } }
 
-        .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; }
-        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; }
-        .modal-300-250 { width: 300px; background: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
-
-        #feed-container { margin-top: 230px; padding: 0 16px; }
-        .publisher-area { margin-top: 130px; padding: 0 16px; }
-        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
-        .tab-content { display: none; }
+        /* Status de Monetização */
+        .monetization-banner { background: #fff; padding: 10px; text-align: center; border-bottom: 1px solid #eee; margin-top: 72px; }
+        
+        .tab-content { display: none; padding: 16px; margin-top: 130px; margin-bottom: 80px; }
         .tab-content.active { display: block; }
-        .comment-section { background: #f8f9fa; border-top: 1px solid #eee; display: none; }
-        .comment-section.active { display: block; }
+
+        /* Modal de Publicidade */
+        #ad-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; align-items: center; justify-content: center; }
     </style>
 </head>
-<body class="pb-24">
+<body>
 
-    <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
+    <div id="floating-gain"><div class="gain-anim" id="gain-val">+0.0000€</div></div>
 
-    <div id="ad-overlay">
-        <div id="ad-decision-ui" class="modal-300-250 p-6 text-center">
-            <h3 class="text-[11px] font-black uppercase text-blue-600 mb-2">Manter Ganhos a 100%</h3>
-            <p class="text-[10px] leading-tight font-bold mb-6 text-gray-400">Vê um anúncio para não perderes o bónus de ganhos atual.</p>
-            <button onclick="startAdFlow()" class="w-full py-4 bg-blue-600 text-white rounded-lg shadow-md uppercase text-[11px] mb-2 font-black">Ver Anúncio (15s)</button>
-            <button onclick="degradeGains()" class="w-full py-2 text-gray-300 uppercase text-[9px] font-black italic">Aceito a redução</button>
-        </div>
-        <div id="ad-player-ui" class="modal-300-250 hidden">
-            <div class="flex-1 bg-black flex flex-col items-center justify-center text-white p-4 text-center">
-                <div id="ad-timer-circle" class="font-black text-5xl mb-2">15</div>
-                <p class="text-[8px] text-gray-400 uppercase font-black">A carregar publicidade...</p>
-            </div>
-            <button id="close-ad-btn" disabled class="h-14 bg-gray-200 text-gray-400 uppercase text-[10px] font-black italic">Aguarde...</button>
-        </div>
-    </div>
-
-    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[200] px-4 flex justify-between items-center h-[72px]">
+    <header class="fixed-header px-4 h-[72px] flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-sm">S</div>
-            <h1 class="text-[12px] font-black uppercase text-blue-600">Social Earn Network</h1>
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
+            <div>
+                <h1 class="text-[12px] font-black text-blue-600 uppercase">Social Earn Network</h1>
+                <p id="status-tag" class="text-[8px] text-green-600 font-black uppercase">Status: 100% OK</p>
+            </div>
         </div>
         <div class="text-right">
-            <div id="main-eur" class="font-black text-green-600 text-lg leading-none">0.0000€</div>
-            <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase mt-1">0.0000 BRL</div>
+            <div id="balance-eur" class="text-xl font-black text-green-600">0.0000€</div>
+            <div id="balance-brl" class="text-[9px] text-gray-400 font-black">0.0000 BRL</div>
         </div>
     </header>
 
-    <div class="status-header-fixed">
-        <div id="status-text" class="text-[9px] font-black uppercase text-green-600 text-center">100% de Ganhos Ativos</div>
-        <button id="restore-btn" onclick="startAdFlow(true)" class="hidden bg-red-600 text-white px-4 py-2 rounded-lg text-[9px] font-black uppercase animate-pulse shadow-md">Restaurar 100%</button>
+    <div class="monetization-banner fixed w-full z-[900]">
+        <div class="bg-blue-50 border border-blue-100 rounded-lg p-2 flex justify-between items-center max-w-lg mx-auto">
+            <span class="text-[10px] font-black text-blue-700 uppercase">Ações Disponíveis (24h)</span>
+            <div id="daily-limit" class="text-[10px] font-black text-blue-600">POSTS: 0/3 | INTERAÇÕES: 0/10</div>
+        </div>
     </div>
 
     <main class="max-w-lg mx-auto">
-        <section id="view-social" class="tab-content active">
-            <div class="publisher-area">
-                <div class="google-card p-3 border-t-4 border-blue-600 shadow-md">
-                    <textarea id="post-input" onclick="expandPublisher()" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 text-[12px] mb-1 resize-none uppercase font-black" rows="1"></textarea>
-                    <div id="expanded-post" class="hidden">
-                        <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-50 border-none text-[10px] p-2 rounded-lg mb-2 font-black uppercase outline-none">
-                        <button onclick="handleInteraction('post')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black text-[11px] uppercase shadow-sm">Publicar</button>
-                    </div>
+        
+        <section id="tab-social" class="tab-content active">
+            <div class="google-card p-4 shadow-md border-t-4 border-blue-600">
+                <textarea id="post-text" placeholder="O QUE PRETENDE PARTILHAR?" class="w-full border-none focus:ring-0 text-sm font-black uppercase mb-2" rows="1" onfocus="this.rows=4"></textarea>
+                <div id="post-actions" class="flex gap-2 justify-end">
+                    <input id="post-img-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="flex-1 bg-gray-50 border rounded-lg px-3 text-[10px] font-black outline-none">
+                    <button onclick="handleAction('post')" class="bg-blue-600 text-white px-6 py-2 btn-google text-[11px]">Publicar (+15 XP)</button>
                 </div>
             </div>
-            <div id="feed-container"></div>
+
+            <div id="feed">
+                </div>
         </section>
 
-        <section id="view-info" class="tab-content px-4 mt-24">
-            <div class="google-card p-10 text-center border-t-[10px] border-blue-600 shadow-xl">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Carteira</p>
-                <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
+        <section id="tab-economy" class="tab-content">
+            <div class="google-card p-8 text-center border-t-8 border-green-500">
+                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Saldo Disponível</p>
+                <h2 id="wallet-eur" class="text-5xl font-black text-blue-600 mb-4">0.0000€</h2>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-gray-50 p-4 rounded-xl border">
+                        <p class="text-[10px] text-gray-400 uppercase">Mínimo Saque</p>
+                        <p class="font-black text-red-500">5000 XP</p>
+                    </div>
+                    <div id="user-xp" class="bg-gray-50 p-4 rounded-xl border">
+                        <p class="text-[10px] text-gray-400 uppercase">Teu XP Atual</p>
+                        <p class="font-black text-blue-600">0 XP</p>
+                    </div>
+                </div>
+                <button onclick="checkWithdrawal()" class="w-full bg-blue-600 text-white py-4 btn-google text-sm">Solicitar Levantamento PayPal</button>
+            </div>
+
+            <div class="google-card mt-4 overflow-hidden">
+                <table class="w-full text-[10px] font-black uppercase">
+                    <tr class="bg-gray-100 border-b">
+                        <th class="p-4 text-left">Ação</th>
+                        <th class="p-4 text-right">Recompensa</th>
+                    </tr>
+                    <tr class="border-b"><td class="p-4">Nova Publicação</td><td class="p-4 text-right text-green-600">0.0150€</td></tr>
+                    <tr class="border-b"><td class="p-4">Seguir Amigo</td><td class="p-4 text-right text-green-600">0.1000€</td></tr>
+                    <tr class="border-b"><td class="p-4">Interação (Like/Com)</td><td class="p-4 text-right text-green-600">0.0010€</td></tr>
+                </table>
             </div>
         </section>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[200]">
-        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black uppercase">REDE</span></button>
-        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black uppercase">GANHOS</span></button>
+    <nav class="nav-bottom">
+        <button onclick="switchTab('social')" id="nav-social" class="nav-item active">
+            <span class="text-xl">📱</span><span class="mt-1">REDE</span>
+        </button>
+        <button onclick="switchTab('economy')" id="nav-economy" class="nav-item">
+            <span class="text-xl">💰</span><span class="mt-1">GANHOS</span>
+        </button>
     </nav>
+
+    <div id="ad-modal">
+        <div class="bg-white w-[320px] rounded-2xl overflow-hidden shadow-2xl text-center">
+            <div class="bg-black aspect-video flex flex-col items-center justify-center text-white p-6">
+                <div id="ad-timer" class="text-6xl font-black mb-2">15</div>
+                <p class="text-[10px] uppercase font-black tracking-widest text-gray-400">Publicidade Obrigatória</p>
+            </div>
+            <div class="p-6">
+                <p class="text-[11px] font-black text-gray-500 uppercase leading-tight">Assiste até ao fim para garantires os teus ganhos na rede.</p>
+                <button id="ad-close-btn" disabled class="mt-4 w-full py-4 bg-gray-200 text-gray-400 btn-google text-[10px]">Aguarde o fim do vídeo...</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const MASTER_ID = "5401881400";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
-        
-        let user = { saldo: 0, interactions: 0, postsToday: 0, multiplier: 1.0, penaltyExpiry: null };
-        let pendingAction = null;
+        const ADMIN_ID = "5401881400";
+
+        let userData = { saldo: 0, xp: 0, actionsToday: 0, postsToday: 0 };
+        let currentTab = 'social';
 
         async function init() {
-            const { data } = await sb.from('perfis').select('*').eq('id', MASTER_ID).single();
-            if(data) user.saldo = parseFloat(data.saldo) || 0;
-            updateUI(); loadFeed();
-            setInterval(updateUI, 1000);
+            const { data, error } = await sb.from('perfis').select('*').eq('id', ADMIN_ID).single();
+            if (data) {
+                userData.saldo = parseFloat(data.saldo) || 0;
+                userData.xp = parseInt(data.xp) || 0;
+                updateUI();
+            }
+            loadFeed();
         }
 
         function updateUI() {
-            const displays = ['main-eur', 'wall-eur'];
-            displays.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.innerText = user.saldo.toFixed(4) + "€";
-            });
-            document.getElementById('main-brl').innerText = (user.saldo * 6.12).toFixed(4) + " BRL";
+            const eur = userData.saldo.toFixed(4);
+            const brl = (userData.saldo * 6.1245).toFixed(4);
             
-            const statusBox = document.getElementById('status-text');
-            const restoreBtn = document.getElementById('restore-btn');
+            document.getElementById('balance-eur').innerText = eur + "€";
+            document.getElementById('wallet-eur').innerText = eur + "€";
+            document.getElementById('balance-brl').innerText = brl + " BRL";
+            document.getElementById('user-xp').querySelector('p:last-child').innerText = userData.xp + " XP";
+        }
+
+        // FIX: Acumulação de ganhos com precisão absoluta
+        async function recordGain(amount, xpGain) {
+            const newSaldo = parseFloat((userData.saldo + amount).toFixed(4));
+            const newXP = userData.xp + xpGain;
             
-            if (user.multiplier < 1.0 && user.penaltyExpiry) {
-                const diff = new Date(user.penaltyExpiry) - new Date();
-                if (diff > 0) {
-                    statusBox.innerText = `${user.multiplier * 100}% DE GANHOS ATÉ ${new Date(user.penaltyExpiry).toLocaleString('pt-PT')}`;
-                    statusBox.className = "text-[9px] font-black uppercase text-red-600 text-center";
-                    restoreBtn.classList.remove('hidden');
-                } else { resetMultiplier(); }
-            } else {
-                statusBox.innerText = "100% de Ganhos Ativos";
-                statusBox.className = "text-[9px] font-black uppercase text-green-600";
-                restoreBtn.classList.add('hidden');
+            const { error } = await sb.from('perfis').update({ 
+                saldo: newSaldo, 
+                xp: newXP 
+            }).eq('id', ADMIN_ID);
+
+            if (!error) {
+                userData.saldo = newSaldo;
+                userData.xp = newXP;
+                showGainAnim(amount);
+                updateUI();
             }
         }
 
-        async function applyGain(val) {
-            const gain = val * user.multiplier;
-            // FIX: Acumulação forçada com precisão de 4 casas decimais
-            user.saldo = parseFloat((user.saldo + gain).toFixed(4));
-            showBigNumber(gain);
-            updateUI();
-            await sb.from('perfis').update({ saldo: user.saldo }).eq('id', MASTER_ID);
+        function handleAction(type, pid = null) {
+            // Regra de monetização: Anúncio a cada 3 interações
+            if (userData.actionsToday > 0 && userData.actionsToday % 3 === 0) {
+                showAd(() => processAction(type, pid));
+            } else {
+                processAction(type, pid);
+            }
         }
 
-        function handleInteraction(type, val = 0, pid = null) {
-            if ((user.interactions >= 2 || user.postsToday >= 3) && user.multiplier === 1.0) {
-                pendingAction = { type, val, pid };
-                document.getElementById('ad-overlay').style.display = 'flex';
-                document.getElementById('ad-decision-ui').classList.remove('hidden');
-                document.getElementById('ad-player-ui').classList.add('hidden');
-            } else { executeAction(type, val, pid); }
-        }
-
-        async function executeAction(type, val, pid) {
-            if (type === 'post') await publish();
-            else {
-                user.interactions++;
-                if (type === 'comment') await processComment(pid);
-                else applyGain(val);
+        async function processAction(type, pid) {
+            userData.actionsToday++;
+            if (type === 'post') {
+                const content = document.getElementById('post-text').value;
+                const img = document.getElementById('post-img-url').value;
+                if (!content) return;
+                
+                const { error } = await sb.from('posts').insert([{ 
+                    user_id: ADMIN_ID, 
+                    content: content, 
+                    image_url: img 
+                }]);
+                
+                if (!error) {
+                    await recordGain(0.0150, 15);
+                    document.getElementById('post-text').value = '';
+                    loadFeed();
+                }
+            } else if (type === 'like') {
+                await recordGain(0.0010, 2);
             }
         }
 
         async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const container = document.getElementById('feed-container');
-            if(!posts) return;
-            container.innerHTML = posts.map(p => `
+            const { data: posts } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+            const feed = document.getElementById('feed');
+            feed.innerHTML = posts.map(p => `
                 <div class="google-card shadow-sm">
-                    <div class="post-text-container">${p.content}</div>
+                    <div class="post-content-area">${p.content}</div>
                     ${p.image_url ? `<img src="${p.image_url}" class="w-full border-y shadow-inner">` : ''}
-                    <div class="interaction-row">
-                        <button onclick="handleInteraction('like', 0.0006)" class="interaction-btn">
-                            <span class="text-xl">👍</span><span class="text-[9px] uppercase font-black text-gray-400">Gostar</span>
+                    <div class="flex border-t">
+                        <button onclick="handleAction('like', '${p.id}')" class="flex-1 py-4 flex flex-col items-center btn-google border-r hover:bg-gray-50">
+                            <span class="text-xl">👍</span><span class="text-[9px] text-gray-400 mt-1">Gostar</span>
                         </button>
-                        <button onclick="toggleComments('${p.id}')" class="interaction-btn border-x">
-                            <div class="interaction-badge" id="badge-${p.id}">0</div>
-                            <span class="text-xl">💬</span><span class="text-[9px] uppercase font-black text-gray-400">Comentar</span>
+                        <button onclick="handleAction('share')" class="flex-1 py-4 flex flex-col items-center btn-google hover:bg-gray-50">
+                            <span class="text-xl">🔗</span><span class="text-[9px] text-gray-400 mt-1">Partilhar</span>
                         </button>
-                        <button onclick="handleInteraction('share', 0.0020)" class="interaction-btn">
-                            <span class="text-xl">🔗</span><span class="text-[9px] uppercase font-black text-gray-400">Partilhar</span>
-                        </button>
-                    </div>
-                    <div id="comments-${p.id}" class="comment-section">
-                        <div id="list-${p.id}" class="p-4 space-y-2 max-h-40 overflow-y-auto text-[10px] uppercase font-bold bg-gray-50"></div>
-                        <div class="p-2 bg-white border-t flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="COMENTAR..." class="flex-1 bg-gray-100 rounded-lg p-2 text-[10px] font-black outline-none">
-                            <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-4 rounded-lg font-black text-[10px]">OK</button>
-                        </div>
                     </div>
                 </div>
             `).join('');
-            posts.forEach(p => updateCommentCount(p.id));
         }
 
-        async function publish() {
-            const content = document.getElementById('post-input').value;
-            if(!content) return;
-            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content, image_url: document.getElementById('post-url').value }]);
-            if(!error) {
-                user.postsToday++;
-                await applyGain(0.0150);
-                document.getElementById('post-input').value = "";
-                document.getElementById('expanded-post').classList.add('hidden');
-                loadFeed();
-            }
-        }
-
-        function startAdFlow(isDirect = false) {
-            document.getElementById('ad-overlay').style.display = 'flex';
-            document.getElementById('ad-decision-ui').classList.add('hidden');
-            document.getElementById('ad-player-ui').classList.remove('hidden');
-            let time = 15;
-            const timerText = document.getElementById('ad-timer-circle');
-            const btn = document.getElementById('close-ad-btn');
-            const countdown = setInterval(() => {
-                time--; timerText.innerText = time;
-                if(time <= 0) {
-                    clearInterval(countdown);
-                    btn.disabled = false; btn.innerText = "CONCLUIR";
-                    btn.className = "h-14 bg-green-600 text-white font-black uppercase text-[10px]";
-                    btn.onclick = () => {
-                        resetMultiplier();
-                        if (!isDirect && pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid);
-                        closeAd();
+        function showAd(callback) {
+            const modal = document.getElementById('ad-modal');
+            const timerEl = document.getElementById('ad-timer');
+            const closeBtn = document.getElementById('ad-close-btn');
+            let timeLeft = 15;
+            
+            modal.style.display = 'flex';
+            const counter = setInterval(() => {
+                timeLeft--;
+                timerEl.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(counter);
+                    closeBtn.disabled = false;
+                    closeBtn.innerText = "CONCLUIR RECOMPENSA";
+                    closeBtn.className = "mt-4 w-full py-4 bg-green-600 text-white btn-google text-[10px]";
+                    closeBtn.onclick = () => {
+                        modal.style.display = 'none';
+                        callback();
                     };
                 }
             }, 1000);
         }
 
-        function degradeGains() {
-            const steps = [1.0, 0.5, 0.25, 0.05];
-            const currentIdx = steps.indexOf(user.multiplier);
-            user.multiplier = steps[Math.min(currentIdx + 1, steps.length - 1)];
-            user.penaltyExpiry = new Date(Date.now() + 86400000).toISOString();
-            if (pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid);
-            closeAd();
+        function showGainAnim(val) {
+            const container = document.getElementById('floating-gain');
+            document.getElementById('gain-val').innerText = "+" + val.toFixed(4) + "€";
+            container.style.display = 'block';
+            setTimeout(() => container.style.display = 'none', 850);
         }
 
-        function closeAd() { document.getElementById('ad-overlay').style.display = 'none'; pendingAction = null; }
-        function resetMultiplier() { user.multiplier = 1.0; user.penaltyExpiry = null; user.interactions = 0; updateUI(); }
-        async function processComment(pid) {
-            const input = document.getElementById(`in-${pid}`);
-            if(!input.value) return;
-            await sb.from('comentarios').insert([{ post_id: pid, user_id: MASTER_ID, content: input.value }]);
-            input.value = ""; await applyGain(0.0010); updateCommentList(pid);
-        }
-        async function updateCommentList(pid) {
-            const { data } = await sb.from('comentarios').select('*').eq('post_id', pid).order('created_at', {ascending: true});
-            const list = document.getElementById(`list-${pid}`);
-            if(list) list.innerHTML = data.map(c => `<div class="bg-white p-2 rounded-lg border shadow-sm mb-1">${c.content}</div>`).join('');
-            updateCommentCount(pid);
-        }
-        async function updateCommentCount(pid) {
-            const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', pid);
-            const badge = document.getElementById(`badge-${pid}`);
-            if(badge) badge.innerText = count || 0;
-        }
-        function toggleComments(id) { document.getElementById(`comments-${id}`).classList.toggle('active'); updateCommentList(id); }
-        function showBigNumber(val) {
-            const container = document.getElementById('floating-earning');
-            document.getElementById('earning-val').innerText = "+" + val.toFixed(4) + "€";
-            container.style.display = 'block';
-            setTimeout(() => container.style.display = 'none', 800);
-        }
-        function nav(t) { 
+        function switchTab(tab) {
             document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
-            document.getElementById('view-'+t).classList.add('active');
-            event.currentTarget.classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('nav-' + tab).classList.add('active');
         }
-        function expandPublisher() { document.getElementById('expanded-post').classList.remove('hidden'); document.getElementById('post-input').rows = 3; }
+
         window.onload = init;
     </script>
 </body>
