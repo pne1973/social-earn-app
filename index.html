@@ -3,39 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v40.2 - Master Production</title>
+    <title>Apex Social v40.3 - Produção</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; --border: #dadce0; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; margin: 0; padding-top: 72px; padding-bottom: 85px; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; margin: 0; padding-top: 155px; padding-bottom: 85px; }
         
-        .google-card { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; position: relative; }
-        .ad-banner { background: #fff8e1; border: 2px dashed #fbc02d; padding: 15px; text-align: center; border-radius: 12px; margin: 10px 0; }
+        /* HEADER COM SALDO DUPLO (EUR/BRL) */
+        header { position: fixed; top: 0; width: 100%; height: 72px; background: white; border-bottom: 1px solid #ddd; z-index: 9999; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; }
+
+        /* PUBLISHER FIXO NO TOPO */
+        .sticky-publisher { position: fixed; top: 72px; left: 0; right: 0; z-index: 999; background: #f1f3f4; padding: 12px 16px; border-bottom: 1px solid #ddd; }
+        .google-card { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; position: relative; }
         
-        /* Contador de Interações (Badge Vermelho) */
-        .counter-badge { position: absolute; top: -5px; right: 10px; background: var(--g-red); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; border: 2px solid white; font-weight: 900; }
+        /* Anúncio Patrocinado e Sugestões */
+        .ad-banner { background: #fffbe6; border: 1px dashed #ffe58f; padding: 10px; margin: 10px 0; border-radius: 8px; text-align: center; font-size: 11px; font-weight: bold; }
         
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 0; cursor: pointer; position: relative; }
-        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
+        /* IMAGEM COMPACTA E AJUSTADA */
+        .img-container { width: 100%; max-height: 280px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #eee; }
+        .img-container img { width: 100%; height: 100%; object-fit: contain; }
+
+        /* Ações e Ganhos */
+        .post-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid #f0f2f5; padding: 10px 0; }
+        .action-btn { text-align: center; font-size: 11px; font-weight: 800; color: #65676b; text-transform: uppercase; cursor: pointer; }
         
+        /* Ganhos Flutuantes */
         #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s ease-out forwards; }
         @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
-        .earning-text { font-size: 3rem; font-weight: 900; color: var(--g-green); -webkit-text-stroke: 1.5px white; }
+        .earning-text { font-size: 3.5rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 15px rgba(52, 168, 83, 0.3); -webkit-text-stroke: 1.5px white; }
+
+        /* NAV INFERIOR */
+        nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; border-top: 1px solid #ddd; display: flex; justify-content: space-around; align-items: center; z-index: 9999; }
+        .nav-item { text-align: center; font-size: 11px; font-weight: 900; color: #65676b; text-transform: uppercase; cursor: pointer; }
+        .nav-item.active { color: var(--g-blue); }
+
+        .btn-pub { background: var(--g-blue); color: white; border-radius: 8px; font-weight: 800; padding: 12px; width: 100%; transition: scale 0.1s; }
+        .btn-pub:active { scale: 0.98; }
     </style>
 </head>
 <body>
 
     <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
 
-    <header class="fixed top-0 left-0 right-0 bg-white border-b-2 z-[500] px-4 flex justify-between items-center h-[72px]">
+    <header>
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black shadow-sm">A</div>
-            <div>
-                <h1 class="text-sm font-black uppercase text-blue-600 tracking-tighter">Apex Social</h1>
-                <div class="text-[9px] text-green-500 font-black">STATUS: 100% OK</div>
-            </div>
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-sm">A</div>
+            <h1 class="text-sm font-black uppercase text-blue-600 tracking-tighter">Apex Social</h1>
         </div>
         <div class="text-right">
             <div id="main-eur" class="font-black text-green-600 text-lg">0.0000€</div>
@@ -43,128 +58,177 @@
         </div>
     </header>
 
-    <main class="max-w-lg mx-auto p-3">
-        <section id="view-social" class="tab-content active">
+    <main id="view-social" class="tab-content active">
+        <div class="sticky-publisher">
             <div class="google-card p-4 border-t-8 border-blue-600 shadow-md">
-                <textarea id="post-input" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none text-xs font-black uppercase outline-none focus:ring-0 mb-3" rows="2"></textarea>
-                <div class="border-2 border-dashed border-gray-200 rounded-lg p-4 mb-3 text-center text-gray-400 text-[10px] uppercase font-black">
-                    📸 Anexar Foto da Galeria
+                <textarea id="post-input" onclick="expandePublisher()" placeholder="O QUE PRETENDE PARTILHAR? (+0.0150€)" class="w-full border-none text-xs font-black uppercase outline-none focus:ring-0 mb-3" rows="1"></textarea>
+                <div id="expanded-post" class="hidden">
+                    <div id="status-img" class="hidden text-[10px] font-black text-blue-600 mb-2 uppercase text-center">📸 Imagem Otimizada</div>
+                    <div class="flex gap-2">
+                        <label for="post-file" class="bg-gray-100 p-3 rounded-lg cursor-pointer text-[10px] font-black text-gray-500 uppercase flex items-center justify-center">Foto</label>
+                        <input type="file" id="post-file" accept="image/*" class="hidden" onchange="processarFoto()">
+                        <button onclick="publish()" id="btn-pub" class="btn-pub flex-1 uppercase text-[11px]">Publicar Agora</button>
+                    </div>
                 </div>
-                <button onclick="publish()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-black uppercase text-[11px]">Publicar Agora</button>
             </div>
-            <div id="feed-container"></div>
-        </section>
+        </div>
 
-        <section id="view-info" class="tab-content hidden">
-            <div class="google-card p-10 text-center border-t-[10px] border-blue-600 mt-4 shadow-xl">
-                <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Carteira Total</p>
-                <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
-                <p id="wall-brl" class="text-sm font-black text-gray-400 mt-2">0.0000 BRL</p>
-            </div>
-        </section>
+        <div id="feed-container" class="max-w-lg mx-auto p-3 space-y-4">
+            <div class="ad-banner">ANÚNCIO: Use o Apex e ganhe recompensas diárias!</div>
+        </div>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex justify-around items-center h-20 z-[500]">
-        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black">REDE</span></button>
-        <button onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black">GANHOS</span></button>
-        <button onclick="nav('admin')" class="nav-item flex-1 py-2 flex flex-col items-center"><span class="text-[11px] font-black">GESTÃO</span></button>
+    <main id="view-info" class="tab-content hidden max-w-lg mx-auto p-3">
+        <div class="google-card p-10 text-center border-t-[10px] border-blue-600 mt-4 shadow-xl">
+            <p class="text-[11px] font-black text-gray-400 uppercase mb-2">Carteira Total</p>
+            <h1 id="wall-eur" class="text-5xl font-black text-blue-600">0.0000€</h1>
+        </div>
+    </main>
+
+    <nav>
+        <div class="nav-item active" onclick="nav('social')">Rede</div>
+        <div class="nav-item" onclick="nav('info')">Ganhos</div>
+        <div class="nav-item" onclick="nav('admin')">Admin</div>
     </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const MASTER_ID = "5401881400";
-        const sb = window.supabase.createClient(SB_URL, SB_KEY);
+        const _sb = window.supabase.createClient(SB_URL, SB_KEY);
+        const MASTER_ID = "5401881400"; //
+        const TAXA_BRL = 6.1245; //
         
         let userBalance = 0;
+        let fotoData = "";
         let adCounter = 0;
 
         async function init() {
-            const { data } = await sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
-            if(data) userBalance = Number(data.saldo);
-            updateUI(); loadFeed();
+            carregarDados();
+            carregarFeed();
+        }
+
+        async function carregarDados() {
+            const { data } = await _sb.from('perfis').select('saldo').eq('id', MASTER_ID).single();
+            if(data) {
+                userBalance = data.saldo;
+                updateUI();
+            }
         }
 
         function updateUI() {
-            document.getElementById('main-eur').innerText = userBalance.toFixed(4) + "€";
-            document.getElementById('wall-eur').innerText = userBalance.toFixed(4) + "€";
-            document.getElementById('main-brl').innerText = (userBalance * 6.1245).toFixed(4) + " BRL";
-            document.getElementById('wall-brl').innerText = (userBalance * 6.1245).toFixed(4) + " BRL";
+            const eur = userBalance.toFixed(4);
+            const brl = (userBalance * TAXA_BRL).toFixed(4);
+            document.getElementById('main-eur').innerText = eur + "€";
+            document.getElementById('wall-eur').innerText = eur + "€";
+            document.getElementById('main-brl').innerText = brl + " BRL";
+        }
+
+        function processarFoto() {
+            const file = document.getElementById('post-file').files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const maxW = 800;
+                    const scale = maxW / img.width;
+                    canvas.width = maxW;
+                    canvas.height = img.height * scale;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    fotoData = canvas.toDataURL('image/jpeg', 0.6); //
+                    document.getElementById('status-img').classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         async function earn(amount) {
             adCounter++;
+            userBalance += amount;
             
-            // Lógica de Anúncio à 2ª Interação (e subsequentes pares)
+            // Lógica de Anúncio à 2ª Interação
             if(adCounter % 2 === 0) {
-                alert("📢 ANÚNCIO PATROCINADO: Ganhe mais pontos convidando amigos!");
+                alert("📢 ANÚNCIO: Visualize este conteúdo para continuar a ganhar!");
             }
 
-            userBalance += amount;
+            // Ganhos Flutuantes
             const el = document.getElementById('floating-earning');
             document.getElementById('earning-val').innerText = "+" + amount.toFixed(4) + "€";
             el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 800);
             
             updateUI();
-            await sb.from('perfis').update({ saldo: userBalance }).eq('id', MASTER_ID);
+            await _sb.from('perfis').update({ saldo: userBalance }).eq('id', MASTER_ID);
         }
 
         async function publish() {
-            const content = document.getElementById('post-input').value;
-            if(!content) return;
-            const { error } = await sb.from('posts').insert([{ user_id: MASTER_ID, content: content }]);
+            const txt = document.getElementById('post-input').value;
+            const btn = document.getElementById('btn-pub');
+            if(!txt && !fotoData) return;
+            
+            btn.disabled = true; btn.innerText = "PROCESSANDO...";
+
+            const { error } = await _sb.from('posts').insert([{ user_id: MASTER_ID, content: txt, image_url: fotoData }]);
             if(!error) {
-                document.getElementById('post-input').value = "";
-                await earn(0.0150);
-                loadFeed();
+                await earn(0.0150); //
+                window.location.reload();
             }
         }
 
-        async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+        async function carregarFeed() {
+            const { data: posts } = await _sb.from('posts').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('feed-container');
-            container.innerHTML = "";
-            
-            posts.forEach((p, index) => {
-                if(index > 0 && index % 3 === 0) {
-                    container.innerHTML += `<div class="ad-banner"><p class="text-[10px] font-black uppercase">Anúncio Patrocinado</p></div>`;
-                }
 
+            posts?.forEach((p, index) => {
                 const card = document.createElement('div');
-                card.className = "google-card shadow-sm p-5";
+                card.className = "google-card shadow-sm mb-4";
+                
+                let imgHtml = p.image_url ? `
+                    <div class="img-container">
+                        <img src="${p.image_url}" loading="lazy">
+                    </div>` : "";
+
                 card.innerHTML = `
-                    <p class="text-[13px] font-black uppercase text-gray-800 mb-5">${p.content}</p>
-                    <div class="flex border-t pt-3 gap-2">
-                        <div onclick="earn(0.0002); updateCount(this)" class="interaction-btn">
-                            <span class="counter-badge">4</span>
-                            <span class="text-xl">👍</span><span class="text-[9px] uppercase">Gostar</span>
-                        </div>
-                        <div onclick="earn(0.0005); updateCount(this)" class="interaction-btn border-x border-gray-100">
-                            <span class="counter-badge">0</span>
-                            <span class="text-xl">💬</span><span class="text-[9px] uppercase">Comentar</span>
-                        </div>
-                        <div onclick="earn(0.0010); updateCount(this)" class="interaction-btn">
-                            <span class="counter-badge">0</span>
-                            <span class="text-xl">🔗</span><span class="text-[9px] uppercase">Partilhar</span>
+                    <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                        <span class="text-[9px] font-black text-gray-400 uppercase italic">Utilizador Master</span>
+                        <span class="text-[9px] font-black text-gray-300">#${String(p.id).slice(-3)}</span>
+                    </div>
+                    ${imgHtml}
+                    <div class="p-5">
+                        <p class="text-[13px] font-black uppercase text-gray-800 mb-5 leading-tight">${p.content || ''}</p>
+                        <div class="post-actions">
+                            <div onclick="earn(0.0002)" class="action-btn">👍 Gostar (+0.0002€)</div>
+                            <div onclick="earn(0.0005)" class="action-btn border-x border-gray-50">💬 Comentar (+0.0005€)</div>
+                            <div onclick="earn(0.0010)" class="action-btn">🔗 Partilhar (+0.0010€)</div>
                         </div>
                     </div>`;
                 container.appendChild(card);
+
+                // Anúncio automático a cada 3 posts
+                if((index + 1) % 3 === 0) {
+                    const ad = document.createElement('div');
+                    ad.className = "ad-banner";
+                    ad.innerText = "Sugestão Apex: Ganhe recompensas convidando amigos!";
+                    container.appendChild(ad);
+                }
             });
         }
 
-        function updateCount(el) {
-            const badge = el.querySelector('.counter-badge');
-            badge.innerText = parseInt(badge.innerText) + 1;
+        function expandePublisher() { 
+            document.getElementById('expanded-post').classList.remove('hidden'); 
+            document.getElementById('post-input').rows = 3; 
         }
 
         function nav(t) {
-            document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
-            document.getElementById('view-'+t).classList.remove('hidden');
+            document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active', 'hidden'));
+            if(t === 'info') document.getElementById('view-social').classList.add('hidden');
+            if(t === 'social') document.getElementById('view-info').classList.add('hidden');
+            document.getElementById('view-'+t).classList.add('active');
             event.currentTarget.classList.add('active');
         }
 
-        window.onload = init;
+        init();
     </script>
 </body>
 </html>
