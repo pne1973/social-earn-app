@@ -3,51 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn v33.12 - Master Production</title>
+    <title>Social Earn v33.12 - Final Production</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --fb-blue: #1877F2; --fb-bg: #f0f2f5; --fb-gray: #65676b; }
-        body { font-family: 'Roboto', sans-serif; background: var(--fb-bg); margin: 0; padding-top: 175px; padding-bottom: 90px; font-weight: 700; color: #1c1e21; }
+        :root { --fb-blue: #1877F2; --fb-bg: #f0f2f5; }
+        body { font-family: 'Roboto', sans-serif; background: var(--fb-bg); margin: 0; padding-top: 175px; padding-bottom: 95px; font-weight: 700; color: #1c1e21; }
         
+        /* UI FIXA */
         header { position: fixed; top: 0; width: 100%; height: 72px; background: white; border-bottom: 1px solid #ddd; z-index: 2000; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
         .status-bar { position: fixed; top: 72px; width: 100%; height: 40px; background: white; border-bottom: 1px solid #eee; z-index: 1999; display: flex; align-items: center; padding: 0 16px; font-size: 10px; color: #34A853; text-transform: uppercase; font-weight: 900; }
         .publisher { position: fixed; top: 112px; width: 100%; background: white; padding: 12px; z-index: 1998; border-bottom: 8px solid #ddd; }
         
-        /* POST STYLE */
+        /* POSTS */
         .fb-post { background: white; margin-bottom: 8px; border-bottom: 1px solid #ddd; width: 100%; }
         .fb-h { display: flex; align-items: center; padding: 12px; gap: 10px; }
-        .fb-avatar { width: 38px; height: 38px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #4b4f56; }
+        .fb-avatar { width: 38px; height: 38px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .fb-c { padding: 0 12px 12px; font-size: 15px; font-weight: 400; line-height: 1.4; }
-        .fb-img { width: 100%; max-height: 500px; object-fit: cover; display: block; background: #f0f2f5; }
+        .fb-img { width: 100%; max-height: 450px; object-fit: cover; display: block; }
         .fb-a { display: flex; border-top: 1px solid #eee; margin: 0 12px; padding: 4px 0; }
-        .fb-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; color: var(--fb-gray); font-size: 13px; font-weight: 700; }
+        .fb-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; color: #65676b; font-size: 13px; font-weight: 700; }
 
-        /* NAV */
+        /* COMMENTS SECTION */
+        .comment-box { background: #f0f2f5; padding: 8px 12px; border-radius: 18px; margin: 4px 12px; font-size: 13px; font-weight: 400; }
+
+        /* NAV & BADGES */
         nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; border-top: 1px solid #ddd; display: flex; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #65676b; font-weight: 900; gap: 2px; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #65676b; font-weight: 900; position: relative; }
         .nav-item.active { color: var(--fb-blue); }
-        .nav-indicator { width: 30px; height: 3px; background: transparent; border-radius: 10px; margin-bottom: 4px; }
-        .nav-item.active .nav-indicator { background: var(--fb-blue); }
+        .badge { position: absolute; top: 8px; right: 22%; background: #fa3e3e; color: white; font-size: 9px; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
-        /* ADS OVERLAY */
         #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; padding: 20px; }
-        .ad-box { background: white; border-radius: 32px; padding: 40px 24px; text-align: center; width: 100%; max-width: 320px; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white italic font-black text-2xl shadow-lg shadow-blue-200">S</div>
-            <div>
-                <span class="text-blue-600 font-black text-xs block leading-none">SOCIAL</span>
-                <span class="text-blue-600 font-black text-xs block leading-none">EARN</span>
-            </div>
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white italic font-black text-2xl">S</div>
+            <span class="text-blue-600 font-black text-xs leading-none uppercase">Social<br>Earn</span>
         </div>
         <div class="text-right">
             <div id="top-saldo" class="text-green-600 text-2xl font-black tracking-tighter">0.0000</div>
@@ -57,7 +54,7 @@
 
     <div class="status-bar">
         <span id="mult-status">Ganhos Ativos: 100%</span>
-        <button onclick="logout()" class="ml-auto text-gray-300 font-black">Sair</button>
+        <button onclick="logout()" class="ml-auto text-gray-300">Sair</button>
     </div>
 
     <main id="view-feed" class="tab-content active">
@@ -71,52 +68,29 @@
     </main>
 
     <main id="view-ganhos" class="tab-content px-6 pt-12">
-        <div class="bg-white p-10 text-center rounded-[40px] shadow-sm border border-gray-100 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-blue-600"></div>
-            <p class="text-[10px] text-gray-300 uppercase mb-4 tracking-widest font-black">Saldo de Produção</p>
-            <h1 id="wall-saldo" class="text-5xl font-black text-blue-600 mb-8 tracking-tighter">0.0000</h1>
+        <div class="bg-white p-10 text-center rounded-[40px] shadow-sm border border-gray-100">
+            <p id="wall-saldo" class="text-5xl font-black text-blue-600 mb-8">0.0000</p>
             <div class="w-full bg-gray-100 h-3 rounded-full mb-4">
                 <div id="progress-bar" class="bg-blue-600 h-full rounded-full transition-all duration-1000"></div>
             </div>
-            <p id="min-text" class="text-[9px] text-gray-400 uppercase font-black"></p>
+            <p id="min-text" class="text-[9px] text-gray-400 font-black uppercase"></p>
         </div>
     </main>
-
-    <main id="view-admin" class="tab-content px-4 pt-10">
-        <div class="bg-slate-900 rounded-3xl p-8 text-white mb-6 shadow-2xl">
-            <div class="grid grid-cols-2 gap-6 mb-8">
-                <div>
-                    <p class="text-[8px] uppercase opacity-50 mb-1">Receita Ads (BI)</p>
-                    <p id="adm-rev" class="text-xl font-black text-blue-400">0.0000</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-[8px] uppercase opacity-50 mb-1">Dívida Utilizadores</p>
-                    <p id="adm-debt" class="text-xl font-black text-red-400">0.0000</p>
-                </div>
-            </div>
-            <div class="text-center pt-6 border-t border-white/10">
-                <p class="text-[10px] uppercase opacity-50 mb-2">Lucro Líquido Real</p>
-                <p id="adm-profit" class="text-4xl font-black text-green-400 tracking-tighter">0.0000</p>
-            </div>
-        </div>
-        <div id="user-list-admin" class="space-y-2 pb-20"></div>
-    </main>
-
-    <div id="ad-overlay">
-        <div class="ad-box shadow-2xl">
-            <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl mx-auto mb-6">📺</div>
-            <h3 class="text-lg font-black mb-2">Multiplicador 1.0x</h3>
-            <p class="text-xs text-gray-400 mb-10 leading-relaxed font-medium">Vê um anúncio curto para manteres o teu nível de ganhos a 100%.</p>
-            <button onclick="startAd()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase text-xs mb-4 shadow-lg shadow-blue-100">Ver Anúncio (15s)</button>
-            <button onclick="applyPenalty()" class="text-[10px] text-gray-300 font-black uppercase tracking-widest">Recusar (Perder 50%)</button>
-        </div>
-    </div>
 
     <nav>
-        <button onclick="changeTab('feed')" id="nav-feed" class="nav-item active"><div class="nav-indicator"></div>🏠 Feed</button>
-        <button onclick="changeTab('ganhos')" id="nav-ganhos" class="nav-item"><div class="nav-indicator"></div>💰 Ganhos</button>
-        <button onclick="changeTab('admin')" id="nav-admin" class="nav-item hidden text-red-600"><div class="nav-indicator"></div>⚙️ Admin</button>
+        <button onclick="changeTab('feed')" class="nav-item active">🏠<span>Feed</span></button>
+        <button onclick="changeTab('ganhos')" class="nav-item">💰<span>Ganhos</span><div class="badge">9+</div></button>
+        <button id="nav-admin" onclick="changeTab('admin')" class="nav-item hidden text-red-600">⚙️<span>BI Admin</span></button>
     </nav>
+
+    <div id="ad-overlay">
+        <div class="bg-white rounded-[32px] p-8 text-center max-w-xs w-full shadow-2xl">
+            <p class="text-[10px] font-black text-blue-600 uppercase mb-2">Manter Ganhos 100%</p>
+            <p class="text-sm text-gray-400 mb-8 font-bold">Vê um anúncio curto para continuar a ganhar o valor máximo!</p>
+            <button onclick="startAd()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase text-xs mb-4">Ver Anúncio (15s)</button>
+            <button onclick="applyPenalty()" class="text-[10px] text-gray-300 font-black uppercase">Recusar (-50%)</button>
+        </div>
+    </div>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
@@ -126,18 +100,10 @@
         
         let app = {
             uid: localStorage.getItem('apex_uid'),
-            saldo: 0,
-            mult: 1.0,
-            actions: 0,
+            saldo: 0, mult: 1.0, actions: 0,
             cur: { sym: '€', code: 'EUR', min: 5.0 },
-            pendingAction: null
+            pending: null
         };
-
-        function setupLocale() {
-            if (navigator.language === 'pt-BR') app.cur = { sym: 'R$', code: 'BRL', min: 25.0 };
-            document.getElementById('top-cur').innerText = app.cur.code;
-            document.getElementById('min-text').innerText = `Mínimo para saque: ${app.cur.sym}${app.cur.min.toFixed(2)}`;
-        }
 
         async function init() {
             if (!app.uid) {
@@ -145,7 +111,9 @@
                 if (id) { localStorage.setItem('apex_uid', id); location.reload(); }
                 return;
             }
-            setupLocale();
+            if (navigator.language === 'pt-BR') app.cur = { sym: 'R$', code: 'BRL', min: 25.0 };
+            document.getElementById('top-cur').innerText = app.cur.code;
+            document.getElementById('min-text').innerText = `Saque Mínimo: ${app.cur.sym}${app.cur.min.toFixed(2)}`;
             if (app.uid === ADMIN_ID) document.getElementById('nav-admin').classList.remove('hidden');
 
             const { data } = await sb.from('perfis').select('*').eq('id', app.uid).single();
@@ -158,114 +126,94 @@
 
         async function loadFeed() {
             const container = document.getElementById('feed-container');
-            const { data: posts, error } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             
-            if (error) { container.innerHTML = `<p class='p-10 text-red-500 text-xs'>Erro de Ligação.</p>`; return; }
-
             let html = "";
             posts.forEach((p, idx) => {
                 const safeId = String(p.user_id).slice(0, 5);
+                const comments = p.comment_data || []; // Array de textos
+
                 html += `
                 <div class="fb-post">
                     <div class="fb-h">
                         <div class="fb-avatar">👤</div>
-                        <div class="flex flex-col">
-                            <span class="text-[14px] font-bold">Utilizador ${safeId}</span>
-                            <span class="text-[11px] text-gray-500 font-normal">Online</span>
-                        </div>
+                        <div class="flex flex-col"><span class="text-sm font-bold">User ${safeId}</span><span class="text-[11px] text-gray-400">Online</span></div>
                     </div>
                     <div class="fb-c">${p.content}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="fb-img" loading="lazy">` : ''}
+                    ${p.image_url ? `<img src="${p.image_url}" class="fb-img">` : ''}
+                    <div class="px-3 py-2 text-[11px] text-gray-400 border-b border-gray-50 mx-3 flex justify-between">
+                        <span>👍 ${p.likes || 0}</span>
+                        <span>${comments.length} comentários</span>
+                    </div>
                     <div class="fb-a">
-                        <button onclick="handleEarn(0.0006)" class="fb-btn">👍 Gosto</button>
-                        <button onclick="handleEarn(0.0010)" class="fb-btn">💬 Comentar</button>
-                        <button onclick="handleEarn(0.0020)" class="fb-btn">🔗 Partilhar</button>
+                        <button onclick="handleLike('${p.id}', ${p.likes || 0})" class="fb-btn">👍 Gosto</button>
+                        <button onclick="handleComment('${p.id}')" class="fb-btn">💬 Comentar</button>
+                    </div>
+                    <div id="comments-${p.id}" class="pb-3">
+                        ${comments.slice(-2).map(c => `<div class="comment-box"><b>User:</b> ${c}</div>`).join('')}
                     </div>
                 </div>`;
-                if((idx+1)%3 === 0) html += `<div class="p-10 bg-white mb-2 text-center border-y border-gray-50"><p class="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1">Sponsored</p><div class="h-16 bg-gray-50 rounded-xl flex items-center justify-center text-[10px] text-gray-200 font-black italic">Google Ads Manager</div></div>`;
+                if((idx+1)%3 === 0) html += `<div class="p-10 bg-white mb-2 text-center text-[8px] text-gray-300 font-black uppercase tracking-widest">Sponsored Ads</div>`;
             });
             container.innerHTML = html;
         }
 
-        function handleEarn(val) {
-            if (app.uid === ADMIN_ID) return;
-            if (app.actions >= 2 && app.mult === 1.0) {
-                app.pendingAction = val;
-                document.getElementById('ad-overlay').style.display = 'flex';
-                return;
-            }
-            executeEarn(val);
+        async function handleLike(postId, current) {
+            if(app.actions >= 2 && app.mult === 1.0) { app.pending = { type: 'like', id: postId, val: current }; document.getElementById('ad-overlay').style.display = 'flex'; return; }
+            await sb.from('posts').update({ likes: current + 1 }).eq('id', postId);
+            earn(0.0006);
+            loadFeed();
         }
 
-        async function executeEarn(val) {
+        async function handleComment(postId) {
+            const txt = prompt("Escreve o teu comentário:");
+            if(!txt) return;
+            if(app.actions >= 2 && app.mult === 1.0) { alert("Vê um anúncio primeiro!"); return; }
+            
+            const { data } = await sb.from('posts').select('comment_data').eq('id', postId).single();
+            let list = data.comment_data || [];
+            list.push(txt);
+            
+            await sb.from('posts').update({ comment_data: list }).eq('id', postId);
+            earn(0.0100);
+            loadFeed();
+        }
+
+        async function earn(v) {
             app.actions++;
-            app.saldo += (val * app.mult);
+            app.saldo += (v * app.mult);
             updateUI();
             await sb.from('perfis').update({ saldo: app.saldo }).eq('id', app.uid);
         }
 
         function updateUI() {
-            const display = `${app.cur.sym}${app.saldo.toFixed(4)}`;
-            document.getElementById('top-saldo').innerText = display;
-            document.getElementById('wall-saldo').innerText = display;
+            const val = `${app.cur.sym}${app.saldo.toFixed(4)}`;
+            document.getElementById('top-saldo').innerText = val;
+            document.getElementById('wall-saldo').innerText = val;
             let p = (app.saldo / app.cur.min) * 100;
             document.getElementById('progress-bar').style.width = Math.min(p, 100) + "%";
-            
-            const status = document.getElementById('mult-status');
-            status.innerText = `Ganhos Ativos: ${Math.round(app.mult * 100)}%`;
-            status.className = app.mult < 1 ? "text-red-500 font-black" : "text-green-600 font-black";
-        }
-
-        async function loadAdminBI() {
-            const { data: users } = await sb.from('perfis').select('*');
-            const { count: posts } = await sb.from('posts').select('*', { count: 'exact', head: true });
-            let debt = users.reduce((a, b) => a + Number(b.saldo), 0);
-            let rev = posts * 0.045; // BI Logic: 0.045€ revenue per post interaction
-            
-            document.getElementById('adm-debt').innerText = `${app.cur.sym}${debt.toFixed(4)}`;
-            document.getElementById('adm-rev').innerText = `${app.cur.sym}${rev.toFixed(4)}`;
-            document.getElementById('adm-profit').innerText = `${app.cur.sym}${(rev - debt).toFixed(4)}`;
-            
-            document.getElementById('user-list-admin').innerHTML = users.map(u => `
-                <div class="bg-white p-5 rounded-2xl flex justify-between items-center shadow-sm border border-gray-50">
-                    <span class="text-xs font-black text-blue-600 uppercase">${u.id}</span>
-                    <span class="text-xs font-bold">${app.cur.sym}${Number(u.saldo).toFixed(4)}</span>
-                </div>
-            `).join('');
+            document.getElementById('mult-status').innerText = `Ganhos: ${Math.round(app.mult * 100)}%`;
         }
 
         function changeTab(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('view-' + t).classList.add('active');
-            document.getElementById('nav-' + t).classList.add('active');
-            if (t === 'admin') loadAdminBI();
+            if(t === 'feed') document.getElementById('view-feed').classList.add('active');
+            if(t === 'ganhos') document.getElementById('view-ganhos').classList.add('active');
             window.scrollTo(0,0);
         }
 
         async function openPost() {
-            const txt = prompt("NO QUE ESTÁS A PENSAR?");
+            const txt = prompt("No que estás a pensar?");
             if (txt) {
-                const img = prompt("URL DA IMAGEM (OPCIONAL):");
-                await sb.from('posts').insert({ user_id: app.uid, content: txt, image_url: img });
-                handleEarn(0.0150);
+                await sb.from('posts').insert({ user_id: app.uid, content: txt, likes: 0, comment_data: [] });
+                earn(0.0150);
                 loadFeed();
             }
         }
 
-        function startAd() { 
-            app.mult = 1.0; 
-            app.actions = 0; 
-            document.getElementById('ad-overlay').style.display = 'none';
-            if(app.pendingAction) executeEarn(app.pendingAction);
-        }
-
-        function applyPenalty() { 
-            app.mult = 0.5; 
-            document.getElementById('ad-overlay').style.display = 'none';
-            if(app.pendingAction) executeEarn(app.pendingAction);
-        }
-
+        function startAd() { app.mult = 1.0; app.actions = 0; document.getElementById('ad-overlay').style.display = 'none'; }
+        function applyPenalty() { app.mult = 0.5; document.getElementById('ad-overlay').style.display = 'none'; }
         function logout() { localStorage.clear(); location.reload(); }
 
         init();
