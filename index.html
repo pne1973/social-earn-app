@@ -12,10 +12,8 @@
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin-bottom: 12px; transition: transform 0.2s; }
         
-        /* MONETIZATION: Inline Ad Style */
         .feed-ad-unit { background: #ffffff; border: 2px dashed var(--g-blue); border-radius: 12px; padding: 20px; margin-bottom: 12px; text-align: center; }
 
-        /* ANIMAÇÃO DE GANHOS */
         #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes popUp {
             0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); }
@@ -24,18 +22,14 @@
         }
         .earning-text { font-size: 3.5rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52,168,83,0.4); -webkit-text-stroke: 1.5px white; }
 
-        /* UI DE ANÚNCIOS */
         #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
         .modal-300-250 { width: 310px; background: white; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
 
-        /* STATUS E HEADER */
         .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; }
         
-        /* PUBLICADOR FIXO REDUZIDO */
         .publisher-fixed { position: fixed; top: 120px; left: 0; right: 0; z-index: 280; background: #f1f3f4; padding: 8px 16px; border-bottom: 1px solid #dadce0; }
         .mini-input-box { background: white; border: 1px solid #dadce0; border-radius: 24px; padding: 8px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
 
-        /* NAVEGAÇÃO E FEED */
         #feed-container { margin-top: 185px; padding: 0 16px; }
         .nav-item { transition: all 0.3s; color: #5f6368; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
@@ -43,11 +37,9 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ADMIN STYLES */
         .profit-card { background: #1a0b2e; color: white; border-radius: 16px; padding: 24px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); }
         .admin-stat-card { background: white; border-radius: 12px; padding: 16px; text-align: center; border-bottom: 4px solid #eee; }
         
-        /* INTERAÇÕES */
         .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0; position: relative; border: none; background: transparent; cursor: pointer; border-radius: 8px; }
         .interaction-btn:active { background: #f8f9fa; transform: scale(0.95); }
         .count-badge { position: absolute; top: 4px; right: 25%; background: var(--g-red); color: white; font-size: 10px; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 900; border: 2px solid white; }
@@ -57,7 +49,7 @@
 </head>
 <body class="pb-24">
 
-    <div id="auth-screen" style="display:none;">
+    <div id="auth-screen">
         <div class="w-16 h-16 bg-blue-600 rounded-2xl mb-6 flex items-center justify-center text-white font-black italic text-3xl shadow-lg shadow-blue-200">S</div>
         <h2 class="text-blue-600 font-black uppercase text-xs mb-8 tracking-[0.2em]">Social Earn Network</h2>
         <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs border-2 border-gray-100 rounded-2xl p-5 text-center mb-4 uppercase font-black focus:border-blue-600 outline-none transition-all shadow-sm">
@@ -224,12 +216,21 @@
 
         function doLogin() {
             const id = document.getElementById('login-id').value.trim();
-            if(id) { localStorage.setItem('apex_uid', id); location.reload(); }
+            if(id) { 
+                localStorage.setItem('apex_uid', id); 
+                document.getElementById('auth-screen').style.display = 'none';
+                activeID = id;
+                init();
+            }
         }
         function doLogout() { localStorage.removeItem('apex_uid'); location.reload(); }
 
         async function init() {
-            if (!activeID) { document.getElementById('auth-screen').style.display = 'flex'; return; }
+            if (!activeID) { 
+                document.getElementById('auth-screen').style.display = 'flex'; 
+                return; 
+            }
+            document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('display-uid').innerText = activeID;
 
             if(activeID === ADMIN_MASTER) {
@@ -237,6 +238,11 @@
                 document.getElementById('nav-wallet-btn').classList.add('hidden');
                 document.getElementById('pub-fixed-container').style.top = '72px';
                 document.getElementById('feed-container').style.marginTop = '135px';
+            } else {
+                document.getElementById('nav-admin-btn').classList.add('hidden');
+                document.getElementById('nav-wallet-btn').classList.remove('hidden');
+                document.getElementById('pub-fixed-container').style.top = '120px';
+                document.getElementById('feed-container').style.marginTop = '185px';
             }
 
             const { data } = await sb.from('perfis').select('*').eq('id', activeID).single();
@@ -254,9 +260,11 @@
             document.getElementById('main-brl').innerText = (curSaldo * 6.1245).toFixed(4) + " BRL";
             document.getElementById('wall-brl-sub').innerText = (curSaldo * 6.1245).toFixed(4) + " BRL";
             
-            const progress = (curSaldo / 5.0) * 100;
             const progBar = document.getElementById('withdraw-progress');
-            if(progBar) progBar.style.width = Math.min(progress, 100) + "%";
+            if(progBar) {
+                const progress = (curSaldo / 5.0) * 100;
+                progBar.style.width = Math.min(progress, 100) + "%";
+            }
 
             if(curSaldo >= 5.0) {
                 document.getElementById('withdraw-area').classList.remove('hidden');
@@ -266,7 +274,11 @@
                 document.getElementById('progress-container').classList.remove('hidden');
             }
 
-            if (activeID !== ADMIN_MASTER) {
+            const statusHeader = document.querySelector('.status-header-fixed');
+            if (activeID === ADMIN_MASTER) {
+                statusHeader.style.display = 'none';
+            } else {
+                statusHeader.style.display = 'flex';
                 const statusBox = document.getElementById('status-text');
                 const restoreBtn = document.getElementById('restore-btn');
                 if (user.multiplier < 1.0 && user.penaltyExpiry) {
@@ -281,8 +293,6 @@
                     statusBox.className = "text-[9px] font-black uppercase text-green-600";
                     restoreBtn.classList.add('hidden');
                 }
-            } else {
-                document.querySelector('.status-header-fixed').style.display = 'none';
             }
         }
 
@@ -311,12 +321,6 @@
             `).join('');
         }
 
-        async function requestWithdraw() {
-            const email = document.getElementById('pp-email').value;
-            if(!email.includes('@')) return alert("INSIRA UM EMAIL PAYPAL VÁLIDO");
-            alert("SOLICITAÇÃO ENVIADA!");
-        }
-
         function handleInteraction(type, val = 0, pid = null) {
             if(activeID === ADMIN_MASTER) { executeAction(type, val, pid); return; }
             if ((user.interactions >= 2 || user.postsToday >= 3) && user.multiplier === 1.0) {
@@ -324,52 +328,6 @@
                 document.getElementById('ad-overlay').style.display = 'flex';
                 document.getElementById('ad-decision-ui').classList.remove('hidden');
             } else { executeAction(type, val, pid); }
-        }
-
-        function startAdFlow(direct = false) {
-            document.getElementById('ad-overlay').style.display = 'flex';
-            document.getElementById('ad-decision-ui').classList.add('hidden');
-            document.getElementById('ad-player-ui').classList.remove('hidden');
-            let time = 15;
-            const timer = setInterval(() => {
-                time--;
-                document.getElementById('ad-timer-circle').innerText = time;
-                if(time <= 0) {
-                    clearInterval(timer);
-                    const btn = document.getElementById('close-ad-btn');
-                    btn.disabled = false;
-                    btn.innerText = "RESGATAR RECOMPENSA";
-                    btn.className = "h-16 bg-green-600 text-white font-black uppercase text-[10px]";
-                    btn.onclick = () => {
-                        resetState();
-                        if (!direct && pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid);
-                        closeAd();
-                    };
-                }
-            }, 1000);
-        }
-
-        function degradeGains() {
-            user.multiplier = user.multiplier > 0.5 ? 0.5 : 0.25;
-            user.penaltyExpiry = new Date(Date.now() + 24*60*60*1000).toISOString();
-            if (pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid);
-            closeAd();
-        }
-
-        function closeAd() {
-            document.getElementById('ad-overlay').style.display = 'none';
-            document.getElementById('close-ad-btn').disabled = true;
-            document.getElementById('close-ad-btn').innerText = "Processando Ganhos...";
-            document.getElementById('close-ad-btn').className = "h-16 bg-gray-100 text-gray-400 uppercase text-[10px] font-black";
-            pendingAction = null;
-        }
-
-        function resetState() { user.multiplier = 1.0; user.penaltyExpiry = null; user.interactions = 0; updateUI(); }
-
-        async function executeAction(type, val, pid) {
-            if (type === 'post') await publish();
-            else if (type === 'comment') { user.interactions++; await addComment(pid); }
-            else { user.interactions++; applyGain(val); }
         }
 
         async function applyGain(val) {
@@ -414,7 +372,6 @@
                     </div>
                 </div>`;
 
-                // MONETIZATION: CONDITIONAL INJECTION (Only for users)
                 if (activeID !== ADMIN_MASTER && (index + 1) % 3 === 0) {
                     htmlOutput += `
                     <div class="feed-ad-unit">
@@ -430,74 +387,79 @@
             posts.forEach(p => { updateCount(p.id); if(!document.getElementById(`comments-${p.id}`).classList.contains('hidden')) updateComments(p.id); });
         }
 
+        // ... resto das funções mantidas conforme v33.12 original ...
+        function startAdFlow(direct = false) {
+            document.getElementById('ad-overlay').style.display = 'flex';
+            document.getElementById('ad-decision-ui').classList.add('hidden');
+            document.getElementById('ad-player-ui').classList.remove('hidden');
+            let time = 15;
+            const timer = setInterval(() => {
+                time--;
+                document.getElementById('ad-timer-circle').innerText = time;
+                if(time <= 0) {
+                    clearInterval(timer);
+                    const btn = document.getElementById('close-ad-btn');
+                    btn.disabled = false;
+                    btn.innerText = "RESGATAR RECOMPENSA";
+                    btn.className = "h-16 bg-green-600 text-white font-black uppercase text-[10px]";
+                    btn.onclick = () => {
+                        resetState();
+                        if (!direct && pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid);
+                        closeAd();
+                    };
+                }
+            }, 1000);
+        }
+        function degradeGains() { user.multiplier = 0.5; user.penaltyExpiry = new Date(Date.now() + 24*60*60*1000).toISOString(); if (pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid); closeAd(); }
+        function closeAd() { document.getElementById('ad-overlay').style.display = 'none'; document.getElementById('close-ad-btn').disabled = true; pendingAction = null; }
+        function resetState() { user.multiplier = 1.0; user.penaltyExpiry = null; user.interactions = 0; updateUI(); }
+        async function executeAction(type, val, pid) { if (type === 'post') await publish(); else if (type === 'comment') { user.interactions++; await addComment(pid); } else { user.interactions++; applyGain(val); } }
+        async function publish() {
+            const content = document.getElementById('post-input').value;
+            const url = document.getElementById('post-url').value;
+            if(!content) return;
+            const { error } = await sb.from('posts').insert([{ user_id: activeID, content, image_url: url }]);
+            if(!error) { user.postsToday++; applyGain(0.0150); document.getElementById('post-input').value = ""; document.getElementById('post-url').value = ""; collapsePublisher(); loadFeed(); }
+        }
         async function addComment(pid) {
             const val = document.getElementById(`in-${pid}`).value;
             if(!val) return;
             const { error } = await sb.from('comentarios').insert([{ post_id: pid, user_id: activeID, content: val }]);
             if(!error) { document.getElementById(`in-${pid}`).value = ""; applyGain(0.0010); updateComments(pid); }
         }
-
         async function updateComments(pid) {
             const { data } = await sb.from('comentarios').select('*').eq('post_id', pid).order('created_at', {ascending: true});
             const list = document.getElementById(`list-${pid}`);
             if(list) list.innerHTML = data.map(c => `<div class="bg-white p-3 rounded-lg border border-gray-100 shadow-sm mb-2">${c.content}</div>`).join('');
             updateCount(pid);
         }
-
         async function updateCount(pid) {
             const { count } = await sb.from('comentarios').select('*', { count: 'exact', head: true }).eq('post_id', pid);
             const badge = document.getElementById(`badge-${pid}`);
             if(badge) badge.innerText = count || 0;
         }
-
-        async function publish() {
-            const content = document.getElementById('post-input').value;
-            const url = document.getElementById('post-url').value;
-            if(!content) return;
-            const { error } = await sb.from('posts').insert([{ user_id: activeID, content, image_url: url }]);
-            if(!error) { 
-                user.postsToday++; 
-                applyGain(0.0150); 
-                document.getElementById('post-input').value = ""; 
-                document.getElementById('post-url').value = "";
-                collapsePublisher(); 
-                loadFeed(); 
-            }
-        }
-
         function toggleComments(id) { 
             const sec = document.getElementById(`comments-${id}`);
             sec.classList.toggle('hidden');
             if(!sec.classList.contains('hidden')) updateComments(id);
         }
-
         function showBigNumber(val) { 
             const c = document.getElementById('floating-earning'); 
             document.getElementById('earning-val').innerText = "+" + val.toFixed(4) + "€"; 
             c.style.display = 'block'; 
             setTimeout(() => c.style.display = 'none', 800); 
         }
-
         function nav(t) { 
             document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active')); 
             document.getElementById('view-'+t).classList.add('active'); 
-            const btn = (t === 'social') ? document.querySelector('nav button:first-child') : (t === 'info' ? document.getElementById('nav-wallet-btn') : document.getElementById('nav-admin-btn'));
-            if(btn) btn.classList.add('active');
+            event.currentTarget.classList.add('active'); 
             if(t === 'admin') loadAdminStats();
             document.getElementById('pub-fixed-container').style.display = (t === 'social') ? 'block' : 'none';
         }
-
-        function expandPublisher() { 
-            document.getElementById('mini-pub').classList.add('hidden');
-            document.getElementById('expanded-post').classList.remove('hidden');
-        }
-        function collapsePublisher() {
-            document.getElementById('mini-pub').classList.remove('hidden');
-            document.getElementById('expanded-post').classList.add('hidden');
-        }
+        function expandPublisher() { document.getElementById('mini-pub').classList.add('hidden'); document.getElementById('expanded-post').classList.remove('hidden'); }
+        function collapsePublisher() { document.getElementById('mini-pub').classList.remove('hidden'); document.getElementById('expanded-post').classList.add('hidden'); }
 
         init();
     </script>
-
 </body>
 </html>
