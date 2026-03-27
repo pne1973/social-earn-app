@@ -3,149 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.12 - Facebook Style Master</title>
+    <title>Apex Social v33.12 - Official Production</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --fb-blue: #1877F2; --fb-bg: #f0f2f5; --fb-gray: #65676b; }
-        body { font-family: 'Roboto', sans-serif; background: var(--fb-bg); color: #1c1e21; -webkit-tap-highlight-color: transparent; }
+        :root { --fb-blue: #1877F2; --fb-bg: #f0f2f5; --fb-gray: #65676b; --g-green: #34A853; }
+        body { font-family: 'Roboto', sans-serif; background: var(--fb-bg); color: #1c1e21; font-weight: 700; -webkit-tap-highlight-color: transparent; }
         
-        /* Facebook Lite Design */
-        .fb-card { background: white; margin-bottom: 8px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
-        .fb-card:first-child { border-top: none; }
+        /* HEADER & STATUS FIXED */
+        header { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; border-bottom: 1px solid #ddd; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; }
+        .status-header-fixed { position: fixed; top: 60px; left: 0; right: 0; height: 40px; background: white; border-bottom: 1px solid #eee; z-index: 900; display: flex; align-items: center; padding: 0 15px; }
+        .publisher-fixed { position: fixed; top: 100px; left: 0; right: 0; background: white; padding: 12px; z-index: 800; border-bottom: 8px solid #ddd; }
         
-        /* Layout Fixo */
-        header { position: fixed; top: 0; left: 0; right: 0; height: 50px; background: white; border-bottom: 1px solid #ddd; z-index: 1000; display: flex; align-items: center; padding: 0 12px; }
-        .status-bar { position: fixed; top: 50px; left: 0; right: 0; height: 35px; background: #fff; border-bottom: 1px solid #eee; z-index: 900; display: flex; align-items: center; px: 12px; }
-        .publisher-area { position: fixed; top: 85px; left: 0; right: 0; z-index: 800; background: white; padding: 10px 12px; border-bottom: 8px solid #ddd; }
-        
-        /* Margem do Feed - ESSENCIAL PARA APARECER */
-        #feed-container { margin-top: 175px; padding-bottom: 80px; }
-        body.is-admin #feed-container { margin-top: 60px; }
+        /* FEED CONTAINER - Adjusted to be visible below fixed elements */
+        #feed-container { margin-top: 185px; padding-bottom: 100px; }
+        body.is-admin #feed-container { margin-top: 70px; }
 
-        /* Botões de Interação Estilo FB */
-        .fb-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 0; color: var(--fb-gray); font-size: 13px; font-weight: 500; }
-        .fb-btn:active { background: #f0f2f5; }
+        /* FACEBOOK LITE POST STYLE */
+        .fb-post { background: white; margin-bottom: 8px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+        .fb-post-header { display: flex; items-center: center; padding: 12px; gap: 10px; }
+        .fb-avatar { width: 36px; height: 36px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .fb-content { padding: 0 12px 12px 12px; font-size: 15px; font-weight: 400; line-height: 1.4; }
+        .fb-image { width: 100%; max-height: 450px; object-fit: cover; background: #f0f2f5; }
+        .fb-actions { display: flex; border-top: 1px solid #f0f2f5; margin: 0 12px; padding: 4px 0; }
+        .fb-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 0; color: var(--fb-gray); font-size: 13px; font-weight: 700; }
+        .fb-btn:active { background: #f2f2f2; }
 
-        /* Animação Ganhos */
+        /* FLOATING EARNINGS */
         #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s forwards; }
         @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
-        .earning-text { font-size: 3rem; font-weight: 900; color: #34A853; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .earning-text { font-size: 3.5rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52,168,83,0.4); -webkit-text-stroke: 1.5px white; }
 
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--fb-gray); font-size: 20px; border-bottom: 3px solid transparent; }
+        /* TABS & NAVIGATION */
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--fb-gray); transition: 0.2s; }
         .nav-item.active { color: var(--fb-blue); border-bottom: 3px solid var(--fb-blue); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
-        /* Ads Injection */
-        .ad-box { background: #fff; padding: 15px; border-bottom: 8px solid #ddd; text-align: center; }
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen" class="fixed inset-0 bg-white z-[6000] flex flex-col items-center justify-center p-6" style="display:none;">
-        <div class="text-blue-600 text-5xl font-bold mb-8 italic">apex</div>
-        <input type="text" id="login-id" placeholder="Telemóvel ou email" class="w-full max-w-xs bg-gray-100 border border-gray-300 rounded p-3 mb-3 text-sm outline-none">
-        <button onclick="doLogin()" class="w-full max-w-xs bg-blue-600 text-white font-bold py-3 rounded text-sm">Entrar</button>
+    <div id="auth-screen" style="display:none;">
+        <div class="text-blue-600 text-5xl font-black mb-10 italic tracking-tighter">apex</div>
+        <input type="text" id="login-id" placeholder="ID de Utilizador" class="w-full max-w-xs border border-gray-300 bg-gray-50 p-4 rounded-lg mb-4 outline-none focus:border-blue-600 font-bold">
+        <button onclick="doLogin()" class="w-full max-w-xs bg-blue-600 text-white font-black py-4 rounded-lg shadow-lg uppercase">Entrar</button>
     </div>
 
     <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
 
-    <header class="justify-between">
-        <h1 class="text-blue-600 font-bold text-2xl tracking-tighter">apex</h1>
-        <div class="flex flex-col items-end">
-            <span id="main-eur" class="text-green-600 font-bold leading-none">0.0000€</span>
-            <span id="main-brl" class="text-[9px] text-gray-400 font-bold">0.0000 BRL</span>
+    <header>
+        <div class="text-blue-600 text-2xl font-black italic tracking-tighter">apex</div>
+        <div class="text-right">
+            <div id="main-eur" class="text-green-600 text-xl font-black">0.0000€</div>
+            <div id="main-brl" class="text-[10px] text-gray-400 font-black">0.0000 BRL</div>
         </div>
     </header>
 
-    <div class="status-bar px-3">
-        <div id="status-text" class="text-[10px] font-bold text-green-600 uppercase">Ganhos 100% Ativos</div>
-        <button onclick="doLogout()" class="ml-auto text-[10px] text-gray-400 font-bold uppercase">Sair</button>
+    <div class="status-header-fixed">
+        <div id="status-text" class="text-[10px] font-black uppercase text-green-600">Ganhos Ativos: 100%</div>
+        <button onclick="doLogout()" class="ml-auto text-[10px] text-gray-400 font-black uppercase">Sair</button>
     </div>
 
-    <div id="pub-fixed-container" class="publisher-area">
+    <div id="pub-fixed-container" class="publisher-fixed">
         <div id="mini-pub" onclick="expandPublisher()" class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-sm">👤</div>
-            <div class="flex-1 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-400">O que estás a pensar?</div>
+            <div class="fb-avatar">👤</div>
+            <div class="flex-1 bg-gray-100 rounded-full px-4 py-2 text-[14px] text-gray-500 font-normal">No que estás a pensar?</div>
         </div>
         <div id="expanded-post" class="hidden mt-2">
-            <textarea id="post-input" class="w-full border-none focus:ring-0 text-base mb-2 p-0" placeholder="Escreve algo..." rows="3"></textarea>
-            <input id="post-url" type="text" placeholder="URL da imagem (opcional)" class="w-full bg-gray-100 border-none text-xs p-2 rounded mb-3">
-            <div class="flex gap-2 border-t pt-2">
-                <button onclick="collapsePublisher()" class="flex-1 py-2 text-sm font-bold text-gray-500">Cancelar</button>
-                <button onclick="handleInteraction('post')" class="flex-1 bg-blue-600 text-white py-2 rounded font-bold text-sm">Publicar</button>
+            <textarea id="post-input" placeholder="Escreve algo aqui..." class="w-full border-none focus:ring-0 text-lg mb-2 font-normal" rows="3"></textarea>
+            <input id="post-url" type="text" placeholder="URL da imagem (opcional)" class="w-full bg-gray-100 p-3 rounded-lg mb-3 text-xs">
+            <div class="flex gap-2">
+                <button onclick="collapsePublisher()" class="flex-1 text-gray-500 font-black uppercase text-xs">Cancelar</button>
+                <button onclick="handleInteraction('post')" class="flex-[2] bg-blue-600 text-white py-3 rounded-lg font-black uppercase text-sm">Publicar (+15 XP)</button>
             </div>
         </div>
     </div>
 
     <main>
         <section id="view-social" class="tab-content active">
-            <div id="feed-container">
-                </div>
+            <div id="feed-container"></div>
         </section>
 
-        <section id="view-info" class="tab-content px-4 mt-24">
-            <div class="fb-card p-6 text-center border-none rounded-lg shadow-sm">
-                <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">A Minha Carteira (ID: <span id="display-uid" class="text-blue-600">--</span>)</p>
-                <h1 id="wall-eur" class="text-4xl font-bold text-gray-800">0.0000€</h1>
-                <p id="wall-brl-sub" class="text-sm font-bold text-gray-400 mb-6">0.0000 BRL</p>
+        <section id="view-info" class="tab-content px-4 mt-32">
+            <div class="bg-white border p-8 text-center rounded-xl shadow-sm">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">ID: <span id="display-uid" class="text-blue-600">--</span></p>
+                <h1 id="wall-eur" class="text-5xl font-black text-blue-600 mb-1">0.0000€</h1>
+                <p id="wall-brl-sub" class="text-sm font-black text-gray-300 mb-8">0.0000 BRL</p>
                 <div id="withdraw-area" class="hidden">
-                    <input id="pp-email" type="email" placeholder="Email PayPal" class="w-full border p-3 rounded mb-2 text-sm">
-                    <button onclick="alert('Solicitado!')" class="w-full bg-blue-600 text-white py-3 rounded font-bold">Solicitar Levantamento</button>
+                    <input id="pp-email" type="email" placeholder="Email PayPal" class="w-full border p-4 rounded-xl text-center mb-3 font-bold">
+                    <button onclick="alert('Pedido Registado!')" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase">Levantar Agora</button>
                 </div>
-                <div class="w-full bg-gray-200 h-1.5 rounded-full mt-4"><div id="withdraw-progress" class="bg-blue-600 h-full w-0"></div></div>
-                <p class="text-[9px] text-gray-400 font-bold mt-2 uppercase">Mínimo: 5000 XP (5.0000€)</p>
+                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden mt-4">
+                    <div id="withdraw-progress" class="bg-blue-600 h-full w-0 transition-all duration-1000"></div>
+                </div>
+                <p class="text-[9px] text-gray-400 font-black uppercase mt-2">Mínimo: 5.0000€ (5000 XP)</p>
             </div>
         </section>
 
-        <section id="view-admin" class="tab-content px-4 mt-24">
-            <div class="fb-card p-4 border-none bg-gray-900 text-white rounded-lg mb-4">
-                <h2 class="text-xs font-bold text-blue-400 uppercase mb-4">Painel Admin</h2>
-                <div class="flex justify-between border-b border-gray-800 pb-2 mb-2">
-                    <span class="text-xs opacity-50">Saldo em Caixa:</span>
-                    <span id="adm-gross-revenue" class="font-bold">0.0000€</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-xs opacity-50">Total Users:</span>
-                    <span id="adm-total-users" class="font-bold">0</span>
+        <section id="view-admin" class="tab-content px-4 mt-32 pb-20">
+            <div class="bg-gray-900 text-white p-6 rounded-xl mb-4">
+                <h2 class="text-blue-400 font-black uppercase text-xs mb-4">Admin BI Dashboard</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><p class="text-[8px] opacity-50 uppercase">Receita Bruta</p><p id="adm-gross-revenue" class="text-xl font-black">0.0000€</p></div>
+                    <div><p class="text-[8px] opacity-50 uppercase">Total Users</p><p id="adm-total-users" class="text-xl font-black">0</p></div>
                 </div>
             </div>
-            <div class="fb-card border-none rounded-lg overflow-hidden">
-                <table class="w-full text-xs">
-                    <thead class="bg-gray-100"><tr><th class="p-3 text-left">ID</th><th class="p-3">Saldo</th><th class="p-3">Ação</th></tr></thead>
+            <div class="bg-white border rounded-xl overflow-hidden">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-gray-50 border-b"><tr><th class="p-4">ID</th><th class="p-4">Saldo</th><th class="p-4 text-right">Ação</th></tr></thead>
                     <tbody id="adm-user-list"></tbody>
                 </table>
             </div>
         </section>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex h-14 z-[1000]">
-        <button onclick="nav('social')" class="nav-item active">🏠</button>
-        <button id="nav-wallet-btn" onclick="nav('info')" class="nav-item">💰</button>
-        <button id="nav-admin-btn" onclick="nav('admin')" class="hidden nav-item text-red-600">⚙️</button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex h-16 z-[1000]">
+        <button onclick="nav('social')" class="nav-item active text-2xl">🏠</button>
+        <button id="nav-wallet-btn" onclick="nav('info')" class="nav-item text-2xl">💰</button>
+        <button id="nav-admin-btn" onclick="nav('admin')" class="hidden nav-item text-red-600 text-2xl">⚙️</button>
     </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const ADMIN_MASTER = "5401881400";
+        const ADMIN_ID = "5401881400";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
         let activeID = localStorage.getItem('apex_uid');
-        let user = { saldo: 0, interactions: 0, postsToday: 0, multiplier: 1.0 };
+        let user = { saldo: 0, multiplier: 1.0 };
 
         async function init() {
             if (!activeID) { document.getElementById('auth-screen').style.display = 'flex'; return; }
             document.getElementById('display-uid').innerText = activeID;
 
-            if(activeID === ADMIN_MASTER) {
+            if(activeID === ADMIN_ID) {
                 document.getElementById('nav-admin-btn').classList.remove('hidden');
                 document.getElementById('nav-wallet-btn').classList.add('hidden');
                 document.body.classList.add('is-admin');
                 document.getElementById('pub-fixed-container').style.display = 'none';
-                document.querySelector('.status-bar').style.display = 'none';
+                document.querySelector('.status-header-fixed').style.display = 'none';
             }
 
             const { data } = await sb.from('perfis').select('*').eq('id', activeID).single();
@@ -164,8 +163,8 @@
             document.getElementById('main-brl').innerText = (cur * 6.1245).toFixed(4) + " BRL";
             document.getElementById('wall-brl-sub').innerText = (cur * 6.1245).toFixed(4) + " BRL";
             
-            const prog = (cur / 5.0) * 100;
-            document.getElementById('withdraw-progress').style.width = Math.min(prog, 100) + "%";
+            const p = (cur / 5.0) * 100;
+            document.getElementById('withdraw-progress').style.width = Math.min(p, 100) + "%";
             if(cur >= 5.0) document.getElementById('withdraw-area').classList.remove('hidden');
         }
 
@@ -177,36 +176,40 @@
             let html = "";
             posts.forEach((p, idx) => {
                 html += `
-                <div class="fb-card">
-                    <div class="flex items-center gap-2 p-3">
-                        <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center font-bold text-xs">👤</div>
+                <div class="fb-post">
+                    <div class="fb-post-header">
+                        <div class="fb-avatar">👤</div>
                         <div class="flex flex-col">
-                            <span class="text-[13px] font-bold">Utilizador ${p.user_id.substring(0,6)}</span>
-                            <span class="text-[10px] text-gray-500">Postado agora</span>
+                            <span class="text-[14px] font-bold">Utilizador ${p.user_id.substring(0,6)}</span>
+                            <span class="text-[11px] text-gray-500 font-normal">Postado agora</span>
                         </div>
+                        <button class="ml-auto text-gray-400">🚩</button>
                     </div>
-                    <div class="px-3 pb-3 text-[14px]">${p.content}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="w-full bg-gray-100 object-cover max-h-96">` : ''}
-                    <div class="px-3 py-2 flex items-center justify-between text-[11px] text-gray-500 border-b border-gray-100 mx-3">
-                        <div class="flex items-center gap-1"><span>👍</span> 0</div>
-                        <div><span id="badge-${p.id}">0</span> comentários</div>
+                    <div class="fb-content">${p.content}</div>
+                    ${p.image_url ? `<img src="${p.image_url}" class="fb-image">` : ''}
+                    
+                    <div class="px-3 py-2 flex justify-between text-[12px] text-gray-500 font-normal">
+                        <span>👍 0 Likes</span>
+                        <span><span id="badge-${p.id}">0</span> comentários</span>
                     </div>
-                    <div class="flex px-1">
+
+                    <div class="fb-actions">
                         <button onclick="handleInteraction('like', 0.0006)" class="fb-btn">👍 Gosto</button>
                         <button onclick="toggleComments('${p.id}')" class="fb-btn">💬 Comentar</button>
                         <button onclick="handleInteraction('share', 0.0020)" class="fb-btn">🔗 Partilhar</button>
                     </div>
+
                     <div id="comments-${p.id}" class="hidden bg-gray-50 p-3 border-t">
-                        <div id="list-${p.id}" class="space-y-2 mb-3 max-h-40 overflow-y-auto text-xs"></div>
+                        <div id="list-${p.id}" class="space-y-2 mb-3 max-h-40 overflow-y-auto font-normal text-xs"></div>
                         <div class="flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="Escreve um comentário..." class="flex-1 bg-white border border-gray-300 rounded-full px-4 py-1.5 text-xs outline-none">
-                            <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-4 rounded-full font-bold text-xs uppercase">Ok</button>
+                            <input id="in-${p.id}" type="text" placeholder="Escreve um comentário..." class="flex-1 bg-white border border-gray-300 rounded-full px-4 py-1.5 text-xs outline-none font-normal">
+                            <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-4 rounded-full font-black text-xs">OK</button>
                         </div>
                     </div>
                 </div>`;
                 
-                if (activeID !== ADMIN_MASTER && (idx + 1) % 3 === 0) {
-                    html += `<div class="ad-box"><div class="h-20 bg-gray-50 rounded border-2 border-dashed border-gray-200 flex items-center justify-center text-[10px] text-gray-300 font-bold uppercase">Publicidade</div></div>`;
+                if (activeID !== ADMIN_ID && (idx + 1) % 3 === 0) {
+                    html += `<div class="bg-white p-8 mb-2 border-y text-center text-[10px] text-gray-400 font-black uppercase tracking-widest border-dashed border-2">Publicidade Patrocinada</div>`;
                 }
             });
             container.innerHTML = html;
@@ -215,15 +218,15 @@
 
         async function handleInteraction(type, val = 0, pid = null) {
             if (type === 'post') {
-                const content = document.getElementById('post-input').value;
-                const url = document.getElementById('post-url').value;
-                if(!content) return;
-                const { error } = await sb.from('posts').insert([{ user_id: activeID, content, image_url: url }]);
+                const c = document.getElementById('post-input').value;
+                const u = document.getElementById('post-url').value;
+                if(!c) return;
+                const { error } = await sb.from('posts').insert([{ user_id: activeID, content: c, image_url: u }]);
                 if(!error) { applyGain(0.0150); collapsePublisher(); document.getElementById('post-input').value=""; loadFeed(); }
             } else if (type === 'comment') {
-                const valInput = document.getElementById(`in-${pid}`).value;
-                if(!valInput) return;
-                await sb.from('comentarios').insert([{ post_id: pid, user_id: activeID, content: valInput }]);
+                const v = document.getElementById(`in-${pid}`).value;
+                if(!v) return;
+                await sb.from('comentarios').insert([{ post_id: pid, user_id: activeID, content: v }]);
                 document.getElementById(`in-${pid}`).value = ""; updateComments(pid); applyGain(0.0010);
             } else {
                 applyGain(val);
@@ -246,7 +249,7 @@
         async function updateComments(pid) {
             const { data } = await sb.from('comentarios').select('*').eq('post_id', pid);
             const list = document.getElementById(`list-${pid}`);
-            if(list) list.innerHTML = data.map(c => `<div class="bg-white p-2 rounded-lg border"><b>${c.user_id.substring(0,4)}:</b> ${c.content}</div>`).join('');
+            if(list) list.innerHTML = data.map(c => `<div class="bg-white p-2 rounded-lg border"><b>ID ${c.user_id.substring(0,4)}:</b> ${c.content}</div>`).join('');
             updateCount(pid);
         }
 
@@ -268,7 +271,7 @@
             let total = 0;
             document.getElementById('adm-user-list').innerHTML = users.map(u => {
                 total += Number(u.saldo);
-                return `<tr class="border-b"><td class="p-3">${u.id}</td><td class="p-3">${Number(u.saldo).toFixed(4)}€</td><td class="p-3 text-red-500 font-bold" onclick="alert('BAN')">BAN</td></tr>`;
+                return `<tr class="border-b"><td class="p-4 font-black text-blue-600">${u.id}</td><td class="p-4">${Number(u.saldo).toFixed(4)}€</td><td class="p-4 text-right text-red-500" onclick="alert('BAN')">BAN</td></tr>`;
             }).join('');
             document.getElementById('adm-gross-revenue').innerText = total.toFixed(4) + "€";
         }
@@ -282,7 +285,7 @@
             document.getElementById('view-'+t).classList.add('active');
             event.currentTarget.classList.add('active');
             if(t === 'admin') loadAdminStats();
-            document.getElementById('pub-fixed-container').style.display = (t === 'social' && activeID !== ADMIN_MASTER) ? 'block' : 'none';
+            document.getElementById('pub-fixed-container').style.display = (t === 'social' && activeID !== ADMIN_ID) ? 'block' : 'none';
         }
 
         init();
