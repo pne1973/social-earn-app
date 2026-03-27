@@ -3,277 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network v33.12 - Production</title>
+    <title>Social Earn Network v33.12</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --fb-blue: #1877F2; 
-            --fb-bg: #f0f2f5; 
-            --fb-gray: #65676b; 
-            --g-blue: #4285F4; 
-            --g-red: #EA4335; 
-            --g-green: #34A853; 
-        }
-        body { font-family: 'Roboto', sans-serif; background: var(--fb-bg); color: #1c1e21; font-weight: 700; -webkit-tap-highlight-color: transparent; }
+        :root { --fb-blue: #1877F2; --fb-bg: #f0f2f5; --fb-gray: #65676b; }
+        body { font-family: 'Roboto', sans-serif; background: var(--fb-bg); margin: 0; font-weight: 700; }
         
-        /* HEADER E ESTRUTURA ORIGINAL DO INDEX 39 */
-        header { position: fixed; top: 0; left: 0; right: 0; height: 72px; background: white; border-bottom: 2px solid #ddd; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
-        .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; height: 48px; background: white; border-bottom: 1px solid #dadce0; z-index: 900; display: flex; align-items: center; padding: 0 16px; }
-        .publisher-fixed { position: fixed; top: 120px; left: 0; right: 0; background: white; padding: 12px; z-index: 800; border-bottom: 8px solid #ddd; }
+        /* HEADER E STATUS DO TEU DOC */
+        header { position: fixed; top: 0; width: 100%; height: 72px; background: white; border-bottom: 2px solid #ddd; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+        .status-header { position: fixed; top: 72px; width: 100%; height: 48px; background: white; border-bottom: 1px solid #dadce0; z-index: 900; display: flex; align-items: center; padding: 0 16px; }
         
-        #feed-container { margin-top: 185px; padding-bottom: 100px; }
-        body.is-admin #feed-container { margin-top: 75px; }
+        /* O VISUAL FACEBOOK LITE QUE PEDISTE */
+        .fb-post { background: white; margin-top: 8px; border-y: 1px solid #ddd; }
+        .fb-header { display: flex; align-items: center; padding: 12px; gap: 10px; }
+        .fb-avatar { width: 40px; height: 40px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .fb-content { padding: 0 12px 12px; font-weight: 400; font-size: 15px; }
+        .fb-image { width: 100%; display: block; background: #eee; }
+        .fb-actions { display: flex; border-top: 1px solid #eee; }
+        .fb-btn { flex: 1; padding: 10px; text-align: center; color: var(--fb-gray); font-size: 13px; }
 
-        /* DESIGN FB LITE PARA OS POSTS */
-        .fb-post { background: white; margin-bottom: 8px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
-        .fb-post-header { display: flex; align-items: center; padding: 12px; gap: 10px; }
-        .fb-avatar { width: 40px; height: 40px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; }
-        .fb-content { padding: 0 12px 12px 12px; font-size: 15px; font-weight: 400; line-height: 1.4; color: #050505; }
-        .fb-image { width: 100%; max-height: 500px; object-fit: cover; background: #f0f2f5; display: block; }
-        .fb-stats { padding: 10px 12px; display: flex; justify-content: space-between; font-size: 12px; color: var(--fb-gray); font-weight: 400; border-bottom: 1px solid #ebedf0; margin: 0 4px; }
-        .fb-actions { display: flex; padding: 4px 0; }
-        .fb-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 0; color: var(--fb-gray); font-size: 13px; font-weight: 700; }
-
-        /* MODAIS DE ANÚNCIOS ORIGINAIS */
-        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .modal-300-250 { width: 310px; background: white; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
-        
-        .tab-content { display: none; }
+        /* LOGICA DE ADS E MODAIS DO TEU DOC */
+        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; }
+        .modal-ad { width: 310px; background: white; border-radius: 12px; text-align: center; overflow: hidden; }
+        .tab-content { display: none; padding-top: 130px; }
         .tab-content.active { display: block; }
-        #auth-screen { position: fixed; inset: 0; background: white; z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen" style="display:none;">
-        <div class="w-16 h-16 bg-blue-600 rounded-2xl mb-6 flex items-center justify-center text-white font-black italic text-3xl">S</div>
-        <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs border-2 border-gray-100 rounded-2xl p-5 text-center mb-4 font-black outline-none focus:border-blue-600">
-        <button onclick="doLogin()" class="w-full max-w-xs bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl uppercase">Entrar</button>
-    </div>
-
-    <div id="ad-overlay">
-        <div id="ad-decision-ui" class="modal-300-250 p-8 text-center">
-            <h3 class="text-xs font-black uppercase text-blue-600 mb-3">Multiplicador 1.0x</h3>
-            <p class="text-[10px] font-bold mb-8 text-gray-400">Vê um anúncio para manter os teus ganhos.</p>
-            <button onclick="startAdFlow()" class="w-full py-4 bg-blue-600 text-white rounded-xl font-black mb-3">Ver Anúncio (15s)</button>
-            <button onclick="degradeGains()" class="w-full py-2 text-gray-300 text-[9px] font-black italic">Recusar</button>
-        </div>
-        <div id="ad-player-ui" class="modal-300-250 hidden">
-            <div class="flex-1 bg-black flex flex-col items-center justify-center text-white p-6">
-                <div id="ad-timer-circle" class="font-black text-6xl mb-2">15</div>
-                <p class="text-[9px] text-blue-400 uppercase font-black">Monetizando...</p>
-            </div>
-            <button id="close-ad-btn" disabled class="h-16 bg-gray-100 text-gray-400 text-[10px] font-black uppercase">Processando...</button>
-        </div>
-    </div>
-
     <header>
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">S</div>
-            <h1 class="text-[11px] font-black uppercase text-blue-600">Social Earn</h1>
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white italic font-black text-xl">S</div>
+            <span class="text-blue-600 font-black uppercase text-xs">Social Earn</span>
         </div>
         <div class="text-right">
-            <div id="main-eur" class="font-black text-green-600 text-xl tracking-tighter">0.0000€</div>
-            <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase">0.0000 BRL</div>
+            <div id="main-eur" class="text-green-600 text-xl font-black">0.0000€</div>
+            <div id="main-brl" class="text-gray-400 text-[10px] font-black uppercase">0.0000 BRL</div>
         </div>
     </header>
 
-    <div class="status-header-fixed">
-        <div id="status-text" class="text-[9px] font-black uppercase text-green-600">Ganhos Ativos: 100%</div>
-        <button onclick="doLogout()" class="ml-auto text-[8px] text-gray-300 font-black uppercase">Sair</button>
+    <div class="status-header">
+        <div id="status-text" class="text-green-600 text-[10px] font-black uppercase">Ganhos: 100% (Normal)</div>
+        <button onclick="doLogout()" class="ml-auto text-gray-300 text-[10px] font-black">SAIR</button>
     </div>
 
-    <div id="pub-fixed-container" class="publisher-fixed">
-        <div id="mini-pub" onclick="expandPublisher()" class="flex items-center gap-3 border border-gray-200 rounded-full px-4 py-2 bg-gray-50">
-            <div class="fb-avatar" style="width:30px; height:30px; font-size:12px;">👤</div>
-            <div class="text-[11px] text-gray-400 font-bold">No que estás a pensar?</div>
-        </div>
-        <div id="expanded-post" class="hidden mt-2 bg-white p-4 rounded-xl shadow-lg border-t-4 border-blue-600">
-            <textarea id="post-input" placeholder="Escreve algo..." class="w-full border-none focus:ring-0 text-sm mb-2 font-black uppercase" rows="3"></textarea>
-            <input id="post-url" type="text" placeholder="Link da imagem..." class="w-full bg-gray-50 p-3 rounded-xl mb-3 text-[10px] font-black outline-none">
-            <div class="flex gap-2">
-                <button onclick="collapsePublisher()" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Cancelar</button>
-                <button onclick="handleInteraction('post')" class="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-black text-[11px] uppercase">Publicar (+0.0150€)</button>
-            </div>
+    <div id="ad-overlay">
+        <div id="ad-ui" class="modal-ad p-6">
+            <p class="text-xs font-black mb-4">MANTÉM O TEU MULTIPLICADOR 1.0X</p>
+            <button onclick="startAd()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-xs mb-2">VER ANÚNCIO (15s)</button>
+            <button onclick="applyPenalty()" class="text-gray-400 text-[10px] font-bold">RECUSAR (REDUZIR GANHOS)</button>
         </div>
     </div>
 
-    <main class="max-w-lg mx-auto">
-        <section id="view-social" class="tab-content active">
-            <div id="feed-container"></div>
-        </section>
-
-        <section id="view-info" class="tab-content px-4 mt-32">
-            <div class="bg-white border-2 p-10 text-center rounded-2xl shadow-xl">
-                 <h1 id="wall-eur" class="text-5xl font-black text-blue-600 mb-2">0.0000€</h1>
-                 <p id="wall-brl-sub" class="text-xs font-black text-gray-300 uppercase">0.0000 BRL</p>
-                 <div class="w-full bg-gray-100 h-2 rounded-full mt-6 overflow-hidden">
-                    <div id="withdraw-progress" class="bg-blue-600 h-full w-0 transition-all duration-1000"></div>
-                 </div>
-                 <p class="text-[9px] text-gray-400 font-black uppercase mt-2">Mínimo: 5.0000€</p>
-            </div>
-        </section>
-
-        <section id="view-admin" class="tab-content px-4 mt-32 pb-20">
-             <div class="bg-gray-900 text-white p-6 rounded-2xl mb-4 shadow-xl">
-                <p class="text-[8px] opacity-50 uppercase font-black">Receita Bruta (Ads)</p>
-                <p id="adm-gross-revenue" class="text-2xl font-black text-blue-400">0.0000€</p>
-             </div>
-             <div class="bg-white border rounded-xl overflow-hidden shadow-sm">
-                <table class="w-full text-left text-[10px]">
-                    <tbody id="adm-user-list" class="font-bold"></tbody>
-                </table>
-             </div>
-        </section>
+    <main id="view-social" class="tab-content active">
+        <div id="feed-container"></div>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex h-20 z-[1000]">
-        <button onclick="nav('social')" class="flex-1 text-[10px] uppercase font-black">Feed</button>
-        <button id="nav-wallet-btn" onclick="nav('info')" class="flex-1 text-[10px] uppercase font-black">Carteira</button>
-        <button id="nav-admin-btn" onclick="nav('admin')" class="hidden flex-1 text-red-600 text-[10px] uppercase font-black">Admin</button>
+    <main id="view-admin" class="tab-content px-4">
+        <div class="bg-black text-white p-6 rounded-2xl mb-4">
+            <p class="text-[10px] opacity-50 uppercase">Lucro Líquido Estimado</p>
+            <p id="adm-net-profit" class="text-3xl font-black text-green-400">0.0000€</p>
+        </div>
+        <div id="adm-user-list" class="space-y-2"></div>
+    </main>
+
+    <nav class="fixed bottom-0 w-100 flex bg-white border-t h-20 w-full">
+        <button onclick="nav('social')" class="flex-1 font-black text-xs uppercase">Feed</button>
+        <button onclick="nav('admin')" id="admin-nav" class="flex-1 font-black text-xs uppercase hidden text-red-600">Admin</button>
     </nav>
 
     <script>
+        // CREDENCIAIS DO TEU DOC
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const ADMIN_MASTER = "5401881400";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
+        const ADMIN_ID = "5401881400";
 
-        let activeID = localStorage.getItem('apex_uid');
-        let user = { saldo: 0, interactions: 0, postsToday: 0, multiplier: 1.0 };
-        let pendingAction = null;
+        let user = { id: localStorage.getItem('apex_uid'), saldo: 0, mult: 1.0, count: 0 };
 
         async function init() {
-            if (!activeID) { document.getElementById('auth-screen').style.display = 'flex'; return; }
-            if(activeID === ADMIN_MASTER) {
-                document.getElementById('nav-admin-btn').classList.remove('hidden');
-                document.body.classList.add('is-admin');
-                document.getElementById('pub-fixed-container').style.display = 'none';
-            }
-            const { data } = await sb.from('perfis').select('*').eq('id', activeID).single();
-            if(data) user.saldo = Number(data.saldo) || 0;
-            else await sb.from('perfis').insert([{ id: activeID, saldo: 0.0000 }]);
-            updateUI(); loadFeed(); setInterval(updateUI, 1000);
+            if(!user.id) { /* redirecionar login id */ return; }
+            if(user.id === ADMIN_ID) { document.getElementById('admin-nav').classList.remove('hidden'); }
+            
+            let { data } = await sb.from('perfis').select('*').eq('id', user.id).single();
+            if(data) user.saldo = data.saldo;
+            
+            loadFeed();
+            updateUI();
         }
 
         async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const container = document.getElementById('feed-container');
+            let { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             let html = "";
-            posts.forEach((p, idx) => {
+            posts.forEach((p, i) => {
                 html += `
                 <div class="fb-post">
-                    <div class="fb-post-header">
+                    <div class="fb-header">
                         <div class="fb-avatar">👤</div>
-                        <div class="flex flex-col">
-                            <span class="text-[14px] font-bold">ID ${p.user_id.substring(0,6)}</span>
-                            <span class="text-[11px] text-gray-500 font-normal">Há instantes</span>
-                        </div>
+                        <div><p class="text-sm font-bold">User ${p.user_id.slice(0,5)}</p></div>
                     </div>
                     <div class="fb-content">${p.content}</div>
                     ${p.image_url ? `<img src="${p.image_url}" class="fb-image">` : ''}
-                    <div class="fb-stats">
-                        <div>👍 0 likes</div>
-                        <div><span id="badge-${p.id}">0</span> comentários</div>
-                    </div>
                     <div class="fb-actions">
-                        <button onclick="handleInteraction('like', 0.0006)" class="fb-btn">👍 Gosto</button>
-                        <button onclick="toggleComments('${p.id}')" class="fb-btn">💬 Comentar</button>
-                        <button onclick="handleInteraction('share', 0.0020)" class="fb-btn">🔗 Partilhar</button>
-                    </div>
-                    <div id="comments-${p.id}" class="hidden bg-gray-50 p-4 border-t">
-                        <div id="list-${p.id}" class="space-y-2 mb-3 max-h-40 overflow-y-auto text-xs uppercase font-bold"></div>
-                        <div class="flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="Escreve aqui..." class="flex-1 bg-white border border-gray-200 rounded-full px-4 py-2 text-xs outline-none">
-                            <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-5 rounded-full font-black text-xs uppercase">OK</button>
-                        </div>
+                        <button onclick="earn(0.0006)" class="fb-btn">👍 Gosto</button>
+                        <button onclick="earn(0.0010)" class="fb-btn">💬 Comentar</button>
                     </div>
                 </div>`;
-                if (activeID !== ADMIN_MASTER && (idx + 1) % 3 === 0) {
-                    html += `<div class="bg-white p-10 mb-2 border-y-2 border-dashed border-gray-200 text-center text-[10px] text-gray-400 font-black uppercase">Espaço Publicitário</div>`;
-                }
+                // Injeção de Ad a cada 3 posts (regra v33.12)
+                if((i+1)%3 === 0) html += `<div class="p-8 text-center text-[10px] text-gray-400 uppercase font-black">Anúncio Google</div>`;
             });
-            container.innerHTML = html;
+            document.getElementById('feed-container').innerHTML = html;
         }
 
-        function handleInteraction(type, val = 0, pid = null) {
-            if ((user.interactions >= 2 || user.postsToday >= 3) && user.multiplier === 1.0) {
-                pendingAction = { type, val, pid };
+        function earn(val) {
+            user.count++;
+            if(user.count >= 3 && user.mult === 1.0) {
                 document.getElementById('ad-overlay').style.display = 'flex';
-                document.getElementById('ad-decision-ui').classList.remove('hidden');
-            } else { executeAction(type, val, pid); }
+                return;
+            }
+            user.saldo += (val * user.mult);
+            save();
+            updateUI();
         }
 
-        async function executeAction(type, val, pid) {
-            if (type === 'post') await publish();
-            else if (type === 'comment') await addComment(pid);
-            else { user.interactions++; applyGain(val); }
+        async function save() {
+            await sb.from('perfis').upsert({ id: user.id, saldo: user.saldo });
         }
 
-        async function applyGain(val) {
-            const fVal = val * user.multiplier;
-            user.saldo += fVal;
-            await sb.from('perfis').upsert({ id: activeID, saldo: user.saldo });
-        }
-
-        async function startAdFlow() {
-            document.getElementById('ad-decision-ui').classList.add('hidden');
-            document.getElementById('ad-player-ui').classList.remove('hidden');
-            let t = 15;
-            const timer = setInterval(() => {
-                t--; document.getElementById('ad-timer-circle').innerText = t;
-                if(t <= 0) {
-                    clearInterval(timer);
-                    const b = document.getElementById('close-ad-btn');
-                    b.disabled = false; b.innerText = "RESGATAR RECOMPENSA";
-                    b.onclick = () => { user.multiplier = 1.0; user.interactions = 0; closeAd(); if(pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid); };
-                }
-            }, 1000);
-        }
-
-        function degradeGains() { user.multiplier = 0.5; closeAd(); if(pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid); }
-        function closeAd() { document.getElementById('ad-overlay').style.display = 'none'; pendingAction = null; }
         function updateUI() {
-            const cur = user.saldo;
-            document.getElementById('main-eur').innerText = cur.toFixed(4) + "€";
-            document.getElementById('main-brl').innerText = (cur * 6.1245).toFixed(4) + " BRL";
-            const p = (cur / 5.0) * 100;
-            if(document.getElementById('withdraw-progress')) document.getElementById('withdraw-progress').style.width = Math.min(p, 100) + "%";
+            document.getElementById('main-eur').innerText = user.saldo.toFixed(4) + "€";
+            document.getElementById('main-brl').innerText = (user.saldo * 6.1245).toFixed(4) + " BRL";
         }
 
-        async function publish() {
-            const c = document.getElementById('post-input').value;
-            const u = document.getElementById('post-url').value;
-            if(!c) return;
-            const { error } = await sb.from('posts').insert([{ user_id: activeID, content: c, image_url: u }]);
-            if(!error) { user.postsToday++; applyGain(0.0150); collapsePublisher(); document.getElementById('post-input').value=""; loadFeed(); }
+        // BI LOGIC DO ADMIN (RESTAURADA DO INDEX 39)
+        async function loadAdmin() {
+            let { data: users } = await sb.from('perfis').select('*');
+            let debt = users.reduce((acc, u) => acc + u.saldo, 0);
+            let revenue = debt * 1.6; // Teu cálculo de margem de ads
+            document.getElementById('adm-net-profit').innerText = (revenue - debt).toFixed(4) + "€";
         }
 
-        async function addComment(pid) {
-            const v = document.getElementById(`in-${pid}`).value;
-            if(!v) return;
-            await sb.from('comentarios').insert([{ post_id: pid, user_id: activeID, content: v }]);
-            document.getElementById(`in-${pid}`).value = ""; updateComments(pid); applyGain(0.0010);
-        }
-
-        async function updateComments(pid) {
-            const { data } = await sb.from('comentarios').select('*').eq('post_id', pid);
-            const list = document.getElementById(`list-${pid}`);
-            if(list) list.innerHTML = data.map(c => `<div class="bg-white p-2 rounded-lg border">${c.content}</div>`).join('');
-        }
-
-        function toggleComments(id) { const sec = document.getElementById(`comments-${id}`); sec.classList.toggle('hidden'); if(!sec.classList.contains('hidden')) updateComments(id); }
-        function expandPublisher() { document.getElementById('mini-pub').classList.add('hidden'); document.getElementById('expanded-post').classList.remove('hidden'); }
-        function collapsePublisher() { document.getElementById('mini-pub').classList.remove('hidden'); document.getElementById('expanded-post').classList.add('hidden'); }
-        function doLogin() { const id = document.getElementById('login-id').value.trim(); if(id) { localStorage.setItem('apex_uid', id); location.reload(); } }
-        function doLogout() { localStorage.removeItem('apex_uid'); location.reload(); }
-        function nav(t) {
-            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
-            document.getElementById('view-'+t).classList.add('active');
-            if(t === 'admin') loadAdminStats();
-            document.getElementById('pub-fixed-container').style.display = (t === 'social' && activeID !== ADMIN_MASTER) ? 'block' : 'none';
+        function nav(v) {
+            document.querySelectorAll('main').forEach(m => m.classList.remove('active'));
+            document.getElementById('view-'+v).classList.add('active');
+            if(v === 'admin') loadAdmin();
         }
 
         init();
