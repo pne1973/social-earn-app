@@ -3,35 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network v33.12 - Production Final</title>
+    <title>Social Earn Network v33.12 - Production Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; --g-yellow: #FBBC05; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; -webkit-tap-highlight-color: transparent; }
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
-        .feed-ad-unit { background: #ffffff; border: 2px dashed var(--g-blue); border-radius: 12px; padding: 20px; margin-bottom: 12px; text-align: center; }
         
+        /* Layout Facebook Lite Style */
+        .google-card { background: white; border: 1px solid #dadce0; border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+        .feed-ad-unit { background: #ffffff; border: 2px dashed var(--g-blue); border-radius: 12px; padding: 20px; margin-bottom: 12px; text-align: center; }
+
+        /* Animação de Ganhos */
         #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s forwards; }
-        @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
+        @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
         .earning-text { font-size: 3.5rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52,168,83,0.4); -webkit-text-stroke: 1.5px white; }
 
-        /* Layout Fixo corrigido */
-        header { position: fixed; top: 0; left: 0; right: 0; height: 72px; background: white; border-bottom: 2px solid #eee; z-index: 1000; }
-        .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; height: 48px; background: white; border-bottom: 1px solid #ddd; z-index: 900; }
-        .publisher-fixed { position: fixed; top: 120px; left: 0; right: 0; background: #f1f3f4; padding: 10px; z-index: 800; border-bottom: 1px solid #ddd; }
+        /* Elementos Fixos */
+        header { position: fixed; top: 0; left: 0; right: 0; height: 72px; background: white; border-bottom: 1px solid #dadce0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+        .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 900; background: white; border-bottom: 1px solid #eee; padding: 8px 16px; display: flex; align-items: center; justify-content: center; min-height: 48px; }
+        .publisher-fixed { position: fixed; top: 120px; left: 0; right: 0; z-index: 800; background: #f1f3f4; padding: 12px 16px; border-bottom: 1px solid #ddd; }
         
-        #feed-container { margin-top: 200px; padding: 10px; }
+        /* Ajuste Dinâmico do Feed */
+        #feed-container { margin-top: 195px; padding: 0 8px; }
         body.is-admin #feed-container { margin-top: 85px; }
 
-        .nav-item { transition: all 0.3s; color: #5f6368; flex: 1; text-align: center; padding: 15px 0; font-size: 10px; font-weight: 900; text-transform: uppercase; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #5f6368; font-size: 10px; font-weight: 900; text-transform: uppercase; border-top: 4px solid transparent; }
         .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
+        
+        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 0; color: #5f6368; position: relative; }
+        .count-badge { position: absolute; top: 0; right: 25%; background: var(--g-red); color: white; font-size: 9px; min-width: 16px; height: 16px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid white; font-weight: 900; }
+
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .interaction-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; position: relative; }
-        .count-badge { position: absolute; top: 2px; right: 20%; background: var(--g-red); color: white; font-size: 9px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
         #auth-screen { position: fixed; inset: 0; background: white; z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
     </style>
 </head>
@@ -39,104 +45,136 @@
 
     <div id="auth-screen" style="display:none;">
         <div class="w-16 h-16 bg-blue-600 rounded-2xl mb-6 flex items-center justify-center text-white font-black italic text-3xl shadow-lg">S</div>
-        <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs border-2 p-5 text-center mb-4 rounded-2xl font-black outline-none focus:border-blue-600">
-        <button onclick="doLogin()" class="w-full max-w-xs bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl uppercase">Entrar</button>
+        <h2 class="text-blue-600 font-black uppercase text-xs mb-8 tracking-widest">Social Earn Network</h2>
+        <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs border-2 border-gray-100 rounded-2xl p-5 text-center mb-4 uppercase font-black outline-none shadow-sm focus:border-blue-600">
+        <button onclick="doLogin()" class="w-full max-w-xs bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl uppercase active:scale-95 transition-transform">Entrar no Sistema</button>
     </div>
 
     <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
 
     <div id="ad-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.97); z-index:5000; align-items:center; justify-content:center;">
-        <div id="ad-decision-ui" class="bg-white p-8 rounded-2xl text-center w-[310px]">
-            <h3 class="text-blue-600 font-black text-xs uppercase mb-4">Manter Ganhos 100%</h3>
-            <button onclick="startAdFlow()" class="w-full py-4 bg-blue-600 text-white rounded-xl font-black mb-2">VER ANÚNCIO</button>
-            <button onclick="degradeGains()" class="text-[9px] text-gray-400 font-black uppercase">Aceitar redução</button>
+        <div id="ad-decision-ui" class="bg-white p-8 rounded-3xl text-center w-[320px] shadow-2xl">
+            <div class="w-12 h-12 bg-yellow-400 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl shadow-lg">⚡</div>
+            <h3 class="text-blue-600 font-black text-xs uppercase mb-3 tracking-widest">Ganhos 100% Ativos</h3>
+            <p class="text-[10px] leading-relaxed font-bold mb-8 text-gray-400 uppercase">Assista a um vídeo curto para manter o seu multiplicador de ganhos no máximo.</p>
+            <button onclick="startAdFlow()" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-black mb-3 shadow-lg uppercase text-[11px]">Ver Anúncio (15s)</button>
+            <button onclick="degradeGains()" class="w-full py-2 text-gray-300 uppercase text-[9px] font-black italic">Aceitar redução de 50%</button>
         </div>
-        <div id="ad-player-ui" class="hidden bg-white p-8 rounded-2xl text-center w-[310px]">
-            <div id="ad-timer-circle" class="text-6xl font-black mb-4">15</div>
-            <p class="text-[9px] text-blue-600 font-black uppercase">Monetizando...</p>
-            <button id="close-ad-btn" disabled class="mt-4 w-full py-3 bg-gray-100 text-gray-400 rounded-xl font-black text-[10px]">A PROCESSAR...</button>
+        <div id="ad-player-ui" class="hidden bg-white p-10 rounded-3xl text-center w-[320px] shadow-2xl">
+            <div id="ad-timer-circle" class="text-7xl font-black mb-4 text-blue-600">15</div>
+            <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-10 italic">A processar recompensa...</p>
+            <button id="close-ad-btn" disabled class="w-full py-4 bg-gray-100 text-gray-400 rounded-2xl font-black text-[10px] uppercase shadow-inner">Validando...</button>
         </div>
     </div>
 
-    <header class="px-5 flex justify-between items-center">
+    <header>
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-md">S</div>
-            <h1 class="text-[11px] font-black uppercase text-blue-600">Social Earn</h1>
+            <div>
+                <h1 class="text-[14px] font-black uppercase text-blue-600 leading-none">Social Earn</h1>
+                <p class="text-[9px] font-black text-gray-300 uppercase tracking-widest mt-1">v33.12 Official</p>
+            </div>
         </div>
         <div class="text-right">
-            <div id="main-eur" class="font-black text-green-600 text-xl">0.0000€</div>
-            <div id="main-brl" class="text-[9px] font-black text-gray-400">0.0000 BRL</div>
+            <div id="main-eur" class="font-black text-green-600 text-xl tracking-tighter">0.0000€</div>
+            <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase">0.0000 BRL</div>
         </div>
     </header>
 
-    <div class="status-header-fixed flex items-center justify-center px-4">
-        <div id="status-text" class="text-[9px] font-black uppercase text-green-600">Ganhos Ativos: 100%</div>
-        <button id="restore-btn" onclick="startAdFlow(true)" class="hidden ml-2 bg-red-600 text-white px-2 py-1 rounded-lg text-[8px] font-black">RESTAURAR</button>
-        <button onclick="doLogout()" class="ml-auto text-[8px] text-gray-300 font-black uppercase">Sair</button>
+    <div id="status-bar" class="status-header-fixed">
+        <div id="status-text" class="text-[10px] font-black uppercase text-green-600 tracking-tight">Ganhos: 100% Ativos</div>
+        <button id="restore-btn" onclick="startAdFlow(true)" class="hidden bg-red-600 text-white px-3 py-1.5 rounded-lg text-[8px] font-black uppercase animate-pulse ml-3 shadow-sm">Restaurar</button>
+        <button onclick="doLogout()" class="ml-auto text-[10px] text-gray-400 uppercase font-black">Sair</button>
     </div>
 
     <div id="pub-fixed-container" class="publisher-fixed">
-        <div id="mini-pub" onclick="expandPublisher()" class="bg-white border p-3 rounded-full flex items-center gap-3 cursor-pointer shadow-sm">
+        <div id="mini-pub" onclick="expandPublisher()" class="bg-white border border-gray-200 rounded-full px-4 py-3 flex items-center gap-3 shadow-sm active:scale-95 transition-transform">
             <div class="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center text-[10px]">👤</div>
-            <div class="text-[10px] text-gray-400 font-black uppercase">O que quer partilhar agora?</div>
+            <div class="text-[11px] text-gray-400 font-black uppercase">O que quer partilhar agora?</div>
         </div>
-        <div id="expanded-post" class="hidden google-card p-4 mt-2 border-t-4 border-blue-600">
-            <textarea id="post-input" placeholder="ESCREVA AQUI..." class="w-full border-none focus:ring-0 text-xs mb-2 resize-none uppercase font-black" rows="3"></textarea>
-            <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full bg-gray-50 p-3 rounded-xl mb-3 text-[10px] font-black">
-            <div class="flex gap-2">
-                <button onclick="collapsePublisher()" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Cancelar</button>
-                <button onclick="handleInteraction('post')" class="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-black text-[11px] uppercase">Publicar (+0.0150€)</button>
+        <div id="expanded-post" class="hidden google-card p-4 mt-2 border-t-4 border-blue-600 shadow-xl">
+            <textarea id="post-input" placeholder="ESCREVA AQUI..." class="w-full border-none focus:ring-0 text-xs mb-3 resize-none uppercase font-black placeholder:text-gray-200" rows="3"></textarea>
+            <div class="border-t pt-4 flex flex-col gap-3">
+                <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full bg-gray-50 border-none text-[10px] p-4 rounded-xl outline-none font-black uppercase">
+                <div class="flex gap-2">
+                    <button onclick="collapsePublisher()" class="flex-1 text-[10px] font-black text-gray-400 uppercase">Cancelar</button>
+                    <button onclick="handleInteraction('post')" class="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-black text-[11px] uppercase shadow-lg shadow-blue-100">Publicar (+0.0150€)</button>
+                </div>
             </div>
         </div>
     </div>
 
     <main class="max-w-lg mx-auto">
+        
         <section id="view-social" class="tab-content active">
             <div id="feed-container"></div>
         </section>
 
         <section id="view-info" class="tab-content px-4 mt-32">
-            <div class="google-card p-10 text-center border-t-[12px] border-blue-600 shadow-xl">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-4">Utilizador ID: <span id="display-uid" class="text-blue-600">--</span></p>
-                <h1 id="wall-eur" class="text-5xl font-black text-blue-600 mb-2">0.0000€</h1>
-                <p id="wall-brl-sub" class="text-xs font-black text-gray-300 mb-8">0.0000 BRL</p>
-                <div id="withdraw-area" class="hidden">
-                    <input id="pp-email" type="email" placeholder="EMAIL PAYPAL" class="w-full border-2 p-4 rounded-xl text-center mb-3 font-black text-xs outline-none">
-                    <button onclick="alert('Pedido enviado!')" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-[11px] uppercase">Levantar Agora</button>
+            <div class="google-card p-10 text-center border-t-[12px] border-blue-600 shadow-2xl">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-4 tracking-widest">Utilizador ID: <span id="display-uid" class="text-blue-600">--</span></p>
+                <h1 id="wall-eur" class="text-5xl font-black text-blue-600 tracking-tighter mb-2">0.0000€</h1>
+                <p id="wall-brl-sub" class="text-xs font-black text-gray-300 uppercase mb-10 tracking-widest">0.0000 BRL</p>
+                
+                <div id="withdraw-area" class="mt-4 hidden">
+                    <input id="pp-email" type="email" placeholder="DIGITE O SEU EMAIL PAYPAL" class="w-full border-2 border-gray-100 p-5 rounded-2xl text-center mb-3 font-black text-[10px] outline-none focus:border-blue-600">
+                    <button onclick="requestWithdraw()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-[11px] uppercase shadow-xl">Solicitar Levantamento</button>
                 </div>
-                <div id="progress-container" class="pt-6 border-t border-dashed">
-                    <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-2">
-                        <div id="withdraw-progress" class="bg-blue-600 h-full w-0 transition-all duration-1000"></div>
+
+                <div id="progress-container" class="pt-8 border-t border-dashed">
+                    <div class="w-full bg-gray-100 h-3 rounded-full overflow-hidden mb-3 shadow-inner">
+                        <div id="withdraw-progress" class="bg-blue-600 h-full w-0 transition-all duration-1000 shadow-lg shadow-blue-200"></div>
                     </div>
-                    <p class="text-[9px] text-gray-400 font-black uppercase">Mínimo: 5.0000€</p>
+                    <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Mínimo necessário: 5.0000€</p>
                 </div>
+            </div>
+
+            <div class="google-card mt-4 p-6 bg-white border-l-4 border-green-500">
+                <h3 class="text-[11px] font-black uppercase text-gray-800 mb-4 tracking-widest">Tabela de Ganhos (XP)</h3>
+                <div class="grid grid-cols-2 gap-4 text-[10px] font-black uppercase text-gray-400">
+                    <div class="bg-gray-50 p-3 rounded-lg"><span class="block text-blue-600 mb-1">Novo Post</span> +15.0 XP</div>
+                    <div class="bg-gray-50 p-3 rounded-lg"><span class="block text-green-600 mb-1">Check-in</span> +5.0 XP</div>
+                    <div class="bg-gray-50 p-3 rounded-lg"><span class="block text-yellow-600 mb-1">Like</span> +2.0 XP</div>
+                    <div class="bg-gray-50 p-3 rounded-lg"><span class="block text-purple-600 mb-1">Comentário</span> +1.0 XP</div>
+                </div>
+                <p class="mt-4 text-[8px] text-gray-300 italic">* 1.0 XP equivale a 0.0010€ aproximadamente.</p>
             </div>
         </section>
 
         <section id="view-admin" class="tab-content px-4 mt-32 pb-10">
-            <div class="bg-gray-900 text-white p-6 rounded-2xl mb-4 shadow-2xl">
-                <h2 class="text-blue-400 font-black uppercase text-xs mb-4 tracking-widest">Admin Dashboard</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><p class="text-[8px] opacity-50 uppercase">Receita Bruta</p><p id="adm-gross-revenue" class="text-xl font-black">0.0000€</p></div>
-                    <div><p class="text-[8px] opacity-50 uppercase">Total Users</p><p id="adm-total-users" class="text-xl font-black">0</p></div>
+            <div class="bg-gray-900 text-white p-8 rounded-3xl mb-4 shadow-2xl">
+                <h2 class="text-blue-400 font-black uppercase text-xs mb-6 tracking-widest">Admin BI Terminal</h2>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="border-l-2 border-blue-600 pl-4">
+                        <p class="text-[8px] opacity-50 uppercase mb-1">Receita em Caixa</p>
+                        <p id="adm-gross-revenue" class="text-2xl font-black">0.0000€</p>
+                    </div>
+                    <div class="border-l-2 border-red-500 pl-4">
+                        <p class="text-[8px] opacity-50 uppercase mb-1">Utilizadores</p>
+                        <p id="adm-total-users" class="text-2xl font-black">0</p>
+                    </div>
                 </div>
             </div>
-            <div class="google-card shadow-sm">
-                <table class="w-full text-left text-[10px] font-black uppercase">
-                    <thead class="bg-gray-50 border-b"><tr><th class="p-4">ID</th><th class="p-4">Saldo</th><th class="p-4 text-right">Ação</th></tr></thead>
+            <div class="google-card shadow-sm overflow-hidden">
+                <div class="bg-gray-50 p-4 border-b text-[10px] font-black uppercase text-gray-400 tracking-widest">Lista de Utilizadores</div>
+                <table class="w-full text-left text-[11px] font-black uppercase">
+                    <thead class="bg-gray-100 border-b">
+                        <tr><th class="p-4">ID</th><th class="p-4">Saldo</th><th class="p-4 text-right">Ação</th></tr>
+                    </thead>
                     <tbody id="adm-user-list"></tbody>
                 </table>
             </div>
         </section>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 flex h-20 z-[1000]">
-        <button onclick="nav('social')" class="nav-item active">Feed</button>
-        <button id="nav-wallet-btn" onclick="nav('info')" class="nav-item">Carteira</button>
-        <button id="nav-admin-btn" onclick="nav('admin')" class="hidden nav-item text-red-600">Admin</button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-100 flex h-20 z-[1000] shadow-2xl">
+        <button onclick="nav('social')" class="nav-item active">🏠<span class="mt-1">Feed</span></button>
+        <button id="nav-wallet-btn" onclick="nav('info')" class="nav-item">💰<span class="mt-1">Ganhos</span></button>
+        <button id="nav-admin-btn" onclick="nav('admin')" class="hidden nav-item text-red-600">⚙️<span class="mt-1">Admin</span></button>
     </nav>
 
     <script>
+        // CONFIGURAÇÃO SUPABASE MASTER
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const ADMIN_MASTER = "5401881400";
@@ -146,123 +184,251 @@
         let user = { saldo: 0, interactions: 0, postsToday: 0, multiplier: 1.0, penaltyExpiry: null };
         let pendingAction = null;
 
+        // INICIALIZAÇÃO DO SISTEMA
         async function init() {
             if (!activeID) { document.getElementById('auth-screen').style.display = 'flex'; return; }
             document.getElementById('display-uid').innerText = activeID;
 
+            // Ativação Modo Admin
             if(activeID === ADMIN_MASTER) {
                 document.getElementById('nav-admin-btn').classList.remove('hidden');
                 document.getElementById('nav-wallet-btn').classList.add('hidden');
                 document.body.classList.add('is-admin');
                 document.getElementById('pub-fixed-container').style.display = 'none';
-                document.querySelector('.status-header-fixed').style.display = 'none';
+                document.getElementById('status-bar').style.display = 'none';
             }
 
-            const { data } = await sb.from('perfis').select('*').eq('id', activeID).single();
-            if(data) user.saldo = Number(data.saldo) || 0;
-            else await sb.from('perfis').insert([{ id: activeID, saldo: 0.0000 }]);
+            // Carregamento de Perfil
+            const { data, error } = await sb.from('perfis').select('*').eq('id', activeID).single();
+            if(data) {
+                user.saldo = Number(data.saldo) || 0;
+            } else {
+                await sb.from('perfis').insert([{ id: activeID, saldo: 0.0000 }]);
+            }
 
             updateUI();
             loadFeed();
-            setInterval(updateUI, 1000);
+            setInterval(updateUI, 1500);
         }
 
+        // ATUALIZAÇÃO DA INTERFACE (EUROS E BRL)
         function updateUI() {
             const cur = user.saldo;
             document.getElementById('main-eur').innerText = cur.toFixed(4) + "€";
             document.getElementById('wall-eur').innerText = cur.toFixed(4) + "€";
-            document.getElementById('main-brl').innerText = (cur * 6.1245).toFixed(4) + " BRL";
-            document.getElementById('wall-brl-sub').innerText = (cur * 6.1245).toFixed(4) + " BRL";
             
+            const cotacaoBRL = 6.1245; // Câmbio dinâmico fixo conforme pedido
+            const totalBRL = (cur * cotacaoBRL).toFixed(4);
+            document.getElementById('main-brl').innerText = totalBRL + " BRL";
+            document.getElementById('wall-brl-sub').innerText = totalBRL + " BRL";
+            
+            // Barra de Progresso de Levantamento
             const progress = (cur / 5.0) * 100;
-            document.getElementById('withdraw-progress').style.width = Math.min(progress, 100) + "%";
-            if(cur >= 5.0) document.getElementById('withdraw-area').classList.remove('hidden');
+            const bar = document.getElementById('withdraw-progress');
+            if(bar) bar.style.width = Math.min(progress, 100) + "%";
+
+            if(cur >= 5.0) document.getElementById('withdraw-area')?.classList.remove('hidden');
+
+            // Feedback de Status do Multiplicador
+            const statusTxt = document.getElementById('status-text');
+            const restoreBtn = document.getElementById('restore-btn');
+            if(user.multiplier < 1.0) {
+                statusTxt.innerText = "GANHOS REDUZIDOS: 50%";
+                statusTxt.className = "text-[9px] font-black uppercase text-red-500";
+                restoreBtn.classList.remove('hidden');
+            } else {
+                statusTxt.innerText = "GANHOS ATIVOS: 100%";
+                statusTxt.className = "text-[9px] font-black uppercase text-green-600";
+                restoreBtn.classList.add('hidden');
+            }
         }
 
+        // CARREGAMENTO DO FEED SOCIAL
         async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            const { data: posts, error } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const container = document.getElementById('feed-container');
-            if(!posts) return;
+            if(!posts) { container.innerHTML = "<p class='text-center p-20 opacity-20'>A carregar...</p>"; return; }
 
-            let html = "";
+            let htmlOutput = "";
             posts.forEach((p, index) => {
-                html += `
+                htmlOutput += `
                 <div class="google-card shadow-sm border border-gray-100">
-                    <div class="p-5">
-                        <p class="text-[13px] font-black uppercase text-gray-800 mb-5">${p.content}</p>
-                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-2xl mb-5 shadow-inner">` : ''}
-                        <div class="flex border-t pt-2">
-                            <button onclick="handleInteraction('like', 0.0006)" class="interaction-btn">
-                                <div class="count-badge">0</div><span class="text-xl">👍</span><span class="text-[8px] uppercase font-black text-gray-400">Gostar</span>
+                    <div class="p-4">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-[10px] text-blue-600 font-black">👤</div>
+                            <div class="flex flex-col">
+                                <span class="text-[11px] font-black uppercase text-gray-800">Utilizador ${p.user_id.substring(0,6)}</span>
+                                <span class="text-[8px] text-gray-300 font-black uppercase">Postado agora</span>
+                            </div>
+                            <button onclick="reportPost('${p.id}')" class="ml-auto text-[14px] opacity-20">🚩</button>
+                        </div>
+                        
+                        <p class="text-[13px] font-black uppercase text-gray-800 leading-relaxed mb-4">${p.content}</p>
+                        
+                        ${p.image_url ? `
+                            <div class="relative rounded-2xl overflow-hidden mb-4 bg-gray-50 border">
+                                <img src="${p.image_url}" class="w-full object-cover max-h-[400px]" onerror="this.style.display='none'">
+                            </div>
+                        ` : ''}
+
+                        <div class="flex border-t pt-2 gap-1">
+                            <button onclick="handleInteraction('like', 0.0020)" class="interaction-btn">
+                                <div class="count-badge">0</div>
+                                <span class="text-xl">👍</span>
+                                <span class="text-[8px] uppercase font-black text-gray-400 mt-1">Gostar</span>
                             </button>
                             <button onclick="toggleComments('${p.id}')" class="interaction-btn border-x border-gray-50">
-                                <div class="count-badge" id="badge-${p.id}">0</div><span class="text-xl">💬</span><span class="text-[8px] uppercase font-black text-gray-400">Comentar</span>
+                                <div class="count-badge" id="badge-${p.id}">0</div>
+                                <span class="text-xl">💬</span>
+                                <span class="text-[8px] uppercase font-black text-gray-400 mt-1">Comentar</span>
                             </button>
-                            <button onclick="handleInteraction('share', 0.0020)" class="interaction-btn">
-                                <span class="text-xl">🔗</span><span class="text-[8px] uppercase font-black text-gray-400">Partilhar</span>
+                            <button onclick="handleInteraction('share', 0.0030)" class="interaction-btn">
+                                <span class="text-xl">🔗</span>
+                                <span class="text-[8px] uppercase font-black text-gray-400 mt-1">Partilhar</span>
                             </button>
                         </div>
                     </div>
+
                     <div id="comments-${p.id}" class="hidden bg-gray-50 border-t p-4">
-                        <div id="list-${p.id}" class="space-y-2 mb-3 max-h-40 overflow-y-auto"></div>
+                        <div id="list-${p.id}" class="space-y-3 mb-4 max-h-48 overflow-y-auto"></div>
                         <div class="flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="ALGO..." class="flex-1 bg-white p-2 rounded-xl text-[10px] font-black outline-none border">
-                            <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-4 rounded-xl font-black text-[10px]">OK</button>
+                            <input id="in-${p.id}" type="text" placeholder="ALGO A DIZER?" class="flex-1 bg-white p-4 rounded-xl text-[10px] font-black outline-none border-2 border-transparent focus:border-blue-600 uppercase">
+                            <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-6 rounded-xl font-black text-[10px] uppercase">OK</button>
                         </div>
                     </div>
                 </div>`;
+
+                // Injeção de Anúncios a cada 3 posts (Não aparece para Admin)
                 if (activeID !== ADMIN_MASTER && (index + 1) % 3 === 0) {
-                    html += `<div class="feed-ad-unit"><p class="text-[9px] font-black text-gray-400 uppercase mb-2">Anúncio Patrocinado</p><div class="h-20 bg-gray-50 rounded flex items-center justify-center border text-[10px] text-blue-600 font-black">PUBLICIDADE</div></div>`;
+                    htmlOutput += `
+                    <div class="feed-ad-unit">
+                        <p class="text-[9px] font-black text-blue-600 uppercase mb-3 tracking-widest">Recomendado para si</p>
+                        <div class="w-full h-32 bg-gray-50 rounded-2xl flex items-center justify-center border-2 border-dotted border-gray-200">
+                             <span class="text-[10px] text-gray-300 font-black uppercase">Espaço Publicitário</span>
+                        </div>
+                    </div>`;
                 }
             });
-            container.innerHTML = html || "<p class='text-center p-10 text-[10px] uppercase font-black opacity-30'>Sem posts.</p>";
+            container.innerHTML = htmlOutput || "<p class='text-center p-20 opacity-20'>Sem publicações.</p>";
             posts.forEach(p => updateCount(p.id));
         }
 
+        // LÓGICA DE INTERAÇÃO E GANHOS
         async function handleInteraction(type, val = 0, pid = null) {
+            // Regra: A cada 2 interações ou 3 posts, exige anúncio para manter 100%
             if ((user.interactions >= 2 || user.postsToday >= 3) && user.multiplier === 1.0) {
                 pendingAction = { type, val, pid };
                 document.getElementById('ad-overlay').style.display = 'flex';
-            } else { executeAction(type, val, pid); }
+                document.getElementById('ad-decision-ui').classList.remove('hidden');
+            } else {
+                executeAction(type, val, pid);
+            }
         }
 
         async function executeAction(type, val, pid) {
             if (type === 'post') await publish();
-            else if (type === 'comment') await addComment(pid);
-            else applyGain(val);
+            else if (type === 'comment') { user.interactions++; await addComment(pid); }
+            else { user.interactions++; applyGain(val); }
         }
 
         async function applyGain(val) {
-            const final = val * user.multiplier;
-            user.saldo += final;
-            showBigNumber(final);
+            const gainFinal = val * user.multiplier;
+            user.saldo = Number((user.saldo + gainFinal).toFixed(4));
+            showBigNumber(gainFinal);
             updateUI();
             await sb.from('perfis').upsert({ id: activeID, saldo: user.saldo });
         }
 
+        // ACÇÕES ESPECÍFICAS
         async function publish() {
-            const content = document.getElementById('post-input').value;
-            const url = document.getElementById('post-url').value;
+            const content = document.getElementById('post-input').value.trim();
+            const url = document.getElementById('post-url').value.trim();
             if(!content) return;
+
             const { error } = await sb.from('posts').insert([{ user_id: activeID, content, image_url: url }]);
-            if(!error) { 
-                user.postsToday++; applyGain(0.0150); 
+            if(!error) {
+                user.postsToday++;
+                applyGain(0.0150); // +15 XP
                 document.getElementById('post-input').value = "";
-                collapsePublisher(); loadFeed(); 
+                document.getElementById('post-url').value = "";
+                collapsePublisher();
+                loadFeed();
             }
         }
 
         async function addComment(pid) {
-            const val = document.getElementById(`in-${pid}`).value;
+            const val = document.getElementById(`in-${pid}`).value.trim();
             if(!val) return;
             const { error } = await sb.from('comentarios').insert([{ post_id: pid, user_id: activeID, content: val }]);
-            if(!error) { document.getElementById(`in-${pid}`).value = ""; applyGain(0.0010); updateComments(pid); }
+            if(!error) {
+                document.getElementById(`in-${pid}`).value = "";
+                applyGain(0.0010); // +1 XP
+                updateComments(pid);
+            }
+        }
+
+        // SISTEMA DE ANÚNCIOS (FLUXO)
+        function startAdFlow() {
+            document.getElementById('ad-decision-ui').classList.add('hidden');
+            document.getElementById('ad-player-ui').classList.remove('hidden');
+            let t = 15;
+            const timer = setInterval(() => {
+                t--;
+                document.getElementById('ad-timer-circle').innerText = t;
+                if(t <= 0) {
+                    clearInterval(timer);
+                    const btn = document.getElementById('close-ad-btn');
+                    btn.disabled = false;
+                    btn.innerText = "RESGATAR RECOMPENSA";
+                    btn.className = "w-full py-4 bg-green-500 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg";
+                    btn.onclick = () => {
+                        user.multiplier = 1.0;
+                        user.interactions = 0;
+                        user.postsToday = 0;
+                        if(pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid);
+                        closeAd();
+                    };
+                }
+            }, 1000);
+        }
+
+        function degradeGains() {
+            user.multiplier = 0.5;
+            if(pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid);
+            closeAd();
+        }
+
+        // UTILITÁRIOS DE UI
+        function showBigNumber(val) {
+            const c = document.getElementById('floating-earning');
+            document.getElementById('earning-val').innerText = "+" + val.toFixed(4) + "€";
+            c.style.display = 'block';
+            setTimeout(() => c.style.display = 'none', 800);
+        }
+
+        function nav(t) {
+            document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
+            document.getElementById('view-'+t).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if(t === 'admin') loadAdminStats();
+            
+            // Controle de visibilidade do publicador
+            const isSocial = (t === 'social' && activeID !== ADMIN_MASTER);
+            document.getElementById('pub-fixed-container').style.display = isSocial ? 'block' : 'none';
+            document.getElementById('status-bar').style.display = isSocial ? 'flex' : 'none';
         }
 
         async function updateComments(pid) {
             const { data } = await sb.from('comentarios').select('*').eq('post_id', pid);
             const list = document.getElementById(`list-${pid}`);
-            if(list) list.innerHTML = data.map(c => `<div class="bg-white p-2 rounded-lg border text-[9px]">${c.content}</div>`).join('');
+            if(list) {
+                list.innerHTML = data.map(c => `
+                    <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm text-[10px] font-black uppercase text-gray-700">
+                        <span class="block text-[8px] text-blue-600 mb-1">ID ${c.user_id.substring(0,5)}</span>
+                        ${c.content}
+                    </div>
+                `).join('');
+            }
             updateCount(pid);
         }
 
@@ -278,47 +444,34 @@
             if(!sec.classList.contains('hidden')) updateComments(id);
         }
 
-        function showBigNumber(val) {
-            const c = document.getElementById('floating-earning');
-            document.getElementById('earning-val').innerText = "+" + val.toFixed(4) + "€";
-            c.style.display = 'block'; setTimeout(() => c.style.display = 'none', 800);
-        }
-
-        function startAdFlow() {
-            document.getElementById('ad-decision-ui').classList.add('hidden');
-            document.getElementById('ad-player-ui').classList.remove('hidden');
-            let t = 15;
-            const timer = setInterval(() => {
-                t--; document.getElementById('ad-timer-circle').innerText = t;
-                if(t <= 0) {
-                    clearInterval(timer);
-                    const btn = document.getElementById('close-ad-btn');
-                    btn.disabled = false; btn.innerText = "RESGATAR AGORA";
-                    btn.onclick = () => { user.interactions = 0; if(pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid); closeAd(); };
-                }
-            }, 1000);
-        }
-
+        // ADMIN FUNCTIONS
         async function loadAdminStats() {
             const { data: users } = await sb.from('perfis').select('*');
             document.getElementById('adm-total-users').innerText = users.length;
-            document.getElementById('adm-user-list').innerHTML = users.map(u => `
-                <tr class="border-b"><td class="p-4 font-black text-blue-600">${u.id}</td><td class="p-4">${Number(u.saldo).toFixed(4)}€</td><td class="p-4 text-right text-red-500">BAN</td></tr>
-            `).join('');
+            
+            let totalDevido = 0;
+            const listBody = document.getElementById('adm-user-list');
+            listBody.innerHTML = users.map(u => {
+                totalDevido += Number(u.saldo);
+                return `
+                <tr class="border-b">
+                    <td class="p-4 font-black text-blue-600">${u.id}</td>
+                    <td class="p-4 text-green-600">${Number(u.saldo).toFixed(4)}€</td>
+                    <td class="p-4 text-right">
+                        <button onclick="deleteUser('${u.id}')" class="text-red-500 text-[14px]">🗑️</button>
+                    </td>
+                </tr>`;
+            }).join('');
+            
+            document.getElementById('adm-gross-revenue').innerText = totalDevido.toFixed(4) + "€";
         }
 
-        function closeAd() { document.getElementById('ad-overlay').style.display = 'none'; document.getElementById('ad-player-ui').classList.add('hidden'); document.getElementById('ad-decision-ui').classList.remove('hidden'); }
-        function degradeGains() { user.multiplier = 0.5; if(pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid); closeAd(); }
+        function closeAd() { document.getElementById('ad-overlay').style.display = 'none'; pendingAction = null; }
         function expandPublisher() { document.getElementById('mini-pub').classList.add('hidden'); document.getElementById('expanded-post').classList.remove('hidden'); }
         function collapsePublisher() { document.getElementById('mini-pub').classList.remove('hidden'); document.getElementById('expanded-post').classList.add('hidden'); }
         function doLogin() { const id = document.getElementById('login-id').value.trim(); if(id) { localStorage.setItem('apex_uid', id); location.reload(); } }
         function doLogout() { localStorage.removeItem('apex_uid'); location.reload(); }
-        function nav(t) {
-            document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
-            document.getElementById('view-'+t).classList.add('active');
-            event.currentTarget.classList.add('active');
-            if(t === 'admin') loadAdminStats();
-        }
+        function reportPost(id) { alert("Publicação reportada à equipa técnica."); }
 
         init();
     </script>
