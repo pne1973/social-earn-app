@@ -11,130 +11,138 @@
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; --g-yellow: #FBBC05; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #1c1e21; -webkit-tap-highlight-color: transparent; }
         
-        .fb-card { background: white; border-radius: 8px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); margin-bottom: 12px; overflow: hidden; }
-        .feed-ad-unit { background: #ffffff; border: 2px dashed var(--g-blue); border-radius: 12px; padding: 20px; margin-bottom: 12px; text-align: center; }
+        /* Estilo de Cartão Facebook */
+        .fb-card { background: white; border-radius: 2px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); margin-bottom: 8px; overflow: hidden; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+        
+        /* Monetização */
+        .feed-ad-unit { background: #ffffff; border: 2px dashed var(--g-blue); border-radius: 8px; padding: 15px; margin: 8px; text-align: center; }
 
+        /* Animação de Ganhos */
         #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s forwards; }
         @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
-        .earning-text { font-size: 3.5rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 20px rgba(52,168,83,0.4); -webkit-text-stroke: 1.5px white; }
+        .earning-text { font-size: 3rem; font-weight: 900; color: var(--g-green); text-shadow: 0 4px 15px rgba(52,168,83,0.3); -webkit-text-stroke: 1px white; }
 
-        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .modal-300-250 { width: 310px; background: white; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+        /* Modais */
+        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 5000; align-items: center; justify-content: center; }
+        .modal-300-250 { width: 310px; background: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
 
-        .status-header-fixed { position: fixed; top: 72px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 1px solid #dadce0; padding: 8px 16px; display: flex; align-items: center; justify-content: center; min-height: 48px; }
-        .publisher-fixed { position: fixed; top: 120px; left: 0; right: 0; z-index: 280; background: #f1f3f4; padding: 8px 16px; border-bottom: 1px solid #dadce0; }
+        /* Layout Dinâmico */
+        .header-fixed { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; border-bottom: 1px solid #ddd; z-index: 1000; display: flex; align-items: center; px: 15px; }
+        .status-header-fixed { position: fixed; top: 60px; left: 0; right: 0; z-index: 900; background: #fff; border-bottom: 1px solid #eee; padding: 10px 15px; display: flex; align-items: center; }
+        .publisher-fixed { position: fixed; top: 110px; left: 0; right: 0; z-index: 800; background: white; padding: 10px 15px; border-bottom: 8px solid #f1f3f4; }
         
-        /* Ajuste crucial para o Feed */
-        #feed-container { margin-top: 195px; padding: 0 8px; }
-        body.is-admin #feed-container { margin-top: 85px; } /* Admin não tem publisher nem barra verde */
+        /* Ajuste de Margem do Feed */
+        #feed-container { margin-top: 195px; }
+        body.is-admin #feed-container { margin-top: 70px; } /* Admin não vê publisher */
 
-        .nav-item { transition: all 0.3s; color: #65676b; border-top: 4px solid transparent; }
-        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
+        .nav-item { transition: all 0.2s; color: #65676b; border-bottom: 3px solid transparent; flex: 1; text-align: center; padding: 12px 0; font-size: 22px; }
+        .nav-item.active { color: var(--g-blue); border-bottom: 3px solid var(--g-blue); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .interaction-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 0; color: #65676b; font-size: 13px; font-weight: 600; }
-        #auth-screen { position: fixed; inset: 0; background: white; z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+        .interaction-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 0; color: #65676b; font-size: 13px; font-weight: 600; }
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-20">
 
     <div id="auth-screen" style="display:none;">
-        <div class="w-16 h-16 bg-blue-600 rounded-2xl mb-6 flex items-center justify-center text-white font-black italic text-3xl shadow-lg">S</div>
-        <h2 class="text-blue-600 font-black uppercase text-xs mb-8 tracking-widest">Social Earn Network</h2>
-        <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs border-2 border-gray-100 rounded-2xl p-5 text-center mb-4 uppercase font-black outline-none shadow-sm">
-        <button onclick="doLogin()" class="w-full max-w-xs bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl uppercase active:scale-95 transition-transform">Entrar no Sistema</button>
+        <div class="w-16 h-16 bg-blue-600 rounded-xl mb-6 flex items-center justify-center text-white font-black italic text-3xl">S</div>
+        <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs border border-gray-300 rounded-lg p-4 text-center mb-4 font-bold outline-none">
+        <button onclick="doLogin()" class="w-full max-w-xs bg-blue-600 text-white font-bold py-4 rounded-lg shadow-lg uppercase">Entrar</button>
     </div>
 
     <div id="floating-earning"><div class="earning-text" id="earning-val">+0.0000€</div></div>
 
     <div id="ad-overlay">
-        <div id="ad-decision-ui" class="modal-300-250 p-8 text-center">
-            <div class="w-12 h-12 bg-yellow-400 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl">⚡</div>
-            <h3 class="text-xs font-black uppercase text-blue-600 mb-3 tracking-tighter">Manter Multiplicador 1.0x</h3>
-            <p class="text-[10px] leading-relaxed font-bold mb-8 text-gray-400 uppercase">Vê um anúncio para manter os teus ganhos máximos.</p>
-            <button onclick="startAdFlow()" class="w-full py-4 bg-blue-600 text-white rounded-xl shadow-lg uppercase text-[11px] font-black mb-3">Ver Anúncio (15s)</button>
-            <button onclick="degradeGains()" class="w-full py-2 text-gray-300 uppercase text-[9px] font-black italic">Aceitar redução</button>
+        <div id="ad-decision-ui" class="modal-300-250 p-6 text-center">
+            <h3 class="font-bold text-blue-600 mb-4">RECARREGAR MULTIPLICADOR</h3>
+            <p class="text-xs text-gray-500 mb-6">Assista a um vídeo para manter os seus ganhos em 100%.</p>
+            <button onclick="startAdFlow()" class="w-full py-3 bg-blue-600 text-white rounded-lg font-bold mb-3">VER ANÚNCIO</button>
+            <button onclick="degradeGains()" class="text-[10px] text-gray-400 font-bold">REDUZIR GANHOS</button>
         </div>
-        <div id="ad-player-ui" class="modal-300-250 hidden">
-            <div class="flex-1 bg-black flex flex-col items-center justify-center text-white p-6">
-                <div id="ad-timer-circle" class="font-black text-6xl mb-2">15</div>
-                <p class="text-[9px] text-blue-400 uppercase font-black tracking-widest">Monetizando...</p>
-            </div>
-            <button id="close-ad-btn" disabled class="h-16 bg-gray-100 text-gray-400 uppercase text-[10px] font-black">Processando...</button>
+        <div id="ad-player-ui" class="modal-300-250 hidden bg-black text-white p-10 text-center">
+            <div id="ad-timer-circle" class="text-6xl font-black mb-4">15</div>
+            <p class="text-xs text-blue-400 font-bold uppercase tracking-widest">A Monetizar...</p>
+            <button id="close-ad-btn" disabled class="mt-8 py-3 px-6 bg-gray-700 text-gray-400 rounded-lg text-xs font-bold uppercase">A processar ganho...</button>
         </div>
     </div>
 
-    <header class="fixed top-0 left-0 right-0 bg-white border-b z-[400] px-5 flex justify-between items-center h-[72px]">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-md">S</div>
-            <div>
-                <h1 class="text-[14px] font-black uppercase text-blue-600 leading-none">Social Earn</h1>
-                <p class="text-[9px] font-black text-gray-300 uppercase tracking-widest mt-1">Official Network</p>
-            </div>
+    <header class="header-fixed px-4 justify-between">
+        <div class="flex items-center gap-2">
+            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic shadow-sm">S</div>
+            <h1 class="text-blue-600 font-black text-lg tracking-tight">Social Earn</h1>
         </div>
         <div class="text-right">
-            <div id="main-eur" class="font-black text-green-600 text-xl tracking-tighter">0.0000€</div>
-            <div id="main-brl" class="text-[9px] font-black text-gray-400 uppercase">0.0000 BRL</div>
+            <div id="main-eur" class="font-black text-green-600 text-lg leading-none">0.0000€</div>
+            <div id="main-brl" class="text-[10px] font-bold text-gray-400">0.0000 BRL</div>
         </div>
     </header>
 
     <div id="status-bar" class="status-header-fixed">
-        <div id="status-text" class="text-[10px] font-bold uppercase text-green-600 tracking-tight">Ganhos Ativos: 100%</div>
-        <button id="restore-btn" onclick="startAdFlow(true)" class="hidden bg-red-600 text-white px-3 py-1.5 rounded-lg text-[8px] font-black uppercase animate-pulse ml-2 shadow-sm">Restaurar</button>
-        <button onclick="doLogout()" class="ml-auto text-[10px] text-gray-400 uppercase font-bold">Sair</button>
+        <span id="status-text" class="text-[11px] font-bold text-green-600 uppercase">Ganhos: 100% Ativos</span>
+        <button id="restore-btn" onclick="startAdFlow(true)" class="hidden ml-2 bg-red-600 text-white px-2 py-1 rounded text-[9px] font-black animate-pulse">RESTAURAR</button>
+        <button onclick="doLogout()" class="ml-auto text-[11px] text-gray-400 font-bold uppercase">Sair</button>
     </div>
 
     <div id="pub-fixed-container" class="publisher-fixed">
-        <div id="mini-pub" onclick="expandPublisher()" class="bg-white border border-gray-200 rounded-full px-4 py-2 flex items-center gap-3 shadow-sm">
-            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-[12px]">👤</div>
-            <div class="text-[13px] text-gray-500">O que está a pensar?</div>
+        <div id="mini-pub" onclick="expandPublisher()" class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-sm">👤</div>
+            <div class="flex-1 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-500">O que está a pensar?</div>
         </div>
-        <div id="expanded-post" class="hidden fb-card p-4 mt-2">
-            <textarea id="post-input" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none focus:ring-0 text-base mb-2 resize-none" rows="3"></textarea>
-            <div class="border-t pt-3 flex flex-col gap-2">
-                <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full bg-gray-100 border-none text-xs p-3 rounded-lg outline-none">
-                <div class="flex gap-2">
-                    <button onclick="collapsePublisher()" class="flex-1 text-sm font-semibold text-gray-500">Cancelar</button>
-                    <button onclick="handleInteraction('post')" class="flex-[2] bg-blue-600 text-white py-2 rounded-lg font-bold text-sm">Publicar</button>
-                </div>
+        <div id="expanded-post" class="hidden mt-2">
+            <textarea id="post-input" placeholder="Escreva algo..." class="w-full border-none focus:ring-0 text-base mb-2 resize-none" rows="3"></textarea>
+            <input id="post-url" type="text" placeholder="URL da imagem (opcional)" class="w-full bg-gray-100 border-none text-xs p-3 rounded-lg mb-3">
+            <div class="flex gap-2">
+                <button onclick="collapsePublisher()" class="flex-1 py-2 text-sm font-bold text-gray-500">Cancelar</button>
+                <button onclick="handleInteraction('post')" class="flex-2 bg-blue-600 text-white px-8 py-2 rounded-lg font-bold text-sm">Publicar</button>
             </div>
         </div>
     </div>
 
     <main class="max-w-lg mx-auto">
         <section id="view-social" class="tab-content active">
-            <div id="feed-container"></div>
+            <div id="feed-container">
+                </div>
         </section>
 
-        <section id="view-info" class="tab-content px-4 mt-32">
-            <div class="fb-card p-8 text-center border-t-4 border-blue-600">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Utilizador ID: <span id="display-uid" class="text-blue-600">---</span></p>
-                <h1 id="wall-eur" class="text-5xl font-black text-blue-600 tracking-tighter mb-2">0.0000€</h1>
-                <p id="wall-brl-sub" class="text-xs font-bold text-gray-400 uppercase mb-8">0.0000 BRL</p>
-                <div id="withdraw-area" class="mt-4 hidden"><input id="pp-email" type="email" placeholder="EMAIL PAYPAL" class="w-full border p-3 rounded-lg mb-3 text-sm outline-none"><button onclick="requestWithdraw()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-sm uppercase">Levantar</button></div>
-                <div id="progress-container" class="pt-6 border-t border-dashed"><div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-2"><div id="withdraw-progress" class="bg-blue-600 h-full w-0 transition-all duration-1000"></div></div><p class="text-[10px] text-gray-400 font-bold">MÍNIMO: 5.0000€</p></div>
+        <section id="view-info" class="tab-content px-4 mt-20">
+            <div class="fb-card p-6 text-center">
+                <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">A Minha Carteira (ID: <span id="display-uid" class="text-blue-600">--</span>)</p>
+                <h1 id="wall-eur" class="text-5xl font-black text-blue-600 mb-2">0.0000€</h1>
+                <p id="wall-brl-sub" class="text-sm font-bold text-gray-400 mb-6">0.0000 BRL</p>
+                <div id="withdraw-area" class="hidden">
+                    <input id="pp-email" type="email" placeholder="Email PayPal" class="w-full border p-3 rounded-lg mb-2 text-sm">
+                    <button onclick="alert('Solicitado!')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">LEVANTAR AGORA</button>
+                </div>
+                <div id="progress-container" class="border-t pt-4">
+                    <div class="w-full bg-gray-100 h-2 rounded-full mb-2"><div id="withdraw-progress" class="bg-blue-600 h-full w-0 transition-all duration-1000"></div></div>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">Mínimo: 5.0000€</p>
+                </div>
             </div>
         </section>
 
-        <section id="view-admin" class="tab-content px-4 mt-32 pb-10">
-            <div class="fb-card p-6 bg-slate-900 text-white mb-4">
-                <h2 class="text-xs font-black uppercase text-blue-400 mb-4">Admin BI</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><p class="text-[8px] uppercase opacity-60">Receita Bruta</p><p id="adm-gross-revenue" class="text-xl font-bold">0.0000€</p></div>
-                    <div class="text-right"><p class="text-[8px] uppercase opacity-60">Saques Devidos</p><p id="adm-total-debt" class="text-xl font-bold text-red-400">0.0000€</p></div>
+        <section id="view-admin" class="tab-content px-4 mt-20 pb-10">
+            <div class="fb-card p-5 bg-gray-900 text-white mb-4">
+                <h2 class="text-xs font-bold text-blue-400 uppercase mb-4 tracking-widest">Painel Administrativo</h2>
+                <div class="grid grid-cols-2 gap-4 text-center">
+                    <div class="border-r border-gray-700"><p class="text-[9px] opacity-50 uppercase">Saldo Adm</p><p id="adm-gross-revenue" class="text-lg font-bold">0.0000€</p></div>
+                    <div><p class="text-[9px] opacity-50 uppercase">Utilizadores</p><p id="adm-total-users" class="text-lg font-bold">0</p></div>
                 </div>
             </div>
             <div class="fb-card overflow-hidden">
-                <table class="w-full text-left text-[11px]"><thead class="bg-gray-50 border-b"><tr><th class="p-4">ID</th><th class="p-4">Saldo</th><th class="p-4">Ação</th></tr></thead><tbody id="adm-user-list"></tbody></table>
+                <table class="w-full text-[11px] text-left">
+                    <thead class="bg-gray-50 font-bold border-b"><tr><th class="p-3">ID</th><th class="p-3">Saldo</th><th class="p-3 text-right">Ação</th></tr></thead>
+                    <tbody id="adm-user-list"></tbody>
+                </table>
             </div>
         </section>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-16 z-[400]">
-        <button onclick="nav('social')" class="nav-item active flex-1 py-2 flex flex-col items-center text-[22px]">🏠<span class="text-[9px] font-bold">Feed</span></button>
-        <button id="nav-wallet-btn" onclick="nav('info')" class="nav-item flex-1 py-2 flex flex-col items-center text-[22px]">💰<span class="text-[9px] font-bold">Ganhos</span></button>
-        <button id="nav-admin-btn" onclick="nav('admin')" class="hidden flex-1 py-2 flex flex-col items-center text-[22px] text-red-600">⚙️<span class="text-[9px] font-bold">Admin</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex z-[1000] h-14">
+        <button onclick="nav('social')" class="nav-item active">🏠</button>
+        <button id="nav-wallet-btn" onclick="nav('info')" class="nav-item">💰</button>
+        <button id="nav-admin-btn" onclick="nav('admin')" class="hidden nav-item text-red-600">⚙️</button>
     </nav>
 
     <script>
@@ -163,74 +171,86 @@
             if(data) user.saldo = Number(data.saldo) || 0;
             else await sb.from('perfis').insert([{ id: activeID, saldo: 0.0000 }]);
 
-            updateUI(); loadFeed();
+            updateUI();
+            loadFeed();
             setInterval(updateUI, 1000);
         }
 
         function updateUI() {
-            const curSaldo = user.saldo;
-            document.getElementById('main-eur').innerText = curSaldo.toFixed(4) + "€";
-            document.getElementById('wall-eur').innerText = curSaldo.toFixed(4) + "€";
-            document.getElementById('main-brl').innerText = (curSaldo * 6.1245).toFixed(4) + " BRL";
-            document.getElementById('wall-brl-sub').innerText = (curSaldo * 6.1245).toFixed(4) + " BRL";
+            const cur = user.saldo;
+            document.getElementById('main-eur').innerText = cur.toFixed(4) + "€";
+            document.getElementById('wall-eur').innerText = cur.toFixed(4) + "€";
+            document.getElementById('main-brl').innerText = (cur * 6.1245).toFixed(4) + " BRL";
+            document.getElementById('wall-brl-sub').innerText = (cur * 6.1245).toFixed(4) + " BRL";
             
             const prog = document.getElementById('withdraw-progress');
-            if(prog) prog.style.width = Math.min((curSaldo / 5.0) * 100, 100) + "%";
-
-            if(curSaldo >= 5.0) document.getElementById('withdraw-area')?.classList.remove('hidden');
+            if(prog) prog.style.width = Math.min((cur / 5.0) * 100, 100) + "%";
+            if(cur >= 5.0) document.getElementById('withdraw-area')?.classList.remove('hidden');
         }
 
         async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            const { data: posts, error } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const container = document.getElementById('feed-container');
-            if(!posts) return;
+            if(error || !posts) { container.innerHTML = "<p class='p-10 text-center text-xs opacity-50'>Nenhum post disponível.</p>"; return; }
 
-            let htmlOutput = "";
+            let html = "";
             posts.forEach((p, index) => {
-                htmlOutput += `
+                html += `
                 <div class="fb-card">
-                    <div class="flex items-center gap-3 p-3">
-                        <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-lg">👤</div>
+                    <div class="flex items-center gap-2 p-3">
+                        <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center font-bold text-xs">👤</div>
                         <div class="flex flex-col">
-                            <span class="text-[14px] font-bold">Utilizador ${p.user_id.substring(0,6)}</span>
-                            <span class="text-[11px] text-[#65676b]">Acabou de publicar</span>
+                            <span class="text-[13px] font-bold">Utilizador ${p.user_id.substring(0,5)}</span>
+                            <span class="text-[10px] text-gray-500">Acabou de publicar</span>
                         </div>
                     </div>
-                    <div class="px-3 pb-3 text-[14px]">${p.content}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="w-full border-y border-gray-100 object-cover">` : ''}
-                    <div class="px-3 py-2 flex justify-between border-b border-gray-100 mx-3 text-[12px] text-[#65676b]">
+                    <div class="px-3 pb-3 text-[14px] leading-tight">${p.content}</div>
+                    ${p.image_url ? `<img src="${p.image_url}" class="w-full border-y border-gray-100 object-cover max-h-96">` : ''}
+                    <div class="px-3 py-2 flex justify-between border-b border-gray-100 mx-3 text-[11px] text-gray-500">
                         <div>👍 0</div><div><span id="badge-${p.id}">0</span> comentários</div>
                     </div>
-                    <div class="flex px-3 py-1">
+                    <div class="flex px-2 py-1">
                         <button onclick="handleInteraction('like', 0.0006)" class="interaction-btn">👍 Gostar</button>
                         <button onclick="toggleComments('${p.id}')" class="interaction-btn">💬 Comentar</button>
-                        <button onclick="socialShare('${p.content.substring(0,30)}', '${p.id}')" class="interaction-btn">🔗 Partilhar</button>
+                        <button onclick="handleInteraction('share', 0.0020)" class="interaction-btn">🔗 Partilhar</button>
                     </div>
                     <div id="comments-${p.id}" class="hidden bg-gray-50 p-3 border-t">
                         <div id="list-${p.id}" class="space-y-2 mb-3"></div>
                         <div class="flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="Escreve..." class="flex-1 bg-gray-200 rounded-full px-4 py-2 text-xs outline-none">
-                            <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-4 rounded-full font-bold text-xs">OK</button>
+                            <input id="in-${p.id}" type="text" placeholder="Escreve um comentário..." class="flex-1 bg-gray-200 rounded-full px-4 py-2 text-xs outline-none">
+                            <button onclick="handleInteraction('comment', 0.0010, '${p.id}')" class="bg-blue-600 text-white px-4 rounded-full font-bold text-[10px]">OK</button>
                         </div>
                     </div>
                 </div>`;
                 
-                // Anúncios ocultos para o Admin
                 if (activeID !== ADMIN_MASTER && (index + 1) % 3 === 0) {
-                    htmlOutput += `<div class="feed-ad-unit mx-2"><p class="text-[9px] text-blue-600 font-black">Sugestão Patrocinada</p><div class="w-full h-24 bg-gray-50 flex items-center justify-center border rounded-lg text-[10px] text-gray-400 font-bold">ANÚNCIO</div></div>`;
+                    html += `<div class="feed-ad-unit"><p class="text-[8px] text-blue-600 font-bold uppercase mb-2">Espaço Patrocinado</p><div class="h-20 bg-gray-50 rounded flex items-center justify-center text-[10px] text-gray-300">PUBLICIDADE</div></div>`;
                 }
             });
-            container.innerHTML = htmlOutput;
+            container.innerHTML = html;
             posts.forEach(p => updateCount(p.id));
         }
 
-        // Funções de interação e suporte
         async function publish() {
             const content = document.getElementById('post-input').value;
             const url = document.getElementById('post-url').value;
             if(!content) return;
             const { error } = await sb.from('posts').insert([{ user_id: activeID, content, image_url: url }]);
             if(!error) { user.postsToday++; applyGain(0.0150); collapsePublisher(); loadFeed(); }
+        }
+
+        async function handleInteraction(type, val = 0, pid = null) {
+            if ((user.interactions >= 2 || user.postsToday >= 3) && user.multiplier === 1.0) {
+                pendingAction = { type, val, pid };
+                document.getElementById('ad-overlay').style.display = 'flex';
+                document.getElementById('ad-decision-ui').classList.remove('hidden');
+            } else { executeAction(type, val, pid); }
+        }
+
+        async function executeAction(type, val, pid) {
+            if (type === 'post') await publish();
+            else if (type === 'comment') { user.interactions++; await addComment(pid); }
+            else { user.interactions++; applyGain(val); }
         }
 
         async function applyGain(val) {
@@ -247,31 +267,17 @@
             c.style.display = 'block'; setTimeout(() => c.style.display = 'none', 800);
         }
 
-        function handleInteraction(type, val = 0, pid = null) {
-            if ((user.interactions >= 2 || user.postsToday >= 3) && user.multiplier === 1.0) {
-                pendingAction = { type, val, pid };
-                document.getElementById('ad-overlay').style.display = 'flex';
-                document.getElementById('ad-decision-ui').classList.remove('hidden');
-            } else { executeAction(type, val, pid); }
-        }
-
-        async function executeAction(type, val, pid) {
-            if (type === 'post') await publish();
-            else if (type === 'comment') { user.interactions++; await addComment(pid); }
-            else { user.interactions++; applyGain(val); }
-        }
-
         async function addComment(pid) {
             const val = document.getElementById(`in-${pid}`).value;
             if(!val) return;
             await sb.from('comentarios').insert([{ post_id: pid, user_id: activeID, content: val }]);
-            document.getElementById(`in-${pid}`).value = ""; applyGain(0.0010); updateComments(pid);
+            document.getElementById(`in-${pid}`).value = ""; updateComments(pid); applyGain(0.0010);
         }
 
         async function updateComments(pid) {
             const { data } = await sb.from('comentarios').select('*').eq('post_id', pid);
             const list = document.getElementById(`list-${pid}`);
-            if(list) list.innerHTML = data.map(c => `<div class="bg-gray-200 p-2 rounded-2xl text-[12px]"><span class="font-bold block text-[10px]">ID ${c.user_id.substring(0,5)}</span>${c.content}</div>`).join('');
+            if(list) list.innerHTML = data.map(c => `<div class="bg-gray-200 p-2 rounded-xl text-xs"><span class="font-bold block text-[9px]">ID ${c.user_id.substring(0,4)}</span>${c.content}</div>`).join('');
             updateCount(pid);
         }
 
@@ -296,9 +302,18 @@
                 if(t <= 0) {
                     clearInterval(timer);
                     const btn = document.getElementById('close-ad-btn');
-                    btn.disabled = false; btn.innerText = "RESGATAR"; btn.onclick = () => { resetState(); if(pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid); closeAd(); };
+                    btn.disabled = false; btn.innerText = "RESGATAR AGORA"; btn.onclick = () => { resetState(); if(pendingAction) executeAction(pendingAction.type, pendingAction.val, pendingAction.pid); closeAd(); };
                 }
             }, 1000);
+        }
+
+        async function loadAdminStats() {
+            if(activeID !== ADMIN_MASTER) return;
+            const { data: users } = await sb.from('perfis').select('*');
+            document.getElementById('adm-total-users').innerText = users.length;
+            document.getElementById('adm-user-list').innerHTML = users.map(u => `
+                <tr class="border-b"><td class="p-3 font-bold text-blue-600">${u.id}</td><td class="p-3">${Number(u.saldo).toFixed(4)}€</td><td class="p-3 text-right text-red-500 font-bold">BAN</td></tr>
+            `).join('');
         }
 
         function closeAd() { document.getElementById('ad-overlay').style.display = 'none'; pendingAction = null; }
@@ -307,12 +322,13 @@
         function doLogout() { localStorage.removeItem('apex_uid'); location.reload(); }
         function expandPublisher() { document.getElementById('mini-pub').classList.add('hidden'); document.getElementById('expanded-post').classList.remove('hidden'); }
         function collapsePublisher() { document.getElementById('mini-pub').classList.remove('hidden'); document.getElementById('expanded-post').classList.add('hidden'); }
-
         function nav(t) {
             document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
             document.getElementById('view-'+t).classList.add('active');
             event.currentTarget.classList.add('active');
+            if(t === 'admin') loadAdminStats();
             document.getElementById('pub-fixed-container').style.display = (t === 'social' && activeID !== ADMIN_MASTER) ? 'block' : 'none';
+            document.getElementById('status-bar').style.display = (t === 'social' && activeID !== ADMIN_MASTER) ? 'flex' : 'none';
         }
 
         init();
