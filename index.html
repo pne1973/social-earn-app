@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network v33.12</title>
+    <title>Social Earn Network</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -13,44 +13,25 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
         body { background-color: var(--fb-bg); color: var(--fb-text); padding-top: 60px; }
         .hidden { display: none !important; }
-
-        #auth-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 2000; display: flex;
-            align-items: center; justify-content: center; flex-direction: column;
-        }
-        .logo-f { font-size: 50px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px; }
-        
-        header { 
-            background: var(--fb-card); height: 60px; width: 100%; position: fixed; 
-            top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 16px; border-bottom: 1px solid var(--fb-border); z-index: 1000; 
-        }
+        #auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .auth-container { text-align: center; width: 90%; max-width: 350px; }
+        .auth-logo { font-size: 40px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px; }
+        .fb-input { width: 100%; border: 1px solid var(--fb-border); padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 16px; outline: none; }
+        .fb-btn { background: var(--fb-blue); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
+        header { background: var(--fb-card); height: 60px; width: 100%; position: fixed; top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid var(--fb-border); z-index: 1000; }
         .header-logo { color: var(--fb-blue); font-size: 28px; font-weight: bold; text-decoration: none; }
-
-        main { max-width: 550px; margin: 0 auto; padding: 12px; }
-        .card { 
-            background: white; border-radius: 8px; border: 1px solid var(--fb-border); 
-            margin-bottom: 12px; padding: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); 
-        }
-        .fb-input { 
-            width: 100%; border: 1px solid var(--fb-border); padding: 12px; 
-            border-radius: 20px; background: var(--fb-bg); margin-bottom: 10px; outline: none;
-        }
-        .fb-btn { 
-            background: var(--fb-blue); color: white; border: none; padding: 10px 20px; 
-            border-radius: 6px; font-weight: bold; cursor: pointer; 
-        }
+        main { max-width: 600px; margin: 0 auto; padding: 12px; }
+        .card { background: white; border-radius: 8px; border: 1px solid var(--fb-border); margin-bottom: 12px; padding: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
     <div id="auth-modal">
-        <div class="logo-f">f</div>
-        <div style="text-align: center; width: 90%; max-width: 320px;">
+        <div class="auth-container">
+            <div class="auth-logo">f</div>
             <p style="margin-bottom: 15px; color: var(--fb-secondary);">Insira o seu ID para entrar.</p>
-            <input type="text" id="auth-username" placeholder="ID (ex: 123)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
-            <button onclick="processAuth()" style="width: 100%; padding: 12px; background: var(--fb-blue); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Entrar</button>
+            <input type="text" id="auth-username" class="fb-input" placeholder="ID (ex: 123)">
+            <button class="fb-btn" onclick="processAuth()">Entrar</button>
         </div>
     </div>
 
@@ -61,14 +42,13 @@
 
     <main class="hidden" id="main-content">
         <div class="card">
-            <input type="text" id="post-content" class="fb-input" placeholder="No que está a pensar?">
-            <button class="fb-btn" onclick="createNewPost()">Publicar</button>
+            <input type="text" id="post-content" class="fb-input" style="border-radius: 20px; background: var(--fb-bg);" placeholder="No que está a pensar?">
+            <button class="fb-btn" style="width: auto; padding: 8px 20px;" onclick="createNewPost()">Publicar</button>
         </div>
         <div id="feed"></div>
     </main>
 
     <script>
-        // CONFIGURAÇÃO SUPABASE FINAL
         const SUPABASE_URL = 'https://fickstyevektwbdgimapy.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -79,21 +59,13 @@
             const id = document.getElementById('auth-username').value;
             if (!id) return alert("Digite um ID");
 
-            // Busca sem usar .single() para evitar erro automático do Supabase caso não encontre na primeira tentativa
-            let { data: profiles, error } = await _supabase
+            let { data: profile, error } = await _supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', id);
+                .eq('id', id)
+                .single();
 
-            if (error) {
-                console.error(error);
-                return alert("Erro de ligação. Verifique a tabela no Supabase.");
-            }
-
-            let profile = profiles.length > 0 ? profiles[0] : null;
-
-            // Se não existir, tenta criar
-            if (!profile) {
+            if (error || !profile) {
                 const { data: newUser, error: createError } = await _supabase
                     .from('profiles')
                     .insert([{ id: id, username: 'User_' + id, balance: 0 }])
@@ -121,8 +93,8 @@
                 <div class="card">
                     <div style="font-weight: bold; margin-bottom: 8px;">${post.author_name}</div>
                     <p>${post.content}</p>
-                    <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 15px; color: var(--fb-secondary); font-size: 14px;">
-                        <span style="cursor:pointer;" onclick="earn(0.0006)">👍 Gosto</span>
+                    <div style="margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 20px; color: var(--fb-secondary); font-size: 14px;">
+                        <span onclick="earn(0.0006)">👍 Gostar</span>
                     </div>
                 </div>
             `).join('');
