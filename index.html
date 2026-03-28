@@ -14,7 +14,6 @@
         body { background-color: var(--fb-bg); color: var(--fb-text); padding-top: 60px; }
         .hidden { display: none !important; }
 
-        /* Estilo do Modal de Entrada Original */
         #auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: white; z-index: 2000; display: flex;
@@ -26,7 +25,6 @@
         .fb-input { width: 100%; border: 1px solid var(--fb-border); padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 16px; outline: none; }
         .fb-btn { background: var(--fb-blue); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
 
-        /* Header */
         header { background: var(--fb-card); height: 60px; width: 100%; position: fixed; top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid var(--fb-border); z-index: 1000; }
         .header-logo { color: var(--fb-blue); font-size: 28px; font-weight: bold; text-decoration: none; }
         
@@ -59,14 +57,12 @@
     </main>
 
     <script>
-        // CREDENCIAIS ORIGINAIS DO SEU INDEX 39
         const SUPABASE_URL = 'https://fickstyevektwbgimapy.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiaW1hcHkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxMTQ1OTI2OCwiZXhwIjoyMDI3MDE2ODY4fQ.nOQWvUv_r_r_r_r_r_r_r_r_r_r_r_C9QY';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
 
-        // FUNÇÃO DE ENTRADA EXATA DO SEU CÓDIGO
         async function processAuth() {
             const id = document.getElementById('auth-username').value;
             if (!id) return alert("Digite um ID");
