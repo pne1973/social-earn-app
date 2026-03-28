@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.14 - Production</title>
+    <title>Apex Social v33.15</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* RESET E CORES OFICIAIS APEX (v33) */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         :root {
             --google-blue: #4285F4;
             --fb-bg: #F0F2F5;
@@ -13,64 +15,73 @@
             --text-main: #1C1E21;
             --text-secondary: #65676B;
             --border-color: #CED0D4;
-            --success: #16a34a;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system; background: var(--fb-bg); margin: 0; padding-top: 95px; padding-bottom: 70px; }
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--fb-bg); 
+            margin: 0; 
+            padding-top: 95px; 
+            padding-bottom: 80px; 
+            color: var(--text-main);
+        }
 
-        /* HEADER & STATUS FIXED */
+        /* HEADER OFICIAL GOOGLE EDITION */
         header {
-            position: fixed; top: 0; left: 0; right: 0; background: #fff; 
-            height: 65px; display: flex; align-items: center; justify-content: space-between; 
+            position: fixed; top: 0; left: 0; right: 0; background: #fff;
+            height: 65px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 15px; z-index: 1000; border-bottom: 1px solid var(--border-color);
         }
-        .status-bar {
+
+        .status-header-fixed {
             position: fixed; top: 65px; left: 0; right: 0; background: #fff;
             height: 30px; display: flex; align-items: center; padding: 0 15px;
             font-size: 10px; font-weight: 800; border-bottom: 1px solid var(--border-color); z-index: 999;
         }
 
-        /* NAVEGAÇÃO POR ABAS (TABS) */
+        /* NAVEGAÇÃO POR ABAS ORIGINAL */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
-            height: 65px; display: flex; justify-content: space-around;
+            height: 70px; display: flex; justify-content: space-around;
             align-items: center; border-top: 1px solid var(--border-color); z-index: 1000;
         }
-        .nav-item { flex: 1; text-align: center; font-size: 10px; font-weight: 700; color: var(--text-secondary); cursor: pointer; }
+        .nav-item { flex: 1; text-align: center; font-size: 10px; font-weight: 900; color: #9ca3af; cursor: pointer; }
         .nav-item.active { color: var(--google-blue); }
 
         /* CONTAINERS DE CONTEÚDO */
-        .tab-content { display: none; max-width: 550px; margin: 0 auto; padding: 10px; }
+        .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; padding: 10px; }
         .tab-content.active { display: block; }
 
-        /* ESTILO FEED FACEBOOK */
+        /* NOVO FEED ESTILO FACEBOOK - ADAPTADO AO CÓDIGO BASE */
         .post-card {
             background: var(--card-bg); border-radius: 8px; margin-bottom: 12px;
             padding: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
-        .post-header { display: flex; align-items: center; margin-bottom: 10px; }
-        .user-avatar { width: 38px; height: 38px; border-radius: 50%; background: #ddd; margin-right: 10px; }
+        .post-header { display: flex; align-items: center; margin-bottom: 12px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e4e6eb; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         .post-meta { display: flex; flex-direction: column; }
         .user-name { font-weight: 600; font-size: 14px; }
-        .post-time { font-size: 11px; color: var(--text-secondary); }
-        .post-image { width: calc(100% + 24px); margin-left: -12px; max-height: 400px; object-fit: cover; margin-top: 10px; }
-        
-        /* PUBLISHER */
-        .publisher { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border-color); }
-        .pub-input { width: 100%; background: #f0f2f5; border-radius: 20px; border: none; padding: 10px 15px; font-size: 14px; outline: none; }
+        .post-time { font-size: 12px; color: var(--text-secondary); }
+        .post-content { font-size: 14px; line-height: 1.4; margin-bottom: 10px; word-wrap: break-word; }
+        .post-image { width: calc(100% + 24px); margin-left: -12px; max-height: 450px; object-fit: cover; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+        .post-actions { display: flex; border-top: 1px solid #eee; margin-top: 10px; padding-top: 5px; }
+        .action-btn { flex: 1; background: none; border: none; padding: 10px; color: var(--text-secondary); font-weight: 600; font-size: 13px; cursor: pointer; border-radius: 4px; }
+        .action-btn:hover { background: rgba(0,0,0,0.05); }
 
-        /* ADMIN & RANKING TABLES */
-        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 12px; }
-        th { background: #f8f9fa; font-weight: 700; }
+        /* PUBLISHER BOX */
+        .publisher-container { background: #fff; border-radius: 8px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border-color); }
+        .publisher-input { width: 100%; background: #f0f2f5; border: none; padding: 12px 15px; border-radius: 20px; font-size: 14px; cursor: pointer; }
+
+        /* TABELAS E BOTÕES ORIGINAIS */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border-radius: 12px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 11px; font-weight: 900; }
+        .btn-apex { width: 100%; background: var(--google-blue); color: white; border: none; padding: 15px; border-radius: 16px; font-weight: 900; cursor: pointer; }
 
         /* ADS */
-        .ad-container { background: #f9f9f9; border: 1px dashed #ccc; text-align: center; padding: 15px; margin: 10px 0; border-radius: 8px; font-size: 11px; color: #999; }
+        .ad-card { background: #f9f9f9; text-align: center; padding: 15px; margin-bottom: 12px; border-radius: 8px; font-size: 10px; color: #999; border: 1px dashed #ccc; }
 
-        /* AUTH SCREEN */
-        #auth-screen { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .btn-main { width: 100%; max-width: 280px; padding: 15px; border-radius: 12px; border: none; background: var(--google-blue); color: #fff; font-weight: 900; cursor: pointer; }
+        /* LOGIN SCREEN */
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
         
         .hidden { display: none !important; }
     </style>
@@ -78,77 +89,84 @@
 <body>
 
     <div id="auth-screen" class="hidden">
-        <div style="background:var(--google-blue); width:60px; height:60px; border-radius:12px; margin-bottom:20px;"></div>
-        <h2 style="font-size:12px; font-weight:900; color:var(--google-blue); margin-bottom:30px;">APEX SOCIAL v33.14</h2>
-        <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" style="width:100%; max-width:280px; padding:15px; border-radius:12px; border:2px solid #eee; text-align:center; margin-bottom:15px; font-weight:700;">
-        <button class="btn-main" onclick="handleLogin()">ENTRAR NO SISTEMA</button>
+        <div style="background:var(--google-blue); width:64px; height:64px; border-radius:16px; margin-bottom:24px;"></div>
+        <h2 style="color:var(--google-blue); font-weight:900; font-size:12px; margin-bottom:32px;">SOCIAL EARN NETWORK</h2>
+        <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" style="width:100%; max-width:280px; border:2px solid #eee; padding:15px; border-radius:16px; text-align:center; margin-bottom:16px; font-weight:900;">
+        <button class="btn-apex" onclick="doLogin()">Entrar no Sistema</button>
     </div>
 
     <header>
         <div style="display:flex; align-items:center; gap:8px;">
-            <div style="background:var(--google-blue); color:white; padding:6px 10px; border-radius:6px; font-weight:900;">A</div>
+            <div style="background:var(--google-blue); color:white; padding:8px; border-radius:8px; font-weight:900; font-style:italic;">S</div>
             <div>
-                <h1 style="font-size:12px; font-weight:900; margin:0;">Apex Social</h1>
-                <p style="font-size:8px; color:#999; margin:0;">v33.14 PRODUCTION</p>
+                <h1 style="font-size:11px; font-weight:900; color:var(--google-blue); margin:0;">Social Earn</h1>
+                <p style="font-size:8px; color:#ccc; margin:0; letter-spacing:1px;">Official Network</p>
             </div>
         </div>
         <div style="text-align:right;">
-            <div id="display-eur" style="font-weight:900; color:var(--success); font-size:16px;">0.0000€</div>
-            <div id="display-brl" style="font-size:9px; color:#999; font-weight:800;">0.0000 BRL</div>
+            <div id="header-eur" style="font-weight:900; color:#16a34a; font-size:18px;">0.0000€</div>
+            <div id="header-brl" style="font-size:9px; color:#9ca3af; font-weight:900;">0.0000 BRL</div>
         </div>
     </header>
 
-    <div class="status-bar">
-        <span id="status-text" style="color:var(--success);">SISTEMA ONLINE - GANHOS ATIVOS</span>
+    <div class="status-header-fixed">
+        <span id="status-text" style="color:#16a34a;">SISTEMA ONLINE - GANHOS ATIVOS</span>
+        <button onclick="doLogout()" style="margin-left:auto; background:none; border:none; font-size:8px; color:#ccc; font-weight:900;">SAIR</button>
     </div>
 
     <main>
         <section id="tab-feed" class="tab-content active">
-            <div class="publisher">
+            <div class="publisher-container">
                 <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="user-avatar" style="background:#4285F4; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold;">A</div>
-                    <input type="text" class="pub-input" placeholder="No que estás a pensar?" onclick="togglePub(true)">
+                    <div class="user-avatar" style="background:var(--google-blue); color:white;">U</div>
+                    <input type="text" class="publisher-input" placeholder="No que estás a pensar?" onclick="expandPublisher(true)">
                 </div>
-                <div id="pub-expanded" class="hidden" style="margin-top:10px;">
-                    <textarea id="post-text" placeholder="Escreve aqui..." style="width:100%; border:none; background:#f0f2f5; padding:10px; border-radius:10px; min-height:80px;"></textarea>
-                    <input type="text" id="post-img-url" placeholder="URL da Imagem (opcional)" style="width:100%; border:none; background:#f0f2f5; padding:10px; border-radius:10px; margin-top:5px;">
-                    <button class="btn-main" style="margin-top:10px; padding:10px;" onclick="createPost()">Publicar (+15 XP)</button>
+                <div id="publisher-expanded" class="hidden" style="margin-top:15px;">
+                    <textarea id="post-content" placeholder="Escreve a tua publicação..." style="width:100%; border:none; background:#f0f2f5; padding:15px; border-radius:15px; min-height:100px; font-weight:600;"></textarea>
+                    <input type="text" id="post-image-url" placeholder="URL da imagem (opcional)" style="width:100%; border:none; background:#f0f2f5; padding:12px; border-radius:12px; margin-top:10px; font-size:12px;">
+                    <button class="btn-apex" style="margin-top:15px;" onclick="handleNewPost()">Publicar (+15 XP)</button>
                 </div>
             </div>
             <div id="feed-render"></div>
         </section>
 
-        <section id="tab-wallet" class="tab-content">
-            <h2 style="font-size:14px; font-weight:900;">MINHA CARTEIRA</h2>
-            <div style="background:#fff; padding:20px; border-radius:12px; text-align:center; border:1px solid var(--border-color);">
-                <p style="font-size:11px; color:#666;">Saldo Disponível (XP: <span id="user-xp">0</span>)</p>
-                <h3 id="wallet-eur" style="font-size:24px; color:var(--success); margin:10px 0;">0.0000€</h3>
-                <button class="btn-main" onclick="requestWithdrawal()">LEVANTAR (Mín. 5000 XP)</button>
-            </div>
-            <h4 style="font-size:10px; margin-top:20px;">TABELA DE GANHOS EXPLICAÇÃO:</h4>
-            <table>
-                <tr><td>Postagem</td><td>+15 XP</td></tr>
-                <tr><td>Novo Amigo</td><td>+100 XP</td></tr>
-                <tr><td>Curtida</td><td>+2 XP</td></tr>
-            </table>
-        </section>
-
         <section id="tab-ranking" class="tab-content">
-            <h2 style="font-size:14px; font-weight:900;">TOP 10 UTILIZADORES</h2>
-            <table id="ranking-table">
-                <thead><tr><th>#</th><th>Utilizador</th><th>XP/Saldo</th></tr></thead>
+            <h2 style="font-size:12px; font-weight:900;">TOP 10 UTILIZADORES</h2>
+            <table id="table-ranking">
+                <thead><tr><th>#</th><th>Utilizador</th><th>Ganhos</th></tr></thead>
                 <tbody></tbody>
             </table>
         </section>
 
-        <section id="tab-admin" class="tab-content">
-            <h2 style="font-size:14px; font-weight:900;">PAINEL ADMINISTRATIVO</h2>
-            <div id="admin-stats" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-                <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border-color);">Users: <b id="total-users">0</b></div>
-                <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border-color);">Posts: <b id="total-posts">0</b></div>
+        <section id="tab-wallet" class="tab-content">
+            <h2 style="font-size:12px; font-weight:900;">MINHA CARTEIRA</h2>
+            <div style="background:white; padding:25px; border-radius:20px; text-align:center; border:1px solid #eee;">
+                <p style="font-size:10px; color:#999; font-weight:900;">SALDO DISPONÍVEL (XP: <span id="user-xp">0</span>)</p>
+                <h3 id="wallet-eur" style="font-size:28px; color:#16a34a; margin:15px 0;">0.0000€</h3>
+                <button class="btn-apex" onclick="handleWithdraw()">LEVANTAR (Mín. 5000 XP)</button>
             </div>
-            <h3 style="font-size:12px;">SOLICITAÇÕES PAYPAL</h3>
-            <table id="admin-withdrawals">
+            <h3 style="font-size:10px; margin-top:25px; font-weight:900;">TABELA DE GANHOS EXPLICATIVA:</h3>
+            <table>
+                <tr><td>Postagem</td><td>+15 XP</td></tr>
+                <tr><td>Curtida</td><td>+2 XP</td></tr>
+                <tr><td>Convite</td><td>+100 XP</td></tr>
+            </table>
+        </section>
+
+        <section id="tab-admin" class="tab-content">
+            <h2 style="font-size:12px; font-weight:900;">PAINEL ADMIN</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
+                <div style="background:white; padding:15px; border-radius:12px; border:1px solid #eee; text-align:center;">
+                    <p style="font-size:9px; color:#999;">TOTAL USERS</p>
+                    <b id="admin-total-users">0</b>
+                </div>
+                <div style="background:white; padding:15px; border-radius:12px; border:1px solid #eee; text-align:center;">
+                    <p style="font-size:9px; color:#999;">TOTAL POSTS</p>
+                    <b id="admin-total-posts">0</b>
+                </div>
+            </div>
+            <h3 style="font-size:10px; font-weight:900;">PEDIDOS DE SAQUE</h3>
+            <table id="table-admin-saques">
                 <thead><tr><th>ID</th><th>Valor</th><th>Ação</th></tr></thead>
                 <tbody></tbody>
             </table>
@@ -156,136 +174,140 @@
     </main>
 
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('feed')">🏠<br>Feed</div>
-        <div class="nav-item" onclick="switchTab('ranking')">🏆<br>Ranking</div>
-        <div class="nav-item" onclick="switchTab('wallet')">💰<br>Carteira</div>
-        <div id="nav-admin" class="nav-item hidden" onclick="switchTab('admin')">⚙️<br>Admin</div>
+        <div class="nav-item active" onclick="navigate('feed')">🏠<br>FEED</div>
+        <div class="nav-item" onclick="navigate('ranking')">🏆<br>RANKING</div>
+        <div class="nav-item" onclick="navigate('wallet')">💰<br>CARTEIRA</div>
+        <div id="nav-admin" class="nav-item hidden" onclick="navigate('admin')">⚙️<br>ADMIN</div>
     </nav>
 
     <script>
-        // CORE CONFIG
+        // CONFIGURAÇÕES SUPABASE E MASTER LIST
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const sb = supabase.createClient(SB_URL, SB_KEY);
         const ADMIN_ID = "5401881400";
-        const CONV = 0.0001; // 1 XP = 0.0001€
+        const XP_VAL = 0.0001; // Conversão 4 casas decimais
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-        let currentUID = localStorage.getItem('apex_uid');
-        let userData = { saldo: 0, xp: 0 };
+        let myID = localStorage.getItem('apex_uid');
+        let mySaldo = 0;
 
         async function init() {
-            if (!currentUID) { document.getElementById('auth-screen').classList.remove('hidden'); return; }
-            if (currentUID === ADMIN_ID) document.getElementById('nav-admin').classList.remove('hidden');
+            if (!myID) { document.getElementById('auth-screen').classList.remove('hidden'); return; }
+            if (myID === ADMIN_ID) document.getElementById('nav-admin').classList.remove('hidden');
 
-            await syncUser();
-            loadFeed();
-            loadRanking();
-            if (currentUID === ADMIN_ID) loadAdminData();
+            await syncProfile();
+            renderFeed();
+            renderRanking();
+            if (myID === ADMIN_ID) loadAdminStats();
         }
 
-        function handleLogin() {
-            const id = document.getElementById('login-id').value.trim();
-            if(id) { localStorage.setItem('apex_uid', id); location.reload(); }
+        function doLogin() {
+            const val = document.getElementById('login-id').value.trim();
+            if(val) { localStorage.setItem('apex_uid', val); location.reload(); }
         }
 
-        async function syncUser() {
-            const { data, error } = await sb.from('perfis').select('*').eq('id', currentUID).single();
-            if (data) {
-                userData.saldo = data.saldo;
-                userData.xp = data.saldo / CONV;
-            } else {
-                await sb.from('perfis').insert([{ id: currentUID, saldo: 0 }]);
-            }
-            updateUI();
-        }
+        function doLogout() { localStorage.removeItem('apex_uid'); location.reload(); }
 
-        function updateUI() {
-            document.getElementById('display-eur').innerText = userData.saldo.toFixed(4) + "€";
-            document.getElementById('display-brl').innerText = (userData.saldo * 6.1245).toFixed(4) + " BRL";
-            document.getElementById('wallet-eur').innerText = userData.saldo.toFixed(4) + "€";
-            document.getElementById('user-xp').innerText = Math.floor(userData.xp);
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        function navigate(tab) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
             event.currentTarget.classList.add('active');
         }
 
-        function togglePub(show) {
-            document.getElementById('pub-expanded').classList.toggle('hidden', !show);
+        async function syncProfile() {
+            const { data } = await supabaseClient.from('perfis').select('*').eq('id', myID).single();
+            if(data) {
+                mySaldo = data.saldo;
+            } else {
+                await supabaseClient.from('perfis').insert([{ id: myID, saldo: 0 }]);
+            }
+            updateDisplays();
         }
 
-        async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+        function updateDisplays() {
+            const eurStr = mySaldo.toFixed(4);
+            const brlStr = (mySaldo * 6.1245).toFixed(4);
+            document.getElementById('header-eur').innerText = eurStr + "€";
+            document.getElementById('header-brl').innerText = brlStr + " BRL";
+            document.getElementById('wallet-eur').innerText = eurStr + "€";
+            document.getElementById('user-xp').innerText = Math.floor(mySaldo / XP_VAL);
+        }
+
+        async function renderFeed() {
+            const { data: posts } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('feed-render');
             container.innerHTML = '';
 
-            posts.forEach((post, i) => {
+            posts.forEach((p, index) => {
                 const card = document.createElement('div');
                 card.className = 'post-card';
                 card.innerHTML = `
                     <div class="post-header">
-                        <div class="user-avatar" style="background:#eee; display:flex; align-items:center; justify-content:center;">👤</div>
+                        <div class="user-avatar">👤</div>
                         <div class="post-meta">
-                            <span class="user-name">Utilizador ${post.user_id}</span>
-                            <span class="post-time">${new Date(post.created_at).toLocaleDateString()}</span>
+                            <span class="user-name">Utilizador ${p.user_id}</span>
+                            <span class="post-time">${new Date(p.created_at).toLocaleDateString()}</span>
                         </div>
-                        ${currentUID === ADMIN_ID ? `<button onclick="deletePost('${post.id}')" style="margin-left:auto; border:none; background:none; color:red; font-size:10px;">APAGAR</button>` : ''}
+                        ${myID === ADMIN_ID ? `<button onclick="deletePost('${p.id}')" style="margin-left:auto; border:none; color:red; font-size:9px; font-weight:900;">APAGAR</button>` : ''}
                     </div>
-                    <div style="font-size:14px;">${post.content || ''}</div>
-                    ${post.image_url ? `<img src="${post.image_url}" class="post-image">` : ''}
-                    <div style="display:flex; border-top:1px solid #eee; margin-top:10px; padding-top:5px;">
-                        <button onclick="rewardAction(2)" style="flex:1; border:none; background:none; padding:8px; font-weight:700; color:#65676B;">👍 Gosto</button>
-                        <button style="flex:1; border:none; background:none; padding:8px; font-weight:700; color:#65676B;">💬 Comentar</button>
+                    <div class="post-content">${p.content || p.texto || ''}</div>
+                    ${(p.image_url || p.url) ? `<img src="${p.image_url || p.url}" class="post-image">` : ''}
+                    <div class="post-actions">
+                        <button class="action-btn" onclick="addXP(2)">👍 Gosto (+2 XP)</button>
+                        <button class="action-btn">💬 Comentar</button>
+                        <button class="action-btn">🚩 Denunciar</button>
                     </div>
                 `;
                 container.appendChild(card);
-                
-                // Injeção de ADS a cada 3 posts
-                if ((i + 1) % 3 === 0) {
+
+                // MONETIZAÇÃO: Ad a cada 3 posts
+                if((index + 1) % 3 === 0) {
                     const ad = document.createElement('div');
-                    ad.className = 'ad-container';
+                    ad.className = 'ad-card';
                     ad.innerText = "PATROCINADO - APEX ADS";
                     container.appendChild(ad);
                 }
             });
         }
 
-        async function createPost() {
-            const text = document.getElementById('post-text').value;
-            const img = document.getElementById('post-img-url').value;
-            if(!text) return;
+        function expandPublisher(show) {
+            document.getElementById('publisher-expanded').classList.toggle('hidden', !show);
+        }
 
-            await sb.from('posts').insert([{ user_id: currentUID, content: text, image_url: img }]);
-            await rewardAction(15);
+        async function handleNewPost() {
+            const txt = document.getElementById('post-content').value;
+            const img = document.getElementById('post-image-url').value;
+            if(!txt) return;
+
+            await supabaseClient.from('posts').insert([{ user_id: myID, content: txt, image_url: img }]);
+            await addXP(15);
             location.reload();
         }
 
-        async function rewardAction(xpAmount) {
-            userData.saldo += (xpAmount * CONV);
-            await sb.from('perfis').update({ saldo: userData.saldo }).eq('id', currentUID);
-            updateUI();
+        async function addXP(amt) {
+            mySaldo += (amt * XP_VAL);
+            await supabaseClient.from('perfis').update({ saldo: mySaldo }).eq('id', myID);
+            updateDisplays();
         }
 
-        async function loadRanking() {
-            const { data } = await sb.from('perfis').select('*').order('saldo', { ascending: false }).limit(10);
-            const tbody = document.querySelector('#ranking-table tbody');
-            tbody.innerHTML = data.map((u, i) => `<tr><td>${i+1}</td><td>ID: ${u.id}</td><td>${u.saldo.toFixed(4)}€</td></tr>`).join('');
+        async function renderRanking() {
+            const { data } = await supabaseClient.from('perfis').select('*').order('saldo', { ascending: false }).limit(10);
+            const body = document.querySelector('#table-ranking tbody');
+            body.innerHTML = data.map((u, i) => `<tr><td>${i+1}</td><td>ID: ${u.id}</td><td>${u.saldo.toFixed(4)}€</td></tr>`).join('');
         }
 
-        async function loadAdminData() {
-            const { count: uCount } = await sb.from('perfis').select('*', { count: 'exact', head: true });
-            const { count: pCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
-            document.getElementById('total-users').innerText = uCount;
-            document.getElementById('total-posts').innerText = pCount;
+        async function loadAdminStats() {
+            const { count: uc } = await supabaseClient.from('perfis').select('*', { count: 'exact', head: true });
+            const { count: pc } = await supabaseClient.from('posts').select('*', { count: 'exact', head: true });
+            document.getElementById('admin-total-users').innerText = uc;
+            document.getElementById('admin-total-posts').innerText = pc;
         }
 
         async function deletePost(id) {
-            if(confirm('Apagar post?')) {
-                await sb.from('posts').delete().eq('id', id);
-                loadFeed();
+            if(confirm('Eliminar post?')) {
+                await supabaseClient.from('posts').delete().eq('id', id);
+                renderFeed();
             }
         }
 
