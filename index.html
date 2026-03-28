@@ -3,200 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social - v33.12 Official</title>
+    <title>APEX C&C CENTER - ADMIN</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f2f5; color: #1c1e21; }
-
-        /* LOGIN */
-        #login-screen { position: fixed; inset: 0; background: #fff; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .login-box { width: 100%; max-width: 350px; text-align: center; }
-        .login-box h1 { color: #4285F4; margin-bottom: 25px; font-weight: 900; font-size: 28px; }
-        input[type="number"] { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 12px; font-size: 16px; outline: none; }
-        .btn-login { width: 100%; padding: 15px; background: #4285F4; color: #fff; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #fff; padding-bottom: 90px; }
 
         /* HEADER */
-        header { position: fixed; top: 0; width: 100%; height: 60px; background: #fff; border-bottom: 1px solid #ddd; display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        header b { color: #4285F4; font-size: 19px; letter-spacing: 0.5px; text-transform: uppercase; }
+        header { 
+            background: #000; padding: 15px; border-bottom: 2px solid #004400; 
+            display: flex; justify-content: center; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .header-title { font-size: 14px; font-weight: 900; letter-spacing: 2px; color: #00ff00; }
 
-        /* CONTEÚDO */
-        .container { padding: 75px 15px 100px 15px; max-width: 500px; margin: 0 auto; display: none; }
-        .page { display: none; }
+        /* ABAS */
+        .page { display: none; padding: 15px; width: 100%; max-width: 500px; margin: 0 auto; }
         .page.active { display: block; }
 
-        /* CARDS UTILIZADOR (COMO NA FOTO 18:51) */
-        .balance-card { background: #fff; border-radius: 15px; padding: 20px; border: 1px solid #ddd; margin-bottom: 20px; display: flex; justify-content: space-around; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .balance-card span { display: block; font-size: 11px; color: #65676B; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; }
-        .balance-card b { font-size: 20px; color: #1c1e21; }
+        /* FEED SEM ANÚNCIOS (VISUALIZAÇÃO ADMIN) */
+        .post-card { background: #111; border: 1px solid #222; border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
+        .post-header { padding: 10px; font-size: 12px; color: #888; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
+        .post-body { padding: 15px; font-size: 15px; line-height: 1.4; }
+        .post-img { width: 100%; display: block; background: #1a1a1a; max-height: 400px; object-fit: cover; }
+        .post-footer { padding: 10px; background: #0d0d0d; display: flex; gap: 15px; font-size: 13px; color: #00ff00; font-weight: bold; }
 
-        /* FEED POSTS */
-        .post { background: #fff; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; overflow: hidden; }
-        .post-header { padding: 12px; font-size: 13px; font-weight: 600; color: #65676B; border-bottom: 1px solid #f0f2f5; }
-        .post-img { width: 100%; display: block; background: #f0f2f5; }
-        .post-content { padding: 15px; font-size: 15px; line-height: 1.4; }
-        .post-footer { padding: 12px; border-top: 1px solid #f0f2f5; display: flex; gap: 20px; font-weight: 700; color: #65676B; font-size: 13px; }
+        /* STATS CARDS */
+        .stat-card { background: #111; border: 1px solid #004400; padding: 20px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid #00ff00; }
+        .stat-val { font-size: 24px; font-weight: 900; }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: #00ff00; margin-bottom: 5px; }
 
         /* ADMIN TABLE */
-        .admin-table-wrap { background: #fff; border-radius: 12px; border: 1px solid #ddd; overflow: hidden; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8f9fa; padding: 12px; text-align: left; font-size: 12px; border-bottom: 1px solid #ddd; color: #65676B; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; }
-        .btn-ban { color: #d32f2f; font-weight: 800; cursor: pointer; border: none; background: none; }
+        .table-wrap { overflow-x: auto; background: #111; border-radius: 8px; border: 1px solid #222; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { background: #002200; text-align: left; padding: 12px; color: #00ff00; }
+        td { padding: 12px; border-bottom: 1px solid #222; }
+        .btn-ban { color: #ff3333; background: none; border: 1px solid #ff3333; padding: 5px; border-radius: 4px; font-weight: bold; font-size: 10px; }
+        .btn-pay { color: #00ff00; background: none; border: 1px solid #00ff00; padding: 5px; border-radius: 4px; font-weight: bold; font-size: 10px; margin-right: 5px; }
 
-        /* NAVBAR (ABAS DO CÓDIGO ORIGINAL) */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 75px; background: #fff; border-top: 1px solid #ddd; display: none; justify-content: space-around; align-items: center; z-index: 1000; }
-        .nav-item { text-align: center; color: #65676B; font-size: 10px; font-weight: 800; text-decoration: none; flex: 1; transition: 0.2s; }
-        .nav-item.active { color: #4285F4; }
-        .nav-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+        /* NAVBAR */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: #000; height: 75px; display: flex; border-top: 2px solid #004400; z-index: 1000; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #444; font-size: 9px; font-weight: 900; }
+        .nav-btn.active { color: #00ff00; background: rgba(0, 255, 0, 0.05); }
+        .nav-icon { font-size: 18px; margin-bottom: 3px; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h1>APEX SOCIAL</h1>
-            <input type="number" id="id-input" placeholder="Insira o seu ID">
-            <button class="btn-login" onclick="login()">ENTRAR</button>
-        </div>
+<header>
+    <div class="header-title">APEX SOCIAL :: COMMAND CENTER</div>
+</header>
+
+<section id="p-feed" class="page active">
+    <div id="feed-list">Carregando feed de monitorização...</div>
+</section>
+
+<section id="p-stats" class="page">
+    <div class="stat-card">
+        <div class="stat-label">Utilizadores Ativos</div>
+        <div id="count-users" class="stat-val">0</div>
     </div>
-
-    <header><b>APEX SOCIAL</b></header>
-
-    <div id="app" class="container">
-        <div id="user-section">
-            <section id="p-home" class="page">
-                <div class="balance-card">
-                    <div><span>Saldo</span><b id="u-saldo">0.0000€</b></div>
-                    <div><span>XP</span><b id="u-xp">0</b></div>
-                </div>
-                <div id="user-feed"></div>
-            </section>
-            <section id="p-postar" class="page">
-                <h2 style="margin-bottom:15px">Criar Publicação</h2>
-                </section>
-            <section id="p-perfil" class="page">
-                <h2 style="margin-bottom:15px">Meu Perfil</h2>
-                <div class="balance-card" id="profile-info"></div>
-            </section>
-        </div>
-
-        <div id="admin-section">
-            <section id="p-feed-adm" class="page">
-                <div id="admin-feed"></div>
-            </section>
-            <section id="p-stats" class="page">
-                <h2>Estatísticas</h2>
-                <div class="balance-card" style="margin-top:15px">
-                    <div><span>Users</span><b id="s-users">0</b></div>
-                    <div><span>Posts</span><b id="s-posts">0</b></div>
-                </div>
-            </section>
-            <section id="p-admin" class="page">
-                <h2 style="color:#d32f2f">Painel Admin</h2>
-                <div class="admin-table-wrap">
-                    <table>
-                        <thead><tr><th>ID</th><th>Saldo</th><th>Ação</th></tr></thead>
-                        <tbody id="admin-tbody"></tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
+    <div class="stat-card">
+        <div id="total-debt" class="stat-val">0.0000€</div>
+        <div class="stat-label">Dívida Global (EUR)</div>
     </div>
+    <div class="stat-card" style="border-left-color: #555;">
+        <div id="count-posts" class="stat-val">0</div>
+        <div class="stat-label">Posts Totais</div>
+    </div>
+</section>
 
-    <nav id="navbar" class="nav-bar"></nav>
-
-    <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const sb = supabase.createClient(SB_URL, SB_KEY);
-
-        const ADMIN_ID = "5401881400";
-        let currentUser = null;
-
-        async function login() {
-            const id = document.getElementById('id-input').value;
-            if(!id) return;
-
-            const { data, error } = await sb.from('perfis').select('*').eq('id', id).single();
-            if(error || !data) return alert("ID inexistente.");
-
-            currentUser = data;
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            document.getElementById('navbar').style.display = 'flex';
-
-            renderMenu(id);
-        }
-
-        function renderMenu(id) {
-            const nav = document.getElementById('navbar');
-            if(id === ADMIN_ID) {
-                document.getElementById('admin-section').style.display = 'block';
-                document.getElementById('user-section').style.display = 'none';
-                nav.innerHTML = `
-                    <a href="#" class="nav-item active" onclick="tab('feed-adm', this)"><span class="nav-icon">🏠</span>FEED</a>
-                    <a href="#" class="nav-item" onclick="tab('stats', this)"><span class="nav-icon">📊</span>STATS</a>
-                    <a href="#" class="nav-item" onclick="tab('admin', this)"><span class="nav-icon">⚙️</span>ADMIN</a>
-                `;
-                tab('feed-adm', nav.children[0]);
-            } else {
-                document.getElementById('admin-section').style.display = 'none';
-                document.getElementById('user-section').style.display = 'block';
-                nav.innerHTML = `
-                    <a href="#" class="nav-item active" onclick="tab('home', this)"><span class="nav-icon">🏠</span>HOME</a>
-                    <a href="#" class="nav-item" onclick="tab('postar', this)"><span class="nav-icon">➕</span>POSTAR</a>
-                    <a href="#" class="nav-item" onclick="tab('perfil', this)"><span class="nav-icon">👤</span>PERFIL</a>
-                `;
-                tab('home', nav.children[0]);
-            }
-        }
-
-        function tab(name, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById('p-' + name).classList.add('active');
-            el.classList.add('active');
-
-            if(name === 'home' || name === 'feed-adm') loadFeed(name);
-            if(name === 'stats') loadStats();
-            if(name === 'admin') loadAdminTable();
-        }
-
-        async function loadFeed(divId) {
-            if(currentUser.id !== ADMIN_ID) {
-                document.getElementById('u-saldo').innerText = currentUser.saldo.toFixed(4) + "€";
-                document.getElementById('u-xp').innerText = currentUser.xp || 0;
-            }
-            const { data } = await sb.from('posts').select('*').order('created_at', { ascending: false });
-            const target = divId === 'home' ? 'user-feed' : 'admin-feed';
-            document.getElementById(target).innerHTML = data.map(p => `
-                <div class="post">
-                    <div class="post-header">UID: ${p.user_id}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    <div class="post-content">${p.content || ''}</div>
-                    <div class="post-footer"><span>👍 ${p.likes || 0}</span><span>💬 ${p.comments || 0}</span></div>
-                </div>
-            `).join('');
-        }
-
-        async function loadStats() {
-            const { data: users } = await sb.from('perfis').select('id');
-            const { count } = await sb.from('posts').select('*', { count: 'exact', head: true });
-            document.getElementById('s-users').innerText = users.length;
-            document.getElementById('s-posts').innerText = count;
-        }
-
-        async function loadAdminTable() {
-            const { data } = await sb.from('perfis').select('*').order('saldo', { ascending: false });
-            document.getElementById('admin-tbody').innerHTML = data.map(u => `
+<section id="p-admin" class="page">
+    <h3 style="color:#ff3333; margin-bottom:15px; font-size:12px;">GESTOR DE CARTEIRAS</h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
                 <tr>
-                    <td>${u.id}</td>
-                    <td>${(u.saldo || 0).toFixed(4)}€</td>
-                    <td><button class="btn-ban" onclick="ban('${u.id}')">BANIR</button></td>
+                    <th>ID_USER</th>
+                    <th>SALDO (€)</th>
+                    <th>AÇÕES</th>
                 </tr>
-            `).join('');
+            </thead>
+            <tbody id="admin-tbody"></tbody>
+        </table>
+    </div>
+</section>
+
+<nav class="nav-bar">
+    <a href="#" class="nav-btn active" onclick="nav('feed', this)"><span class="nav-icon">📱</span>FEED</a>
+    <a href="#" class="nav-btn" onclick="nav('stats', this)"><span class="nav-icon">📊</span>STATS</a>
+    <a href="#" class="nav-btn" onclick="nav('admin', this)"><span class="nav-icon">⚙️</span>ADMIN</a>
+</nav>
+
+<script>
+    const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+    const sb = supabase.createClient(SB_URL, SB_KEY);
+
+    function nav(page, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('p-' + page).classList.add('active');
+        el.classList.add('active');
+
+        if(page === 'feed') loadFeed();
+        if(page === 'stats') loadStats();
+        if(page === 'admin') loadAdmin();
+    }
+
+    async function loadFeed() {
+        const { data } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+        const container = document.getElementById('feed-list');
+        container.innerHTML = data.map(p => `
+            <div class="post-card">
+                <div class="post-header">
+                    <span>UID: ${p.user_id}</span>
+                    <span>${new Date(p.created_at).toLocaleDateString()}</span>
+                </div>
+                ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                <div class="post-body">${p.content || ''}</div>
+                <div class="post-footer">
+                    <span>👍 ${p.likes || 0}</span>
+                    <span>💬 ${p.comments || 0}</span>
+                    <span style="color:#ff3333; margin-left:auto" onclick="deletePost('${p.id}')">APAGAR</span>
+                </div>
+            </div>
+        `).join('') || 'Sem posts para exibir.';
+    }
+
+    async function loadStats() {
+        const { data: users } = await sb.from('perfis').select('saldo');
+        const { count: postCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
+        let debt = users.reduce((acc, u) => acc + (u.saldo || 0), 0);
+        document.getElementById('count-users').innerText = users.length;
+        document.getElementById('count-posts').innerText = postCount;
+        document.getElementById('total-debt').innerText = debt.toFixed(4) + "€";
+    }
+
+    async function loadAdmin() {
+        const { data: users } = await sb.from('perfis').select('*').order('saldo', { ascending: false });
+        const tbody = document.getElementById('admin-tbody');
+        tbody.innerHTML = users.map(u => `
+            <tr>
+                <td>${u.id}</td>
+                <td><b>${(u.saldo || 0).toFixed(4)}€</b></td>
+                <td>
+                    <button class="btn-pay" onclick="resetSaldo('${u.id}')">PAY</button>
+                    <button class="btn-ban" onclick="banUser('${u.id}')">BAN</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function deletePost(id) {
+        if(confirm("Apagar esta publicação definitivamente?")) {
+            await sb.from('posts').delete().eq('id', id);
+            loadFeed();
         }
-    </script>
+    }
+
+    async function resetSaldo(id) {
+        if(confirm("Zerar saldo do utilizador?")) {
+            await sb.from('perfis').update({ saldo: 0 }).eq('id', id);
+            loadAdmin();
+        }
+    }
+
+    async function banUser(id) {
+        if(confirm("Banir utilizador " + id + "?")) {
+            await sb.from('perfis').delete().eq('id', id);
+            loadAdmin();
+        }
+    }
+
+    // Inicialização
+    loadFeed();
+</script>
+
 </body>
 </html>
