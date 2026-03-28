@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.22</title>
+    <title>Apex Social v33.23 - Sistema de Recompensas</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -14,17 +14,16 @@
             --text-main: #1C1E21;
             --text-secondary: #65676B;
             --border-color: #CED0D4;
-            --success-green: #16a34a;
+            --success: #16a34a;
         }
 
         body { 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background: var(--fb-bg); 
             margin: 0; padding-top: 95px; padding-bottom: 80px; 
-            color: var(--text-main);
         }
 
-        /* HEADER FIXO */
+        /* HEADER & STATUS */
         header {
             position: fixed; top: 0; left: 0; right: 0; background: #fff;
             height: 65px; display: flex; align-items: center; justify-content: space-between;
@@ -37,7 +36,22 @@
             font-size: 10px; font-weight: 800; border-bottom: 1px solid var(--border-color); z-index: 999;
         }
 
-        /* NAVEGAÇÃO INFERIOR */
+        /* FEED CARDS */
+        .post-card {
+            background: var(--card-bg); border-radius: 8px; margin-bottom: 12px;
+            padding: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            max-width: 500px; margin-left: auto; margin-right: auto;
+        }
+        .post-header { display: flex; align-items: center; margin-bottom: 12px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e4e6eb; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .post-content { font-size: 14px; margin-bottom: 10px; word-wrap: break-word; }
+        .post-image { width: calc(100% + 24px); margin-left: -12px; max-height: 450px; object-fit: cover; }
+        
+        /* ACTIONS & REWARDS */
+        .post-actions { display: flex; border-top: 1px solid #eee; margin-top: 10px; padding-top: 5px; }
+        .action-btn { flex: 1; background: none; border: none; padding: 10px; color: var(--text-secondary); font-weight: 600; font-size: 13px; cursor: pointer; border-radius: 4px; }
+        .action-btn:active { background: #f0f2f5; transform: scale(0.98); }
+
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
             height: 70px; display: flex; justify-content: space-around;
@@ -46,27 +60,10 @@
         .nav-item { flex: 1; text-align: center; font-size: 10px; font-weight: 900; color: #9ca3af; cursor: pointer; }
         .nav-item.active { color: var(--google-blue); }
 
-        /* CONTAINERS DE ABA */
         .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; padding: 10px; }
         .tab-content.active { display: block; }
-
-        /* FEED STYLE (EXATO) */
-        .post-card {
-            background: var(--card-bg); border-radius: 8px; margin-bottom: 12px;
-            padding: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        .post-header { display: flex; align-items: center; margin-bottom: 12px; }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e4e6eb; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #65676B; }
-        .post-content { font-size: 14px; line-height: 1.4; margin-bottom: 10px; word-wrap: break-word; }
-        .post-image { width: calc(100% + 24px); margin-left: -12px; max-height: 450px; object-fit: cover; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
         
-        /* BOTÕES DE INTERAÇÃO */
-        .post-actions { display: flex; border-top: 1px solid #eee; margin-top: 10px; padding-top: 5px; }
-        .action-btn { flex: 1; background: none; border: none; padding: 10px; color: var(--text-secondary); font-weight: 600; font-size: 13px; cursor: pointer; border-radius: 4px; }
-        .action-btn:active { background: #f0f2f5; }
-
         .btn-apex { width: 100%; background: var(--google-blue); color: white; border: none; padding: 15px; border-radius: 16px; font-weight: 900; cursor: pointer; }
-        .hidden { display: none !important; }
         .ad-card { background: #f9f9f9; text-align: center; padding: 15px; margin-bottom: 12px; border-radius: 8px; font-size: 10px; color: #999; border: 1px dashed #ccc; }
     </style>
 </head>
@@ -77,17 +74,15 @@
             <div style="background:var(--google-blue); color:white; padding:8px; border-radius:8px; font-weight:900;">S</div>
             <div>
                 <h1 style="font-size:11px; font-weight:900; color:var(--google-blue); margin:0;">Social Earn</h1>
-                <p id="loc-tag" style="font-size:8px; color:#ccc; margin:0;">Detecting...</p>
+                <p id="loc-tag" style="font-size:8px; color:#ccc; margin:0;">REGION...</p>
             </div>
         </div>
-        <div style="text-align:right;">
-            <div id="main-balance" style="font-weight:900; color:var(--success-green); font-size:20px;">0.0000€</div>
-        </div>
+        <div id="main-balance" style="font-weight:900; color:var(--success); font-size:20px;">0.0000€</div>
     </header>
 
     <div class="status-header-fixed">
-        <span id="status-text" style="color:var(--success-green);">GANHOS ATIVOS</span>
-        <button onclick="logout()" style="margin-left:auto; background:none; border:none; font-size:8px; color:#ccc; font-weight:900; cursor:pointer;">SAIR</button>
+        <span style="color:var(--success);">SISTEMA DE PAGAMENTOS ATIVO</span>
+        <button onclick="logout()" style="margin-left:auto; background:none; border:none; font-size:8px; color:#ccc; font-weight:900;">SAIR</button>
     </div>
 
     <main>
@@ -95,23 +90,17 @@
             <div id="feed-render"></div>
         </section>
 
-        <section id="tab-ranking" class="tab-content">
-            <h2 style="font-size:12px; font-weight:900;">RANKING</h2>
-            <div id="ranking-list"></div>
-        </section>
-
         <section id="tab-wallet" class="tab-content">
             <div style="background:white; padding:25px; border-radius:20px; text-align:center; border:1px solid #eee;">
-                <p style="font-size:10px; color:#999; font-weight:900;">SALDO DISPONÍVEL</p>
-                <h3 id="wallet-balance" style="font-size:28px; color:var(--success-green); margin:15px 0;">0.0000€</h3>
-                <button class="btn-apex" onclick="alert('Pedido de levantamento enviado!')">LEVANTAR</button>
+                <p style="font-size:10px; color:#999; font-weight:900;">SALDO NA CARTEIRA</p>
+                <h3 id="wallet-balance" style="font-size:28px; color:var(--success); margin:15px 0;">0.0000€</h3>
+                <button class="btn-apex" onclick="alert('Solicitação de levantamento enviada!')">LEVANTAR</button>
             </div>
         </section>
     </main>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="nav('feed', this)">🏠<br>FEED</div>
-        <div class="nav-item" onclick="nav('ranking', this)">🏆<br>RANKING</div>
         <div class="nav-item" onclick="nav('wallet', this)">💰<br>CARTEIRA</div>
     </nav>
 
@@ -122,10 +111,15 @@
         
         let myID = localStorage.getItem('apex_uid');
         let mySaldo = 0;
-        let userLocale = { rate: 1, symbol: '€' };
+        let locale = { rate: 1, symbol: '€' };
 
-        // VALORES EXATOS DAS RECOMPENSAS (CONVERTIDOS DE XP PARA MOEDA)
-        const REWARDS = { post: 0.0015, like: 0.0002, share: 0.0005 };
+        // RECOMPENSAS DIRETAS (Conforme Especificação v32/v33)
+        const REWARDS = {
+            like: 0.0002,    // Correspondente a +2 pontos
+            comment: 0.0002, // Correspondente a +2 pontos
+            share: 0.0005,   // Correspondente a +5 pontos
+            post: 0.0015     // Correspondente a +15 pontos
+        };
 
         async function init() {
             if(!myID) { 
@@ -142,7 +136,7 @@
             try {
                 const res = await fetch('https://ipapi.co/json/');
                 const data = await res.json();
-                if(data.country_code === 'BR') { userLocale = { rate: 6.12, symbol: 'R$' }; }
+                if(data.country_code === 'BR') { locale = { rate: 6.12, symbol: 'R$' }; }
                 document.getElementById('loc-tag').innerText = `REGION: ${data.country_code}`;
             } catch(e) {}
         }
@@ -154,12 +148,12 @@
         }
 
         function updateUI() {
-            const val = (mySaldo * userLocale.rate).toFixed(4);
-            document.getElementById('main-balance').innerText = `${userLocale.symbol}${val}`;
-            document.getElementById('wallet-balance').innerText = `${userLocale.symbol}${val}`;
+            const val = (mySaldo * locale.rate).toFixed(4);
+            document.getElementById('main-balance').innerText = `${locale.symbol}${val}`;
+            document.getElementById('wallet-balance').innerText = `${locale.symbol}${val}`;
         }
 
-        async function addMoney(amt) {
+        async function addCredit(amt) {
             mySaldo += amt;
             await sb.from('perfis').update({ saldo: mySaldo }).eq('id', myID);
             updateUI();
@@ -180,30 +174,29 @@
                     <div class="post-content">${p.content || ''}</div>
                     ${p.image_url ? `<img src="${p.image_url}" class="post-image">` : ''}
                     <div class="post-actions">
-                        <button class="action-btn" onclick="handleLike(this)">👍 Gosto</button>
-                        <button class="action-btn" onclick="handleComment()">💬 Comentar</button>
-                        <button class="action-btn" onclick="handleShare()">↗ Partilhar</button>
+                        <button class="action-btn" onclick="rewardAction('like', this)">👍 Gosto</button>
+                        <button class="action-btn" onclick="rewardAction('comment', this)">💬 Comentar</button>
+                        <button class="action-btn" onclick="rewardAction('share', this)">↗ Partilhar</button>
                     </div>
                 `;
                 cont.appendChild(card);
-                if((i+1)%3===0) cont.innerHTML += `<div class="ad-card">ANÚNCIO PATROCINADO</div>`;
+                if((i+1)%3===0) cont.innerHTML += `<div class="ad-card">ANÚNCIO - MONETIZAÇÃO ATIVA</div>`;
             });
         }
 
-        function handleLike(btn) {
-            btn.style.color = "#4285F4";
-            btn.innerHTML = "💙 Gostei";
-            addMoney(REWARDS.like);
-        }
-
-        function handleComment() {
-            const msg = prompt("Escreva o seu comentário:");
-            if(msg) { addMoney(REWARDS.like); alert("Comentário publicado!"); }
-        }
-
-        function handleShare() {
-            addMoney(REWARDS.share);
-            alert("Link de convite copiado!");
+        // SISTEMA DE RECOMPENSA POR INTERAÇÃO
+        function rewardAction(type, btn) {
+            if(type === 'like') {
+                btn.style.color = "#4285F4";
+                btn.innerHTML = "💙 Gostei";
+                addCredit(REWARDS.like);
+            } else if(type === 'comment') {
+                const msg = prompt("O seu comentário:");
+                if(msg) { addCredit(REWARDS.comment); alert("Comentário recompensado!"); }
+            } else if(type === 'share') {
+                addCredit(REWARDS.share);
+                alert("Link de convite partilhado! Recompensa creditada.");
+            }
         }
 
         function nav(t, el) {
