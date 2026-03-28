@@ -3,182 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>APEX C&C CENTER - ADMIN</title>
+    <title>Social Earn Network v33.12</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #fff; padding-bottom: 90px; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #fff; }
 
-        /* HEADER */
-        header { 
-            background: #000; padding: 15px; border-bottom: 2px solid #004400; 
-            display: flex; justify-content: center; align-items: center;
-            position: sticky; top: 0; z-index: 1000;
+        /* --- NOVO SISTEMA DE ENTRADA (ESTILO 12:29) --- */
+        #login-screen { 
+            position: fixed; inset: 0; background: #fff; z-index: 5000; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; 
         }
-        .header-title { font-size: 14px; font-weight: 900; letter-spacing: 2px; color: #00ff00; }
+        .logo-box {
+            background: #2962ff; width: 100px; height: 100px; border-radius: 25px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 20px rgba(41, 98, 255, 0.3); margin-bottom: 25px;
+        }
+        .logo-box span { color: #fff; font-size: 50px; font-weight: 900; font-style: italic; }
+        .login-title { color: #2962ff; font-weight: 800; font-size: 14px; letter-spacing: 1px; margin-bottom: 40px; text-transform: uppercase; }
+        
+        #id-input { 
+            width: 100%; max-width: 400px; padding: 20px; text-align: center;
+            border: 2px solid #2962ff; border-radius: 20px; font-size: 22px; font-weight: bold;
+            color: #333; margin-bottom: 20px; outline: none;
+        }
+        .btn-entrar { 
+            width: 100%; max-width: 400px; padding: 20px; background: #2962ff; 
+            color: #fff; border: none; border-radius: 20px; font-size: 16px; 
+            font-weight: 800; text-transform: uppercase; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(41, 98, 255, 0.4);
+        }
 
-        /* ABAS */
-        .page { display: none; padding: 15px; width: 100%; max-width: 500px; margin: 0 auto; }
+        /* --- INTERFACE UTILIZADOR (ESTILO ESTA.JPG) --- */
+        .user-body { background: #f0f2f5; }
+        .user-header { background: #fff; padding: 15px; border-bottom: 1px solid #ddd; display: flex; align-items: center; justify-content: space-between; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .u-balance b { color: #00a859; font-size: 20px; display: block; }
+        .u-balance span { font-size: 10px; color: #999; text-align: right; display: block; }
+        
+        .user-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; border-top: 1px solid #eee; height: 65px; z-index: 1000; }
+        .user-nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #4285F4; font-size: 12px; text-decoration: none; border-bottom: 3px solid transparent; }
+        .user-nav-item.active { border-bottom: 3px solid #4285F4; }
+
+        /* --- INTERFACE ADMIN (ESTILO HACKER) --- */
+        .admin-body { background: #000; color: #0f0; font-family: 'Courier New', monospace; }
+        .hacker-card { background: #0a0a0a; border: 1px solid #0f0; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
+
+        /* GERAIS */
+        .container { padding: 80px 15px 80px 15px; max-width: 500px; margin: 0 auto; display: none; }
+        .page { display: none; }
         .page.active { display: block; }
-
-        /* FEED SEM ANÚNCIOS (VISUALIZAÇÃO ADMIN) */
-        .post-card { background: #111; border: 1px solid #222; border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
-        .post-header { padding: 10px; font-size: 12px; color: #888; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
-        .post-body { padding: 15px; font-size: 15px; line-height: 1.4; }
-        .post-img { width: 100%; display: block; background: #1a1a1a; max-height: 400px; object-fit: cover; }
-        .post-footer { padding: 10px; background: #0d0d0d; display: flex; gap: 15px; font-size: 13px; color: #00ff00; font-weight: bold; }
-
-        /* STATS CARDS */
-        .stat-card { background: #111; border: 1px solid #004400; padding: 20px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid #00ff00; }
-        .stat-val { font-size: 24px; font-weight: 900; }
-        .stat-label { font-size: 10px; text-transform: uppercase; color: #00ff00; margin-bottom: 5px; }
-
-        /* ADMIN TABLE */
-        .table-wrap { overflow-x: auto; background: #111; border-radius: 8px; border: 1px solid #222; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { background: #002200; text-align: left; padding: 12px; color: #00ff00; }
-        td { padding: 12px; border-bottom: 1px solid #222; }
-        .btn-ban { color: #ff3333; background: none; border: 1px solid #ff3333; padding: 5px; border-radius: 4px; font-weight: bold; font-size: 10px; }
-        .btn-pay { color: #00ff00; background: none; border: 1px solid #00ff00; padding: 5px; border-radius: 4px; font-weight: bold; font-size: 10px; margin-right: 5px; }
-
-        /* NAVBAR */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: #000; height: 75px; display: flex; border-top: 2px solid #004400; z-index: 1000; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #444; font-size: 9px; font-weight: 900; }
-        .nav-btn.active { color: #00ff00; background: rgba(0, 255, 0, 0.05); }
-        .nav-icon { font-size: 18px; margin-bottom: 3px; }
+        .user-card { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .post-img { width: 100%; border-radius: 20px; margin: 10px 0; display: block; }
     </style>
 </head>
-<body>
+<body id="main-body">
 
-<header>
-    <div class="header-title">APEX SOCIAL :: COMMAND CENTER</div>
-</header>
-
-<section id="p-feed" class="page active">
-    <div id="feed-list">Carregando feed de monitorização...</div>
-</section>
-
-<section id="p-stats" class="page">
-    <div class="stat-card">
-        <div class="stat-label">Utilizadores Ativos</div>
-        <div id="count-users" class="stat-val">0</div>
+    <div id="login-screen">
+        <div class="logo-box"><span>S</span></div>
+        <div class="login-title">Social Earn Network</div>
+        <input type="number" id="id-input" placeholder="000" oninput="if(this.value.length > 10) this.value = this.value.slice(0,10)">
+        <button class="btn-entrar" onclick="autenticar()">Entrar no Sistema</button>
     </div>
-    <div class="stat-card">
-        <div id="total-debt" class="stat-val">0.0000€</div>
-        <div class="stat-label">Dívida Global (EUR)</div>
-    </div>
-    <div class="stat-card" style="border-left-color: #555;">
-        <div id="count-posts" class="stat-val">0</div>
-        <div class="stat-label">Posts Totais</div>
-    </div>
-</section>
 
-<section id="p-admin" class="page">
-    <h3 style="color:#ff3333; margin-bottom:15px; font-size:12px;">GESTOR DE CARTEIRAS</h3>
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID_USER</th>
-                    <th>SALDO (€)</th>
-                    <th>AÇÕES</th>
-                </tr>
-            </thead>
-            <tbody id="admin-tbody"></tbody>
-        </table>
-    </div>
-</section>
+    <header id="app-header" style="display:none"></header>
+    
+    <div id="app-container" class="container">
+        </div>
 
-<nav class="nav-bar">
-    <a href="#" class="nav-btn active" onclick="nav('feed', this)"><span class="nav-icon">📱</span>FEED</a>
-    <a href="#" class="nav-btn" onclick="nav('stats', this)"><span class="nav-icon">📊</span>STATS</a>
-    <a href="#" class="nav-btn" onclick="nav('admin', this)"><span class="nav-icon">⚙️</span>ADMIN</a>
-</nav>
+    <nav id="app-nav" style="display:none"></nav>
 
-<script>
-    const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-    const sb = supabase.createClient(SB_URL, SB_KEY);
+    <script>
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const sb = supabase.createClient(SB_URL, SB_KEY);
 
-    function nav(page, el) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('p-' + page).classList.add('active');
-        el.classList.add('active');
+        const ADMIN_ID = "5401881400"; // [cite: 2026-03-26]
+        let user = null;
 
-        if(page === 'feed') loadFeed();
-        if(page === 'stats') loadStats();
-        if(page === 'admin') loadAdmin();
-    }
+        async function autenticar() {
+            const id = document.getElementById('id-input').value;
+            if(!id) return;
 
-    async function loadFeed() {
-        const { data } = await sb.from('posts').select('*').order('created_at', { ascending: false });
-        const container = document.getElementById('feed-list');
-        container.innerHTML = data.map(p => `
-            <div class="post-card">
-                <div class="post-header">
-                    <span>UID: ${p.user_id}</span>
-                    <span>${new Date(p.created_at).toLocaleDateString()}</span>
+            const { data, error } = await sb.from('perfis').select('*').eq('id', id).single();
+            if(error || !data) return alert("ID não encontrado.");
+
+            user = data;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-header').style.display = 'flex';
+            document.getElementById('app-container').style.display = 'block';
+            document.getElementById('app-nav').style.display = 'flex';
+            
+            configurarInterface(id === ADMIN_ID);
+        }
+
+        function configurarInterface(isAdmin) {
+            const body = document.getElementById('main-body');
+            const header = document.getElementById('app-header');
+            const nav = document.getElementById('app-nav');
+
+            if(isAdmin) {
+                body.className = "admin-body";
+                header.className = "user-header"; // Mantemos cabeçalho mas com estilo admin
+                header.style.background = "#000";
+                header.innerHTML = "<b style='color:#0f0'>APEX SOCIAL :: COMMAND CENTER</b>";
+                nav.className = "user-nav"; 
+                nav.style.background = "#000";
+                nav.innerHTML = `
+                    <a href="#" class="user-nav-item active" style="color:#0f0" onclick="tab('adm-feed', this)">FEED</a>
+                    <a href="#" class="user-nav-item" style="color:#0f0" onclick="tab('adm-stats', this)">STATS</a>
+                    <a href="#" class="user-nav-item" style="color:#0f0" onclick="tab('adm-painel', this)">ADMIN</a>
+                `;
+                showPage('adm-feed');
+            } else {
+                body.className = "user-body";
+                header.className = "user-header";
+                header.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px">
+                        <div style="background:#2962ff; color:#fff; padding:6px 10px; border-radius:8px; font-weight:900">S</div>
+                        <b style="color:#2962ff; font-size:14px">SOCIAL EARN</b>
+                    </div>
+                    <div class="u-balance">
+                        <b>${user.saldo.toFixed(4)}€</b>
+                        <span>${(user.saldo * 6.1).toFixed(4)} BRL</span>
+                    </div>
+                `;
+                nav.className = "user-nav";
+                nav.innerHTML = `
+                    <a href="#" class="user-nav-item active" onclick="tab('u-feed', this)">FEED</a>
+                    <a href="#" class="user-nav-item" onclick="tab('u-carteira', this)">CARTEIRA</a>
+                `;
+                showPage('u-feed');
+            }
+        }
+
+        function showPage(pageId) {
+            const container = document.getElementById('app-container');
+            if(pageId === 'u-feed') {
+                container.innerHTML = `
+                    <div style="color:#00a859; font-size:10px; font-weight:bold; margin-bottom:15px">GANHOS ATIVOS: 100%</div>
+                    <div class="user-card" style="display:flex; align-items:center; gap:10px; color:#999; font-weight:bold; font-size:12px">
+                        <div style="background:#f0f2f5; padding:8px; border-radius:50%">👤</div> O QUE QUER PARTILHAR AGORA?
+                    </div>
+                    <div id="feed-lista"></div>
+                `;
+                carregarFeed(false);
+            } else if(pageId === 'adm-painel') {
+                container.innerHTML = `<p style="color:red; font-weight:bold; margin-bottom:15px">GESTOR DE CARTEIRAS</p><div id="admin-lista"></div>`;
+                carregarAdminLista();
+            }
+        }
+
+        async function carregarFeed(isAdmin) {
+            const { data } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+            document.getElementById('feed-lista').innerHTML = data.map(p => `
+                <div class="${isAdmin ? 'hacker-card' : 'user-card'}">
+                    <b style="font-size:14px">${p.content || 'GGHH'}</b>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                    <div style="display:flex; justify-content:space-around; border-top:1px solid #eee; padding-top:12px; margin-top:10px">
+                        <span style="color:#888; font-size:11px; font-weight:bold">👍 GOSTAR</span>
+                        <span style="color:#888; font-size:11px; font-weight:bold">💬 COMENTAR</span>
+                        <span style="color:#888; font-size:11px; font-weight:bold">🔗 PARTILHAR</span>
+                    </div>
                 </div>
-                ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                <div class="post-body">${p.content || ''}</div>
-                <div class="post-footer">
-                    <span>👍 ${p.likes || 0}</span>
-                    <span>💬 ${p.comments || 0}</span>
-                    <span style="color:#ff3333; margin-left:auto" onclick="deletePost('${p.id}')">APAGAR</span>
-                </div>
-            </div>
-        `).join('') || 'Sem posts para exibir.';
-    }
-
-    async function loadStats() {
-        const { data: users } = await sb.from('perfis').select('saldo');
-        const { count: postCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
-        let debt = users.reduce((acc, u) => acc + (u.saldo || 0), 0);
-        document.getElementById('count-users').innerText = users.length;
-        document.getElementById('count-posts').innerText = postCount;
-        document.getElementById('total-debt').innerText = debt.toFixed(4) + "€";
-    }
-
-    async function loadAdmin() {
-        const { data: users } = await sb.from('perfis').select('*').order('saldo', { ascending: false });
-        const tbody = document.getElementById('admin-tbody');
-        tbody.innerHTML = users.map(u => `
-            <tr>
-                <td>${u.id}</td>
-                <td><b>${(u.saldo || 0).toFixed(4)}€</b></td>
-                <td>
-                    <button class="btn-pay" onclick="resetSaldo('${u.id}')">PAY</button>
-                    <button class="btn-ban" onclick="banUser('${u.id}')">BAN</button>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    async function deletePost(id) {
-        if(confirm("Apagar esta publicação definitivamente?")) {
-            await sb.from('posts').delete().eq('id', id);
-            loadFeed();
+            `).join('');
         }
-    }
 
-    async function resetSaldo(id) {
-        if(confirm("Zerar saldo do utilizador?")) {
-            await sb.from('perfis').update({ saldo: 0 }).eq('id', id);
-            loadAdmin();
+        function tab(name, el) {
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            el.classList.add('active');
+            showPage(name);
         }
-    }
-
-    async function banUser(id) {
-        if(confirm("Banir utilizador " + id + "?")) {
-            await sb.from('perfis').delete().eq('id', id);
-            loadAdmin();
-        }
-    }
-
-    // Inicialização
-    loadFeed();
-</script>
-
+    </script>
 </body>
 </html>
