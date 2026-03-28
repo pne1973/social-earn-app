@@ -1,101 +1,94 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social Admin - Feed View</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        :root { --google-blue: #4285F4; --fb-bg: #F0F2F5; --card-bg: #FFFFFF; --text-gray: #65676B; }
+<style>
+    .admin-section { padding: 20px; display: none; }
+    .stats-card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #ddd; }
+    .admin-table { width: 100%; border-collapse: collapse; background: white; font-size: 12px; }
+    .admin-table th, .admin-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .admin-table th { background: #f4f4f4; }
+</style>
+
+<main id="tab-feed">
+    <div id="posts-container"></div>
+</main>
+
+<main id="tab-stats" class="admin-section">
+    <h2 style="color:var(--google-blue)">Estatísticas Globais</h2>
+    <div id="stats-content">Carregando dados...</div>
+</main>
+
+<main id="tab-admin" class="admin-section">
+    <h2 style="color:red">Painel de Controlo</h2>
+    <div style="overflow-x:auto">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Saldo (€)</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="admin-users-list"></tbody>
+        </table>
+    </div>
+</main>
+
+<nav class="bottom-nav">
+    <a href="javascript:void(0)" class="nav-link active" onclick="showTab('feed', this)">🏠<br>FEED</a>
+    <a href="javascript:void(0)" class="nav-link" onclick="showTab('stats', this)">📊<br>ESTATÍSTICAS</a>
+    <a href="javascript:void(0)" class="nav-link" style="color:red" onclick="showTab('admin', this)">⚙️<br>PAINEL ADMIN</a>
+</nav>
+
+<script>
+    // Função para trocar as abas (Tabs)
+    function showTab(tabName, el) {
+        // Esconder todas
+        document.getElementById('tab-feed').style.display = 'none';
+        document.getElementById('tab-stats').style.display = 'none';
+        document.getElementById('tab-admin').style.display = 'none';
         
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--fb-bg); margin: 0; padding-top: 60px; padding-bottom: 75px; }
+        // Remover classe ativa
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        
+        // Mostrar a selecionada
+        document.getElementById('tab-' + tabName).style.display = 'block';
+        el.classList.add('active');
 
-        /* HEADER LIMPO (ADMIN VIEW) */
-        header {
-            position: fixed; top: 0; width: 100%; background: #fff; height: 60px;
-            display: flex; align-items: center; justify-content: center;
-            border-bottom: 1px solid #ddd; z-index: 1000;
+        if(tabName === 'stats') loadStats();
+        if(tabName === 'admin') loadAdminPanel();
+    }
+
+    // Carregar Estatísticas (Total de Users e Posts)
+    async function loadStats() {
+        const { count: userCount } = await sb.from('perfis').select('*', { count: 'exact', head: true });
+        const { count: postCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
+        
+        document.getElementById('stats-content').innerHTML = `
+            <div class="stats-card"><b>Utilizadores Totais:</b> ${userCount}</div>
+            <div class="stats-card"><b>Publicações Ativas:</b> ${postCount}</div>
+        `;
+    }
+
+    // Carregar Lista de Utilizadores para o Admin
+    async function loadAdminPanel() {
+        const { data: users } = await sb.from('perfis').select('*').order('saldo', { ascending: false });
+        const list = document.getElementById('admin-users-list');
+        list.innerHTML = '';
+
+        users.forEach(u => {
+            list.innerHTML += `
+                <tr>
+                    <td>${u.id}</td>
+                    <td>${u.saldo.toFixed(4)}€</td>
+                    <td><button onclick="deleteUser('${u.id}')" style="color:red; font-size:10px">Banir</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    // Função de moderação simples
+    async function deleteUser(id) {
+        if(confirm("Deseja banir este utilizador?")) {
+            await sb.from('perfis').delete().eq('id', id);
+            loadAdminPanel();
         }
-        .logo { font-weight: 900; color: var(--google-blue); font-size: 20px; }
-
-        /* CONTEÚDO DO FEED */
-        .post-card { background: var(--card-bg); margin-bottom: 10px; border-bottom: 1px solid #ddd; }
-        .post-header { display: flex; align-items: center; padding: 12px; }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e4e6eb; margin-right: 10px; }
-        .post-content { padding: 0 12px 12px 12px; font-size: 15px; }
-        .post-image { width: 100%; display: block; background: #eee; }
-
-        /* CONTABILIZAÇÃO DE INTERAÇÕES */
-        .interaction-stats { 
-            display: flex; padding: 10px 12px; border-top: 1px solid #f0f2f5; 
-            justify-content: space-around; color: var(--text-gray); font-size: 14px;
-        }
-        .stat-item { display: flex; align-items: center; gap: 5px; font-weight: 600; }
-
-        /* BALÕES DE COMENTÁRIO */
-        .comments-section { padding: 10px 12px; background: #fafafa; }
-        .balloon { 
-            background: #E4E6EB; border-radius: 18px; padding: 8px 15px; 
-            font-size: 13px; margin-bottom: 5px; display: inline-block; clear: both;
-        }
-
-        /* NAVEGAÇÃO ADMIN */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; height: 70px; display: flex; border-top: 1px solid #ddd; }
-        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #9ca3af; text-decoration: none; }
-        .nav-link.active { color: var(--google-blue); }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="logo">APEX SOCIAL</div>
-    </header>
-
-    <main id="feed-admin">
-        <div id="posts-container">
-            </div>
-    </main>
-
-    <nav class="bottom-nav">
-        <a href="#" class="nav-link active">🏠<br>FEED</a>
-        <a href="#" class="nav-link">📊<br>ESTATÍSTICAS</a>
-        <a href="#" class="nav-link" style="color:red">⚙️<br>PAINEL ADMIN</a>
-    </nav>
-
-    <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const sb = supabase.createClient(SB_URL, SB_KEY);
-
-        async function fetchFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', { ascending: false });
-            const container = document.getElementById('posts-container');
-            container.innerHTML = '';
-
-            posts.forEach(post => {
-                const card = document.createElement('div');
-                card.className = 'post-card';
-                card.innerHTML = `
-                    <div class="post-header">
-                        <div class="user-avatar"></div>
-                        <div style="font-weight:700;">ID: ${post.user_id}</div>
-                    </div>
-                    <div class="post-content">${post.content || ''}</div>
-                    ${post.image_url ? `<img src="${post.image_url}" class="post-image">` : ''}
-                    <div class="interaction-stats">
-                        <div class="stat-item">👍 <span>${post.likes_count || 0}</span></div>
-                        <div class="stat-item">💬 <span>${post.comments_count || 1}</span></div>
-                    </div>
-                    <div class="comments-section">
-                        <div class="balloon">Comentário monitorizado pelo Admin.</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        fetchFeed();
-    </script>
-</body>
-</html>
+    }
+</script>
