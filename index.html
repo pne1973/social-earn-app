@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.12 - Estável</title>
+    <title>Apex Social v33.28</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -11,88 +11,77 @@
             --google-blue: #4285F4;
             --fb-bg: #F0F2F5;
             --card-bg: #FFFFFF;
-            --text-secondary: #65676B;
             --border: #CED0D4;
             --success: #16a34a;
         }
 
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
             background: var(--fb-bg); 
             margin: 0; padding-top: 110px; padding-bottom: 80px; 
         }
 
-        /* HEADER OFICIAL */
+        /* HEADER & AD SYSTEM */
         header {
             position: fixed; top: 0; left: 0; right: 0; background: #fff;
-            height: 65px; display: flex; align-items: center; justify-content: space-between;
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 15px; z-index: 1000; border-bottom: 1px solid var(--border);
         }
 
-        .ad-injection-top {
-            position: fixed; top: 65px; left: 0; right: 0; background: #fff;
-            height: 40px; display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 800; color: #999; border-bottom: 1px solid var(--border); z-index: 999;
+        .ad-banner {
+            position: fixed; top: 60px; left: 0; right: 0; background: #fff;
+            height: 45px; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 800; color: #888; border-bottom: 1px solid var(--border); z-index: 999;
         }
 
-        /* FEED POST CARDS */
+        /* FEED & CARDS */
+        .feed-container { max-width: 500px; margin: 0 auto; padding: 0 10px; }
         .post-card {
-            background: var(--card-bg); border-radius: 8px; margin: 0 auto 12px auto;
-            max-width: 500px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            background: var(--card-bg); border-radius: 8px; margin-bottom: 12px;
+            border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         .post-header { display: flex; align-items: center; padding: 12px; }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e4e6eb; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .post-content { padding: 0 12px 12px 12px; font-size: 14px; line-height: 1.5; }
+        .user-icon { width: 38px; height: 38px; border-radius: 50%; background: #e4e6eb; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .post-body { padding: 0 12px 12px 12px; font-size: 14px; color: #1c1e21; }
         
-        /* INTERAÇÕES SOCIAIS */
-        .post-actions { display: flex; padding: 5px 12px; border-top: 1px solid #f0f2f5; border-bottom: 1px solid #f0f2f5; }
-        .action-btn { flex: 1; background: none; border: none; padding: 10px; color: var(--text-secondary); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        /* ACTIONS */
+        .post-actions { display: flex; border-top: 1px solid #f0f2f5; border-bottom: 1px solid #f0f2f5; }
+        .act-btn { flex: 1; background: none; border: none; padding: 10px; color: #65676b; font-weight: 600; font-size: 13px; cursor: pointer; }
 
-        /* SISTEMA DE BALÕES DE COMENTÁRIO */
-        .comments-container { background: #fff; padding: 10px; }
-        .comment-bubble { 
+        /* COMMENTS AREA (BALÕES) */
+        .comments-section { background: #fff; padding: 10px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+        .bubble-list { display: flex; flex-direction: column; gap: 6px; }
+        .bubble { 
             background: #F0F2F5; border-radius: 18px; padding: 8px 12px; 
-            margin-bottom: 5px; font-size: 13px; display: inline-block; max-width: 85%;
-            word-wrap: break-word;
+            font-size: 13px; max-width: 85%; align-self: flex-start;
         }
-        .comment-input-wrap { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
-        .comment-field { flex: 1; background: #F0F2F5; border: none; border-radius: 20px; padding: 10px 15px; font-size: 13px; }
+        
+        /* INPUT AREA */
+        .comment-box { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+        .comment-input { flex: 1; background: #F0F2F5; border: none; border-radius: 20px; padding: 9px 15px; font-size: 13px; }
 
-        /* NAVEGAÇÃO */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; height: 70px; display: flex; border-top: 1px solid #ddd; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #9ca3af; cursor: pointer; }
-        .nav-item.active { color: var(--google-blue); }
-
-        .tab-content { display: none; padding: 10px; }
-        .tab-content.active { display: block; }
+        /* BOTTOM NAV */
+        .navbar { position: fixed; bottom: 0; width: 100%; background: #fff; height: 70px; display: flex; border-top: 1px solid #ddd; z-index: 1000; }
+        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #9ca3af; text-decoration: none; }
+        .nav-link.active { color: var(--google-blue); }
     </style>
 </head>
 <body>
 
     <header>
         <div style="font-weight: 900; color: var(--google-blue); font-size: 18px;">Social Earn</div>
-        <div id="balance-header" style="font-weight: 900; color: var(--success); font-size: 18px;">0.0000€</div>
+        <div id="display-balance" style="font-weight: 900; color: var(--success); font-size: 18px;">0.0000€</div>
     </header>
 
-    <div class="ad-injection-top">ANÚNCIO PATROCINADO APEX</div>
+    <div class="ad-banner">PUBLICIDADE OFICIAL APEX</div>
 
-    <main>
-        <section id="tab-feed" class="tab-content active">
-            <div id="feed-container"></div>
-        </section>
-
-        <section id="tab-wallet" class="tab-content">
-            <div style="background: #fff; padding: 30px; border-radius: 20px; text-align: center; border: 1px solid #ddd;">
-                <p style="font-size: 10px; color: #999; font-weight: 900;">SALDO TOTAL</p>
-                <h2 id="wallet-balance" style="font-size: 32px; color: var(--success); margin: 10px 0;">0.0000€</h2>
-                <button style="width: 100%; background: var(--google-blue); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 900;">LEVANTAR</button>
-            </div>
-        </section>
+    <main class="feed-container">
+        <div id="post-feed"></div>
     </main>
 
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="nav('feed', this)">🏠<br>FEED</div>
-        <div class="nav-item" onclick="nav('wallet', this)">💰<br>CARTEIRA</div>
+    <nav class="navbar">
+        <a href="#" class="nav-link active">🏠<br>FEED</a>
+        <a href="#" class="nav-link">💰<br>CARTEIRA</a>
     </nav>
 
     <script>
@@ -100,89 +89,76 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const sb = supabase.createClient(SB_URL, SB_KEY);
         
-        let myID = localStorage.getItem('apex_uid') || "5401881400";
-        let mySaldo = 0;
+        let userID = localStorage.getItem('apex_uid') || "5401881400";
+        let userBalance = 0;
 
-        async function init() {
-            await syncUser();
-            renderPosts();
+        // VALORES ORIGINAIS DE RECOMPENSA
+        const RECOMPENSAS = { like: 0.0020, comment: 0.0050 };
+
+        async function start() {
+            const { data } = await sb.from('perfis').select('saldo').eq('id', userID).single();
+            if(data) userBalance = parseFloat(data.saldo);
+            refreshUI();
+            loadPosts();
         }
 
-        async function syncUser() {
-            const { data } = await sb.from('perfis').select('saldo').eq('id', myID).single();
-            if(data) mySaldo = parseFloat(data.saldo);
-            updateView();
+        function refreshUI() {
+            document.getElementById('display-balance').innerText = userBalance.toFixed(4) + "€";
         }
 
-        function updateView() {
-            const val = mySaldo.toFixed(4);
-            document.getElementById('balance-header').innerText = `${val}€`;
-            document.getElementById('wallet-balance').innerText = `${val}€`;
+        async function updateBalance(amount) {
+            userBalance += amount;
+            await sb.from('perfis').update({ saldo: userBalance }).eq('id', userID);
+            refreshUI();
         }
 
-        async function addReward(amt) {
-            mySaldo += amt;
-            await sb.from('perfis').update({ saldo: mySaldo }).eq('id', myID);
-            updateView();
-        }
-
-        async function renderPosts() {
+        async function loadPosts() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', { ascending: false });
-            const feed = document.getElementById('feed-container');
-            feed.innerHTML = '';
+            const container = document.getElementById('post-feed');
+            container.innerHTML = '';
 
             posts.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'post-card';
                 card.innerHTML = `
                     <div class="post-header">
-                        <div class="user-avatar">${p.user_id.charAt(0).toUpperCase()}</div>
+                        <div class="user-icon">${p.user_id.charAt(0).toUpperCase()}</div>
                         <div style="font-weight:700; font-size:14px;">Membro ${p.user_id}</div>
                     </div>
-                    <div class="post-content">${p.content || ''}</div>
-                    
+                    <div class="post-body">${p.content || ''}</div>
                     <div class="post-actions">
-                        <button class="action-btn" onclick="likePost(this)">👍 Gosto</button>
-                        <button class="action-btn">💬 Balão</button>
-                        <button class="action-btn" onclick="alert('Link copiado!')">↗️ Partilhar</button>
+                        <button class="act-btn" onclick="giveLike(this)">👍 Gosto</button>
+                        <button class="act-btn">💬 Balão</button>
                     </div>
-
-                    <div class="comments-container">
-                        <div id="comments-${p.id}"></div>
-                        <div class="comment-input-wrap">
-                            <input type="text" class="comment-field" placeholder="Escreva um comentário..." onkeydown="if(event.key==='Enter') postComment('${p.id}', this)">
+                    <div class="comments-section">
+                        <div class="bubble-list" id="bubbles-${p.id}"></div>
+                        <div class="comment-box">
+                            <input type="text" class="comment-input" placeholder="Escreva aqui..." onkeydown="if(event.key==='Enter') addComment('${p.id}', this)">
                         </div>
                     </div>
                 `;
-                feed.appendChild(card);
+                container.appendChild(card);
             });
         }
 
-        function likePost(btn) {
-            btn.style.color = "#4285F4";
-            btn.innerHTML = "💙 Gostei";
-            addReward(0.0020);
+        function giveLike(btn) {
+            btn.style.color = "var(--google-blue)";
+            btn.innerText = "💙 Gostei";
+            updateBalance(RECOMPENSAS.like);
         }
 
-        function postComment(postId, input) {
+        function addComment(id, input) {
             if(!input.value) return;
-            const container = document.getElementById('comments-'+postId);
-            const bubble = document.createElement('div');
-            bubble.className = 'comment-bubble';
-            bubble.innerText = input.value;
-            container.appendChild(bubble);
+            const list = document.getElementById('bubbles-'+id);
+            const b = document.createElement('div');
+            b.className = 'bubble';
+            b.innerText = input.value;
+            list.appendChild(b);
             input.value = '';
-            addReward(0.0050);
+            updateBalance(RECOMPENSAS.comment);
         }
 
-        function nav(id, el) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-'+id).classList.add('active');
-            el.classList.add('active');
-        }
-
-        init();
+        start();
     </script>
 </body>
 </html>
