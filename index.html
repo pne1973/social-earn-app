@@ -14,7 +14,7 @@
         body { background-color: var(--fb-bg); color: var(--fb-text); padding-top: 60px; }
         .hidden { display: none !important; }
 
-        /* MODAL DE ENTRADA ORIGINAL (PRESERVADO) */
+        /* MODAL DE ENTRADA ORIGINAL (ESTILO PRESERVADO) */
         #auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: white; z-index: 2000; display: flex;
@@ -22,7 +22,7 @@
         }
         .logo-orig { font-size: 40px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px; }
         
-        /* HEADER FACEBOOK EDITION */
+        /* HEADER FACEBOOK */
         header { 
             background: var(--fb-card); height: 60px; width: 100%; position: fixed; 
             top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; 
@@ -30,7 +30,7 @@
         }
         .header-logo { color: var(--fb-blue); font-size: 28px; font-weight: bold; text-decoration: none; }
 
-        /* CONTEÚDO */
+        /* FEED E CARDS */
         main { max-width: 550px; margin: 0 auto; padding: 12px; }
         .card { 
             background: white; border-radius: 8px; border: 1px solid var(--fb-border); 
@@ -68,14 +68,14 @@
     </main>
 
     <script>
-        /* CREDENCIAIS ORIGINAIS DO INDEX 39 */
+        /* CONFIGURAÇÃO SUPABASE ORIGINAL DO SEU DOC */
         const SUPABASE_URL = 'https://fickstyevektwbgimapy.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiaW1hcHkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxMTQ1OTI2OCwiZXhwIjoyMDI3MDE2ODY4fQ.nOQWvUv_r_r_r_r_r_r_r_r_r_r_r_C9QY';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
 
-        /* FUNÇÃO DE ENTRADA ORIGINAL - INTOCADA */
+        /* FUNÇÃO DE ENTRADA: CÓPIA EXATA DO SEU CÓDIGO FUNCIONAL */
         async function processAuth() {
             const id = document.getElementById('auth-username').value;
             if (!id) return alert("Digite um ID");
@@ -105,7 +105,7 @@
             loadPosts();
         }
 
-        /* LÓGICA DE FEED E GANHOS */
+        /* SISTEMA DE FEED E GANHOS */
         async function loadPosts() {
             const { data: posts } = await _supabase.from('posts').select('*').order('created_at', { ascending: false });
             const feed = document.getElementById('feed');
@@ -113,11 +113,14 @@
 
             feed.innerHTML = posts.map(post => `
                 <div class="card">
-                    <div style="font-weight: bold; margin-bottom: 8px;">${post.author_name}</div>
-                    <p>${post.content}</p>
-                    <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 15px; color: var(--fb-secondary); font-size: 14px;">
+                    <div style="font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 32px; height: 32px; background: #ddd; border-radius: 50%;"></div>
+                        ${post.author_name}
+                    </div>
+                    <p style="margin-bottom: 12px;">${post.content}</p>
+                    <div style="border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 20px; color: var(--fb-secondary); font-size: 14px; font-weight: bold;">
                         <span style="cursor:pointer;" onclick="earn(0.0006)">👍 Gosto</span>
-                        <span style="cursor:pointer;" onclick="earn(0.0010)">💬 Comentar</span>
+                        <span style="cursor:pointer;" onclick="earn(0.0010)">💬 Comentário</span>
                     </div>
                 </div>
             `).join('');
