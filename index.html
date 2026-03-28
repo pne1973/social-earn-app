@@ -1,83 +1,113 @@
-<script>
-    const SB_URL = 'https://fickstyevektwbdgimapy.supabase.co';
-    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
-    const sb = supabase.createClient(SB_URL, SB_KEY);
-
-    let user = null;
-
-    async function entrar() {
-        const idInput = document.getElementById('login-id').value.trim();
-        if(!idInput) return;
-
-        // Tenta buscar o perfil existente
-        const { data: perfil, error: fetchError } = await sb
-            .from('perfis')
-            .select('*')
-            .eq('id', idInput)
-            .maybeSingle();
-
-        if (fetchError) {
-            console.error("Erro Supabase:", fetchError);
-            alert("Erro de conexão ou RLS. Verifique o console.");
-            return;
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Facebook</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --fb-blue: #1877F2;
+            --fb-bg: #F0F2F5;
+            --fb-card: #FFFFFF;
+            --fb-text-main: #050505;
+            --fb-text-sec: #65676B;
+            --fb-border: #CED0D4;
         }
 
-        if (perfil) {
-            // Se o perfil existe (como o seu ID 123), entra direto
-            user = perfil;
-            iniciarApp();
-        } else {
-            // Se NÃO existe, tenta criar
-            const { data: novo, error: createError } = await sb
-                .from('perfis')
-                .insert([{ id: idInput, nome: 'Novo_User', saldo_eur: 0 }])
-                .select().single();
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
+        body { background-color: var(--fb-bg); color: var(--fb-text-main); padding-top: 56px; }
 
-            if (createError) {
-                alert("Erro RLS: A tabela 'perfis' não permite criar novos usuários via código.");
-                return;
+        /* HEADER */
+        header {
+            background: var(--fb-card);
+            height: 56px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--fb-border);
+            z-index: 1000;
+        }
+        .logo-fb { color: var(--fb-blue); font-size: 28px; font-weight: bold; letter-spacing: -1px; text-decoration: none; }
+        .header-right { display: flex; align-items: center; gap: 8px; }
+        .balance-pill { background: #E7F3FF; color: var(--fb-blue); padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+        .icon-circle { background: #EBEDF0; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+        /* FEED CONTAINER */
+        main { max-width: 500px; margin: 0 auto; padding: 10px 0; }
+        
+        /* CAIXA DE POSTAGEM */
+        .composer { background: white; padding: 12px 16px; margin-bottom: 10px; border-bottom: 1px solid var(--fb-border); }
+        .composer-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #ddd; background-image: url('https://via.placeholder.com/40'); background-size: cover; }
+        .fake-input { flex: 1; background: #F0F2F5; border-radius: 20px; padding: 10px 16px; color: var(--fb-text-sec); font-size: 15px; border: none; outline: none; }
+        .composer-btns { display: flex; border-top: 1px solid #E4E6EB; padding-top: 10px; }
+        .comp-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--fb-text-sec); cursor: pointer; }
+
+        /* CARD DE POST */
+        .fb-card { background: white; margin-bottom: 10px; border-top: 1px solid var(--fb-border); border-bottom: 1px solid var(--fb-border); }
+        .card-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+        .user-name { font-weight: bold; font-size: 15px; }
+        .post-meta { font-size: 12px; color: var(--fb-text-sec); }
+        .card-body { padding: 4px 16px 12px 16px; font-size: 15px; line-height: 1.4; }
+        .card-img { width: 100%; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+        .card-stats { padding: 10px 16px; display: flex; justify-content: space-between; font-size: 13px; color: var(--fb-text-sec); }
+        .card-actions { display: flex; border-top: 1px solid #E4E6EB; padding: 4px 0; }
+        .act-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 0; color: var(--fb-text-sec); font-weight: 600; font-size: 14px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <a href="#" class="logo-fb">facebook</a>
+        <div class="header-right">
+            <div class="balance-pill">€ <span id="val-saldo">0.0000</span></div>
+            <div class="icon-circle"><i class="fa-solid fa-search"></i></div>
+            <div class="icon-circle"><i class="fa-solid fa-bars"></i></div>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <div class="composer">
+            <div class="composer-row">
+                <div class="avatar"></div>
+                <input type="text" id="new-post-text" class="fake-input" placeholder="No que está a pensar?">
+            </div>
+            <div class="composer-btns">
+                <div class="comp-btn" onclick="postar()"><i class="fa-solid fa-paper-plane" style="color: #45bd62;"></i> Publicar</div>
+                <div class="comp-btn"><i class="fa-solid fa-image" style="color: #45bd62;"></i> Foto</div>
+            </div>
+        </div>
+        <div id="feed-container"></div>
+    </main>
+
+    <script>
+        const SB_URL = 'https://fickstyevektwbdgimapy.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+
+        // ID PADRÃO PARA CARREGAMENTO AUTOMÁTICO
+        const DEFAULT_USER_ID = "123"; 
+        let user = null;
+
+        async function initApp() {
+            // Carrega o usuário automaticamente sem tela de login
+            let { data: perfil } = await sb.from('perfis').select('*').eq('id', DEFAULT_USER_ID).maybeSingle();
+            
+            if (perfil) {
+                user = perfil;
+                document.getElementById('val-saldo').innerText = Number(user.saldo_eur || 0).toFixed(4);
+                carregarFeed();
+            } else {
+                console.error("Usuário padrão não encontrado na tabela perfis.");
+                carregarFeed(); // Tenta carregar o feed mesmo sem usuário logado
             }
-            user = novo;
-            iniciarApp();
         }
-    }
 
-    function iniciarApp() {
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('nav-header').classList.remove('hidden');
-        document.getElementById('app-content').classList.remove('hidden');
-        
-        // Exibe o saldo_eur que vimos no seu print
-        document.getElementById('val-saldo').innerText = Number(user.saldo_eur || 0).toFixed(4);
-        carregarFeed();
-    }
-
-    async function carregarFeed() {
-        // Usa a tabela 'posts' e colunas reais
-        const { data: posts } = await sb.from('posts').select('*').order('created_at', { ascending: false });
-        
-        if(posts) {
-            document.getElementById('feed-container').innerHTML = posts.map(p => `
-                <div class="fb-card">
-                    <div class="card-header">
-                        <div class="avatar"></div>
-                        <div class="user-info">
-                            <div class="user-name">${p.username || 'Anónimo'}</div>
-                            <div class="post-meta">ID: ${p.user_id}</div>
-                        </div>
-                    </div>
-                    <div class="card-body">${p.content || ''}</div>
-                    <div class="card-actions">
-                        <div class="act-btn" onclick="ganhar(0.0006)"><i class="fa-regular fa-thumbs-up"></i> Gosto</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-    }
-
-    async function ganhar(v) {
-        user.saldo_eur = (Number(user.saldo_eur) || 0) + v;
-        await sb.from('perfis').update({ saldo_eur: user.saldo_eur }).eq('id', user.id);
-        document.getElementById('val-saldo').innerText = user.saldo_eur.toFixed(4);
-    }
-</script>
+        async function carregarFeed() {
