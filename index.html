@@ -6,215 +6,123 @@
     <title>Apex Social v33.12</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* --- RESET GERAL --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #fff; }
-
-        /* --- 1. TELA DE LOGIN (FIEL À Screenshot_20260328_122909) --- */
-        #login-screen { 
-            position: fixed; inset: 0; background: #fff; z-index: 10000; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; 
-        }
-        .l-logo { 
-            background: #2962ff; width: 100px; height: 100px; border-radius: 25px; 
-            display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 10px 20px rgba(41, 98, 255, 0.3); margin-bottom: 20px;
-        }
-        .l-logo span { color: #fff; font-size: 60px; font-weight: 900; font-style: italic; font-family: sans-serif; }
-        .l-brand { color: #2962ff; font-weight: 800; font-size: 14px; letter-spacing: 1.5px; margin-bottom: 50px; text-transform: uppercase; }
-        #id-input { 
-            width: 100%; max-width: 350px; padding: 22px; text-align: center; 
-            border: 2px solid #2962ff; border-radius: 20px; font-size: 26px; 
-            font-weight: bold; margin-bottom: 20px; outline: none; background: #f8f9fa;
-        }
-        .btn-entrar { 
-            width: 100%; max-width: 350px; padding: 20px; background: #2962ff; 
-            color: #fff; border: none; border-radius: 20px; font-size: 16px; 
-            font-weight: 800; text-transform: uppercase; cursor: pointer;
-        }
-
-        /* --- 2. INTERFACE UTILIZADOR (FIEL À esta.jpg / 19:59) --- */
-        .user-mode .header { 
-            height: 70px; background: #fff; border-bottom: 1px solid #eee; 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 15px; position: fixed; top: 0; width: 100%; z-index: 1000;
-        }
-        .u-brand { display: flex; align-items: center; gap: 8px; }
-        .u-logo-box { background: #2962ff; color: #fff; padding: 5px 8px; border-radius: 8px; font-weight: 900; font-style: italic; font-size: 18px; }
-        .u-brand b { color: #2962ff; font-size: 14px; letter-spacing: 0.5px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
         
-        .u-balance { text-align: right; }
-        .u-balance .eur { color: #00a859; font-size: 20px; font-weight: 800; display: block; }
-        .u-balance .brl { color: #9aa0a6; font-size: 11px; font-weight: 600; }
+        /* LOGIN - Screenshot 12:29 */
+        #login-screen { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 40px; }
+        .l-logo { background: #2962ff; width: 90px; height: 90px; border-radius: 22px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+        .l-logo span { color: #fff; font-size: 55px; font-weight: 900; font-style: italic; }
+        .l-text { color: #2962ff; font-weight: 800; font-size: 14px; letter-spacing: 1.5px; margin-bottom: 50px; }
+        #id-input { width: 100%; max-width: 350px; padding: 22px; text-align: center; border: 2px solid #2962ff; border-radius: 20px; font-size: 24px; font-weight: bold; margin-bottom: 20px; outline: none; }
+        .btn-entrar { width: 100%; max-width: 350px; padding: 20px; background: #2962ff; color: #fff; border: none; border-radius: 20px; font-size: 16px; font-weight: 800; text-transform: uppercase; }
 
-        .u-content { padding: 85px 15px 100px; max-width: 500px; margin: 0 auto; }
-        .u-post-btn { background: #fff; border: 1px solid #dadce0; border-radius: 15px; padding: 15px; color: #70757a; font-weight: 700; font-size: 13px; margin-bottom: 15px; }
-        
-        /* Abas Utilizador (Linha azul em cima - esta.jpg) */
-        .u-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #fff; display: flex; border-top: 1px solid #eee; }
-        .u-tab { flex: 1; display: flex; align-items: center; justify-content: center; color: #70757a; font-weight: 800; font-size: 12px; border-top: 3px solid transparent; text-decoration: none; }
-        .u-tab.active { color: #2962ff; border-top: 3px solid #2962ff; }
+        /* USER INTERFACE - esta.jpg */
+        .user-view .u-header { height: 70px; background: #fff; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; position: fixed; top: 0; width: 100%; }
+        .user-view .u-balance { text-align: right; }
+        .user-view .u-eur { color: #1e8e3e; font-size: 22px; font-weight: 800; display: block; }
+        .user-view .u-brl { color: #9aa0a6; font-size: 12px; }
+        .user-view .u-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #fff; display: flex; border-top: 1px solid #eee; }
+        .user-view .u-tab { flex: 1; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #70757a; font-size: 13px; border-top: 4px solid transparent; }
+        .user-view .u-tab.active { color: #2962ff; border-top: 4px solid #2962ff; }
 
-        /* --- 3. INTERFACE ADMIN (FIEL À 19:51 / 20:00) --- */
-        .admin-mode { background: #000 !important; color: #0f0 !important; font-family: 'Courier New', Courier, monospace; }
-        .admin-mode .header { 
-            height: 65px; background: #000; border-bottom: 2px solid #0055ff; 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 15px; position: fixed; top: 0; width: 100%; z-index: 1000;
-        }
-        .a-brand { color: #0055ff; font-weight: 900; font-size: 14px; letter-spacing: 1px; }
-        .a-live { color: #0f0; font-size: 9px; display: flex; align-items: center; gap: 5px; }
-
-        .a-content { padding: 80px 15px 100px; }
-        .a-terminal { background: #000; color: #0f0; font-size: 12px; line-height: 1.5; }
-        .a-log { margin-bottom: 8px; border-bottom: 1px solid #111; padding-bottom: 4px; }
-        .a-log .time { color: #444; }
-        .a-log .uid { color: #0f0; font-weight: bold; }
-
-        /* Abas Admin (Gradiente azul/preto - 19:51) */
-        .a-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; border-top: 1px solid #111; }
-        .a-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #444; font-size: 10px; font-weight: bold; text-decoration: none; }
-        .a-tab.active { color: #0f0; border-top: 3px solid #0055ff; background: linear-gradient(to bottom, #001133, #000); }
+        /* ADMIN INTERFACE - 19:51 / 20:00 */
+        .admin-view { background: #000; color: #0f0; min-height: 100vh; font-family: monospace; }
+        .admin-view .a-header { height: 65px; border-bottom: 2px solid #0055ff; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; }
+        .admin-view .a-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; }
+        .admin-view .a-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #444; font-size: 10px; font-weight: bold; }
+        .admin-view .a-tab.active { color: #0f0; border-top: 3px solid #0055ff; background: linear-gradient(to bottom, #001133, #000); }
 
         .hidden { display: none !important; }
     </style>
 </head>
-<body id="body-main">
+<body>
 
     <div id="login-screen">
         <div class="l-logo"><span>S</span></div>
-        <div class="l-brand">SOCIAL EARN NETWORK</div>
+        <div class="l-text">SOCIAL EARN NETWORK</div>
         <input type="number" id="id-input" placeholder="123">
-        <button class="btn-entrar" onclick="processLogin()">ENTRAR NO SISTEMA</button>
+        <button class="btn-entrar" onclick="login()">ENTRAR NO SISTEMA</button>
     </div>
 
-    <header class="header hidden" id="main-header"></header>
-
-    <main id="main-content" class="hidden">
-        <div id="user-pages" class="hidden">
-            <section id="u-feed" class="page">
-                <div style="color:#00a859; font-size:11px; font-weight:900; margin-bottom:15px;">GANHOS ATIVOS: 100%</div>
-                <div class="u-post-btn">O QUE QUER PARTILHAR AGORA?</div>
-                <div id="u-feed-list"></div>
-            </section>
-            <section id="u-carteira" class="page hidden">
-                <div style="padding:20px; text-align:center;">
-                    <h2 style="color:#2962ff">Minha Carteira</h2>
-                    <p style="color:#70757a; margin-top:10px;">Mínimo: 5000 XP</p>
-                </div>
-            </section>
+    <div id="app-user" class="user-view hidden">
+        <header class="u-header">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div style="background:#2962ff; color:#fff; padding:4px 8px; border-radius:8px; font-weight:900; font-style:italic;">S</div>
+                <span style="color:#2962ff; font-weight:800; font-size:14px;">SOCIAL EARN</span>
+            </div>
+            <div class="u-balance">
+                <span class="u-eur" id="u-val-eur">0.0000€</span>
+                <span class="u-brl" id="u-val-brl">0.0000 BRL</span>
+            </div>
+        </header>
+        <div style="padding: 85px 15px;">
+            <div style="color:#1e8e3e; font-size:11px; font-weight:800; margin-bottom:15px;">GANHOS ATIVOS: 100%</div>
+            <div id="feed-lista"></div>
         </div>
+        <nav class="u-nav">
+            <div class="u-tab active">FEED</div>
+            <div class="u-tab">CARTEIRA</div>
+        </nav>
+    </div>
 
-        <div id="admin-pages" class="hidden">
-            <section id="a-monitor" class="page">
-                <h3 style="color:#0f0; font-size:18px; margin-bottom:20px; font-weight:bold;">SISTEMA_LOGS_POSTS</h3>
-                <div id="a-logs-list" class="a-terminal"></div>
-            </section>
-            <section id="a-stats" class="page hidden">
-                <div style="border-left:5px solid #0f0; background:#0a0a0a; padding:20px;">
-                    <small style="color:#0f0">DÍVIDA TOTAL</small>
-                    <h1 id="total-divida" style="color:#fff; font-size:35px;">0.0000€</h1>
-                </div>
-            </section>
+    <div id="app-admin" class="admin-view hidden">
+        <header class="a-header">
+            <div style="color:#0055ff; font-weight:900; letter-spacing:1px;">APEX C&C CENTER</div>
+            <div style="color:#0f0; font-size:9px;">● SB_LIVE_FEED</div>
+        </header>
+        <div style="padding: 20px;">
+            <h2 style="margin-bottom:20px;">SISTEMA_LOGS_POSTS</h2>
+            <div id="admin-logs"></div>
         </div>
-    </main>
-
-    <nav id="main-nav" class="hidden"></nav>
+        <nav class="a-nav">
+            <div class="a-tab active">🖥️<br>MONITOR</div>
+            <div class="a-tab">📊<br>STATS</div>
+            <div class="a-tab">⚔️<br>ADMIN</div>
+        </nav>
+    </div>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const sb = supabase.createClient(SB_URL, SB_KEY);
-        
         const ADMIN_ID = "5401881400";
-        let currentUser = null;
 
-        async function processLogin() {
+        async function login() {
             const id = document.getElementById('id-input').value;
-            if(!id) return;
+            const { data: user } = await sb.from('perfis').select('*').eq('id', id).single();
+            
+            if(!user) return alert("Erro");
 
-            const { data, error } = await sb.from('perfis').select('*').eq('id', id).single();
-            if(error || !data) return alert("ID INVÁLIDO");
-
-            currentUser = data;
             document.getElementById('login-screen').classList.add('hidden');
-            
-            const isAdmin = (id === ADMIN_ID);
-            setupUI(isAdmin);
-        }
-
-        function setupUI(isAdmin) {
-            const body = document.getElementById('body-main');
-            const header = document.getElementById('main-header');
-            const content = document.getElementById('main-content');
-            const nav = document.getElementById('main-nav');
-
-            header.classList.remove('hidden');
-            content.classList.remove('hidden');
-            nav.classList.remove('hidden');
-
-            if(isAdmin) {
-                body.className = "admin-mode";
-                header.innerHTML = `<div class="a-brand">APEX C&C CENTER</div><div class="a-live">● SB_LIVE_FEED</div>`;
-                document.getElementById('admin-pages').classList.remove('hidden');
-                nav.className = "a-nav";
-                nav.innerHTML = `
-                    <a href="javascript:void(0)" class="a-tab active" onclick="switchTab('a-monitor', this)">🖥️<br>MONITOR</a>
-                    <a href="javascript:void(0)" class="a-tab" onclick="switchTab('a-stats', this)">📊<br>STATS</a>
-                    <a href="javascript:void(0)" class="a-tab">⚔️<br>ADMIN</a>
-                `;
-                switchTab('a-monitor', nav.children[0]);
+            if(id === ADMIN_ID) {
+                document.getElementById('app-admin').classList.remove('hidden');
+                loadAdmin();
             } else {
-                body.className = "user-mode";
-                header.innerHTML = `
-                    <div class="u-brand"><div class="u-logo-box">S</div><b>SOCIAL EARN</b></div>
-                    <div class="u-balance"><span class="eur">${currentUser.saldo.toFixed(4)}€</span><span class="brl">${(currentUser.saldo * 6.12).toFixed(4)} BRL</span></div>
-                `;
-                document.getElementById('user-pages').classList.remove('hidden');
-                nav.className = "u-nav";
-                nav.innerHTML = `
-                    <a href="javascript:void(0)" class="u-tab active" onclick="switchTab('u-feed', this)">FEED</a>
-                    <a href="javascript:void(0)" class="u-tab" onclick="switchTab('u-carteira', this)">CARTEIRA</a>
-                `;
-                switchTab('u-feed', nav.children[0]);
+                document.getElementById('app-user').classList.remove('hidden');
+                document.getElementById('u-val-eur').innerText = user.saldo.toFixed(4) + "€";
+                document.getElementById('u-val-brl').innerText = (user.saldo * 6.12).toFixed(4) + " BRL";
+                loadUser();
             }
         }
 
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(tabId).classList.remove('hidden');
-            
-            const tabs = el.parentElement.children;
-            for(let t of tabs) t.classList.remove('active');
-            el.classList.add('active');
-
-            if(tabId === 'u-feed' || tabId === 'a-monitor') loadPosts(tabId === 'a-monitor');
-            if(tabId === 'a-stats') loadStats();
-        }
-
-        async function loadPosts(isAdmin) {
+        async function loadUser() {
             const { data } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            if(isAdmin) {
-                document.getElementById('a-logs-list').innerHTML = data.map(p => `
-                    <div class="a-log">
-                        <span class="time">[${new Date(p.created_at).toLocaleTimeString()}]</span>
-                        <span class="uid"> ID:${p.user_id}</span>: "${p.content}"
-                    </div>
-                `).join('');
-            } else {
-                document.getElementById('u-feed-list').innerHTML = data.map(p => `
-                    <div style="background:#fff; border:1px solid #eee; border-radius:15px; padding:15px; margin-bottom:12px;">
-                        <b style="color:#70757a; font-size:11px;">ID: ${p.user_id}</b>
-                        <p style="margin-top:8px; font-weight:600; color:#1c1e21;">${p.content}</p>
-                    </div>
-                `).join('');
-            }
+            document.getElementById('feed-lista').innerHTML = data.map(p => `
+                <div style="background:#fff; border:1px solid #eee; border-radius:15px; padding:15px; margin-bottom:10px;">
+                    <b style="color:#8a8d91; font-size:11px;">ID: ${p.user_id}</b>
+                    <p style="margin-top:5px; font-weight:600;">${p.content}</p>
+                </div>
+            `).join('');
         }
 
-        async function loadStats() {
-            const { data } = await sb.from('perfis').select('saldo');
-            const total = data.reduce((a, b) => a + (b.saldo || 0), 0);
-            document.getElementById('total-divida').innerText = total.toFixed(4) + "€";
+        async function loadAdmin() {
+            const { data } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            document.getElementById('admin-logs').innerHTML = data.map(p => `
+                <div style="margin-bottom:10px;">
+                    <span style="color:#444">[${new Date(p.created_at).toLocaleTimeString()}]</span>
+                    <span style="color:#0f0"> ID:${p.user_id}</span> postou: "${p.content}"
+                </div>
+            `).join('');
         }
     </script>
 </body>
