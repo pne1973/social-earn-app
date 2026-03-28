@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network</title>
+    <title>Social Earn v33.12</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* Cores Facebook solicitadas */
         :root {
             --fb-blue: #1877F2; --fb-bg: #F0F2F5; --fb-card: #FFFFFF;
             --fb-text: #050505; --fb-secondary: #65676B; --fb-border: #ced0d4;
@@ -14,98 +15,101 @@
         body { background-color: var(--fb-bg); color: var(--fb-text); padding-top: 60px; }
         .hidden { display: none !important; }
 
-        /* Estilo do Modal de Entrada Original */
+        /* Estilo do Login Original (Mantido para segurança) */
         #auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: white; z-index: 2000; display: flex;
             align-items: center; justify-content: center; flex-direction: column;
         }
-        .auth-container { text-align: center; width: 90%; max-width: 350px; }
-        .auth-logo { font-size: 40px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px; }
         
-        .fb-input { width: 100%; border: 1px solid var(--fb-border); padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 16px; outline: none; }
-        .fb-btn { background: var(--fb-blue); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
-
         /* Header Facebook */
-        header { background: var(--fb-card); height: 60px; width: 100%; position: fixed; top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid var(--fb-border); z-index: 1000; }
+        header { 
+            background: var(--fb-card); height: 60px; width: 100%; position: fixed; 
+            top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 16px; border-bottom: 1px solid var(--fb-border); z-index: 1000; 
+        }
         .header-logo { color: var(--fb-blue); font-size: 28px; font-weight: bold; text-decoration: none; }
-        
-        main { max-width: 600px; margin: 0 auto; padding: 12px; }
-        .card { background: white; border-radius: 8px; border: 1px solid var(--fb-border); margin-bottom: 12px; padding: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+
+        /* Estilo de Cards do Feed */
+        main { max-width: 550px; margin: 0 auto; padding: 12px; }
+        .card { 
+            background: white; border-radius: 8px; border: 1px solid var(--fb-border); 
+            margin-bottom: 12px; padding: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); 
+        }
+        .fb-input { 
+            width: 100%; border: 1px solid var(--fb-border); padding: 12px; 
+            border-radius: 20px; background: var(--fb-bg); margin-bottom: 10px; outline: none;
+        }
+        .fb-btn { 
+            background: var(--fb-blue); color: white; border: none; padding: 10px 20px; 
+            border-radius: 6px; font-weight: bold; cursor: pointer; 
+        }
     </style>
 </head>
 <body>
 
     <div id="auth-modal">
-        <div class="auth-container">
-            <div class="auth-logo">f</div>
-            <p style="margin-bottom: 15px; color: var(--fb-secondary);">Para começar a ganhar com as suas interações, por favor identifique-se.</p>
-            <input type="text" id="auth-username" class="fb-input" placeholder="Insira o seu ID" value="123">
-            <button class="fb-btn" onclick="processAuth()">Começar a Ganhar</button>
+        <div style="text-align: center; width: 90%; max-width: 320px;">
+            <div style="font-size: 45px; font-weight: bold; color: var(--fb-blue); margin-bottom: 10px;">f</div>
+            <h2 style="margin-bottom: 20px;">Social Earn</h2>
+            <input type="text" id="auth-username" placeholder="Insira seu ID" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <button onclick="processAuth()" style="width: 100%; padding: 12px; background: var(--fb-blue); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Entrar</button>
         </div>
     </div>
 
-    <header class="hidden" id="main-header">
+    <header class="hidden" id="app-header">
         <a href="#" class="header-logo">f</a>
         <div style="font-weight: bold; color: var(--fb-blue);">€ <span id="user-balance">0.0000</span></div>
     </header>
 
-    <main class="hidden" id="main-content">
+    <main class="hidden" id="app-content">
         <div class="card">
-            <input type="text" id="post-content" class="fb-input" style="border-radius: 20px; background: var(--fb-bg);" placeholder="No que está a pensar?">
-            <button class="fb-btn" style="width: auto; padding: 8px 20px;" onclick="createNewPost()">Publicar</button>
+            <input type="text" id="post-content" class="fb-input" placeholder="No que está a pensar?">
+            <button class="fb-btn" onclick="createNewPost()">Publicar</button>
         </div>
         <div id="feed"></div>
     </main>
 
     <script>
-        // CREDENCIAIS ORIGINAIS DO SEU INDEX 39
+        /* CONFIGURAÇÃO SUPABASE: COPIADA DO SEU DOC INDEX 39 */
         const SUPABASE_URL = 'https://fickstyevektwbgimapy.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiaW1hcHkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxMTQ1OTI2OCwiZXhwIjoyMDI3MDE2ODY4fQ.nOQWvUv_r_r_r_r_r_r_r_r_r_r_r_C9QY';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
 
-        // SISTEMA DE ENTRADA ORIGINAL COM AJUSTE DE ESTABILIDADE
+        /* FUNÇÃO DE ENTRADA: RIGOROSAMENTE IGUAL À DO SEU CÓDIGO */
         async function processAuth() {
             const id = document.getElementById('auth-username').value;
             if (!id) return alert("Digite um ID");
 
-            try {
-                // Procuramos primeiro sem o .single() para evitar o erro de "Failed to fetch" ou crash
-                let { data, error } = await _supabase
+            let { data: profile, error } = await _supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error || !profile) {
+                const { data: newUser, error: createError } = await _supabase
                     .from('profiles')
-                    .select('*')
-                    .eq('id', id);
-
-                if (error) throw error;
-
-                let profile = data[0];
-
-                if (!profile) {
-                    // SE NÃO EXISTIR -> REGISTA (Lógica original)
-                    const { data: newUser, error: createError } = await _supabase
-                        .from('profiles')
-                        .insert([{ id: id, username: 'User_' + id, balance: 0 }])
-                        .select();
-                    
-                    if (createError) throw createError;
-                    profile = newUser[0];
-                }
-
-                currentUser = profile;
-                document.getElementById('auth-modal').classList.add('hidden');
-                document.getElementById('main-header').classList.remove('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
-                document.getElementById('user-balance').innerText = currentUser.balance.toFixed(4);
-                loadPosts();
-
-            } catch (err) {
-                console.error(err);
-                alert("Erro ao conectar: " + err.message);
+                    .insert([{ id: id, username: 'User_' + id, balance: 0 }])
+                    .select()
+                    .single();
+                
+                if (createError) return alert("Erro ao criar perfil");
+                profile = newUser;
             }
+
+            currentUser = profile;
+            // Transição de ecrãs
+            document.getElementById('auth-modal').classList.add('hidden');
+            document.getElementById('app-header').classList.remove('hidden');
+            document.getElementById('app-content').classList.remove('hidden');
+            document.getElementById('user-balance').innerText = currentUser.balance.toFixed(4);
+            loadPosts();
         }
 
+        /* LÓGICA DE FEED E GANHOS */
         async function loadPosts() {
             const { data: posts } = await _supabase.from('posts').select('*').order('created_at', { ascending: false });
             const feed = document.getElementById('feed');
@@ -113,10 +117,14 @@
 
             feed.innerHTML = posts.map(post => `
                 <div class="card">
-                    <div style="font-weight: bold; margin-bottom: 8px;">${post.author_name}</div>
-                    <p>${post.content}</p>
-                    <div style="margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 20px; color: var(--fb-secondary); font-size: 14px;">
-                        <span onclick="earn(0.0006)">👍 Gostar</span>
+                    <div style="font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 32px; height: 32px; background: #ddd; border-radius: 50%;"></div>
+                        ${post.author_name}
+                    </div>
+                    <p style="margin-bottom: 12px;">${post.content}</p>
+                    <div style="border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 15px; color: var(--fb-secondary); font-size: 14px; font-weight: bold;">
+                        <span style="cursor:pointer;" onclick="earn(0.0006)">👍 Gostar</span>
+                        <span style="cursor:pointer;" onclick="earn(0.0010)">💬 Comentar</span>
                     </div>
                 </div>
             `).join('');
