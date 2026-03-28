@@ -3,196 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex C&C Center (v33.20 Final)</title>
+    <title>APEX C&C CENTER</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Consolas', 'Monaco', monospace; }
-        :root { --blue: #007bff; --red: #dc3545; --green: #28a745; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --border: #333; }
-        
-        body { background: var(--bg); color: var(--text); padding-top: 60px; padding-bottom: 90px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Courier New', monospace; background: #0a0a0a; color: #00ff00; padding-bottom: 90px; }
 
-        /* HEADER TÉCNICO */
-        header {
-            position: fixed; top: 0; width: 100%; background: #000; height: 60px;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 15px; border-bottom: 2px solid var(--blue); z-index: 2000;
+        /* HEADER */
+        header { 
+            background: #000; padding: 15px; border-bottom: 2px solid #004400; 
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
         }
-        .header-title { font-weight: 900; color: var(--blue); font-size: 16px; text-transform: uppercase; letter-spacing: 1px; }
-        .server-status { font-size: 10px; color: var(--green); animation: blink 1.5s infinite; }
+        .header-title { font-size: 14px; font-weight: bold; letter-spacing: 2px; }
+        .status-dot { color: #00ff00; font-size: 10px; animation: blink 1.5s infinite; }
 
-        /* CONTEÚDO DINÂMICO */
-        .page { display: none; padding: 15px; width: 100%; max-width: 600px; margin: 0 auto; }
+        /* ABAS */
+        .page { display: none; padding: 20px; }
         .page.active { display: block; }
 
-        /* DASHBOARD ANALÍTICO (ALTO NÍVEL) */
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .stat-card h4 { font-size: 10px; color: #aaa; text-transform: uppercase; margin-bottom: 6px; }
-        .stat-card p { font-size: 22px; font-weight: 900; color: var(--text); }
-        .stat-card.critical { border-left: 4px solid var(--red); }
-        .stat-card.growth { border-left: 4px solid var(--green); }
+        /* MONITOR (LOGS) */
+        .log-container { background: #000; border: 1px solid #004400; padding: 10px; border-radius: 4px; height: 60vh; overflow-y: auto; font-size: 12px; }
+        .log-entry { margin-bottom: 8px; border-bottom: 1px solid #002200; padding-bottom: 4px; }
+        .log-time { color: #888; }
 
-        /* LISTA DE AUDITORIA DE UTILIZADORES */
-        .audit-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
-        .audit-header { padding: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .user-id { font-weight: 900; color: var(--blue); font-size: 14px; }
-        .user-balance { font-size: 18px; font-weight: 800; color: var(--text); }
-        
-        .audit-body { padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; color: #ccc; }
-        .audit-meta b { color: #fff; }
+        /* STATS CARDS */
+        .stat-card { background: #111; border: 1px solid #004400; padding: 20px; margin-bottom: 15px; border-radius: 8px; }
+        .stat-val { font-size: 24px; font-weight: bold; color: #fff; }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: #00ff00; }
 
-        .audit-actions { padding: 10px 12px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--border); display: flex; gap: 8px; }
-        .btn { flex: 1; padding: 10px; border-radius: 4px; border: none; font-weight: 900; font-size: 11px; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
-        .btn-reset { background: #333; color: var(--text); }
-        .btn-pay { background: var(--green); color: #fff; }
-        .btn-ban { background: var(--red); color: #fff; }
-        .btn:active { transform: scale(0.96); }
+        /* ADMIN TABLE */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        th { background: #002200; text-align: left; padding: 12px; color: #00ff00; }
+        td { padding: 12px; border-bottom: 1px solid #002200; color: #fff; }
+        .btn-ban { color: #ff0000; background: none; border: 1px solid #ff0000; padding: 4px 8px; cursor: pointer; font-weight: bold; }
+        .btn-pay { color: #00ff00; background: none; border: 1px solid #00ff00; padding: 4px 8px; cursor: pointer; margin-right: 5px; }
 
-        /* NAVBAR TÁTICA */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: #000; height: 80px; display: flex; border-top: 2px solid var(--border); z-index: 2000; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #666; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-        .nav-btn.active { color: var(--blue); border-top: 2px solid var(--blue); background: rgba(0,123,255,0.05); }
-        .nav-icon { font-size: 22px; margin-bottom: 5px; }
+        /* NAVBAR */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: #000; height: 75px; display: flex; border-top: 2px solid #004400; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #004400; font-size: 10px; font-weight: bold; }
+        .nav-btn.active { color: #00ff00; background: rgba(0, 255, 0, 0.05); }
+        .nav-icon { font-size: 20px; margin-bottom: 4px; }
 
-        /* FILTRO RÁPIDO */
-        .filter-bar { background: var(--card); padding: 10px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 15px; display: flex; gap: 10px; align-items: center; font-size: 12px; }
-        input[type="number"] { background: #000; border: 1px solid var(--border); color: var(--text); padding: 5px 10px; border-radius: 4px; width: 60px; }
-
-        @keyframes blink { 50% { opacity: 0.3; } }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-title">APEX C&C CENTER</div>
-        <div class="server-status">● SB LIVE</div>
-    </header>
+<header>
+    <div class="header-title">APEX C&C CENTER</div>
+    <div class="status-dot">● SB_LIVE_FEED</div>
+</header>
 
-    <section id="p-monitor" class="page active">
-        <h2 style="font-weight:900; margin-bottom:15px; text-transform:uppercase; color:var(--text);">Monitor do Sistema</h2>
-        <div id="feed-log" style="font-size:11px; color:#aaa; height:60vh; overflow-y:scroll; background:#000; padding:10px; border-radius:4px; border:1px solid var(--border);">
-            > Carregando logs da tabela 'posts'...<br>
-        </div>
-    </section>
+<section id="p-monitor" class="page active">
+    <h3 style="margin-bottom:10px">SISTEMA_LOGS_POSTS</h3>
+    <div id="log-list" class="log-container">> Inicializando terminal...</div>
+</section>
 
-    <section id="p-stats" class="page">
-        <h2 style="font-weight:900; margin-bottom:15px; text-transform:uppercase; color:var(--text);">KPIs Analíticos</h2>
-        <div class="stat-grid">
-            <div class="stat-card growth"><h4>Utilizadores</h4><p id="s-users">...</p></div>
-            <div class="stat-card growth"><h4>Posts Totais</h4><p id="s-posts">...</p></div>
-            <div class="stat-card critical"><h4>Dívida Global (€)</h4><p id="s-debt">...</p></div>
-            <div class="stat-card"><h4>Interações (Likes+Coment)</h4><p id="s-inter">...</p></div>
-            <div class="stat-card critical"><h4>Payout Pendente (>5€)</h4><p id="s-pend">...</p></div>
-            <div class="stat-card"><h4>Média Ganho/User</h4><p id="s-avg">...</p></div>
-        </div>
-    </section>
+<section id="p-stats" class="page">
+    <div class="stat-card">
+        <div class="stat-label">Utilizadores Ativos</div>
+        <div id="count-users" class="stat-val">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Conteúdo Global (Posts)</div>
+        <div id="count-posts" class="stat-val">0</div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #00ff00;">
+        <div class="stat-label">Dívida Total (EUR)</div>
+        <div id="total-debt" class="stat-val">0.0000€</div>
+    </div>
+</section>
 
-    <section id="p-admin" class="page">
-        <h2 style="color:var(--red); font-weight:900; margin-bottom:15px; text-transform:uppercase;">Auditoria de Utilizadores</h2>
+<section id="p-admin" class="page">
+    <h3 style="color:#ff0000; margin-bottom:15px">CONTROLO_DE_CARTEIRAS</h3>
+    <div style="overflow-x:auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>UID</th>
+                    <th>SALDO</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody id="admin-tbody"></tbody>
+        </table>
+    </div>
+</section>
+
+<nav class="nav-bar">
+    <a href="#" class="nav-btn active" onclick="nav('monitor', this)"><span class="nav-icon">🖥️</span>MONITOR</a>
+    <a href="#" class="nav-btn" onclick="nav('stats', this)"><span class="nav-icon">📊</span>STATS</a>
+    <a href="#" class="nav-btn" onclick="nav('admin', this)"><span class="nav-icon">⚔️</span>ADMIN</a>
+</nav>
+
+<script>
+    const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+    const sb = supabase.createClient(SB_URL, SB_KEY);
+
+    function nav(page, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('p-' + page).classList.add('active');
+        el.classList.add('active');
+
+        if(page === 'monitor') loadLogs();
+        if(page === 'stats') loadStats();
+        if(page === 'admin') loadAdmin();
+    }
+
+    async function loadLogs() {
+        const { data } = await sb.from('posts').select('*').order('created_at', { ascending: false }).limit(30);
+        const container = document.getElementById('log-list');
+        container.innerHTML = data.map(p => `
+            <div class="log-entry">
+                <span class="log-time">[${new Date(p.created_at).toLocaleTimeString()}]</span> 
+                USER_ID: <b style="color:#fff">${p.user_id}</b> postou: "${p.content || 'Sem texto'}"
+            </div>
+        `).join('') || '> Nenhum post encontrado no banco de dados.';
+    }
+
+    async function loadStats() {
+        const { data: users } = await sb.from('perfis').select('saldo');
+        const { count: postCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
         
-        <div class="filter-bar">
-            <span>Avisar se saldo for > </span>
-            <input type="number" id="balance-limit" value="5.0000" step="0.5" onchange="loadAdmin()">
-            <span>€</span>
-        </div>
+        let debt = users.reduce((acc, u) => acc + (u.saldo || 0), 0);
+        
+        document.getElementById('count-users').innerText = users.length;
+        document.getElementById('count-posts').innerText = postCount;
+        document.getElementById('total-debt').innerText = debt.toFixed(4) + "€";
+    }
 
-        <div id="admin-list">Carregando lista de auditoria...</div>
-    </section>
+    async function loadAdmin() {
+        const { data: users } = await sb.from('perfis').select('*').order('saldo', { ascending: false });
+        const tbody = document.getElementById('admin-tbody');
+        tbody.innerHTML = users.map(u => `
+            <tr>
+                <td>${u.id}</td>
+                <td style="color:${u.saldo > 5 ? '#00ff00' : '#fff'}">${(u.saldo || 0).toFixed(4)}€</td>
+                <td>
+                    <button class="btn-pay" onclick="resetSaldo('${u.id}')">PAY</button>
+                    <button class="btn-ban" onclick="banUser('${u.id}')">BAN</button>
+                </td>
+            </tr>
+        `).join('');
+    }
 
-    <nav class="nav-bar">
-        <a href="javascript:void(0)" class="nav-btn active" onclick="nav('monitor', this)"><span class="nav-icon">🖥️</span>MONITOR</a>
-        <a href="javascript:void(0)" class="nav-btn" onclick="nav('stats', this)"><span class="nav-icon">📊</span>STATS</a>
-        <a href="javascript:void(0)" class="nav-btn" onclick="nav('admin', this)"><span class="nav-icon">⚔️</span>ADMIN</a>
-    </nav>
-
-    <script>
-        const URL = "https://fickstyevektwbgimapy.supabase.co";
-        const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const sb = supabase.createClient(URL, KEY);
-
-        function nav(t, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('p-'+t).classList.add('active');
-            el.classList.add('active');
-            if(t === 'stats') loadStats();
-            if(t === 'admin') loadAdmin();
-            if(t === 'monitor') loadMonitorFeed();
+    async function resetSaldo(id) {
+        if(confirm("Confirmar pagamento e zerar saldo do ID " + id + "?")) {
+            await sb.from('perfis').update({ saldo: 0 }).eq('id', id);
+            loadAdmin();
         }
+    }
 
-        async function loadMonitorFeed() {
-            const { data } = await sb.from('posts').select('*').order('created_at', { ascending: false }).limit(20);
-            const log = document.getElementById('feed-log');
-            log.innerHTML = '> A aguardar novos posts...<br><br>';
-            data.forEach(p => {
-                const date = new Date(p.created_at).toLocaleTimeString();
-                log.innerHTML += `>[${date}] POST ID ${p.id} detetado (User: ${p.user_id}). Likes: ${p.likes || 0}, Comentários: ${p.comments || 0}.<br>`;
-            });
-            log.scrollTop = log.scrollHeight; // Auto-scroll to bottom
+    async function banUser(id) {
+        if(confirm("Deseja expulsar permanentemente o ID " + id + "?")) {
+            await sb.from('perfis').delete().eq('id', id);
+            loadAdmin();
         }
+    }
 
-        async function loadStats() {
-            const { data: users } = await sb.from('perfis').select('saldo');
-            const { data: posts } = await sb.from('posts').select('likes, comments');
-            
-            let debt = users.reduce((acc, u) => acc + (u.saldo || 0), 0);
-            let inter = posts.reduce((acc, p) => acc + (p.likes || 0) + (p.comments || 0), 0);
-            let pend = users.filter(u => u.saldo >= 5).length;
+    // Init
+    loadLogs();
+</script>
 
-            document.getElementById('s-users').innerText = users.length;
-            document.getElementById('s-posts').innerText = posts.length;
-            document.getElementById('s-debt').innerText = debt.toFixed(4);
-            document.getElementById('s-avg').innerText = (debt / users.length).toFixed(2);
-            document.getElementById('s-inter').innerText = inter;
-            document.getElementById('s-pend').innerText = pend;
-        }
-
-        async function loadAdmin() {
-            const { data: users } = await sb.from('perfis').select('*').order('saldo', { ascending: false });
-            const limit = parseFloat(document.getElementById('balance-limit').value);
-            const list = document.getElementById('admin-list');
-            list.innerHTML = '';
-
-            users.forEach(u => {
-                const isAlert = u.saldo >= limit;
-                const card = document.createElement('div');
-                card.className = 'audit-card';
-                card.style.borderLeft = isAlert ? `4px solid ${var(--red)}` : `1px solid ${var(--border)}`;
-                
-                card.innerHTML = `
-                    <div class="audit-header">
-                        <span class="user-id">UID: ${u.id}</span>
-                        <span class="user-balance">${(u.saldo || 0).toFixed(4)}€</span>
-                    </div>
-                    <div class="audit-body">
-                        <div class="audit-meta">Entrou: <b>${new Date(u.created_at).toLocaleDateString()}</b></div>
-                        <div class="audit-meta">Status: <b>${isAlert ? 'ALERTA PAYOUT' : 'OK'}</b></div>
-                        <div class="audit-meta">Postagens: <b>N/A</b></div>
-                    </div>
-                    <div class="audit-actions">
-                        <button class="btn btn-pay" onclick="payReset('${u.id}')">PAY+RESET</button>
-                        <button class="btn btn-ban" onclick="banUser('${u.id}')">BAN</button>
-                    </td>
-                `;
-                list.appendChild(card);
-            });
-        }
-
-        async function payReset(id) {
-            if(confirm("Confirmar processamento de pagamento e RESET DE SALDO?")) {
-                const { error } = await sb.from('perfis').update({ saldo: 0 }).eq('id', id);
-                if(!error) loadAdmin();
-            }
-        }
-
-        async function banUser(id) {
-            if(confirm("Deseja ELIMINAR DEFINITIVAMENTE este utilizador e os seus posts?")) {
-                const { error } = await sb.from('perfis').delete().eq('id', id);
-                if(!error) loadAdmin();
-            }
-        }
-
-        loadMonitorFeed(); // Inicialização tática
-    </script>
 </body>
 </html>
