@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Social - v33.13</title>
+    <title>Apex Social - v33.14</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --google-blue: #4285F4;
@@ -19,30 +20,33 @@
             background-color: var(--fb-bg);
             color: var(--text-main);
             margin: 0;
-            padding-top: 60px;
+            padding-top: 80px; /* Ajuste para o Header e Status */
+            padding-bottom: 90px;
         }
 
-        /* Banner de Monetização Fixo */
-        #monetization-top {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 50px;
-            background: #fff;
-            border-bottom: 1px solid var(--border-color);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* HEADER & STATUS FIXED (Base v33) */
+        header {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: #fff; border-bottom: 1px solid var(--border-color);
+            z-index: 1000; height: 60px; display: flex;
+            align-items: center; justify-content: space-between; padding: 0 15px;
         }
 
+        .status-header-fixed {
+            position: fixed; top: 60px; left: 0; right: 0;
+            background: #fff; border-bottom: 1px solid var(--border-color);
+            z-index: 999; height: 30px; display: flex;
+            align-items: center; padding: 0 15px; font-size: 10px; font-weight: 800;
+        }
+
+        /* FEED CONTAINER */
         .feed-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 10px;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 0 10px;
         }
 
-        /* Card de Post estilo Facebook */
+        /* CARD DE POST ESTILO FACEBOOK */
         .post-card {
             background: var(--card-bg);
             border-radius: 8px;
@@ -59,168 +63,213 @@
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #ddd;
-            margin-right: 10px;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: #e4e6eb; margin-right: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
         }
 
-        .post-meta {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .user-name {
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .post-time {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
+        .post-meta { display: flex; flex-direction: column; }
+        .user-name { font-weight: 600; font-size: 14px; }
+        .post-time { font-size: 12px; color: var(--text-secondary); }
 
         .post-content {
-            font-size: 15px;
-            line-height: 1.4;
-            margin-bottom: 12px;
-            word-wrap: break-word;
+            font-size: 14px; line-height: 1.4;
+            margin-bottom: 12px; word-wrap: break-word;
         }
 
         .post-image {
-            width: calc(100% + 24px);
-            margin-left: -12px;
-            max-height: 500px;
-            object-fit: cover;
-            border-top: 1px solid #eee;
-            border-bottom: 1px solid #eee;
+            width: calc(100% + 24px); margin-left: -12px;
+            max-height: 450px; object-fit: cover;
+            border-top: 1px solid #eee; border-bottom: 1px solid #eee;
         }
 
         .post-actions {
-            display: flex;
-            border-top: 1px solid #eee;
-            margin-top: 10px;
-            padding-top: 5px;
+            display: flex; border-top: 1px solid #eee;
+            margin-top: 10px; padding-top: 4px;
         }
 
         .action-btn {
-            flex: 1;
-            background: none;
-            border: none;
-            padding: 8px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
+            flex: 1; background: none; border: none; padding: 8px;
+            color: var(--text-secondary); font-weight: 600; cursor: pointer;
+            font-size: 13px; border-radius: 4px;
         }
 
-        .action-btn:hover {
-            background-color: rgba(0,0,0,0.05);
+        .action-btn:hover { background-color: rgba(0,0,0,0.05); }
+
+        /* PUBLISHER BOX */
+        .publisher-card {
+            background: #fff; border-radius: 8px; padding: 12px;
+            margin-bottom: 16px; border: 1px solid var(--border-color);
         }
 
-        /* Ad Injection Style */
-        .ad-container {
-            background: #f9f9f9;
-            text-align: center;
-            padding: 15px;
-            margin-bottom: 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            color: #999;
-            border: 1px dashed #ccc;
+        #post-input {
+            width: 100%; border: none; background: #f0f2f5;
+            padding: 12px; border-radius: 20px; outline: none;
+            font-size: 14px; cursor: pointer; margin-bottom: 10px;
         }
 
-        /* Status de Processamento */
-        #status-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
+        /* ADS */
+        .ad-card {
+            background: #f9f9f9; text-align: center; padding: 12px;
+            margin-bottom: 16px; border-radius: 8px; font-size: 11px;
+            color: #999; border: 1px dashed #ccc;
         }
+
+        /* AUTH SCREEN */
+        #auth-screen {
+            position: fixed; inset: 0; background: white; z-index: 6000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px;
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
-<body>
+<body class="pb-24">
 
-    <div id="status-overlay">Processando...</div>
-
-    <div id="monetization-top">
-        <span>Publicidade Oficial Apex</span>
+    <div id="auth-screen" style="display:none;">
+        <div style="background:#4285F4; width:64px; height:64px; border-radius:16px; margin-bottom:24px;"></div>
+        <h2 style="color:#4285F4; font-weight:900; font-size:12px; margin-bottom:32px;">SOCIAL EARN NETWORK</h2>
+        <input type="text" id="login-id" placeholder="ID DE UTILIZADOR" style="width:100%; max-width:280px; border:2px solid #eee; padding:15px; border-radius:16px; text-align:center; margin-bottom:16px; font-weight:900;">
+        <button onclick="doLogin()" style="width:100%; max-width:280px; bg:#4285F4; background:#4285F4; color:white; padding:15px; border-radius:16px; font-weight:900; border:none; cursor:pointer;">Entrar no Sistema</button>
     </div>
 
-    <div class="feed-container" id="main-feed">
+    <header>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <div style="background:#4285F4; color:white; padding:8px; border-radius:8px; font-weight:900; font-style:italic;">S</div>
+            <div>
+                <h1 style="font-size:11px; font-weight:900; color:#4285F4; margin:0;">Social Earn</h1>
+                <p style="font-size:8px; color:#ccc; margin:0; letter-spacing:1px;">Official Network</p>
+            </div>
+        </div>
+        <div style="text-align:right;">
+            <div id="main-eur" style="font-weight:900; color:#16a34a; font-size:18px;">0.0000€</div>
+            <div id="main-brl" style="font-size:9px; color:#9ca3af; font-weight:900;">0.0000 BRL</div>
+        </div>
+    </header>
+
+    <div class="status-header-fixed">
+        <span id="status-text" style="color:#16a34a;">GANHOS ATIVOS: 100% (MODO NORMAL)</span>
+        <button onclick="doLogout()" style="margin-left:auto; background:none; border:none; font-size:8px; color:#ccc; font-weight:900; cursor:pointer;">SAIR</button>
+    </div>
+
+    <main class="feed-container">
+        <div class="publisher-card">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div class="user-avatar">👤</div>
+                <textarea id="post-input" placeholder="No que estás a pensar?" rows="1" onclick="expandPublisher()"></textarea>
+            </div>
+            <div id="expanded-post" class="hidden">
+                <input id="post-url" type="text" placeholder="URL da Imagem (Opcional)" style="width:100%; background:#f0f2f5; border:none; padding:10px; border-radius:10px; margin-bottom:10px; font-size:12px;">
+                <button onclick="handleInteraction('post')" style="width:100%; background:#4285F4; color:white; padding:12px; border-radius:10px; border:none; font-weight:900;">Publicar (+15 XP)</button>
+            </div>
         </div>
 
-    <script>
-        // CONFIGURAÇÕES BASE v33.12
-        const ADMIN_ID = "5401881400";
-        const MIN_WITHDRAWAL = 5000;
-        const CONVERSION_RATE = 0.0001; // Exemplo para 4 casas decimais
-        
-        let posts = [];
-        let postCount = 0;
+        <div id="feed-container">
+            </div>
+    </main>
 
-        // FUNÇÃO DE RENDERIZAÇÃO ESTILO FACEBOOK
-        function renderPosts(data) {
-            const feed = document.getElementById('main-feed');
+    <script>
+        // CONFIGURAÇÕES SUPABASE 
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const ADMIN_MASTER = "5401881400";
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+
+        let activeID = localStorage.getItem('apex_uid');
+        let user = { saldo: 0, interactions: 0 };
+
+        function doLogin() {
+            const id = document.getElementById('login-id').value.trim();
+            if(id) { localStorage.setItem('apex_uid', id); location.reload(); }
+        }
+
+        function doLogout() { localStorage.removeItem('apex_uid'); location.reload(); }
+
+        async function init() {
+            if (!activeID) { document.getElementById('auth-screen').style.display = 'flex'; return; }
             
-            data.forEach((post, index) => {
-                const postElement = document.createElement('div');
-                postElement.className = 'post-card';
-                postElement.innerHTML = `
+            // Carrega perfil [cite: 15]
+            const { data } = await sb.from('perfis').select('*').eq('id', activeID).single();
+            if(data) user.saldo = Number(data.saldo) || 0;
+            else await sb.from('perfis').insert([{ id: activeID, saldo: 0.0000 }]);
+
+            updateUI();
+            loadFeed();
+        }
+
+        function updateUI() {
+            document.getElementById('main-eur').innerText = user.saldo.toFixed(4) + "€";
+            document.getElementById('main-brl').innerText = (user.saldo * 6.1245).toFixed(4) + " BRL";
+        }
+
+        async function loadFeed() {
+            const { data: posts, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+            if (error) return;
+
+            const container = document.getElementById('feed-container');
+            container.innerHTML = '';
+
+            posts.forEach((post, index) => {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                card.innerHTML = `
                     <div class="post-header">
-                        <div class="user-avatar"></div>
+                        <div class="user-avatar">👤</div>
                         <div class="post-meta">
-                            <span class="user-name">Usuário ${post.userId}</span>
-                            <span class="post-time">ID: ${post.id}</span>
+                            <span class="user-name">Utilizador ${post.user_id}</span>
+                            <span class="post-time">${new Date(post.created_at).toLocaleString()}</span>
                         </div>
-                        ${post.userId === ADMIN_ID ? '<button onclick="deletePost('+post.id+')" style="margin-left:auto">X</button>' : ''}
+                        ${activeID === ADMIN_MASTER ? `<button onclick="deletePost('${post.id}')" style="margin-left:auto; color:red; border:none; background:none; cursor:pointer; font-weight:900;">EXCLUIR</button>` : ''}
                     </div>
-                    <div class="post-content">${post.text}</div>
-                    ${post.image ? `<img src="${post.image}" class="post-image">` : ''}
+                    <div class="post-content">${post.content || post.texto || ''}</div>
+                    ${post.image_url || post.url ? `<img src="${post.image_url || post.url}" class="post-image">` : ''}
                     <div class="post-actions">
-                        <button class="action-btn" onclick="likePost(${post.id})">👍 Curtir (+2 XP)</button>
-                        <button class="action-btn" onclick="reportPost(${post.id})">🚩 Denunciar</button>
+                        <button class="action-btn" onclick="handleInteraction('like')">👍 Gosto (+2 XP)</button>
+                        <button class="action-btn">💬 Comentar</button>
                     </div>
                 `;
-                feed.appendChild(postElement);
+                container.appendChild(card);
 
-                // Injeção automática de anúncios a cada 3 posts
+                // Ad Injection a cada 3 posts
                 if ((index + 1) % 3 === 0) {
                     const ad = document.createElement('div');
-                    ad.className = 'ad-container';
-                    ad.innerText = "Espaço Publicitário - Apex Social";
-                    feed.appendChild(ad);
+                    ad.className = 'ad-card';
+                    ad.innerText = "ESPAÇO PUBLICITÁRIO APEX SOCIAL";
+                    container.appendChild(ad);
                 }
             });
         }
 
-        // Simulação de Infinite Scroll (10 por vez)
-        window.onscroll = function() {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-                // Lógica para carregar mais 10 posts
+        function expandPublisher() {
+            document.getElementById('expanded-post').classList.remove('hidden');
+            document.getElementById('post-input').rows = 3;
+        }
+
+        async function handleInteraction(type) {
+            // Lógica de XP e Saldo baseada na sua Master List
+            const reward = type === 'post' ? 0.0150 : 0.0020;
+            user.saldo += reward;
+            
+            // Atualiza Supabase 
+            await sb.from('perfis').update({ saldo: user.saldo }).eq('id', activeID);
+            
+            if(type === 'post') {
+                const content = document.getElementById('post-input').value;
+                const url = document.getElementById('post-url').value;
+                await sb.from('posts').insert([{ user_id: activeID, content: content, image_url: url }]);
+                location.reload();
             }
-        };
-
-        // Gamificação
-        function addPoints(type) {
-            const points = { 'post': 15, 'friend': 100, 'like': 2, 'checkin': 5 };
-            console.log(`Ganhou ${points[type]} XP`);
+            updateUI();
         }
 
-        // Compressão de Imagem < 500KB
-        async function processImage(file) {
-            document.getElementById('status-overlay').style.display = 'flex';
-            // Lógica de compressão aqui
-            document.getElementById('status-overlay').style.display = 'none';
+        async function deletePost(id) {
+            if(activeID === ADMIN_MASTER) {
+                await sb.from('posts').delete().eq('id', id);
+                loadFeed();
+            }
         }
 
-        // Inicialização
-        console.log("Apex Social v33.13 carregado para ID:", ADMIN_ID);
+        init();
     </script>
 </body>
 </html>
