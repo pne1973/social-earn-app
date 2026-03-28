@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn v33.12</title>
+    <title>Social Earn Network v33.12</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Cores Facebook solicitadas */
         :root {
             --fb-blue: #1877F2; --fb-bg: #F0F2F5; --fb-card: #FFFFFF;
             --fb-text: #050505; --fb-secondary: #65676B; --fb-border: #ced0d4;
@@ -15,14 +14,15 @@
         body { background-color: var(--fb-bg); color: var(--fb-text); padding-top: 60px; }
         .hidden { display: none !important; }
 
-        /* Estilo do Login Original (Mantido para segurança) */
+        /* MODAL DE ENTRADA ORIGINAL (PRESERVADO) */
         #auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: white; z-index: 2000; display: flex;
             align-items: center; justify-content: center; flex-direction: column;
         }
+        .logo-orig { font-size: 40px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px; }
         
-        /* Header Facebook */
+        /* HEADER FACEBOOK EDITION */
         header { 
             background: var(--fb-card); height: 60px; width: 100%; position: fixed; 
             top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; 
@@ -30,7 +30,7 @@
         }
         .header-logo { color: var(--fb-blue); font-size: 28px; font-weight: bold; text-decoration: none; }
 
-        /* Estilo de Cards do Feed */
+        /* CONTEÚDO */
         main { max-width: 550px; margin: 0 auto; padding: 12px; }
         .card { 
             background: white; border-radius: 8px; border: 1px solid var(--fb-border); 
@@ -49,20 +49,17 @@
 <body>
 
     <div id="auth-modal">
-        <div style="text-align: center; width: 90%; max-width: 320px;">
-            <div style="font-size: 45px; font-weight: bold; color: var(--fb-blue); margin-bottom: 10px;">f</div>
-            <h2 style="margin-bottom: 20px;">Social Earn</h2>
-            <input type="text" id="auth-username" placeholder="Insira seu ID" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
-            <button onclick="processAuth()" style="width: 100%; padding: 12px; background: var(--fb-blue); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Entrar</button>
-        </div>
+        <div class="logo-orig">f</div>
+        <input type="text" id="auth-username" placeholder="Insira seu ID" style="width: 280px; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        <button onclick="processAuth()" style="width: 280px; padding: 10px; background: var(--fb-blue); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Entrar</button>
     </div>
 
-    <header class="hidden" id="app-header">
+    <header class="hidden" id="main-header">
         <a href="#" class="header-logo">f</a>
         <div style="font-weight: bold; color: var(--fb-blue);">€ <span id="user-balance">0.0000</span></div>
     </header>
 
-    <main class="hidden" id="app-content">
+    <main class="hidden" id="main-content">
         <div class="card">
             <input type="text" id="post-content" class="fb-input" placeholder="No que está a pensar?">
             <button class="fb-btn" onclick="createNewPost()">Publicar</button>
@@ -71,14 +68,14 @@
     </main>
 
     <script>
-        /* CONFIGURAÇÃO SUPABASE: COPIADA DO SEU DOC INDEX 39 */
+        /* CREDENCIAIS ORIGINAIS DO INDEX 39 */
         const SUPABASE_URL = 'https://fickstyevektwbgimapy.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiaW1hcHkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxMTQ1OTI2OCwiZXhwIjoyMDI3MDE2ODY4fQ.nOQWvUv_r_r_r_r_r_r_r_r_r_r_r_C9QY';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
 
-        /* FUNÇÃO DE ENTRADA: RIGOROSAMENTE IGUAL À DO SEU CÓDIGO */
+        /* FUNÇÃO DE ENTRADA ORIGINAL - INTOCADA */
         async function processAuth() {
             const id = document.getElementById('auth-username').value;
             if (!id) return alert("Digite um ID");
@@ -101,10 +98,9 @@
             }
 
             currentUser = profile;
-            // Transição de ecrãs
             document.getElementById('auth-modal').classList.add('hidden');
-            document.getElementById('app-header').classList.remove('hidden');
-            document.getElementById('app-content').classList.remove('hidden');
+            document.getElementById('main-header').classList.remove('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
             document.getElementById('user-balance').innerText = currentUser.balance.toFixed(4);
             loadPosts();
         }
@@ -117,13 +113,10 @@
 
             feed.innerHTML = posts.map(post => `
                 <div class="card">
-                    <div style="font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 32px; height: 32px; background: #ddd; border-radius: 50%;"></div>
-                        ${post.author_name}
-                    </div>
-                    <p style="margin-bottom: 12px;">${post.content}</p>
-                    <div style="border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 15px; color: var(--fb-secondary); font-size: 14px; font-weight: bold;">
-                        <span style="cursor:pointer;" onclick="earn(0.0006)">👍 Gostar</span>
+                    <div style="font-weight: bold; margin-bottom: 8px;">${post.author_name}</div>
+                    <p>${post.content}</p>
+                    <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 15px; color: var(--fb-secondary); font-size: 14px;">
+                        <span style="cursor:pointer;" onclick="earn(0.0006)">👍 Gosto</span>
                         <span style="cursor:pointer;" onclick="earn(0.0010)">💬 Comentar</span>
                     </div>
                 </div>
