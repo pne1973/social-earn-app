@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network v33.12</title>
+    <title>Social Earn Network</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -14,15 +14,15 @@
         body { background-color: var(--fb-bg); color: var(--fb-text); padding-top: 60px; }
         .hidden { display: none !important; }
 
-        /* MODAL DE ENTRADA ORIGINAL (ESTILO PRESERVADO) */
+        /* MODAL DE ENTRADA ORIGINAL - PRESERVADO */
         #auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: white; z-index: 2000; display: flex;
             align-items: center; justify-content: center; flex-direction: column;
         }
-        .logo-orig { font-size: 40px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px; }
+        .logo-f { font-size: 50px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px; }
         
-        /* HEADER FACEBOOK */
+        /* HEADER */
         header { 
             background: var(--fb-card); height: 60px; width: 100%; position: fixed; 
             top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; 
@@ -30,7 +30,7 @@
         }
         .header-logo { color: var(--fb-blue); font-size: 28px; font-weight: bold; text-decoration: none; }
 
-        /* FEED E CARDS */
+        /* FEED */
         main { max-width: 550px; margin: 0 auto; padding: 12px; }
         .card { 
             background: white; border-radius: 8px; border: 1px solid var(--fb-border); 
@@ -49,9 +49,12 @@
 <body>
 
     <div id="auth-modal">
-        <div class="logo-orig">f</div>
-        <input type="text" id="auth-username" placeholder="Insira seu ID" style="width: 280px; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
-        <button onclick="processAuth()" style="width: 280px; padding: 10px; background: var(--fb-blue); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Entrar</button>
+        <div class="logo-f">f</div>
+        <div style="text-align: center; width: 90%; max-width: 320px;">
+            <p style="margin-bottom: 15px; color: var(--fb-secondary);">Insira o seu ID para entrar.</p>
+            <input type="text" id="auth-username" placeholder="ID (ex: 123)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <button onclick="processAuth()" style="width: 100%; padding: 12px; background: var(--fb-blue); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Entrar</button>
+        </div>
     </div>
 
     <header class="hidden" id="main-header">
@@ -62,30 +65,32 @@
     <main class="hidden" id="main-content">
         <div class="card">
             <input type="text" id="post-content" class="fb-input" placeholder="No que está a pensar?">
-            <button class="fb-btn" onclick="createNewPost()">Publicar</button>
+            <button class="fb-btn" onclick="createNewPost()">Publicar (+€0.0150)</button>
         </div>
         <div id="feed"></div>
     </main>
 
     <script>
-        /* CONFIGURAÇÃO SUPABASE ORIGINAL DO SEU DOC */
+        /* CREDENCIAIS ORIGINAIS DO INDEX 39 */
         const SUPABASE_URL = 'https://fickstyevektwbgimapy.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiaW1hcHkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxMTQ1OTI2OCwiZXhwIjoyMDI3MDE2ODY4fQ.nOQWvUv_r_r_r_r_r_r_r_r_r_r_r_C9QY';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
 
-        /* FUNÇÃO DE ENTRADA: CÓPIA EXATA DO SEU CÓDIGO FUNCIONAL */
+        /* FUNÇÃO DE ENTRADA: ORIGINAL DO SEU DOC (NÃO ALTERADA) */
         async function processAuth() {
             const id = document.getElementById('auth-username').value;
             if (!id) return alert("Digite um ID");
 
+            // Esta é a linha que você enviou: busca um perfil único pelo ID
             let { data: profile, error } = await _supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', id)
                 .single();
 
+            // Se der erro ou não encontrar, ele tenta criar
             if (error || !profile) {
                 const { data: newUser, error: createError } = await _supabase
                     .from('profiles')
@@ -97,6 +102,7 @@
                 profile = newUser;
             }
 
+            // Se chegou aqui, o login foi bem sucedido
             currentUser = profile;
             document.getElementById('auth-modal').classList.add('hidden');
             document.getElementById('main-header').classList.remove('hidden');
@@ -105,7 +111,7 @@
             loadPosts();
         }
 
-        /* SISTEMA DE FEED E GANHOS */
+        /* RESTANTE DO SISTEMA */
         async function loadPosts() {
             const { data: posts } = await _supabase.from('posts').select('*').order('created_at', { ascending: false });
             const feed = document.getElementById('feed');
@@ -113,14 +119,10 @@
 
             feed.innerHTML = posts.map(post => `
                 <div class="card">
-                    <div style="font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 32px; height: 32px; background: #ddd; border-radius: 50%;"></div>
-                        ${post.author_name}
-                    </div>
-                    <p style="margin-bottom: 12px;">${post.content}</p>
-                    <div style="border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 20px; color: var(--fb-secondary); font-size: 14px; font-weight: bold;">
+                    <div style="font-weight: bold; margin-bottom: 8px;">${post.author_name}</div>
+                    <p>${post.content}</p>
+                    <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 15px; color: var(--fb-secondary); font-size: 14px;">
                         <span style="cursor:pointer;" onclick="earn(0.0006)">👍 Gosto</span>
-                        <span style="cursor:pointer;" onclick="earn(0.0010)">💬 Comentário</span>
                     </div>
                 </div>
             `).join('');
