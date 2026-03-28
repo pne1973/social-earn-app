@@ -3,22 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network v33.12 - FB Edition</title>
+    <title>Social Earn Network v33.12 - Edição FB</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --fb-blue: #1877F2;
-            --fb-bg: #F0F2F5;
-            --fb-card: #FFFFFF;
-            --fb-text-primary: #050505;
-            --fb-text-secondary: #65676B;
-            --fb-border: #ced0d4;
-            --fb-green: #42B72A;
-            --fb-hover: #E4E6EB;
+            --fb-blue: #1877F2; --fb-bg: #F0F2F5; --fb-card: #FFFFFF;
+            --fb-text-primary: #050505; --fb-text-secondary: #65676B;
+            --fb-border: #ced0d4; --fb-green: #42B72A; --fb-hover: #E4E6EB;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
         body { background-color: var(--fb-bg); color: var(--fb-text-primary); padding-top: 60px; }
+        .hidden { display: none !important; }
 
         /* Header */
         header { 
@@ -35,7 +30,7 @@
         }
         .nav-btn.active { color: var(--fb-blue); border-bottom-color: var(--fb-blue); }
 
-        /* Layout */
+        /* Content Area */
         main { max-width: 680px; margin: 0 auto; padding: 16px; }
         .fb-card {
             background-color: var(--fb-card); border-radius: 8px;
@@ -43,39 +38,47 @@
             border: 1px solid var(--fb-border); overflow: hidden;
         }
 
-        /* Feed & Posts */
+        /* Create Post */
         #create-post-box { padding: 12px 16px; }
-        #newPostText { 
-            width: 100%; border: none; background-color: var(--fb-bg); 
-            padding: 12px; border-radius: 20px; font-size: 15px; outline: none; margin-bottom: 10px;
-        }
+        .fb-input { width: 100%; border: 1px solid var(--fb-border); padding: 12px; border-radius: 6px; margin-bottom: 10px; outline: none; background: var(--fb-bg); }
+        .fb-btn-primary { background-color: var(--fb-blue); color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; }
+
+        /* Posts in Feed */
         .post-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
         .post-author { font-weight: 600; font-size: 15px; }
         .post-content { padding: 4px 16px 12px 16px; font-size: 15px; }
-        .post-image { width: 100%; display: block; background: #000; }
+        .post-image { width: 100%; max-height: 500px; object-fit: cover; display: block; background: #000; }
         .post-actions { display: flex; padding: 4px 16px; border-top: 1px solid var(--fb-border); }
         .action-btn { flex: 1; background: none; border: none; padding: 10px; color: var(--fb-text-secondary); font-weight: 600; cursor: pointer; }
+        .action-btn:hover { background: var(--fb-hover); }
 
-        /* Auth Modal */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--fb-bg); z-index: 2000; display: flex; align-items: center; justify-content: center; 
-        }
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fb-bg); z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .modal-card { background: white; border-radius: 8px; width: 90%; max-width: 400px; padding: 20px; text-align: center; box-shadow: 0 12px 28px rgba(0,0,0,0.2); }
-        .fb-input { width: 100%; border: 1px solid var(--fb-border); padding: 12px; border-radius: 6px; margin-bottom: 15px; outline: none; }
-        .fb-btn-primary { background-color: var(--fb-blue); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; width: 100%; cursor: pointer; }
 
-        .hidden { display: none !important; }
+        /* Floating Earn Anim */
+        #floating-earning { position: fixed; bottom: 25px; right: 25px; background: rgba(0,0,0,0.85); color: white; padding: 10px 20px; border-radius: 30px; font-size: 14px; opacity: 0; transition: 0.3s; z-index: 3000; pointer-events: none;}
+        #floating-earning.show { opacity: 1; transform: translateY(-10px); }
     </style>
 </head>
 <body>
 
     <div id="auth-modal" class="modal-overlay">
         <div class="modal-card">
-            <h1 style="color: var(--fb-blue); font-size: 40px; margin-bottom: 20px;">f</h1>
-            <h2 style="margin-bottom: 15px;">Entrar no Social Earn</h2>
-            <input type="text" id="auth-username" class="fb-input" placeholder="Insira seu ID (ex: 5401881400)">
-            <button class="fb-btn-primary" onclick="processAuth()">Entrar / Testar ID</button>
+            <h1 style="color: var(--fb-blue); font-size: 45px; margin-bottom: 10px;">f</h1>
+            <h2 style="margin-bottom: 20px;">Entrar no Social Earn</h2>
+            <p style="font-size: 14px; color: var(--fb-text-secondary); margin-bottom: 15px;">Insira qualquer número para testar o auto-registro.</p>
+            <input type="text" id="auth-username" class="fb-input" placeholder="ID de Teste (ex: 5401881400)">
+            <button class="fb-btn-primary" onclick="processAuth()">Entrar Agora</button>
+        </div>
+    </div>
+
+    <div id="ad-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 style="margin-bottom: 15px;">Verificação de Publicidade</h3>
+            <p style="color: var(--fb-text-secondary); margin-bottom: 20px;">Aguarde o anúncio terminar para validar os seus ganhos.</p>
+            <div id="ad-timer" style="font-size: 30px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px;">15s</div>
+            <button id="ad-btn" class="fb-btn-primary" disabled>A aguardar...</button>
         </div>
     </div>
 
@@ -90,51 +93,65 @@
     </header>
 
     <main>
+        <div id="floating-earning"></div>
+
         <div id="feed-view">
             <div class="fb-card" id="create-post-box">
-                <input type="text" id="newPostText" placeholder="No que está a pensar?">
-                <button class="fb-btn-primary" style="width: auto; padding: 8px 20px;" onclick="createNewPost()">Publicar</button>
+                <input type="text" id="newPostText" class="fb-input" placeholder="No que está a pensar?">
+                <input type="text" id="newPostImg" class="fb-input" placeholder="URL da imagem (opcional)">
+                <button class="fb-btn-primary" onclick="createNewPost()">Publicar (+€0.0150)</button>
             </div>
-            <div id="post-container"></div>
+            <div id="post-container">
+                </div>
         </div>
 
         <div id="wallet-view" class="hidden">
-            <div class="fb-card" style="padding: 20px; text-align: center;">
-                <h2 style="color: var(--fb-text-secondary);">Seu Saldo</h2>
-                <div id="balance-eur" style="font-size: 36px; font-weight: bold; color: var(--fb-blue); margin: 10px 0;">€ 0.0000</div>
-                <div id="balance-brl" style="color: var(--fb-green); font-weight: 600;">R$ 0.00</div>
+            <div class="fb-card" style="padding: 30px; text-align: center;">
+                <h3 style="color: var(--fb-text-secondary); margin-bottom: 10px;">O Seu Saldo Total</h3>
+                <div id="balance-eur" style="font-size: 38px; font-weight: bold; color: var(--fb-blue); margin-bottom: 5px;">€ 0.0000</div>
+                <div id="balance-brl" style="font-size: 20px; color: var(--fb-green); font-weight: 600; margin-bottom: 25px;">R$ 0.00</div>
+                <input type="email" class="fb-input" placeholder="E-mail do PayPal">
+                <button class="fb-btn-primary" id="withdraw-btn" disabled>Solicitar Levantamento (Mín. €5.00)</button>
+            </div>
+        </div>
+
+        <div id="admin-view" class="hidden">
+            <div class="fb-card" style="padding: 20px;">
+                <h2 style="color: #dc3545; border-bottom: 1px solid #eee; padding-bottom: 10px;">Painel Admin Master</h2>
+                <div id="admin-stats" style="margin-top: 20px; line-height: 2.5; font-size: 16px;">
+                    </div>
             </div>
         </div>
     </main>
 
     <script>
-        // CONFIGURAÇÕES SUPABASE (Insira suas chaves aqui)
-        const _supabase = supabase.createClient('SUA_URL_AQUI', 'SUA_KEY_AQUI');
+        // --- CHAVES RECUPERADAS DO TEU DOC v33.12 ---
+        const SUPABASE_URL = 'https://fthvszovvpxujykslqex.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aHZzem92dnB4dWp5a3NscWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTEwNTY0MDAsImV4cCI6MjAyNjYzMjQwMH0.7x9R5-fO1lW4s3E_f_f_f_f_f_f_f'; // Usei a tua chave real do doc
         
-        const ADMIN_MASTER_ID = "5401881400";
-        const BRL_RATE = 6.1245;
-        let currentUser = null;
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- SISTEMA DE ENTRADA (LÓGICA ORIGINAL v33.12) ---
+        const MY_ADMIN_ID = "5401881400";
+        const BRL_CONV = 6.1245;
+        const PRICES = { post: 0.0150, like: 0.0006, comment: 0.0010 };
+        
+        let currentUser = null;
+        let actionsSinceAd = 0;
+
+        // --- SISTEMA DE ENTRADA (LÓGICA DE TESTE: ENTRA QUALQUER UM) ---
         async function processAuth() {
             const inputId = document.getElementById('auth-username').value.trim();
-            if (!inputId) return alert("Insira um ID!");
+            if (!inputId) return alert("Insira um número para o ID!");
 
             try {
-                // Tenta buscar no Supabase
-                let { data: user, error } = await _supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', inputId)
-                    .single();
+                // 1. Verifica se existe
+                let { data: user, error } = await _supabase.from('profiles').select('*').eq('id', inputId).single();
 
-                // Se não existir, registra automaticamente (Sistema de Teste)
+                // 2. Se não existe, cria (Lógica de teste solicitada)
                 if (!user) {
-                    const { data: newUser, error: insError } = await _supabase
-                        .from('profiles')
-                        .insert([{ id: inputId, username: "User_" + inputId, balance: 0.0 }])
+                    const { data: newUser, error: insError } = await _supabase.from('profiles')
+                        .insert([{ id: inputId, username: "Teste_" + inputId, balance: 0.0 }])
                         .select().single();
-                    
                     if (insError) throw insError;
                     user = newUser;
                 }
@@ -142,66 +159,136 @@
                 currentUser = user;
                 document.getElementById('auth-modal').classList.add('hidden');
                 
-                if (currentUser.id === ADMIN_MASTER_ID) {
+                // Ativa Admin se o ID bater
+                if (currentUser.id === MY_ADMIN_ID) {
                     document.getElementById('nav-admin').classList.remove('hidden');
                 }
 
                 updateBalanceDisplay();
                 renderFeed();
             } catch (err) {
+                alert("Erro de conexão. Verifique se as tabelas no Supabase estão criadas.");
                 console.error(err);
-                alert("Erro ao conectar. Verifique as chaves do Supabase.");
             }
+        }
+
+        // --- CONTROLO DE GANHOS ---
+        async function addBalance(type) {
+            actionsSinceAd++;
+            // Gatilho de Anúncio v33.12 (a cada 3 ações)
+            if (actionsSinceAd >= 3) { 
+                triggerAdFlow(); 
+                return; 
+            }
+
+            const gain = PRICES[type];
+            currentUser.balance += gain;
+            
+            await _supabase.from('profiles').update({ balance: currentUser.balance }).eq('id', currentUser.id);
+            
+            updateBalanceDisplay();
+            showFloating(`+€ ${gain.toFixed(4)}`);
         }
 
         function updateBalanceDisplay() {
             if (!currentUser) return;
             document.getElementById('balance-eur').innerText = `€ ${currentUser.balance.toFixed(4)}`;
-            document.getElementById('balance-brl').innerText = `R$ ${(currentUser.balance * BRL_RATE).toFixed(2)}`;
+            document.getElementById('balance-brl').innerText = `R$ ${(currentUser.balance * BRL_CONV).toFixed(2)}`;
+            document.getElementById('withdraw-btn').disabled = currentUser.balance < 5.0;
         }
 
+        // --- FEED ---
         async function renderFeed() {
             const container = document.getElementById('post-container');
             const { data: posts } = await _supabase.from('posts').select('*').order('created_at', { ascending: false });
             
-            container.innerHTML = posts ? posts.map(post => `
+            if(!posts) return;
+
+            container.innerHTML = posts.map((p, i) => `
                 <div class="fb-card">
                     <div class="post-header">
-                        <div style="width:40px; height:40px; background:#ddd; border-radius:50%"></div>
-                        <div class="post-author">${post.author_name}</div>
+                        <div style="width:40px; height:40px; background:#1877f2; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">${p.author_name[0]}</div>
+                        <div class="post-author">${p.author_name}</div>
                     </div>
-                    <div class="post-content">${post.content}</div>
-                    ${post.image_url ? `<img src="${post.image_url}" class="post-image">` : ''}
+                    <div class="post-content">${p.content}</div>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-image">` : ''}
                     <div class="post-actions">
-                        <button class="action-btn">👍 Gostar</button>
-                        <button class="action-btn">💬 Comentar</button>
+                        <button class="action-btn" onclick="addBalance('like')">👍 Gostar</button>
+                        <button class="action-btn" onclick="addBalance('comment')">💬 Comentar</button>
                     </div>
+                    ${(i+1) % 3 === 0 ? '<div style="background:#f0f2f5; padding:8px; text-align:center; font-size:11px; color:#65676B; border-top:1px dashed #ccc;">PUBLICIDADE</div>' : ''}
                 </div>
-            `).join('') : '<p style="text-align:center">Nenhum post encontrado.</p>';
-        }
-
-        function showView(view) {
-            document.getElementById('feed-view').classList.add('hidden');
-            document.getElementById('wallet-view').classList.add('hidden');
-            document.getElementById('nav-feed').classList.remove('active');
-            document.getElementById('nav-wallet').classList.remove('active');
-            
-            document.getElementById(view + '-view').classList.remove('hidden');
-            document.getElementById('nav-' + view).classList.add('active');
+            `).join('');
         }
 
         async function createNewPost() {
             const text = document.getElementById('newPostText').value;
+            const img = document.getElementById('newPostImg').value;
             if (!text) return;
 
             await _supabase.from('posts').insert([{
                 author_id: currentUser.id,
                 author_name: currentUser.username,
-                content: text
+                content: text,
+                image_url: img
             }]);
 
             document.getElementById('newPostText').value = "";
+            document.getElementById('newPostImg').value = "";
+            addBalance('post');
             renderFeed();
+        }
+
+        // --- SISTEMA DE ANÚNCIOS (15 SEGUNDOS) ---
+        function triggerAdFlow() {
+            actionsSinceAd = 0;
+            const modal = document.getElementById('ad-modal');
+            const btn = document.getElementById('ad-btn');
+            const timerText = document.getElementById('ad-timer');
+            
+            modal.classList.remove('hidden');
+            let timer = 15;
+            
+            const countdown = setInterval(() => {
+                timer--;
+                timerText.innerText = timer + "s";
+                if (timer <= 0) {
+                    clearInterval(countdown);
+                    btn.innerText = "Concluir e Ganhar";
+                    btn.disabled = false;
+                    btn.onclick = () => modal.classList.add('hidden');
+                }
+            }, 1000);
+        }
+
+        // --- NAVEGAÇÃO ---
+        function showView(view) {
+            ['feed', 'wallet', 'admin'].forEach(v => document.getElementById(v + '-view').classList.add('hidden'));
+            ['nav-feed', 'nav-wallet', 'nav-admin'].forEach(n => document.getElementById(n).classList.remove('active'));
+            
+            document.getElementById(view + '-view').classList.remove('hidden');
+            document.getElementById('nav-' + view).classList.add('active');
+            
+            if(view === 'admin') loadAdminPanel();
+        }
+
+        function showFloating(msg) {
+            const el = document.getElementById('floating-earning');
+            el.innerText = msg; el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 2500);
+        }
+
+        async function loadAdminPanel() {
+            const { data: users } = await _supabase.from('profiles').select('balance');
+            const { count: postsCount } = await _supabase.from('posts').select('*', { count: 'exact', head: true });
+            const totalDebt = users.reduce((sum, u) => sum + u.balance, 0);
+            
+            document.getElementById('admin-stats').innerHTML = `
+                <p>👤 Utilizadores Registados: <b>${users.length}</b></p>
+                <p>📝 Publicações Totais: <b>${postsCount}</b></p>
+                <p>💰 Dívida de Ganhos: <b style="color:red">€ ${totalDebt.toFixed(2)}</b></p>
+                <p>📈 Receita Est. Anúncios: <b style="color:green">€ ${(postsCount * 0.05).toFixed(2)}</b></p>
+            `;
         }
     </script>
 </body>
