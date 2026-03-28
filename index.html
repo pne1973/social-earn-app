@@ -20,7 +20,7 @@
         body { background-color: var(--fb-bg); color: var(--fb-text-main); }
         .hidden { display: none !important; }
 
-        /* HEADER FACEBOOK */
+        /* HEADER */
         header {
             background: var(--fb-card);
             height: 56px;
@@ -37,7 +37,7 @@
         }
         .logo-fb { color: var(--fb-blue); font-size: 28px; font-weight: bold; letter-spacing: -1px; text-decoration: none; }
         .header-right { display: flex; align-items: center; gap: 8px; }
-        .balance-display { background: #E7F3FF; color: var(--fb-blue); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+        .balance-pill { background: #E7F3FF; color: var(--fb-blue); padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
         .icon-circle { background: #EBEDF0; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
 
         /* LOGIN */
@@ -50,8 +50,8 @@
         main { max-width: 500px; margin: 56px auto 0 auto; padding: 10px 0; }
         
         .composer { background: white; padding: 12px 16px; margin-bottom: 10px; border-bottom: 1px solid var(--fb-border); }
-        .composer-input-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #ddd; object-fit: cover; }
+        .composer-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #ddd; }
         .fake-input { flex: 1; background: #F0F2F5; border-radius: 20px; padding: 10px 16px; color: var(--fb-text-sec); font-size: 15px; border: none; outline: none; }
         
         .composer-btns { display: flex; border-top: 1px solid #E4E6EB; padding-top: 10px; }
@@ -61,10 +61,12 @@
         .card-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
         .user-name { font-weight: bold; font-size: 15px; }
         .post-meta { font-size: 12px; color: var(--fb-text-sec); }
-        .card-body { padding: 4px 16px 12px 16px; font-size: 15px; }
+        .card-body { padding: 4px 16px 12px 16px; font-size: 15px; line-height: 1.4; }
         .card-img { width: 100%; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+        
+        .card-stats { padding: 10px 16px; display: flex; justify-content: space-between; font-size: 13px; color: var(--fb-text-sec); }
         .card-actions { display: flex; border-top: 1px solid #E4E6EB; padding: 4px 0; }
-        .act-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 0; color: var(--fb-text-sec); font-weight: 600; font-size: 14px; }
+        .act-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 0; color: var(--fb-text-sec); font-weight: 600; font-size: 14px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -78,7 +80,7 @@
     <header class="hidden" id="nav-header">
         <a href="#" class="logo-fb">facebook</a>
         <div class="header-right">
-            <div class="balance-display">€ <span id="val-saldo">0.0000</span></div>
+            <div class="balance-pill">€ <span id="val-saldo">0.0000</span></div>
             <div class="icon-circle"><i class="fa-solid fa-search"></i></div>
             <div class="icon-circle"><i class="fa-solid fa-bars"></i></div>
         </div>
@@ -86,7 +88,7 @@
 
     <main class="hidden" id="app-content">
         <div class="composer">
-            <div class="composer-input-row">
+            <div class="composer-row">
                 <div class="avatar"></div>
                 <input type="text" id="new-post-text" class="fake-input" placeholder="No que está a pensar?">
             </div>
@@ -109,12 +111,16 @@
             const id = document.getElementById('login-id').value;
             if(!id) return;
 
-            // Busca na tabela 'perfis' (como no seu código original)
-            let { data: perfil } = await sb.from('perfis').select('*').eq('id', id).maybeSingle();
+            // Busca na tabela 'perfis' (conforme o print de 13 tabelas)
+            let { data: perfil, error: fetchError } = await sb.from('perfis').select('*').eq('id', id).maybeSingle();
 
             if(!perfil) {
-                // Se não existir, cria com saldo_eur (conforme o seu print de colunas)
-                const { data: novo } = await sb.from('perfis').insert([{ id: id, nome: 'User_'+id, saldo_eur: 0 }]).select().single();
+                // Criar novo perfil respeitando a estrutura do print (saldo_eur)
+                const { data: novo, error: createError } = await sb.from('perfis')
+                    .insert([{ id: id, nome: 'User_'+id, saldo_eur: 0 }])
+                    .select().single();
+                
+                if(createError) return alert("Erro ao criar perfil. Verifique as RLS.");
                 perfil = novo;
             }
 
@@ -123,18 +129,17 @@
             document.getElementById('nav-header').classList.remove('hidden');
             document.getElementById('app-content').classList.remove('hidden');
             
-            // Prioriza exibir o saldo_eur que vimos no print
             document.getElementById('val-saldo').innerText = Number(user.saldo_eur || 0).toFixed(4);
             carregarFeed();
         }
 
         async function carregarFeed() {
-            // AJUSTADO: Agora lê da tabela 'posts' que você circulou
+            // Lendo da tabela 'posts' com as colunas reais do seu print
             const { data: posts, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
             
             const container = document.getElementById('feed-container');
             if(error || !posts) {
-                container.innerHTML = "<p style='text-align:center; padding:20px;'>Erro ao carregar posts. Verifique a tabela 'posts'.</p>";
+                container.innerHTML = "<p style='text-align:center; padding:20px;'>Sem publicações no momento.</p>";
                 return;
             }
 
@@ -143,14 +148,20 @@
                     <div class="card-header">
                         <div class="avatar"></div>
                         <div class="user-info">
-                            <div class="user-name">${p.author_name || 'Utilizador'}</div>
+                            <div class="user-name">${p.username || 'Utilizador'}</div>
                             <div class="post-meta">Agora · <i class="fa-solid fa-earth-americas"></i></div>
                         </div>
                     </div>
-                    <div class="card-body">${p.content}</div>
+                    <div class="card-body">${p.content || ''}</div>
                     ${p.image_url ? `<img src="${p.image_url}" class="card-img">` : ''}
+                    
+                    <div class="card-stats">
+                        <span><i class="fa-solid fa-thumbs-up" style="color: var(--fb-blue);"></i> ${p.likes || 0}</span>
+                        <span>${p.comments_count || 0} comentários</span>
+                    </div>
+
                     <div class="card-actions">
-                        <div class="act-btn" onclick="ganhar(0.0006)"><i class="fa-regular fa-thumbs-up"></i> Gosto</div>
+                        <div class="act-btn" onclick="interagir(0.0006)"><i class="fa-regular fa-thumbs-up"></i> Gosto</div>
                         <div class="act-btn"><i class="fa-regular fa-comment"></i> Comentar</div>
                         <div class="act-btn"><i class="fa-solid fa-share"></i> Partilhar</div>
                     </div>
@@ -162,20 +173,25 @@
             const txt = document.getElementById('new-post-text').value;
             if(!txt) return;
 
+            // Inserindo na tabela 'posts' usando as colunas corretas (username, user_id, content)
             const { error } = await sb.from('posts').insert([{ 
-                author_id: user.id, 
-                author_name: user.nome, 
-                content: txt 
+                user_id: user.id, 
+                username: user.nome, 
+                content: txt,
+                likes: 0,
+                comments_count: 0
             }]);
 
             if(!error) {
                 document.getElementById('new-post-text').value = '';
-                ganhar(0.0150);
+                interagir(0.0150);
                 carregarFeed();
+            } else {
+                alert("Erro ao publicar. Verifique se a coluna 'user_id' aceita o formato do seu ID.");
             }
         }
 
-        async function ganhar(valor) {
+        async function interagir(valor) {
             user.saldo_eur = (Number(user.saldo_eur) || 0) + valor;
             await sb.from('perfis').update({ saldo_eur: user.saldo_eur }).eq('id', user.id);
             document.getElementById('val-saldo').innerText = user.saldo_eur.toFixed(4);
