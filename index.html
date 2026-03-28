@@ -1,201 +1,226 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Facebook</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Social - v33.13</title>
     <style>
         :root {
-            --fb-blue: #1877F2;
+            --google-blue: #4285F4;
             --fb-bg: #F0F2F5;
-            --fb-card: #FFFFFF;
-            --fb-text-main: #050505;
-            --fb-text-sec: #65676B;
-            --fb-border: #CED0D4;
+            --card-bg: #FFFFFF;
+            --text-main: #1C1E21;
+            --text-secondary: #65676B;
+            --border-color: #CED0D4;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
-        body { background-color: var(--fb-bg); color: var(--fb-text-main); padding-top: 56px; }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--fb-bg);
+            color: var(--text-main);
+            margin: 0;
+            padding-top: 60px;
+        }
 
-        /* HEADER */
-        header {
-            background: var(--fb-card);
-            height: 56px;
-            width: 100%;
+        /* Banner de Monetização Fixo */
+        #monetization-top {
             position: fixed;
             top: 0;
-            left: 0;
+            width: 100%;
+            height: 50px;
+            background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            border-bottom: 1px solid var(--fb-border);
-            z-index: 1000;
+            justify-content: center;
         }
-        .logo-fb { color: var(--fb-blue); font-size: 28px; font-weight: bold; letter-spacing: -1px; text-decoration: none; }
-        
-        .header-right { display: flex; align-items: center; gap: 8px; }
-        .balance-container { text-align: right; margin-right: 5px; }
-        .balance-pill { background: #E7F3FF; color: var(--fb-blue); padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; display: block; }
-        .brl-text { font-size: 10px; color: var(--fb-text-sec); display: block; font-weight: bold; margin-top: 2px; }
-        .icon-circle { background: #EBEDF0; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
 
-        /* CONTENT */
-        main { max-width: 500px; margin: 0 auto; padding: 10px 0; }
-        
-        /* COMPOSER */
-        .composer { background: white; padding: 12px 16px; margin-bottom: 10px; border-bottom: 1px solid var(--fb-border); }
-        .composer-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #EBEDF0; display: flex; align-items: center; justify-content: center; color: #65676B; }
-        .fake-input { flex: 1; background: #F0F2F5; border-radius: 20px; padding: 10px 16px; color: var(--fb-text-sec); font-size: 15px; border: none; outline: none; }
-        
-        /* FEED CARDS */
-        .fb-card { background: white; margin-bottom: 10px; border-top: 1px solid var(--fb-border); border-bottom: 1px solid var(--fb-border); }
-        .card-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
-        .user-name { font-weight: bold; font-size: 15px; }
-        .post-meta { font-size: 12px; color: var(--fb-text-sec); }
-        .card-body { padding: 4px 16px 12px 16px; font-size: 15px; line-height: 1.4; }
-        .card-img { width: 100%; max-height: 400px; object-fit: cover; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
-        
-        .card-stats { padding: 10px 16px; display: flex; justify-content: space-between; font-size: 13px; color: var(--fb-text-sec); }
-        .card-actions { display: flex; border-top: 1px solid #E4E6EB; padding: 4px 0; }
-        .act-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 0; color: var(--fb-text-sec); font-weight: 600; font-size: 14px; cursor: pointer; }
-        .act-btn i { font-size: 18px; }
+        .feed-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        /* Card de Post estilo Facebook */
+        .post-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+            margin-right: 10px;
+        }
+
+        .post-meta {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .post-time {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .post-content {
+            font-size: 15px;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            word-wrap: break-word;
+        }
+
+        .post-image {
+            width: calc(100% + 24px);
+            margin-left: -12px;
+            max-height: 500px;
+            object-fit: cover;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .post-actions {
+            display: flex;
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+            padding-top: 5px;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        /* Ad Injection Style */
+        .ad-container {
+            background: #f9f9f9;
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #999;
+            border: 1px dashed #ccc;
+        }
+
+        /* Status de Processamento */
+        #status-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <a href="#" class="logo-fb">facebook</a>
-        <div class="header-right">
-            <div class="balance-container">
-                <div class="balance-pill">€ <span id="val-eur">0.0000</span></div>
-                <span class="brl-text">R$ <span id="val-brl">0.0000</span></span>
-            </div>
-            <div class="icon-circle"><i class="fa-solid fa-search"></i></div>
-            <div class="icon-circle"><i class="fa-solid fa-bars"></i></div>
-        </div>
-    </header>
+    <div id="status-overlay">Processando...</div>
 
-    <main>
-        <div class="composer">
-            <div class="composer-row">
-                <div class="avatar"><i class="fa-solid fa-user"></i></div>
-                <input type="text" id="post-input" class="fake-input" placeholder="No que está a pensar?">
-            </div>
-            <div class="composer-btns" style="display: flex; border-top: 1px solid #E4E6EB; padding-top: 10px;">
-                <div class="comp-btn" style="flex:1; text-align:center; color:#65676B; font-weight:600; font-size:14px; cursor:pointer;" onclick="criarPost()">
-                    <i class="fa-solid fa-paper-plane" style="color: #45bd62; margin-right:5px;"></i> Publicar
-                </div>
-                <div class="comp-btn" style="flex:1; text-align:center; color:#65676B; font-weight:600; font-size:14px;">
-                    <i class="fa-solid fa-image" style="color: #45bd62; margin-right:5px;"></i> Foto
-                </div>
-            </div>
-        </div>
+    <div id="monetization-top">
+        <span>Publicidade Oficial Apex</span>
+    </div>
 
-        <div id="feed">
-            <div style="text-align: center; padding: 40px; color: #65676B;">A carregar publicações...</div>
+    <div class="feed-container" id="main-feed">
         </div>
-    </main>
 
     <script>
-        const SB_URL = 'https://fickstyevektwbdgimapy.supabase.co';
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
-        const sb = supabase.createClient(SB_URL, SB_KEY);
+        // CONFIGURAÇÕES BASE v33.12
+        const ADMIN_ID = "5401881400";
+        const MIN_WITHDRAWAL = 5000;
+        const CONVERSION_RATE = 0.0001; // Exemplo para 4 casas decimais
+        
+        let posts = [];
+        let postCount = 0;
 
-        // CONFIGURAÇÕES FIXAS
-        const MEU_ID = "123"; 
-        const TAXA_CONVERSAO = 6.1242; // Exemplo de taxa EUR -> BRL
-
-        async function carregarTudo() {
-            await carregarSaldo();
-            await carregarPosts();
-        }
-
-        async function carregarSaldo() {
-            // Busca o saldo_eur da tabela 'perfis'
-            const { data } = await sb.from('perfis').select('saldo_eur').eq('id', MEU_ID).maybeSingle();
-            if (data) {
-                const eur = Number(data.saldo_eur || 0);
-                const brl = eur * TAXA_CONVERSAO;
-                document.getElementById('val-eur').innerText = eur.toFixed(4);
-                document.getElementById('val-brl').innerText = brl.toFixed(4);
-            }
-        }
-
-        async function carregarPosts() {
-            // Busca da tabela 'posts' identificada nos seus prints
-            const { data: posts, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+        // FUNÇÃO DE RENDERIZAÇÃO ESTILO FACEBOOK
+        function renderPosts(data) {
+            const feed = document.getElementById('main-feed');
             
-            const feedDiv = document.getElementById('feed');
-            
-            if (error) {
-                feedDiv.innerHTML = `<div style="text-align:center; padding:20px;">Erro ao ligar à base de dados. Verifique as RLS.</div>`;
-                return;
-            }
-
-            if (!posts || posts.length === 0) {
-                feedDiv.innerHTML = `<div style="text-align:center; padding:20px;">Nenhuma publicação encontrada.</div>`;
-                return;
-            }
-
-            feedDiv.innerHTML = posts.map(p => `
-                <div class="fb-card">
-                    <div class="card-header">
-                        <div class="avatar"><i class="fa-solid fa-user"></i></div>
-                        <div class="user-info">
-                            <div class="user-name">${p.username || 'Utilizador'}</div>
-                            <div class="post-meta">ID: ${p.user_id} · <i class="fa-solid fa-earth-americas"></i></div>
+            data.forEach((post, index) => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post-card';
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <div class="user-avatar"></div>
+                        <div class="post-meta">
+                            <span class="user-name">Usuário ${post.userId}</span>
+                            <span class="post-time">ID: ${post.id}</span>
                         </div>
+                        ${post.userId === ADMIN_ID ? '<button onclick="deletePost('+post.id+')" style="margin-left:auto">X</button>' : ''}
                     </div>
-                    <div class="card-body">${p.content || ''}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="card-img">` : ''}
-                    
-                    <div class="card-stats">
-                        <span><i class="fa-solid fa-thumbs-up" style="color: var(--fb-blue);"></i> ${p.likes || 0}</span>
-                        <span>${p.comments_count || 0} comentários</span>
+                    <div class="post-content">${post.text}</div>
+                    ${post.image ? `<img src="${post.image}" class="post-image">` : ''}
+                    <div class="post-actions">
+                        <button class="action-btn" onclick="likePost(${post.id})">👍 Curtir (+2 XP)</button>
+                        <button class="action-btn" onclick="reportPost(${post.id})">🚩 Denunciar</button>
                     </div>
+                `;
+                feed.appendChild(postElement);
 
-                    <div class="card-actions">
-                        <div class="act-btn" onclick="curtir()"><i class="fa-regular fa-thumbs-up"></i> Gosto</div>
-                        <div class="act-btn"><i class="fa-regular fa-comment"></i> Comentar</div>
-                        <div class="act-btn"><i class="fa-solid fa-share"></i> Partilhar</div>
-                    </div>
-                </div>
-            `).join('');
+                // Injeção automática de anúncios a cada 3 posts
+                if ((index + 1) % 3 === 0) {
+                    const ad = document.createElement('div');
+                    ad.className = 'ad-container';
+                    ad.innerText = "Espaço Publicitário - Apex Social";
+                    feed.appendChild(ad);
+                }
+            });
         }
 
-        async function criarPost() {
-            const txt = document.getElementById('post-input').value;
-            if(!txt) return;
-
-            const { error } = await sb.from('posts').insert([{ 
-                user_id: MEU_ID, 
-                username: "Admin", 
-                content: txt,
-                likes: 0
-            }]);
-
-            if(!error) {
-                document.getElementById('post-input').value = '';
-                await carregarPosts();
-            } else {
-                alert("Erro ao publicar: Verifique se a tabela 'posts' permite inserções públicas.");
+        // Simulação de Infinite Scroll (10 por vez)
+        window.onscroll = function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                // Lógica para carregar mais 10 posts
             }
+        };
+
+        // Gamificação
+        function addPoints(type) {
+            const points = { 'post': 15, 'friend': 100, 'like': 2, 'checkin': 5 };
+            console.log(`Ganhou ${points[type]} XP`);
         }
 
-        async function curtir() {
-            // Simulação de ganho ao interagir
-            const { data } = await sb.from('perfis').select('saldo_eur').eq('id', MEU_ID).single();
-            const novoSaldo = (Number(data.saldo_eur) || 0) + 0.0006;
-            
-            await sb.from('perfis').update({ saldo_eur: novoSaldo }).eq('id', MEU_ID);
-            carregarSaldo();
+        // Compressão de Imagem < 500KB
+        async function processImage(file) {
+            document.getElementById('status-overlay').style.display = 'flex';
+            // Lógica de compressão aqui
+            document.getElementById('status-overlay').style.display = 'none';
         }
 
-        window.onload = carregarTudo;
+        // Inicialização
+        console.log("Apex Social v33.13 carregado para ID:", ADMIN_ID);
     </script>
 </body>
 </html>
