@@ -35,56 +35,69 @@
             z-index: 1000;
         }
         .logo-fb { color: var(--fb-blue); font-size: 28px; font-weight: bold; letter-spacing: -1px; text-decoration: none; }
+        
         .header-right { display: flex; align-items: center; gap: 8px; }
-        .balance-pill { background: #E7F3FF; color: var(--fb-blue); padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+        .balance-container { text-align: right; margin-right: 5px; }
+        .balance-pill { background: #E7F3FF; color: var(--fb-blue); padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; display: block; }
+        .brl-text { font-size: 10px; color: var(--fb-text-sec); display: block; font-weight: bold; margin-top: 2px; }
         .icon-circle { background: #EBEDF0; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
 
-        /* FEED CONTAINER */
+        /* CONTENT */
         main { max-width: 500px; margin: 0 auto; padding: 10px 0; }
         
-        /* CAIXA DE POSTAGEM */
+        /* COMPOSER */
         .composer { background: white; padding: 12px 16px; margin-bottom: 10px; border-bottom: 1px solid var(--fb-border); }
         .composer-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #ddd; background-image: url('https://via.placeholder.com/40'); background-size: cover; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #EBEDF0; display: flex; align-items: center; justify-content: center; color: #65676B; }
         .fake-input { flex: 1; background: #F0F2F5; border-radius: 20px; padding: 10px 16px; color: var(--fb-text-sec); font-size: 15px; border: none; outline: none; }
-        .composer-btns { display: flex; border-top: 1px solid #E4E6EB; padding-top: 10px; }
-        .comp-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--fb-text-sec); cursor: pointer; }
-
-        /* CARD DE POST */
+        
+        /* FEED CARDS */
         .fb-card { background: white; margin-bottom: 10px; border-top: 1px solid var(--fb-border); border-bottom: 1px solid var(--fb-border); }
         .card-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
         .user-name { font-weight: bold; font-size: 15px; }
         .post-meta { font-size: 12px; color: var(--fb-text-sec); }
         .card-body { padding: 4px 16px 12px 16px; font-size: 15px; line-height: 1.4; }
-        .card-img { width: 100%; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+        .card-img { width: 100%; max-height: 400px; object-fit: cover; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+        
         .card-stats { padding: 10px 16px; display: flex; justify-content: space-between; font-size: 13px; color: var(--fb-text-sec); }
         .card-actions { display: flex; border-top: 1px solid #E4E6EB; padding: 4px 0; }
         .act-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 0; color: var(--fb-text-sec); font-weight: 600; font-size: 14px; cursor: pointer; }
+        .act-btn i { font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <header id="main-header">
+    <header>
         <a href="#" class="logo-fb">facebook</a>
         <div class="header-right">
-            <div class="balance-pill">€ <span id="val-saldo">0.0000</span></div>
+            <div class="balance-container">
+                <div class="balance-pill">€ <span id="val-eur">0.0000</span></div>
+                <span class="brl-text">R$ <span id="val-brl">0.0000</span></span>
+            </div>
             <div class="icon-circle"><i class="fa-solid fa-search"></i></div>
             <div class="icon-circle"><i class="fa-solid fa-bars"></i></div>
         </div>
     </header>
 
-    <main id="main-content">
+    <main>
         <div class="composer">
             <div class="composer-row">
-                <div class="avatar"></div>
-                <input type="text" id="new-post-text" class="fake-input" placeholder="No que está a pensar?">
+                <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                <input type="text" id="post-input" class="fake-input" placeholder="No que está a pensar?">
             </div>
-            <div class="composer-btns">
-                <div class="comp-btn" onclick="postar()"><i class="fa-solid fa-paper-plane" style="color: #45bd62;"></i> Publicar</div>
-                <div class="comp-btn"><i class="fa-solid fa-image" style="color: #45bd62;"></i> Foto</div>
+            <div class="composer-btns" style="display: flex; border-top: 1px solid #E4E6EB; padding-top: 10px;">
+                <div class="comp-btn" style="flex:1; text-align:center; color:#65676B; font-weight:600; font-size:14px; cursor:pointer;" onclick="criarPost()">
+                    <i class="fa-solid fa-paper-plane" style="color: #45bd62; margin-right:5px;"></i> Publicar
+                </div>
+                <div class="comp-btn" style="flex:1; text-align:center; color:#65676B; font-weight:600; font-size:14px;">
+                    <i class="fa-solid fa-image" style="color: #45bd62; margin-right:5px;"></i> Foto
+                </div>
             </div>
         </div>
-        <div id="feed-container"></div>
+
+        <div id="feed">
+            <div style="text-align: center; padding: 40px; color: #65676B;">A carregar publicações...</div>
+        </div>
     </main>
 
     <script>
@@ -92,22 +105,97 @@
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
         const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        // ID PADRÃO PARA CARREGAMENTO AUTOMÁTICO
-        const DEFAULT_USER_ID = "123"; 
-        let user = null;
+        // CONFIGURAÇÕES FIXAS
+        const MEU_ID = "123"; 
+        const TAXA_CONVERSAO = 6.1242; // Exemplo de taxa EUR -> BRL
 
-        async function initApp() {
-            // Carrega o usuário automaticamente sem tela de login
-            let { data: perfil } = await sb.from('perfis').select('*').eq('id', DEFAULT_USER_ID).maybeSingle();
-            
-            if (perfil) {
-                user = perfil;
-                document.getElementById('val-saldo').innerText = Number(user.saldo_eur || 0).toFixed(4);
-                carregarFeed();
-            } else {
-                console.error("Usuário padrão não encontrado na tabela perfis.");
-                carregarFeed(); // Tenta carregar o feed mesmo sem usuário logado
+        async function carregarTudo() {
+            await carregarSaldo();
+            await carregarPosts();
+        }
+
+        async function carregarSaldo() {
+            // Busca o saldo_eur da tabela 'perfis'
+            const { data } = await sb.from('perfis').select('saldo_eur').eq('id', MEU_ID).maybeSingle();
+            if (data) {
+                const eur = Number(data.saldo_eur || 0);
+                const brl = eur * TAXA_CONVERSAO;
+                document.getElementById('val-eur').innerText = eur.toFixed(4);
+                document.getElementById('val-brl').innerText = brl.toFixed(4);
             }
         }
 
-        async function carregarFeed() {
+        async function carregarPosts() {
+            // Busca da tabela 'posts' identificada nos seus prints
+            const { data: posts, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+            
+            const feedDiv = document.getElementById('feed');
+            
+            if (error) {
+                feedDiv.innerHTML = `<div style="text-align:center; padding:20px;">Erro ao ligar à base de dados. Verifique as RLS.</div>`;
+                return;
+            }
+
+            if (!posts || posts.length === 0) {
+                feedDiv.innerHTML = `<div style="text-align:center; padding:20px;">Nenhuma publicação encontrada.</div>`;
+                return;
+            }
+
+            feedDiv.innerHTML = posts.map(p => `
+                <div class="fb-card">
+                    <div class="card-header">
+                        <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                        <div class="user-info">
+                            <div class="user-name">${p.username || 'Utilizador'}</div>
+                            <div class="post-meta">ID: ${p.user_id} · <i class="fa-solid fa-earth-americas"></i></div>
+                        </div>
+                    </div>
+                    <div class="card-body">${p.content || ''}</div>
+                    ${p.image_url ? `<img src="${p.image_url}" class="card-img">` : ''}
+                    
+                    <div class="card-stats">
+                        <span><i class="fa-solid fa-thumbs-up" style="color: var(--fb-blue);"></i> ${p.likes || 0}</span>
+                        <span>${p.comments_count || 0} comentários</span>
+                    </div>
+
+                    <div class="card-actions">
+                        <div class="act-btn" onclick="curtir()"><i class="fa-regular fa-thumbs-up"></i> Gosto</div>
+                        <div class="act-btn"><i class="fa-regular fa-comment"></i> Comentar</div>
+                        <div class="act-btn"><i class="fa-solid fa-share"></i> Partilhar</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function criarPost() {
+            const txt = document.getElementById('post-input').value;
+            if(!txt) return;
+
+            const { error } = await sb.from('posts').insert([{ 
+                user_id: MEU_ID, 
+                username: "Admin", 
+                content: txt,
+                likes: 0
+            }]);
+
+            if(!error) {
+                document.getElementById('post-input').value = '';
+                await carregarPosts();
+            } else {
+                alert("Erro ao publicar: Verifique se a tabela 'posts' permite inserções públicas.");
+            }
+        }
+
+        async function curtir() {
+            // Simulação de ganho ao interagir
+            const { data } = await sb.from('perfis').select('saldo_eur').eq('id', MEU_ID).single();
+            const novoSaldo = (Number(data.saldo_eur) || 0) + 0.0006;
+            
+            await sb.from('perfis').update({ saldo_eur: novoSaldo }).eq('id', MEU_ID);
+            carregarSaldo();
+        }
+
+        window.onload = carregarTudo;
+    </script>
+</body>
+</html>
