@@ -14,15 +14,13 @@
         body { background-color: var(--fb-bg); color: var(--fb-text); padding-top: 60px; }
         .hidden { display: none !important; }
 
-        /* MODAL DE ENTRADA ORIGINAL */
         #auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: white; z-index: 2000; display: flex;
             align-items: center; justify-content: center; flex-direction: column;
         }
-        .logo-orig { font-size: 40px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px; }
+        .logo-f { font-size: 50px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px; }
         
-        /* HEADER FACEBOOK */
         header { 
             background: var(--fb-card); height: 60px; width: 100%; position: fixed; 
             top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; 
@@ -30,7 +28,6 @@
         }
         .header-logo { color: var(--fb-blue); font-size: 28px; font-weight: bold; text-decoration: none; }
 
-        /* CONTEÚDO */
         main { max-width: 550px; margin: 0 auto; padding: 12px; }
         .card { 
             background: white; border-radius: 8px; border: 1px solid var(--fb-border); 
@@ -49,9 +46,12 @@
 <body>
 
     <div id="auth-modal">
-        <div class="logo-orig">f</div>
-        <input type="text" id="auth-username" placeholder="Insira seu ID" style="width: 280px; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
-        <button onclick="processAuth()" style="width: 280px; padding: 10px; background: var(--fb-blue); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Entrar</button>
+        <div class="logo-f">f</div>
+        <div style="text-align: center; width: 90%; max-width: 320px;">
+            <p style="margin-bottom: 15px; color: var(--fb-secondary);">Insira o seu ID para entrar.</p>
+            <input type="text" id="auth-username" placeholder="ID (ex: 123)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <button onclick="processAuth()" style="width: 100%; padding: 12px; background: var(--fb-blue); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Entrar</button>
+        </div>
     </div>
 
     <header class="hidden" id="main-header">
@@ -68,25 +68,32 @@
     </main>
 
     <script>
-        /* CONFIGURAÇÃO CORRIGIDA: ADICIONADO O "D" NO URL PARA CASAR COM A SUA CHAVE */
+        // CONFIGURAÇÃO SUPABASE FINAL
         const SUPABASE_URL = 'https://fickstyevektwbdgimapy.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
 
-        /* FUNÇÃO DE ENTRADA ORIGINAL - SEM ALTERAÇÕES NA LÓGICA */
         async function processAuth() {
             const id = document.getElementById('auth-username').value;
             if (!id) return alert("Digite um ID");
 
-            let { data: profile, error } = await _supabase
+            // Busca sem usar .single() para evitar erro automático do Supabase caso não encontre na primeira tentativa
+            let { data: profiles, error } = await _supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', id)
-                .single();
+                .eq('id', id);
 
-            if (error || !profile) {
+            if (error) {
+                console.error(error);
+                return alert("Erro de ligação. Verifique a tabela no Supabase.");
+            }
+
+            let profile = profiles.length > 0 ? profiles[0] : null;
+
+            // Se não existir, tenta criar
+            if (!profile) {
                 const { data: newUser, error: createError } = await _supabase
                     .from('profiles')
                     .insert([{ id: id, username: 'User_' + id, balance: 0 }])
