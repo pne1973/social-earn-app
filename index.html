@@ -6,168 +6,158 @@
     <title>Apex Social v33.12</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* --- RESET & FONTS --- */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f2f5; color: #1c1e21; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #fff; overflow-x: hidden; }
 
-        /* --- TELA DE LOGIN (Screenshot_20260328_122909) --- */
+        /* --- TELA DE LOGIN (ESTILO 12:29) --- */
         #login-screen { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
-        .login-logo { width: 85px; height: 85px; background: #2962ff; border-radius: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(41, 98, 255, 0.2); margin-bottom: 25px; }
-        .login-logo span { color: #fff; font-size: 50px; font-weight: 900; font-style: italic; }
-        .brand-name { color: #2962ff; font-weight: 800; font-size: 16px; letter-spacing: 1.5px; margin-bottom: 50px; }
-        #id-input { width: 100%; max-width: 350px; padding: 22px; text-align: center; border: 2px solid #2962ff; border-radius: 18px; font-size: 24px; font-weight: bold; margin-bottom: 20px; outline: none; transition: 0.3s; }
-        .btn-entrar { width: 100%; max-width: 350px; padding: 20px; background: #2962ff; color: #fff; border: none; border-radius: 18px; font-size: 16px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+        .login-logo { width: 90px; height: 90px; background: #2962ff; border-radius: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(41, 98, 255, 0.3); margin-bottom: 20px; }
+        .login-logo span { color: #fff; font-size: 55px; font-weight: 900; font-style: italic; }
+        .brand-name { color: #2962ff; font-weight: 800; font-size: 15px; letter-spacing: 1.5px; margin-bottom: 40px; text-transform: uppercase; }
+        #id-input { width: 100%; max-width: 350px; padding: 20px; text-align: center; border: 2.5px solid #2962ff; border-radius: 20px; font-size: 24px; font-weight: bold; margin-bottom: 20px; outline: none; background: #f8f9fa; }
+        .btn-entrar { width: 100%; max-width: 350px; padding: 20px; background: #2962ff; color: #fff; border: none; border-radius: 20px; font-size: 16px; font-weight: 800; text-transform: uppercase; cursor: pointer; box-shadow: 0 5px 15px rgba(41, 98, 255, 0.3); }
 
-        /* --- INTERFACE UTILIZADOR (esta.jpg) --- */
-        .user-view .header { background: #fff; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 1px solid #e4e6eb; }
-        .user-view .logo-small { display: flex; align-items: center; gap: 12px; }
-        .user-view .s-box { background: #2962ff; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; font-style: italic; }
-        .user-view .header-title { color: #2962ff; font-weight: 800; font-size: 14px; }
-        .user-view .balance-area { text-align: right; }
-        .user-view .val-eur { color: #1e8e3e; font-size: 20px; font-weight: 800; display: block; }
-        .user-view .val-brl { color: #8a8d91; font-size: 11px; font-weight: 600; }
-        .user-view .status-bar { background: #fff; padding: 10px 20px; margin-top: 65px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: #1e8e3e; border-bottom: 1px solid #f0f2f5; }
+        /* --- INTERFACE UTILIZADOR (ESTILO ESTA.JPG) --- */
+        .user-header { background: #fff; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; position: fixed; top: 0; width: 100%; z-index: 900; border-bottom: 1px solid #eee; }
+        .u-brand { display: flex; align-items: center; gap: 10px; }
+        .u-logo-s { background: #2962ff; color: #fff; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-style: italic; }
+        .u-balance { text-align: right; }
+        .u-balance b { color: #1e8e3e; font-size: 20px; display: block; font-weight: 800; }
+        .u-balance span { font-size: 11px; color: #8a8d91; font-weight: 600; }
         
-        .user-view .post-box { background: #fff; margin: 12px; border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .user-view .post-box img { width: 35px; height: 35px; border-radius: 50%; background: #e4e6eb; }
-        .user-view .post-box input { border: none; outline: none; font-size: 14px; flex: 1; color: #65676b; font-weight: 600; }
+        .user-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #fff; display: flex; border-top: 1px solid #eee; z-index: 1000; }
+        .u-nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #65676b; font-size: 12px; position: relative; }
+        .u-nav-item.active { color: #2962ff; }
+        .u-nav-item.active::after { content: ''; position: absolute; top: 0; width: 40%; height: 3px; background: #2962ff; border-radius: 0 0 5px 5px; }
 
-        .user-view .nav-user { position: fixed; bottom: 0; width: 100%; height: 65px; background: #fff; display: flex; border-top: 1px solid #e4e6eb; }
-        .user-view .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; color: #65676b; font-size: 12px; font-weight: 800; position: relative; }
-        .user-view .nav-item.active { color: #2962ff; }
-        .user-view .nav-item.active::after { content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 3px; background: #2962ff; border-radius: 0 0 5px 5px; }
+        /* --- INTERFACE ADMIN (ESTILO 19:51) --- */
+        .admin-body { background: #000 !important; color: #0f0 !important; font-family: 'Consolas', monospace !important; }
+        .admin-header { background: #000; border-bottom: 2px solid #0055ff; height: 70px; display: flex; align-items: center; justify-content: center; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .admin-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; border-top: 1px solid #111; z-index: 1000; }
+        .a-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #444; font-size: 10px; font-weight: bold; }
+        .a-nav-item.active { color: #0f0; border-top: 3px solid #0055ff; background: linear-gradient(to bottom, #001133, #000); }
 
-        /* --- INTERFACE ADMIN (19:51) --- */
-        .admin-mode { background: #000 !important; color: #0f0 !important; font-family: 'Consolas', monospace !important; }
-        .admin-mode .header { background: #000; border-bottom: 2px solid #0055ff; color: #00ff00; }
-        .admin-mode .nav-admin { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; border-top: 1px solid #111; }
-        .admin-mode .nav-item-adm { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-size: 10px; font-weight: bold; }
-        .admin-mode .nav-item-adm.active { color: #0f0; border-top: 3px solid #0055ff; background: linear-gradient(to bottom, #001133, #000); }
-        .admin-mode .terminal { background: #050505; border: 1px solid #111; padding: 15px; border-radius: 8px; font-size: 12px; color: #0f0; line-height: 1.6; }
-
-        .hidden { display: none !important; }
-        .container { padding-bottom: 80px; }
+        /* GERAIS */
+        .main-content { padding: 85px 15px 100px; max-width: 550px; margin: 0 auto; display: none; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .card { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 12px; border: 1px solid #eee; }
+        .admin-card { background: #0a0a0a; border: 1px solid #111; padding: 15px; margin-bottom: 12px; border-radius: 8px; }
     </style>
 </head>
-<body id="main-body">
+<body id="app-body">
 
     <div id="login-screen">
         <div class="login-logo"><span>S</span></div>
         <div class="brand-name">SOCIAL EARN NETWORK</div>
-        <input type="number" id="id-input" placeholder="123">
-        <button class="btn-entrar" onclick="autenticar()">ENTRAR NO SISTEMA</button>
+        <input type="number" id="id-input" placeholder="ID">
+        <button class="btn-entrar" onclick="tentarLogin()">ENTRAR NO SISTEMA</button>
     </div>
 
-    <div id="view-user" class="user-view hidden">
-        <header class="header">
-            <div class="logo-small">
-                <div class="s-box">S</div>
-                <span class="header-title">SOCIAL EARN</span>
-            </div>
-            <div class="balance-area">
-                <span class="val-eur" id="u-eur">0.0000€</span>
-                <span class="val-brl" id="u-brl">0.0000 BRL</span>
-            </div>
-        </header>
-
-        <div class="status-bar">
-            <span>GANHOS ATIVOS: 100%</span>
-            <span style="color:#8a8d91; cursor:pointer" onclick="location.reload()">SAIR</span>
+    <header id="app-header" style="display:none"></header>
+    
+    <main id="app-main" class="main-content">
+        <div id="user-views">
+            <section id="p-u-feed" class="page">
+                <div style="color:#1e8e3e; font-size:11px; font-weight:800; margin-bottom:15px">GANHOS ATIVOS: 100%</div>
+                <div class="card" style="color:#65676b; font-weight:600; font-size:14px">O QUE QUER PARTILHAR AGORA?</div>
+                <div id="lista-feed-u"></div>
+            </section>
+            <section id="p-u-carteira" class="page">
+                <div class="card"><h2>Minha Carteira</h2><p>Mínimo: 5000 XP</p></div>
+            </section>
         </div>
 
-        <div class="container">
-            <div id="aba-feed">
-                <div class="post-box">
-                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
-                    <input type="text" placeholder="O QUE QUER PARTILHAR AGORA?">
-                </div>
-                <div id="feed-lista" style="padding: 0 12px;"></div>
-            </div>
-            <div id="aba-carteira" class="hidden" style="padding: 20px;">
-                <div style="background:#fff; border-radius:15px; padding:20px; text-align:center;">
-                    <h3>A tua Carteira</h3>
-                    <p style="color:#65676b; margin-top:10px;">Mínimo de levantamento: 5000 XP</p>
-                </div>
-            </div>
+        <div id="admin-views">
+            <section id="p-a-monitor" class="page">
+                <h3 style="color:#0f0; margin-bottom:15px">SISTEMA_LOGS_POSTS</h3>
+                <div id="logs-terminal" style="background:#050505; padding:15px; border:1px solid #111; font-size:12px"></div>
+            </section>
+            <section id="p-a-stats" class="page">
+                <div class="admin-card"><span>DÍVIDA GLOBAL</span><h2 id="adm-debt">0.0000€</h2></div>
+            </section>
         </div>
+    </main>
 
-        <nav class="nav-user">
-            <div class="nav-item active" onclick="tabUser('feed', this)">FEED</div>
-            <div class="nav-item" onclick="tabUser('carteira', this)">CARTEIRA</div>
-        </nav>
-    </div>
-
-    <div id="view-admin" class="admin-mode hidden">
-        <header class="header" style="height:70px; display:flex; justify-content:space-between; align-items:center; padding: 0 20px;">
-            <b style="color:#0055ff; letter-spacing:2px;">APEX <span style="color:#0088ff">C&C</span> CENTER</b>
-            <span style="color:#0f0; font-size:10px;">● SB_LIVE_FEED</span>
-        </header>
-
-        <div class="container" style="padding: 90px 20px;">
-            <div id="adm-monitor">
-                <h2 style="color:#0f0; margin-bottom:20px; font-size:18px;">SISTEMA_LOGS_POSTS</h2>
-                <div id="logs-terminal" class="terminal">
-                    <div style="color:#555">> Estabelecendo ligação segura...</div>
-                </div>
-            </div>
-        </div>
-
-        <nav class="nav-admin">
-            <div class="nav-item-adm active" onclick="tabAdm('monitor', this)">🖥️<br>MONITOR</div>
-            <div class="nav-item-adm" onclick="tabAdm('stats', this)">📊<br>STATS</div>
-            <div class="nav-item-adm" onclick="tabAdm('admin', this)">⚔️<br>ADMIN</div>
-        </nav>
-    </div>
+    <nav id="app-nav" style="display:none"></nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."; // Chave anon
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const sb = supabase.createClient(SB_URL, SB_KEY);
         
-        const ADMIN_ID = "5401881400"; [cite: 2026-03-26]
+        const ADMIN_ID = "5401881400";
+        let userAtual = null;
 
-        function autenticar() {
+        async function tentarLogin() {
             const id = document.getElementById('id-input').value;
             if(!id) return;
 
-            document.getElementById('login-screen').classList.add('hidden');
+            const { data, error } = await sb.from('perfis').select('*').eq('id', id).single();
+            
+            if(error || !data) {
+                alert("ID NÃO ENCONTRADO.");
+                return;
+            }
 
-            if(id === ADMIN_ID) {
-                document.getElementById('main-body').classList.add('admin-mode');
-                document.getElementById('view-admin').classList.remove('hidden');
-                loadAdminData();
+            userAtual = data;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-main').style.display = 'block';
+            
+            configurarTelas(id === ADMIN_ID);
+        }
+
+        function configurarTelas(isAdmin) {
+            const body = document.getElementById('app-body');
+            const header = document.getElementById('app-header');
+            const nav = document.getElementById('app-nav');
+            
+            header.style.display = 'flex';
+            nav.style.display = 'flex';
+
+            if(isAdmin) {
+                body.className = "admin-body";
+                header.className = "admin-header";
+                header.innerHTML = `<b style="color:#0055ff; letter-spacing:2px">APEX <span style="color:#0088ff">C&C</span> CENTER</b>`;
+                nav.className = "admin-nav";
+                nav.innerHTML = `
+                    <div class="a-nav-item active" onclick="trocarAba('a-monitor', this)">🖥️ MONITOR</div>
+                    <div class="a-nav-item" onclick="trocarAba('a-stats', this)">📊 STATS</div>
+                `;
+                trocarAba('a-monitor', nav.children[0]);
             } else {
-                document.getElementById('view-user').classList.remove('hidden');
-                loadUserData(id);
+                body.className = "";
+                header.className = "user-header";
+                header.innerHTML = `
+                    <div class="u-brand"><div class="u-logo-s">S</div><span style="color:#2962ff; font-weight:800; font-size:14px">SOCIAL EARN</span></div>
+                    <div class="u-balance"><b>${userAtual.saldo.toFixed(4)}€</b><span>${(userAtual.saldo * 6.12).toFixed(4)} BRL</span></div>
+                `;
+                nav.className = "user-nav";
+                nav.innerHTML = `
+                    <div class="u-nav-item active" onclick="trocarAba('u-feed', this)">FEED</div>
+                    <div class="u-nav-item" onclick="trocarAba('u-carteira', this)">CARTEIRA</div>
+                `;
+                trocarAba('u-feed', nav.children[0]);
             }
         }
 
-        function tabUser(name, el) {
-            document.getElementById('aba-feed').classList.add('hidden');
-            document.getElementById('aba-carteira').classList.add('hidden');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('aba-' + name).classList.remove('hidden');
+        function trocarAba(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.u-nav-item, .a-nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('p-' + id).classList.add('active');
             el.classList.add('active');
+
+            if(id === 'u-feed' || id === 'a-monitor') carregarPosts(id === 'a-monitor');
         }
 
-        async function loadUserData(id) {
-            const { data: perfil } = await sb.from('perfis').select('*').eq('id', id).single();
-            if(perfil) {
-                document.getElementById('u-eur').innerText = perfil.saldo.toFixed(4) + "€";
-                document.getElementById('u-brl').innerText = (perfil.saldo * 6.12).toFixed(4) + " BRL"; [cite: 2026-03-22]
-            }
-        }
-
-        async function loadAdminData() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const terminal = document.getElementById('logs-terminal');
-            terminal.innerHTML = posts.map(p => `
-                <div style="margin-bottom:8px">
-                    <span style="color:#555">[${new Date(p.created_at).toLocaleTimeString()}]</span>
-                    <span style="color:#0f0"> USER_ID: ${p.user_id}</span> postou: 
-                    <span style="color:#ffcc00">"${p.content}"</span>
-                </div>
-            `).join('');
+        async function carregarPosts(isAdmin) {
+            const { data } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            const container = isAdmin ? document.getElementById('logs-terminal') : document.getElementById('lista-feed-u');
+            
+            container.innerHTML = data.map(p => isAdmin ? 
+                `<div style="margin-bottom:5px; color:#555">[${new Date(p.created_at).toLocaleTimeString()}] <span style="color:#0f0">ID:${p.user_id}</span> postou "${p.content}"</div>` :
+                `<div class="card"><b style="font-size:12px; color:#8a8d91">ID: ${p.user_id}</b><p style="margin-top:10px">${p.content}</p></div>`
+            ).join('');
         }
     </script>
 </body>
