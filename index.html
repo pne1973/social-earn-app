@@ -3,228 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network</title>
+    <title>APEX C&C CENTER</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #fff; }
+        body { font-family: 'Courier New', monospace; background: #0a0a0a; color: #00ff00; padding-bottom: 90px; }
 
-        /* --- TELA DE LOGIN (FIEL À IMAGEM 12:29) --- */
-        #login-screen { 
-            position: fixed; inset: 0; background: #fff; z-index: 9999; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; 
+        /* HEADER */
+        header { 
+            background: #000; padding: 15px; border-bottom: 2px solid #004400; 
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
         }
-        .logo-box {
-            background: #2962ff; width: 100px; height: 100px; border-radius: 25px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 10px 20px rgba(41, 98, 255, 0.3); margin-bottom: 20px;
-        }
-        .logo-box span { color: #fff; font-size: 55px; font-weight: 900; font-style: italic; }
-        .login-title { color: #2962ff; font-weight: 800; font-size: 14px; letter-spacing: 1px; margin-bottom: 50px; text-transform: uppercase; }
-        
-        #id-input { 
-            width: 100%; max-width: 400px; padding: 22px; text-align: center;
-            border: 2px solid #2962ff; border-radius: 20px; font-size: 24px; font-weight: bold;
-            color: #333; margin-bottom: 20px; outline: none; background: #f8f9fa;
-        }
-        .btn-entrar { 
-            width: 100%; max-width: 400px; padding: 20px; background: #2962ff; 
-            color: #fff; border: none; border-radius: 20px; font-size: 16px; 
-            font-weight: 800; text-transform: uppercase; cursor: pointer;
-            box-shadow: 0 5px 15px rgba(41, 98, 255, 0.4);
-        }
+        .header-title { font-size: 14px; font-weight: bold; letter-spacing: 2px; }
+        .status-dot { color: #00ff00; font-size: 10px; animation: blink 1.5s infinite; }
 
-        /* --- ESTRUTURA DINÂMICA (USER VS ADMIN) --- */
-        header { position: fixed; top: 0; width: 100%; height: 70px; z-index: 1000; border-bottom: 1px solid #eee; display: flex; align-items: center; padding: 0 15px; }
-        .container { padding: 85px 15px 90px 15px; max-width: 500px; margin: 0 auto; min-height: 100vh; }
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 70px; z-index: 1000; display: flex; }
-        .page { display: none; }
+        /* ABAS */
+        .page { display: none; padding: 20px; }
         .page.active { display: block; }
 
-        /* --- ESTILO UTILIZADOR (IMAGEM ESTA.JPG) --- */
-        .user-header { background: #fff; justify-content: space-between; }
-        .u-brand { display: flex; align-items: center; gap: 8px; }
-        .u-logo-mini { background: #2962ff; color: #fff; padding: 6px 10px; border-radius: 10px; font-weight: 900; font-size: 16px; }
-        .u-balance { text-align: right; }
-        .u-balance b { color: #00a859; font-size: 18px; display: block; }
-        .u-balance span { font-size: 10px; color: #999; }
-        
-        .user-nav { background: #fff; border-top: 1px solid #eee; }
-        .user-nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #4285F4; font-size: 12px; text-decoration: none; border-top: 3px solid transparent; }
-        .user-nav-item.active { border-top: 3px solid #4285F4; }
+        /* MONITOR (LOGS) */
+        .log-container { background: #000; border: 1px solid #004400; padding: 10px; border-radius: 4px; height: 60vh; overflow-y: auto; font-size: 12px; }
+        .log-entry { margin-bottom: 8px; border-bottom: 1px solid #002200; padding-bottom: 4px; }
+        .log-time { color: #888; }
 
-        .user-card { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 12px; border: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .u-post-btn { display: flex; align-items: center; gap: 10px; color: #888; font-weight: 700; font-size: 13px; }
-        .post-img { width: 100%; border-radius: 15px; margin: 12px 0; display: block; }
-        .post-actions { display: flex; border-top: 1px solid #f0f2f5; padding-top: 12px; margin-top: 12px; }
-        .post-actions span { flex: 1; text-align: center; color: #888; font-size: 11px; font-weight: 800; cursor: pointer; }
+        /* STATS CARDS */
+        .stat-card { background: #111; border: 1px solid #004400; padding: 20px; margin-bottom: 15px; border-radius: 8px; }
+        .stat-val { font-size: 24px; font-weight: bold; color: #fff; }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: #00ff00; }
 
-        /* --- ESTILO ADMIN (IMAGENS 19:21 / 19:22) --- */
-        .admin-mode { background: #000 !important; color: #0f0 !important; font-family: 'Courier New', monospace; }
-        .admin-header { background: #000; border-bottom: 1px solid #0f0; justify-content: center; }
-        .admin-nav { background: #000; border-top: 1px solid #333; }
-        .admin-nav-item { flex: 1; text-align: center; color: #444; padding-top: 15px; font-size: 10px; font-weight: bold; text-decoration: none; }
-        .admin-nav-item.active { color: #0f0; }
-        
-        .hacker-card { background: #0a0a0a; border: 1px solid #0f0; padding: 15px; margin-bottom: 12px; border-radius: 4px; box-shadow: inset 0 0 10px rgba(0,255,0,0.1); }
-        .hacker-card span { display: block; font-size: 10px; color: #0f0; margin-bottom: 5px; text-transform: uppercase; }
-        .hacker-card b { font-size: 24px; color: #fff; }
-        
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .admin-table th { color: #0f0; font-size: 11px; text-align: left; padding: 10px; border-bottom: 1px solid #333; }
-        .admin-table td { padding: 10px; border-bottom: 1px solid #111; font-size: 13px; color: #fff; }
+        /* ADMIN TABLE */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        th { background: #002200; text-align: left; padding: 12px; color: #00ff00; }
+        td { padding: 12px; border-bottom: 1px solid #002200; color: #fff; }
+        .btn-ban { color: #ff0000; background: none; border: 1px solid #ff0000; padding: 4px 8px; cursor: pointer; font-weight: bold; }
+        .btn-pay { color: #00ff00; background: none; border: 1px solid #00ff00; padding: 4px 8px; cursor: pointer; margin-right: 5px; }
+
+        /* NAVBAR */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: #000; height: 75px; display: flex; border-top: 2px solid #004400; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #004400; font-size: 10px; font-weight: bold; }
+        .nav-btn.active { color: #00ff00; background: rgba(0, 255, 0, 0.05); }
+        .nav-icon { font-size: 20px; margin-bottom: 4px; }
+
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="logo-box"><span>S</span></div>
-        <div class="login-title">Social Earn Network</div>
-        <input type="number" id="id-input" placeholder="000">
-        <button class="btn-entrar" onclick="autenticar()">Entrar no Sistema</button>
+<header>
+    <div class="header-title">APEX C&C CENTER</div>
+    <div class="status-dot">● SB_LIVE_FEED</div>
+</header>
+
+<section id="p-monitor" class="page active">
+    <h3 style="margin-bottom:10px">SISTEMA_LOGS_POSTS</h3>
+    <div id="log-list" class="log-container">> Inicializando terminal...</div>
+</section>
+
+<section id="p-stats" class="page">
+    <div class="stat-card">
+        <div class="stat-label">Utilizadores Ativos</div>
+        <div id="count-users" class="stat-val">0</div>
     </div>
-
-    <header id="main-header" style="display:none;"></header>
-    
-    <div id="main-app" class="container" style="display:none;">
-        <div id="u-pages">
-            <section id="p-u-feed" class="page active">
-                <div style="color:#00a859; font-size:11px; font-weight:900; margin-bottom:15px; letter-spacing:0.5px;">GANHOS ATIVOS: 100%</div>
-                <div class="user-card u-post-btn">
-                    <div style="background:#f0f2f5; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center;">👤</div>
-                    O QUE QUER PARTILHAR AGORA?
-                </div>
-                <div id="u-feed-list"></div>
-            </section>
-            <section id="p-u-carteira" class="page">
-                <div class="user-card">
-                    <h2 style="color:#2962ff">Minha Carteira</h2>
-                    <p style="margin-top:10px; font-size:14px; color:#666">Mínimo para saque: 5000 XP</p>
-                </div>
-            </section>
-        </div>
-
-        <div id="adm-pages" style="display:none;">
-            <section id="p-a-feed" class="page active">
-                <div id="a-feed-list"></div>
-            </section>
-            <section id="p-a-stats" class="page">
-                <div class="hacker-card"><span>Utilizadores Ativos</span><b id="s-u">0</b></div>
-                <div class="hacker-card"><span>Dívida Global</span><b id="s-d">0.0000€</b></div>
-                <div class="hacker-card"><span>Posts Totais</span><b id="s-p">0</b></div>
-            </section>
-            <section id="p-a-gestao" class="page">
-                <p style="color:red; font-weight:bold; margin-bottom:15px; font-size:12px;">GESTOR DE CARTEIRAS</p>
-                <table class="admin-table">
-                    <thead><tr><th>ID_USER</th><th>SALDO (€)</th><th>AÇÃO</th></tr></thead>
-                    <tbody id="a-table-body"></tbody>
-                </table>
-            </section>
-        </div>
+    <div class="stat-card">
+        <div class="stat-label">Conteúdo Global (Posts)</div>
+        <div id="count-posts" class="stat-val">0</div>
     </div>
+    <div class="stat-card" style="border-left: 4px solid #00ff00;">
+        <div class="stat-label">Dívida Total (EUR)</div>
+        <div id="total-debt" class="stat-val">0.0000€</div>
+    </div>
+</section>
 
-    <nav id="main-nav" class="nav-bar" style="display:none;"></nav>
+<section id="p-admin" class="page">
+    <h3 style="color:#ff0000; margin-bottom:15px">CONTROLO_DE_CARTEIRAS</h3>
+    <div style="overflow-x:auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>UID</th>
+                    <th>SALDO</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody id="admin-tbody"></tbody>
+        </table>
+    </div>
+</section>
 
-    <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const sb = supabase.createClient(SB_URL, SB_KEY);
+<nav class="nav-bar">
+    <a href="#" class="nav-btn active" onclick="nav('monitor', this)"><span class="nav-icon">🖥️</span>MONITOR</a>
+    <a href="#" class="nav-btn" onclick="nav('stats', this)"><span class="nav-icon">📊</span>STATS</a>
+    <a href="#" class="nav-btn" onclick="nav('admin', this)"><span class="nav-icon">⚔️</span>ADMIN</a>
+</nav>
 
-        const ADMIN_ID = "5401881400";
-        let currentUser = null;
+<script>
+    const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+    const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        async function autenticar() {
-            const id = document.getElementById('id-input').value;
-            const { data, error } = await sb.from('perfis').select('*').eq('id', id).single();
-            
-            if(error || !data) return alert("Acesso negado.");
-            currentUser = data;
+    function nav(page, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('p-' + page).classList.add('active');
+        el.classList.add('active');
 
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-            document.getElementById('main-header').style.display = 'flex';
-            document.getElementById('main-nav').style.display = 'flex';
+        if(page === 'monitor') loadLogs();
+        if(page === 'stats') loadStats();
+        if(page === 'admin') loadAdmin();
+    }
 
-            renderInterface(id === ADMIN_ID);
+    async function loadLogs() {
+        const { data } = await sb.from('posts').select('*').order('created_at', { ascending: false }).limit(30);
+        const container = document.getElementById('log-list');
+        container.innerHTML = data.map(p => `
+            <div class="log-entry">
+                <span class="log-time">[${new Date(p.created_at).toLocaleTimeString()}]</span> 
+                USER_ID: <b style="color:#fff">${p.user_id}</b> postou: "${p.content || 'Sem texto'}"
+            </div>
+        `).join('') || '> Nenhum post encontrado no banco de dados.';
+    }
+
+    async function loadStats() {
+        const { data: users } = await sb.from('perfis').select('saldo');
+        const { count: postCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
+        
+        let debt = users.reduce((acc, u) => acc + (u.saldo || 0), 0);
+        
+        document.getElementById('count-users').innerText = users.length;
+        document.getElementById('count-posts').innerText = postCount;
+        document.getElementById('total-debt').innerText = debt.toFixed(4) + "€";
+    }
+
+    async function loadAdmin() {
+        const { data: users } = await sb.from('perfis').select('*').order('saldo', { ascending: false });
+        const tbody = document.getElementById('admin-tbody');
+        tbody.innerHTML = users.map(u => `
+            <tr>
+                <td>${u.id}</td>
+                <td style="color:${u.saldo > 5 ? '#00ff00' : '#fff'}">${(u.saldo || 0).toFixed(4)}€</td>
+                <td>
+                    <button class="btn-pay" onclick="resetSaldo('${u.id}')">PAY</button>
+                    <button class="btn-ban" onclick="banUser('${u.id}')">BAN</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function resetSaldo(id) {
+        if(confirm("Confirmar pagamento e zerar saldo do ID " + id + "?")) {
+            await sb.from('perfis').update({ saldo: 0 }).eq('id', id);
+            loadAdmin();
         }
+    }
 
-        function renderInterface(isAdmin) {
-            const header = document.getElementById('main-header');
-            const nav = document.getElementById('main-nav');
-            const body = document.body;
-
-            if(isAdmin) {
-                body.classList.add('admin-mode');
-                header.className = "admin-header";
-                header.innerHTML = "<b>APEX SOCIAL :: COMMAND CENTER</b>";
-                document.getElementById('adm-pages').style.display = 'block';
-                document.getElementById('u-pages').style.display = 'none';
-                
-                nav.className = "nav-bar admin-nav";
-                nav.innerHTML = `
-                    <a href="#" class="admin-nav-item active" onclick="tab('a-feed', this)">FEED</a>
-                    <a href="#" class="admin-nav-item" onclick="tab('a-stats', this)">STATS</a>
-                    <a href="#" class="admin-nav-item" onclick="tab('a-gestao', this)">ADMIN</a>
-                `;
-                tab('a-feed', nav.children[0]);
-            } else {
-                body.classList.remove('admin-mode');
-                header.className = "user-header";
-                header.innerHTML = `
-                    <div class="u-brand"><div class="u-logo-mini">S</div><b style="color:#2962ff; font-size:14px">SOCIAL EARN</b></div>
-                    <div class="u-balance"><b>${currentUser.saldo.toFixed(4)}€</b><span>${(currentUser.saldo * 6.15).toFixed(4)} BRL</span></div>
-                `;
-                document.getElementById('u-pages').style.display = 'block';
-                document.getElementById('adm-pages').style.display = 'none';
-
-                nav.className = "nav-bar user-nav";
-                nav.innerHTML = `
-                    <a href="#" class="user-nav-item active" onclick="tab('u-feed', this)">FEED</a>
-                    <a href="#" class="user-nav-item" onclick="tab('u-carteira', this)">CARTEIRA</a>
-                `;
-                tab('u-feed', nav.children[0]);
-            }
+    async function banUser(id) {
+        if(confirm("Deseja expulsar permanentemente o ID " + id + "?")) {
+            await sb.from('perfis').delete().eq('id', id);
+            loadAdmin();
         }
+    }
 
-        function tab(pageId, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-bar a').forEach(a => a.classList.remove('active'));
-            document.getElementById('p-' + pageId).classList.add('active');
-            el.classList.add('active');
+    // Init
+    loadLogs();
+</script>
 
-            if(pageId === 'u-feed' || pageId === 'a-feed') loadFeed(pageId === 'a-feed');
-            if(pageId === 'a-stats') loadStats();
-            if(pageId === 'a-gestao') loadAdminTable();
-        }
-
-        async function loadFeed(isAdmin) {
-            const { data } = await sb.from('posts').select('*').order('created_at', { ascending: false });
-            const container = isAdmin ? 'a-feed-list' : 'u-feed-list';
-            document.getElementById(container).innerHTML = data.map(p => `
-                <div class="${isAdmin ? 'hacker-card' : 'user-card'}">
-                    <b style="font-size:14px">${p.content || 'SEM TÍTULO'}</b>
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    ${isAdmin ? `<div style="text-align:right"><button onclick="deletePost('${p.id}')" style="color:red; background:none; border:none; font-weight:bold; cursor:pointer">APAGAR</button></div>` : `
-                    <div class="post-actions"><span>👍 GOSTAR</span><span>💬 COMENTAR</span><span>🔗 PARTILHAR</span></div>`}
-                </div>
-            `).join('');
-        }
-
-        async function loadStats() {
-            const { data: profiles } = await sb.from('perfis').select('saldo');
-            const { count } = await sb.from('posts').select('*', { count: 'exact', head: true });
-            const debt = profiles.reduce((a, b) => a + (b.saldo || 0), 0);
-            document.getElementById('s-u').innerText = profiles.length;
-            document.getElementById('s-p').innerText = count;
-            document.getElementById('s-d').innerText = debt.toFixed(4) + "€";
-        }
-
-        async function loadAdminTable() {
-            const { data } = await sb.from('perfis').select('*').order('saldo', { ascending: false });
-            document.getElementById('a-table-body').innerHTML = data.map(u => `
-                <tr><td>${u.id}</td><td>${u.saldo.toFixed(4)}€</td><td><button style="color:#0f0; background:none; border:1px solid #0f0; padding:2px 5px; font-size:10px">PAY</button></td></tr>
-            `).join('');
-        }
-    </script>
 </body>
 </html>
