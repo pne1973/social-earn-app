@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.27</title>
+    <title>Apex Social v33.12 - Estável</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -22,41 +22,43 @@
             margin: 0; padding-top: 110px; padding-bottom: 80px; 
         }
 
-        /* HEADER ESTILO SCREENSHOT */
+        /* HEADER OFICIAL */
         header {
             position: fixed; top: 0; left: 0; right: 0; background: #fff;
-            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            height: 65px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 15px; z-index: 1000; border-bottom: 1px solid var(--border);
         }
 
-        .ad-banner-top {
-            position: fixed; top: 60px; left: 0; right: 0; background: #fff;
-            height: 45px; display: flex; align-items: center; justify-content: center;
-            font-size: 14px; border-bottom: 1px solid var(--border); z-index: 999;
+        .ad-injection-top {
+            position: fixed; top: 65px; left: 0; right: 0; background: #fff;
+            height: 40px; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800; color: #999; border-bottom: 1px solid var(--border); z-index: 999;
         }
 
-        /* FEED CARDS */
+        /* FEED POST CARDS */
         .post-card {
             background: var(--card-bg); border-radius: 8px; margin: 0 auto 12px auto;
             max-width: 500px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         .post-header { display: flex; align-items: center; padding: 12px; }
-        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: #e4e6eb; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .post-content { padding: 0 12px 12px 12px; font-size: 14px; line-height: 1.4; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e4e6eb; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .post-content { padding: 0 12px 12px 12px; font-size: 14px; line-height: 1.5; }
         
-        /* ACTIONS & BUBBLES */
-        .post-actions { display: flex; padding: 4px 12px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
-        .action-btn { flex: 1; background: none; border: none; padding: 10px; color: var(--text-secondary); font-weight: 600; font-size: 13px; cursor: pointer; }
-        
-        .comments-area { background: #fff; padding: 10px; }
-        .comment-bubble { 
-            background: #F0F2F5; border-radius: 15px; padding: 8px 12px; 
-            margin-bottom: 6px; font-size: 13px; display: block; width: fit-content; max-width: 90%;
-        }
-        .comment-input-box { display: flex; gap: 8px; margin-top: 8px; }
-        .c-input { flex: 1; background: #F0F2F5; border: none; border-radius: 20px; padding: 8px 15px; font-size: 13px; }
+        /* INTERAÇÕES SOCIAIS */
+        .post-actions { display: flex; padding: 5px 12px; border-top: 1px solid #f0f2f5; border-bottom: 1px solid #f0f2f5; }
+        .action-btn { flex: 1; background: none; border: none; padding: 10px; color: var(--text-secondary); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* BOTTOM NAV ESTILO SCREENSHOT */
+        /* SISTEMA DE BALÕES DE COMENTÁRIO */
+        .comments-container { background: #fff; padding: 10px; }
+        .comment-bubble { 
+            background: #F0F2F5; border-radius: 18px; padding: 8px 12px; 
+            margin-bottom: 5px; font-size: 13px; display: inline-block; max-width: 85%;
+            word-wrap: break-word;
+        }
+        .comment-input-wrap { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+        .comment-field { flex: 1; background: #F0F2F5; border: none; border-radius: 20px; padding: 10px 15px; font-size: 13px; }
+
+        /* NAVEGAÇÃO */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; height: 70px; display: flex; border-top: 1px solid #ddd; z-index: 1000; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #9ca3af; cursor: pointer; }
         .nav-item.active { color: var(--google-blue); }
@@ -69,21 +71,21 @@
 
     <header>
         <div style="font-weight: 900; color: var(--google-blue); font-size: 18px;">Social Earn</div>
-        <div id="top-balance" style="font-weight: 900; color: var(--success); font-size: 18px;">€0.0000</div>
+        <div id="balance-header" style="font-weight: 900; color: var(--success); font-size: 18px;">0.0000€</div>
     </header>
 
-    <div class="ad-banner-top">Publicidade Oficial Apex</div>
+    <div class="ad-injection-top">ANÚNCIO PATROCINADO APEX</div>
 
     <main>
         <section id="tab-feed" class="tab-content active">
-            <div id="render-feed"></div>
+            <div id="feed-container"></div>
         </section>
 
         <section id="tab-wallet" class="tab-content">
-            <div style="background: #fff; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid #ddd;">
-                <p style="font-size: 10px; color: #999; font-weight: 900;">CARTEIRA</p>
-                <h3 id="wallet-balance" style="font-size: 32px; color: var(--success); margin: 10px 0;">€0.0000</h3>
-                <button style="width: 100%; background: var(--google-blue); color: #fff; border: none; padding: 15px; border-radius: 10px; font-weight: 900;">LEVANTAR</button>
+            <div style="background: #fff; padding: 30px; border-radius: 20px; text-align: center; border: 1px solid #ddd;">
+                <p style="font-size: 10px; color: #999; font-weight: 900;">SALDO TOTAL</p>
+                <h2 id="wallet-balance" style="font-size: 32px; color: var(--success); margin: 10px 0;">0.0000€</h2>
+                <button style="width: 100%; background: var(--google-blue); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 900;">LEVANTAR</button>
             </div>
         </section>
     </main>
@@ -102,72 +104,75 @@
         let mySaldo = 0;
 
         async function init() {
-            await sync();
-            renderFeed();
+            await syncUser();
+            renderPosts();
         }
 
-        async function sync() {
+        async function syncUser() {
             const { data } = await sb.from('perfis').select('saldo').eq('id', myID).single();
             if(data) mySaldo = parseFloat(data.saldo);
-            updateUI();
+            updateView();
         }
 
-        function updateUI() {
-            const display = mySaldo.toFixed(4);
-            document.getElementById('top-balance').innerText = `€${display}`;
-            document.getElementById('wallet-balance').innerText = `€${display}`;
+        function updateView() {
+            const val = mySaldo.toFixed(4);
+            document.getElementById('balance-header').innerText = `${val}€`;
+            document.getElementById('wallet-balance').innerText = `${val}€`;
         }
 
-        async function addCredit(amt) {
+        async function addReward(amt) {
             mySaldo += amt;
             await sb.from('perfis').update({ saldo: mySaldo }).eq('id', myID);
-            updateUI();
+            updateView();
         }
 
-        async function renderFeed() {
+        async function renderPosts() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', { ascending: false });
-            const cont = document.getElementById('render-feed');
-            cont.innerHTML = '';
+            const feed = document.getElementById('feed-container');
+            feed.innerHTML = '';
 
             posts.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'post-card';
                 card.innerHTML = `
                     <div class="post-header">
-                        <div class="user-avatar">${p.user_id.charAt(0)}</div>
-                        <div style="font-weight:700; font-size:13px;">Membro ${p.user_id}</div>
+                        <div class="user-avatar">${p.user_id.charAt(0).toUpperCase()}</div>
+                        <div style="font-weight:700; font-size:14px;">Membro ${p.user_id}</div>
                     </div>
                     <div class="post-content">${p.content || ''}</div>
+                    
                     <div class="post-actions">
-                        <button class="action-btn" onclick="handleLike(this)">👍 Gosto</button>
+                        <button class="action-btn" onclick="likePost(this)">👍 Gosto</button>
                         <button class="action-btn">💬 Balão</button>
+                        <button class="action-btn" onclick="alert('Link copiado!')">↗️ Partilhar</button>
                     </div>
-                    <div class="comments-area">
-                        <div id="list-${p.id}"></div>
-                        <div class="comment-input-box">
-                            <input type="text" class="c-input" placeholder="Escreva aqui..." onkeydown="if(event.key==='Enter') sendComment('${p.id}', this)">
+
+                    <div class="comments-container">
+                        <div id="comments-${p.id}"></div>
+                        <div class="comment-input-wrap">
+                            <input type="text" class="comment-field" placeholder="Escreva um comentário..." onkeydown="if(event.key==='Enter') postComment('${p.id}', this)">
                         </div>
                     </div>
                 `;
-                cont.appendChild(card);
+                feed.appendChild(card);
             });
         }
 
-        function handleLike(btn) {
+        function likePost(btn) {
             btn.style.color = "#4285F4";
-            btn.innerText = "💙 Gostei";
-            addCredit(0.0020);
+            btn.innerHTML = "💙 Gostei";
+            addReward(0.0020);
         }
 
-        function sendComment(postId, input) {
+        function postComment(postId, input) {
             if(!input.value) return;
-            const list = document.getElementById('list-'+postId);
+            const container = document.getElementById('comments-'+postId);
             const bubble = document.createElement('div');
             bubble.className = 'comment-bubble';
             bubble.innerText = input.value;
-            list.appendChild(bubble);
+            container.appendChild(bubble);
             input.value = '';
-            addCredit(0.0050);
+            addReward(0.0050);
         }
 
         function nav(id, el) {
