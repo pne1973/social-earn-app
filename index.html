@@ -2,91 +2,210 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Earn v33.12</title>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Social Earn v33.12 - Facebook Edition</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --fb-blue: #1877F2; --fb-bg: #F0F2F5; }
-        body { background: var(--fb-bg); font-family: Segoe UI, Helvetica, Arial, sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 12px 28px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; outline: none; }
-        button { width: 100%; padding: 12px; background: var(--fb-blue); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        #log { margin-top: 15px; font-size: 12px; color: #65676B; min-height: 20px; }
+        :root {
+            --fb-blue: #1877F2; --fb-bg: #F0F2F5; --fb-card: #FFFFFF;
+            --fb-text: #050505; --fb-secondary: #65676B; --fb-border: #ced0d4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
+        body { background-color: var(--fb-bg); color: var(--fb-text); padding-top: 60px; }
+        .hidden { display: none !important; }
+
+        /* Header Estilo FB */
+        header { 
+            background: var(--fb-card); height: 60px; width: 100%; position: fixed; 
+            top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1000; 
+        }
+        #logo-fb { color: var(--fb-blue); font-size: 32px; font-weight: bold; text-decoration: none; }
+        
+        nav { display: flex; gap: 10px; height: 100%; }
+        .nav-link { 
+            background: none; border: none; color: var(--fb-secondary); 
+            font-size: 24px; padding: 0 20px; cursor: pointer; border-bottom: 3px solid transparent;
+        }
+        .nav-link.active { color: var(--fb-blue); border-bottom-color: var(--fb-blue); }
+
+        /* Container Principal */
+        main { max-width: 500px; margin: 0 auto; padding: 12px; }
+        .fb-card {
+            background: var(--fb-card); border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 12px;
+            border: 1px solid var(--fb-border);
+        }
+
+        /* Post Box */
+        .post-box { padding: 12px; }
+        .fb-input { 
+            width: 100%; border: 1px solid var(--fb-border); padding: 10px 15px; 
+            border-radius: 20px; outline: none; background: var(--fb-bg); font-size: 15px;
+        }
+        .fb-btn { 
+            background: var(--fb-blue); color: white; border: none; padding: 10px; 
+            border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px;
+        }
+
+        /* Feed */
+        .post-item { padding: 12px; }
+        .user-info { display: flex; align-items: center; gap: 10px; font-weight: bold; margin-bottom: 10px; }
+        .avatar { width: 36px; height: 36px; background: #ddd; border-radius: 50%; }
+        .post-actions { display: flex; border-top: 1px solid #eee; margin-top: 10px; padding-top: 5px; }
+        .action-btn { flex: 1; background: none; border: none; padding: 8px; color: var(--fb-secondary); font-weight: bold; cursor: pointer; }
+
+        /* Login Modal */
+        #login-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--fb-bg); z-index: 9999; display: flex; align-items: center; justify-content: center; 
+        }
+        .login-card { background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 12px 28px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1 style="color: var(--fb-blue); font-size: 45px; margin: 0;">f</h1>
-        <h2>Social Earn</h2>
-        <p style="color: #65676B;">Insira o ID para entrar</p>
-        
-        <input type="text" id="user-id" placeholder="ID de Teste" value="123">
-        <button id="btn-entrar" onclick="tentarEntrar()">Entrar Agora</button>
-        
-        <div id="log">Aguardando entrada...</div>
+    <div id="login-screen">
+        <div class="login-card">
+            <h1 style="color: var(--fb-blue); font-size: 50px; margin-bottom: 5px;">f</h1>
+            <h2 style="margin-bottom: 20px;">Social Earn v33.12</h2>
+            <input type="text" id="login-id" class="fb-input" style="border-radius: 6px;" placeholder="ID para teste (ex: 123)">
+            <button class="fb-btn" onclick="processAuth()">Entrar Agora</button>
+            <p id="auth-status" style="font-size: 12px; margin-top: 10px; color: #65676B;"></p>
+        </div>
     </div>
 
+    <header>
+        <a href="#" id="logo-fb">f</a>
+        <nav>
+            <button class="nav-link active" onclick="tab('feed')" id="t-feed">🏠</button>
+            <button class="nav-link" onclick="tab('wallet')" id="t-wallet">💰</button>
+            <button class="nav-link hidden" id="t-admin" onclick="tab('admin')">🛠️</button>
+        </nav>
+        <div id="top-balance" style="font-weight: bold; color: var(--fb-blue);">€ 0.0000</div>
+    </header>
+
+    <main>
+        <div id="view-feed">
+            <div class="fb-card post-box">
+                <input type="text" id="post-input" class="fb-input" placeholder="No que está a pensar?">
+                <button class="fb-btn" onclick="createPost()">Publicar e Ganhar</button>
+            </div>
+            <div id="feed-render"></div>
+        </div>
+
+        <div id="view-wallet" class="hidden">
+            <div class="fb-card" style="padding: 30px; text-align: center;">
+                <p style="color: var(--fb-secondary);">Saldo Disponível</p>
+                <h1 id="wall-bal" style="font-size: 40px; color: var(--fb-blue);">€ 0.0000</h1>
+                <button class="fb-btn" style="background: #ddd; color: #888;" disabled>Mínimo €5.00 para saque</button>
+            </div>
+        </div>
+
+        <div id="view-admin" class="hidden">
+            <div class="fb-card" style="padding: 20px;">
+                <h2 style="color: red;">Painel de Controle</h2>
+                <div id="adm-stats" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+    </main>
+
     <script>
-        // CHAVES DO TEU DOCUMENTO
-        const URL_DB = "https://fthvszovvpxujykslqex.supabase.co";
-        const KEY_DB = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aHZzem92dnB4dWp5a3NscWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTEwNTY0MDAsImV4cCI6MjAyNjYzMjQwMH0.7x9R5-fO1lW4s3E_f_f_f_f_f_f_f";
-        
-        // Inicialização
-        const _supabase = supabase.createClient(URL_DB, KEY_DB);
+        // AS CHAVES QUE VOCÊ ENVIOU NO SEU CÓDIGO ORIGINAL
+        const URL_S = "https://fthvszovvpxujykslqex.supabase.co";
+        const KEY_S = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aHZzem92dnB4dWp5a3NscWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTEwNTY0MDAsImV4cCI6MjAyNjYzMjQwMH0.7x9R5-fO1lW4s3E_f_f_f_f_f_f_f";
+        const _supabase = supabase.createClient(URL_S, KEY_S);
 
-        async function tentarEntrar() {
-            const id = document.getElementById('user-id').value.trim();
-            const log = document.getElementById('log');
-            const btn = document.getElementById('btn-entrar');
+        let user = null;
+        const ADMIN_ID = "5401881400";
 
+        // --- LÓGICA DE ENTRADA DO SEU CÓDIGO ORIGINAL ---
+        async function processAuth() {
+            const id = document.getElementById('login-id').value.trim();
+            const status = document.getElementById('auth-status');
             if (!id) return alert("Insira um ID!");
 
-            log.innerText = "A ligar ao servidor...";
-            btn.disabled = true;
+            status.innerText = "Conectando...";
 
             try {
-                // Tenta ler a tabela (Verifica se existe e se há rede)
-                let { data, error } = await _supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', id);
-
+                // Busca sem o .single() para evitar erro se o ID não existir
+                let { data, error } = await _supabase.from('profiles').select('*').eq('id', id);
                 if (error) throw error;
 
                 if (data.length === 0) {
-                    log.innerText = "ID não encontrado. A criar novo perfil...";
-                    
-                    const { data: newUser, error: errIns } = await _supabase
-                        .from('profiles')
+                    // SE NÃO EXISTE -> REGISTRA (Sua lógica de teste)
+                    status.innerText = "ID novo! Criando perfil...";
+                    const { data: nUser, error: iErr } = await _supabase.from('profiles')
                         .insert([{ id: id, username: "User_" + id, balance: 0.0 }])
                         .select();
-
-                    if (errIns) throw errIns;
-                    log.innerText = "Sucesso! Perfil criado.";
-                    alert("Bem-vindo! Perfil novo criado para o ID: " + id);
+                    if (iErr) throw iErr;
+                    user = nUser[0];
                 } else {
-                    log.innerText = "Sucesso! Perfil carregado.";
-                    alert("Entrou com sucesso! Saldo: € " + data[0].balance.toFixed(4));
+                    user = data[0];
                 }
 
-                // Se chegou aqui, a conexão está 100%
-                log.style.color = "green";
-                log.innerText = "Conectado ao Supabase!";
+                // LIBERA ACESSO
+                document.getElementById('login-screen').classList.add('hidden');
+                if(user.id === ADMIN_ID) document.getElementById('t-admin').classList.remove('hidden');
+                
+                updateUI();
+                renderFeed();
 
-            } catch (err) {
-                console.error(err);
-                log.style.color = "red";
-                // Explicação amigável do erro técnico
-                if (err.message === "Failed to fetch") {
-                    log.innerText = "Erro: Sem internet ou Supabase bloqueou o acesso (CORS).";
-                } else {
-                    log.innerText = "Erro: " + err.message;
-                }
-                alert("Falha técnica: " + err.message);
-            } finally {
-                btn.disabled = false;
+            } catch (e) {
+                console.error(e);
+                status.innerText = "Erro: " + e.message;
             }
+        }
+
+        function updateUI() {
+            const val = user.balance.toFixed(4);
+            document.getElementById('top-balance').innerText = `€ ${val}`;
+            document.getElementById('wall-bal').innerText = `€ ${val}`;
+        }
+
+        async function renderFeed() {
+            const { data: posts } = await _supabase.from('posts').select('*').order('created_at', { ascending: false });
+            const cont = document.getElementById('feed-render');
+            if(!posts) return;
+
+            cont.innerHTML = posts.map(p => `
+                <div class="fb-card post-item">
+                    <div class="user-info"><div class="avatar"></div> ${p.author_name}</div>
+                    <div>${p.content}</div>
+                    <div class="post-actions">
+                        <button class="action-btn" onclick="earn(0.0006)">👍 Like</button>
+                        <button class="action-btn" onclick="earn(0.0010)">💬 Comentar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function earn(amt) {
+            user.balance += amt;
+            updateUI();
+            await _supabase.from('profiles').update({ balance: user.balance }).eq('id', user.id);
+        }
+
+        async function createPost() {
+            const txt = document.getElementById('post-input').value;
+            if(!txt) return;
+
+            await _supabase.from('posts').insert([{
+                author_id: user.id,
+                author_name: user.username,
+                content: txt
+            }]);
+
+            document.getElementById('post-text').value = "";
+            await earn(0.0150);
+            renderFeed();
+        }
+
+        function tab(name) {
+            ['feed', 'wallet', 'admin'].forEach(v => document.getElementById('view-'+v).classList.add('hidden'));
+            ['feed', 'wallet', 'admin'].forEach(t => document.getElementById('t-'+t).classList.remove('active'));
+            document.getElementById('view-'+name).classList.remove('hidden');
+            document.getElementById('t-'+name).classList.add('active');
         }
     </script>
 </body>
