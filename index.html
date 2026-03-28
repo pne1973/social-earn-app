@@ -2,217 +2,91 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn v33.12 - Facebook Edition</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Earn v33.12</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --fb-blue: #1877F2; --fb-bg: #F0F2F5; --fb-card: #FFFFFF;
-            --fb-text: #050505; --fb-secondary: #65676B; --fb-border: #ced0d4;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
-        body { background-color: var(--fb-bg); color: var(--fb-text); padding-top: 60px; }
-        .hidden { display: none !important; }
-
-        /* Header */
-        header { 
-            background: var(--fb-card); height: 60px; width: 100%; position: fixed; 
-            top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1000; 
-        }
-        #app-logo { color: var(--fb-blue); font-size: 28px; font-weight: bold; text-decoration: none; }
-        
-        /* Nav */
-        nav { display: flex; gap: 5px; height: 100%; }
-        .nav-btn { 
-            background: none; border: none; color: var(--fb-secondary); 
-            font-size: 24px; padding: 0 20px; cursor: pointer; height: 100%;
-            border-bottom: 3px solid transparent;
-        }
-        .nav-btn.active { color: var(--fb-blue); border-bottom-color: var(--fb-blue); }
-
-        /* Main Content */
-        main { max-width: 600px; margin: 0 auto; padding: 12px; }
-        .fb-card {
-            background: var(--fb-card); border-radius: 8px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 12px;
-            border: 1px solid var(--fb-border);
-        }
-
-        /* Create Post */
-        .create-post { padding: 12px; }
-        .fb-input { 
-            width: 100%; border: 1px solid var(--fb-border); padding: 12px; 
-            border-radius: 20px; outline: none; background: var(--fb-bg); font-size: 15px;
-        }
-
-        /* Post Render */
-        .post-header { padding: 12px; display: flex; align-items: center; gap: 10px; font-weight: bold; }
-        .post-content { padding: 0 12px 12px 12px; font-size: 15px; }
-        .post-actions { display: flex; border-top: 1px solid var(--fb-border); padding: 4px; }
-        .action-btn { flex: 1; background: none; border: none; padding: 8px; color: var(--fb-secondary); font-weight: bold; border-radius: 4px; cursor: pointer; }
-        .action-btn:hover { background: #f2f2f2; }
-
-        /* Auth Modal (Tela de Entrada) */
-        #auth-modal { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--fb-bg); z-index: 9999; display: flex; align-items: center; justify-content: center; 
-        }
-        .auth-card { background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 12px 28px rgba(0,0,0,0.2); }
-        .login-btn { background: var(--fb-blue); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; }
-
-        #balance-display { color: var(--fb-blue); font-weight: bold; font-size: 18px; }
+        :root { --fb-blue: #1877F2; --fb-bg: #F0F2F5; }
+        body { background: var(--fb-bg); font-family: Segoe UI, Helvetica, Arial, sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 12px 28px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; outline: none; }
+        button { width: 100%; padding: 12px; background: var(--fb-blue); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        #log { margin-top: 15px; font-size: 12px; color: #65676B; min-height: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="auth-modal">
-        <div class="auth-card">
-            <h1 style="color: var(--fb-blue); font-size: 45px; margin-bottom: 10px;">f</h1>
-            <h2 style="margin-bottom: 20px;">Entrar no Social Earn</h2>
-            <input type="text" id="auth-username" class="fb-input" placeholder="Seu ID (Ex: 123 ou 5401881400)" style="border-radius: 6px; margin-bottom: 10px;">
-            <button class="login-btn" onclick="processAuth()">Entrar / Registrar</button>
-            <p id="auth-status" style="font-size: 12px; color: gray; margin-top: 10px;"></p>
-        </div>
+    <div class="card">
+        <h1 style="color: var(--fb-blue); font-size: 45px; margin: 0;">f</h1>
+        <h2>Social Earn</h2>
+        <p style="color: #65676B;">Insira o ID para entrar</p>
+        
+        <input type="text" id="user-id" placeholder="ID de Teste" value="123">
+        <button id="btn-entrar" onclick="tentarEntrar()">Entrar Agora</button>
+        
+        <div id="log">Aguardando entrada...</div>
     </div>
 
-    <header>
-        <a href="#" id="app-logo">f</a>
-        <nav>
-            <button class="nav-btn active" onclick="showView('feed')" id="nav-feed">🏠</button>
-            <button class="nav-btn" onclick="showView('wallet')" id="nav-wallet">💰</button>
-            <button class="nav-btn hidden" id="nav-admin" onclick="showView('admin')">🛠️</button>
-        </nav>
-        <div id="balance-display">€ 0.0000</div>
-    </header>
-
-    <main>
-        <div id="feed-view">
-            <div class="fb-card create-post">
-                <input type="text" id="post-text" class="fb-input" placeholder="No que está a pensar?">
-                <button class="login-btn" style="width: auto; padding: 8px 20px; margin-top: 10px;" onclick="createNewPost()">Publicar</button>
-            </div>
-            <div id="post-container"></div>
-        </div>
-
-        <div id="wallet-view" class="hidden">
-            <div class="fb-card" style="padding: 20px; text-align: center;">
-                <h3>O Seu Saldo</h3>
-                <div id="wallet-balance" style="font-size: 32px; font-weight: bold; color: var(--fb-blue); margin: 15px 0;">€ 0.0000</div>
-                <button class="login-btn" disabled>Levantar (Mín. €5.00)</button>
-            </div>
-        </div>
-
-        <div id="admin-view" class="hidden">
-            <div class="fb-card" style="padding: 20px;">
-                <h2 style="color: red;">Painel Admin</h2>
-                <div id="admin-data" style="margin-top: 10px;"></div>
-            </div>
-        </div>
-    </main>
-
     <script>
-        // CHAVES ORIGINAIS DO SEU CÓDIGO v33.12
-        const S_URL = "https://fthvszovvpxujykslqex.supabase.co";
-        const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aHZzem92dnB4dWp5a3NscWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTEwNTY0MDAsImV4cCI6MjAyNjYzMjQwMH0.7x9R5-fO1lW4s3E_f_f_f_f_f_f_f";
-        const _supabase = supabase.createClient(S_URL, S_KEY);
+        // CHAVES DO TEU DOCUMENTO
+        const URL_DB = "https://fthvszovvpxujykslqex.supabase.co";
+        const KEY_DB = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aHZzem92dnB4dWp5a3NscWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTEwNTY0MDAsImV4cCI6MjAyNjYzMjQwMH0.7x9R5-fO1lW4s3E_f_f_f_f_f_f_f";
+        
+        // Inicialização
+        const _supabase = supabase.createClient(URL_DB, KEY_DB);
 
-        const ADMIN_ID = "5401881400";
-        let currentUser = null;
+        async function tentarEntrar() {
+            const id = document.getElementById('user-id').value.trim();
+            const log = document.getElementById('log');
+            const btn = document.getElementById('btn-entrar');
 
-        // --- SISTEMA DE ENTRADA (LÓGICA v33.12 CORRIGIDA) ---
-        async function processAuth() {
-            const inputId = document.getElementById('auth-username').value.trim();
-            const status = document.getElementById('auth-status');
-            if (!inputId) return alert("Insira um ID!");
+            if (!id) return alert("Insira um ID!");
 
-            status.innerText = "A validar acesso...";
+            log.innerText = "A ligar ao servidor...";
+            btn.disabled = true;
 
             try {
-                // Buscamos sem o .single() para evitar o erro de 'nada encontrado'
-                let { data, error } = await _supabase.from('profiles').select('*').eq('id', inputId);
+                // Tenta ler a tabela (Verifica se existe e se há rede)
+                let { data, error } = await _supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', id);
+
                 if (error) throw error;
 
                 if (data.length === 0) {
-                    // SE NÃO EXISTE -> REGISTRA (Lógica de teste)
-                    status.innerText = "Criando novo perfil de teste...";
-                    const { data: newUser, error: insError } = await _supabase.from('profiles')
-                        .insert([{ id: inputId, username: "User_" + inputId, balance: 0.0 }])
-                        .select();
+                    log.innerText = "ID não encontrado. A criar novo perfil...";
                     
-                    if (insError) throw insError;
-                    currentUser = newUser[0];
+                    const { data: newUser, error: errIns } = await _supabase
+                        .from('profiles')
+                        .insert([{ id: id, username: "User_" + id, balance: 0.0 }])
+                        .select();
+
+                    if (errIns) throw errIns;
+                    log.innerText = "Sucesso! Perfil criado.";
+                    alert("Bem-vindo! Perfil novo criado para o ID: " + id);
                 } else {
-                    // SE EXISTE -> ENTRA
-                    currentUser = data[0];
+                    log.innerText = "Sucesso! Perfil carregado.";
+                    alert("Entrou com sucesso! Saldo: € " + data[0].balance.toFixed(4));
                 }
 
-                // LIBERAR INTERFACE
-                document.getElementById('auth-modal').classList.add('hidden');
-                if (currentUser.id === ADMIN_ID) document.getElementById('nav-admin').classList.remove('hidden');
-
-                updateUI();
-                renderFeed();
+                // Se chegou aqui, a conexão está 100%
+                log.style.color = "green";
+                log.innerText = "Conectado ao Supabase!";
 
             } catch (err) {
                 console.error(err);
-                status.innerText = "Erro ao conectar. Tente novamente.";
-                alert("Erro técnico: " + err.message);
+                log.style.color = "red";
+                // Explicação amigável do erro técnico
+                if (err.message === "Failed to fetch") {
+                    log.innerText = "Erro: Sem internet ou Supabase bloqueou o acesso (CORS).";
+                } else {
+                    log.innerText = "Erro: " + err.message;
+                }
+                alert("Falha técnica: " + err.message);
+            } finally {
+                btn.disabled = false;
             }
-        }
-
-        function updateUI() {
-            const b = currentUser.balance.toFixed(4);
-            document.getElementById('balance-display').innerText = `€ ${b}`;
-            document.getElementById('wallet-balance').innerText = `€ ${b}`;
-        }
-
-        async function renderFeed() {
-            const { data: posts } = await _supabase.from('posts').select('*').order('created_at', { ascending: false });
-            const container = document.getElementById('post-container');
-            if (!posts) return;
-
-            container.innerHTML = posts.map(p => `
-                <div class="fb-card">
-                    <div class="post-header">
-                        <div style="width:36px; height:36px; background:var(--fb-blue); border-radius:50%; color:white; display:flex; align-items:center; justify-content:center;">${p.author_name[0]}</div>
-                        ${p.author_name}
-                    </div>
-                    <div class="post-content">${p.content}</div>
-                    <div class="post-actions">
-                        <button class="action-btn" onclick="earn(0.0006)">👍 Gostar</button>
-                        <button class="action-btn" onclick="earn(0.0010)">💬 Comentar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function earn(amount) {
-            currentUser.balance += amount;
-            updateUI();
-            await _supabase.from('profiles').update({ balance: currentUser.balance }).eq('id', currentUser.id);
-        }
-
-        async function createNewPost() {
-            const txt = document.getElementById('post-text').value;
-            if (!txt) return;
-
-            await _supabase.from('posts').insert([{
-                author_id: currentUser.id,
-                author_name: currentUser.username,
-                content: txt
-            }]);
-
-            document.getElementById('post-text').value = "";
-            await earn(0.0150);
-            renderFeed();
-        }
-
-        function showView(view) {
-            ['feed', 'wallet', 'admin'].forEach(v => document.getElementById(v + '-view').classList.add('hidden'));
-            ['nav-feed', 'nav-wallet', 'nav-admin'].forEach(n => document.getElementById(n).classList.remove('active'));
-            document.getElementById(view + '-view').classList.remove('hidden');
-            document.getElementById('nav-' + view).classList.add('active');
         }
     </script>
 </body>
