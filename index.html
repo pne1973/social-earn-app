@@ -3,155 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social - Admin Panel</title>
+    <title>Apex C&C Center (v33.20 Final)</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        :root { --google-blue: #4285F4; --bg: #f8f9fa; --admin-red: #dc2626; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Consolas', 'Monaco', monospace; }
+        :root { --blue: #007bff; --red: #dc3545; --green: #28a745; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --border: #333; }
         
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); padding-top: 60px; padding-bottom: 80px; }
+        body { background: var(--bg); color: var(--text); padding-top: 60px; padding-bottom: 90px; }
 
-        /* HEADER FIXO */
+        /* HEADER TÉCNICO */
         header {
-            position: fixed; top: 0; width: 100%; background: #fff; height: 60px;
-            display: flex; align-items: center; justify-content: center;
-            border-bottom: 1px solid #ddd; z-index: 1000;
+            position: fixed; top: 0; width: 100%; background: #000; height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 15px; border-bottom: 2px solid var(--blue); z-index: 2000;
         }
-        .header-title { font-weight: 800; color: var(--google-blue); font-size: 18px; text-transform: uppercase; }
+        .header-title { font-weight: 900; color: var(--blue); font-size: 16px; text-transform: uppercase; letter-spacing: 1px; }
+        .server-status { font-size: 10px; color: var(--green); animation: blink 1.5s infinite; }
 
-        /* SECCÕES (ABAS) */
-        .tab-content { display: none; padding: 15px; }
-        .tab-content.active { display: block; }
+        /* CONTEÚDO DINÂMICO */
+        .page { display: none; padding: 15px; width: 100%; max-width: 600px; margin: 0 auto; }
+        .page.active { display: block; }
 
-        /* FEED VIEW (ADMIN STYLE) */
-        .post-card { background: #fff; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ddd; overflow: hidden; }
-        .post-info { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; color: #666; }
-        .post-body { padding: 12px; font-size: 15px; }
-        .post-img { width: 100%; max-height: 300px; object-fit: cover; background: #eee; }
-        .post-footer { padding: 10px 12px; background: #fafafa; display: flex; gap: 20px; font-size: 14px; font-weight: 700; }
+        /* DASHBOARD ANALÍTICO (ALTO NÍVEL) */
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .stat-card h4 { font-size: 10px; color: #aaa; text-transform: uppercase; margin-bottom: 6px; }
+        .stat-card p { font-size: 22px; font-weight: 900; color: var(--text); }
+        .stat-card.critical { border-left: 4px solid var(--red); }
+        .stat-card.growth { border-left: 4px solid var(--green); }
 
-        /* PAINEL DE CONTROLO & TABELAS */
-        .admin-title { color: var(--admin-red); font-size: 24px; font-weight: 900; margin-bottom: 20px; }
-        .table-container { width: 100%; overflow-x: auto; background: #fff; border-radius: 8px; border: 1px solid #ddd; }
-        .admin-table { width: 100%; border-collapse: collapse; min-width: 300px; }
-        .admin-table th { background: #eee; padding: 12px; text-align: left; font-size: 13px; }
-        .admin-table td { padding: 12px; border-top: 1px solid #eee; font-size: 14px; }
+        /* LISTA DE AUDITORIA DE UTILIZADORES */
+        .audit-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+        .audit-header { padding: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .user-id { font-weight: 900; color: var(--blue); font-size: 14px; }
+        .user-balance { font-size: 18px; font-weight: 800; color: var(--text); }
+        
+        .audit-body { padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; color: #ccc; }
+        .audit-meta b { color: #fff; }
 
-        /* NAVEGAÇÃO INFERIOR FIXA */
-        .bottom-nav { 
-            position: fixed; bottom: 0; width: 100%; background: #fff; height: 75px; 
-            display: flex; border-top: 1px solid #ddd; z-index: 1000;
-        }
-        .nav-item { 
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-decoration: none; color: #999; font-size: 10px; font-weight: 800;
-        }
-        .nav-item.active { color: var(--google-blue); }
-        .nav-item.admin-btn.active { color: var(--admin-red); }
-        .nav-icon { font-size: 20px; margin-bottom: 4px; }
+        .audit-actions { padding: 10px 12px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--border); display: flex; gap: 8px; }
+        .btn { flex: 1; padding: 10px; border-radius: 4px; border: none; font-weight: 900; font-size: 11px; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+        .btn-reset { background: #333; color: var(--text); }
+        .btn-pay { background: var(--green); color: #fff; }
+        .btn-ban { background: var(--red); color: #fff; }
+        .btn:active { transform: scale(0.96); }
 
-        .stats-box { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px; }
+        /* NAVBAR TÁTICA */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: #000; height: 80px; display: flex; border-top: 2px solid var(--border); z-index: 2000; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #666; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .nav-btn.active { color: var(--blue); border-top: 2px solid var(--blue); background: rgba(0,123,255,0.05); }
+        .nav-icon { font-size: 22px; margin-bottom: 5px; }
+
+        /* FILTRO RÁPIDO */
+        .filter-bar { background: var(--card); padding: 10px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 15px; display: flex; gap: 10px; align-items: center; font-size: 12px; }
+        input[type="number"] { background: #000; border: 1px solid var(--border); color: var(--text); padding: 5px 10px; border-radius: 4px; width: 60px; }
+
+        @keyframes blink { 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="header-title">APEX SOCIAL</div>
+        <div class="header-title">APEX C&C CENTER</div>
+        <div class="server-status">● SB LIVE</div>
     </header>
 
-    <main id="view-feed" class="tab-content active">
-        <div id="feed-render"></div>
-    </main>
-
-    <main id="view-stats" class="tab-content">
-        <div class="admin-title" style="color:var(--google-blue)">Estatísticas</div>
-        <div id="stats-render"></div>
-    </main>
-
-    <main id="view-admin" class="tab-content">
-        <h1 class="admin-title">Painel de Controlo</h1>
-        <div class="table-container">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Saldo (€)</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="users-render"></tbody>
-            </table>
+    <section id="p-monitor" class="page active">
+        <h2 style="font-weight:900; margin-bottom:15px; text-transform:uppercase; color:var(--text);">Monitor do Sistema</h2>
+        <div id="feed-log" style="font-size:11px; color:#aaa; height:60vh; overflow-y:scroll; background:#000; padding:10px; border-radius:4px; border:1px solid var(--border);">
+            > Carregando logs da tabela 'posts'...<br>
         </div>
-    </main>
+    </section>
 
-    <nav class="bottom-nav">
-        <a href="#" class="nav-item active" onclick="changeTab('feed', this)">
-            <span class="nav-icon">🏠</span>FEED
-        </a>
-        <a href="#" class="nav-item" onclick="changeTab('stats', this)">
-            <span class="nav-icon">📊</span>ESTATÍSTICAS
-        </a>
-        <a href="#" class="nav-item admin-btn" onclick="changeTab('admin', this)">
-            <span class="nav-icon">⚙️</span>PAINEL ADMIN
-        </a>
+    <section id="p-stats" class="page">
+        <h2 style="font-weight:900; margin-bottom:15px; text-transform:uppercase; color:var(--text);">KPIs Analíticos</h2>
+        <div class="stat-grid">
+            <div class="stat-card growth"><h4>Utilizadores</h4><p id="s-users">...</p></div>
+            <div class="stat-card growth"><h4>Posts Totais</h4><p id="s-posts">...</p></div>
+            <div class="stat-card critical"><h4>Dívida Global (€)</h4><p id="s-debt">...</p></div>
+            <div class="stat-card"><h4>Interações (Likes+Coment)</h4><p id="s-inter">...</p></div>
+            <div class="stat-card critical"><h4>Payout Pendente (>5€)</h4><p id="s-pend">...</p></div>
+            <div class="stat-card"><h4>Média Ganho/User</h4><p id="s-avg">...</p></div>
+        </div>
+    </section>
+
+    <section id="p-admin" class="page">
+        <h2 style="color:var(--red); font-weight:900; margin-bottom:15px; text-transform:uppercase;">Auditoria de Utilizadores</h2>
+        
+        <div class="filter-bar">
+            <span>Avisar se saldo for > </span>
+            <input type="number" id="balance-limit" value="5.0000" step="0.5" onchange="loadAdmin()">
+            <span>€</span>
+        </div>
+
+        <div id="admin-list">Carregando lista de auditoria...</div>
+    </section>
+
+    <nav class="nav-bar">
+        <a href="javascript:void(0)" class="nav-btn active" onclick="nav('monitor', this)"><span class="nav-icon">🖥️</span>MONITOR</a>
+        <a href="javascript:void(0)" class="nav-btn" onclick="nav('stats', this)"><span class="nav-icon">📊</span>STATS</a>
+        <a href="javascript:void(0)" class="nav-btn" onclick="nav('admin', this)"><span class="nav-icon">⚔️</span>ADMIN</a>
     </nav>
 
     <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const sb = supabase.createClient(SB_URL, SB_KEY);
+        const URL = "https://fickstyevektwbgimapy.supabase.co";
+        const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const sb = supabase.createClient(URL, KEY);
 
-        function changeTab(tab, el) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById('view-' + tab).classList.add('active');
+        function nav(t, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('p-'+t).classList.add('active');
             el.classList.add('active');
-
-            if(tab === 'feed') loadFeed();
-            if(tab === 'stats') loadStats();
-            if(tab === 'admin') loadAdmin();
+            if(t === 'stats') loadStats();
+            if(t === 'admin') loadAdmin();
+            if(t === 'monitor') loadMonitorFeed();
         }
 
-        async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', { ascending: false });
-            const container = document.getElementById('feed-render');
-            container.innerHTML = posts.map(p => `
-                <div class="post-card">
-                    <div class="post-info">ID: ${p.user_id} • ${new Date(p.created_at).toLocaleDateString()}</div>
-                    <div class="post-body">${p.content || ''}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
-                    <div class="post-footer">
-                        <span>👍 ${p.likes || 0}</span>
-                        <span>💬 ${p.comments || 0}</span>
-                    </div>
-                </div>
-            `).join('');
+        async function loadMonitorFeed() {
+            const { data } = await sb.from('posts').select('*').order('created_at', { ascending: false }).limit(20);
+            const log = document.getElementById('feed-log');
+            log.innerHTML = '> A aguardar novos posts...<br><br>';
+            data.forEach(p => {
+                const date = new Date(p.created_at).toLocaleTimeString();
+                log.innerHTML += `>[${date}] POST ID ${p.id} detetado (User: ${p.user_id}). Likes: ${p.likes || 0}, Comentários: ${p.comments || 0}.<br>`;
+            });
+            log.scrollTop = log.scrollHeight; // Auto-scroll to bottom
         }
 
         async function loadStats() {
-            const { count: uCount } = await sb.from('perfis').select('*', { count: 'exact', head: true });
-            const { count: pCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
-            document.getElementById('stats-render').innerHTML = `
-                <div class="stats-box"><b>Total Utilizadores:</b> ${uCount}</div>
-                <div class="stats-box"><b>Total Publicações:</b> ${pCount}</div>
-            `;
+            const { data: users } = await sb.from('perfis').select('saldo');
+            const { data: posts } = await sb.from('posts').select('likes, comments');
+            
+            let debt = users.reduce((acc, u) => acc + (u.saldo || 0), 0);
+            let inter = posts.reduce((acc, p) => acc + (p.likes || 0) + (p.comments || 0), 0);
+            let pend = users.filter(u => u.saldo >= 5).length;
+
+            document.getElementById('s-users').innerText = users.length;
+            document.getElementById('s-posts').innerText = posts.length;
+            document.getElementById('s-debt').innerText = debt.toFixed(4);
+            document.getElementById('s-avg').innerText = (debt / users.length).toFixed(2);
+            document.getElementById('s-inter').innerText = inter;
+            document.getElementById('s-pend').innerText = pend;
         }
 
         async function loadAdmin() {
             const { data: users } = await sb.from('perfis').select('*').order('saldo', { ascending: false });
-            const tbody = document.getElementById('users-render');
-            tbody.innerHTML = users.map(u => `
-                <tr>
-                    <td>${u.id}</td>
-                    <td>${u.saldo.toFixed(4)}€</td>
-                    <td><button style="color:red; background:none; border:none; font-weight:bold;">BANIR</button></td>
-                </tr>
-            `).join('');
+            const limit = parseFloat(document.getElementById('balance-limit').value);
+            const list = document.getElementById('admin-list');
+            list.innerHTML = '';
+
+            users.forEach(u => {
+                const isAlert = u.saldo >= limit;
+                const card = document.createElement('div');
+                card.className = 'audit-card';
+                card.style.borderLeft = isAlert ? `4px solid ${var(--red)}` : `1px solid ${var(--border)}`;
+                
+                card.innerHTML = `
+                    <div class="audit-header">
+                        <span class="user-id">UID: ${u.id}</span>
+                        <span class="user-balance">${(u.saldo || 0).toFixed(4)}€</span>
+                    </div>
+                    <div class="audit-body">
+                        <div class="audit-meta">Entrou: <b>${new Date(u.created_at).toLocaleDateString()}</b></div>
+                        <div class="audit-meta">Status: <b>${isAlert ? 'ALERTA PAYOUT' : 'OK'}</b></div>
+                        <div class="audit-meta">Postagens: <b>N/A</b></div>
+                    </div>
+                    <div class="audit-actions">
+                        <button class="btn btn-pay" onclick="payReset('${u.id}')">PAY+RESET</button>
+                        <button class="btn btn-ban" onclick="banUser('${u.id}')">BAN</button>
+                    </td>
+                `;
+                list.appendChild(card);
+            });
         }
 
-        // Inicializar
-        loadFeed();
+        async function payReset(id) {
+            if(confirm("Confirmar processamento de pagamento e RESET DE SALDO?")) {
+                const { error } = await sb.from('perfis').update({ saldo: 0 }).eq('id', id);
+                if(!error) loadAdmin();
+            }
+        }
+
+        async function banUser(id) {
+            if(confirm("Deseja ELIMINAR DEFINITIVAMENTE este utilizador e os seus posts?")) {
+                const { error } = await sb.from('perfis').delete().eq('id', id);
+                if(!error) loadAdmin();
+            }
+        }
+
+        loadMonitorFeed(); // Inicialização tática
     </script>
 </body>
 </html>
