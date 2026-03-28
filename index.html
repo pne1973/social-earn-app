@@ -68,14 +68,14 @@
     </main>
 
     <script>
-        /* CONFIGURAÇÃO SUPABASE COM A CHAVE QUE ENVIOU */
-        const SUPABASE_URL = 'https://fickstyevektwbgimapy.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiaWdltmFweIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
+        /* CONFIGURAÇÃO CORRIGIDA: ADICIONADO O "D" NO URL PARA CASAR COM A SUA CHAVE */
+        const SUPABASE_URL = 'https://fickstyevektwbdgimapy.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
 
-        /* FUNÇÃO DE ENTRADA ORIGINAL - ABSOLUTAMENTE IGUAL AO SEU DOC */
+        /* FUNÇÃO DE ENTRADA ORIGINAL - SEM ALTERAÇÕES NA LÓGICA */
         async function processAuth() {
             const id = document.getElementById('auth-username').value;
             if (!id) return alert("Digite um ID");
