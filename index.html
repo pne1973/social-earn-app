@@ -23,11 +23,10 @@
         .auth-container { text-align: center; width: 90%; max-width: 350px; }
         .auth-logo { font-size: 40px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px; }
         
-        /* Estilo dos Elementos Base */
-        .fb-input { width: 100%; border: 1px solid var(--fb-border); padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 16px; }
-        .fb-btn { background: var(--fb-blue); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; }
+        .fb-input { width: 100%; border: 1px solid var(--fb-border); padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 16px; outline: none; }
+        .fb-btn { background: var(--fb-blue); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
 
-        /* Header Facebook Edition */
+        /* Header Facebook */
         header { background: var(--fb-card); height: 60px; width: 100%; position: fixed; top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid var(--fb-border); z-index: 1000; }
         .header-logo { color: var(--fb-blue); font-size: 28px; font-weight: bold; text-decoration: none; }
         
@@ -41,7 +40,7 @@
         <div class="auth-container">
             <div class="auth-logo">f</div>
             <p style="margin-bottom: 15px; color: var(--fb-secondary);">Para começar a ganhar com as suas interações, por favor identifique-se.</p>
-            <input type="text" id="auth-username" class="fb-input" placeholder="Insira o seu ID">
+            <input type="text" id="auth-username" class="fb-input" placeholder="Insira o seu ID" value="123">
             <button class="fb-btn" onclick="processAuth()">Começar a Ganhar</button>
         </div>
     </div>
@@ -60,44 +59,53 @@
     </main>
 
     <script>
-        // CREDENCIAIS E INSTÂNCIA ORIGINAIS (CONFORME INDEX 39)
+        // CREDENCIAIS ORIGINAIS DO SEU INDEX 39
         const SUPABASE_URL = 'https://fickstyevektwbgimapy.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiaW1hcHkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxMTQ1OTI2OCwiZXhwIjoyMDI3MDE2ODY4fQ.nOQWvUv_r_r_r_r_r_r_r_r_r_r_r_C9QY';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
 
-        // LÓGICA DE ENTRADA ORIGINAL E INTOCADA
+        // SISTEMA DE ENTRADA ORIGINAL COM AJUSTE DE ESTABILIDADE
         async function processAuth() {
             const id = document.getElementById('auth-username').value;
             if (!id) return alert("Digite um ID");
 
-            let { data: profile, error } = await _supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', id)
-                .single();
-
-            if (error || !profile) {
-                const { data: newUser, error: createError } = await _supabase
+            try {
+                // Procuramos primeiro sem o .single() para evitar o erro de "Failed to fetch" ou crash
+                let { data, error } = await _supabase
                     .from('profiles')
-                    .insert([{ id: id, username: 'User_' + id, balance: 0 }])
-                    .select()
-                    .single();
-                
-                if (createError) return alert("Erro ao criar perfil");
-                profile = newUser;
-            }
+                    .select('*')
+                    .eq('id', id);
 
-            currentUser = profile;
-            document.getElementById('auth-modal').classList.add('hidden');
-            document.getElementById('main-header').classList.remove('hidden');
-            document.getElementById('main-content').classList.remove('hidden');
-            document.getElementById('user-balance').innerText = currentUser.balance.toFixed(4);
-            loadPosts();
+                if (error) throw error;
+
+                let profile = data[0];
+
+                if (!profile) {
+                    // SE NÃO EXISTIR -> REGISTA (Lógica original)
+                    const { data: newUser, error: createError } = await _supabase
+                        .from('profiles')
+                        .insert([{ id: id, username: 'User_' + id, balance: 0 }])
+                        .select();
+                    
+                    if (createError) throw createError;
+                    profile = newUser[0];
+                }
+
+                currentUser = profile;
+                document.getElementById('auth-modal').classList.add('hidden');
+                document.getElementById('main-header').classList.remove('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                document.getElementById('user-balance').innerText = currentUser.balance.toFixed(4);
+                loadPosts();
+
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao conectar: " + err.message);
+            }
         }
 
-        // DEMAIS FUNÇÕES DO SISTEMA
         async function loadPosts() {
             const { data: posts } = await _supabase.from('posts').select('*').order('created_at', { ascending: false });
             const feed = document.getElementById('feed');
@@ -109,7 +117,6 @@
                     <p>${post.content}</p>
                     <div style="margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 20px; color: var(--fb-secondary); font-size: 14px;">
                         <span onclick="earn(0.0006)">👍 Gostar</span>
-                        <span onclick="earn(0.0010)">💬 Comentar</span>
                     </div>
                 </div>
             `).join('');
