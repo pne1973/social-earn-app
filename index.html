@@ -3,182 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network v33.12</title>
+    <title>Social Earn v33.12 - Edição FB</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --google-blue: #4285F4;
-            --google-red: #EA4335;
-            --google-yellow: #FBBC05;
-            --google-green: #34A853;
-            --bg-color: #FFFFFF;
-            --text-color: #202124;
-            --border-color: #DADCE0;
+            --fb-blue: #1877F2; --fb-bg: #F0F2F5; --fb-card: #FFFFFF;
+            --fb-text: #050505; --fb-secondary: #65676B; --fb-border: #ced0d4;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
+        body { background-color: var(--fb-bg); color: var(--fb-text); padding-top: 60px; }
+        .hidden { display: none !important; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.5; }
-
-        header {
-            background-color: #fff;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border-color);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-
-        .logo { font-size: 22px; font-weight: bold; }
-        .logo span:nth-child(1) { color: var(--google-blue); }
-        .logo span:nth-child(2) { color: var(--google-red); }
-        .logo span:nth-child(3) { color: var(--google-yellow); }
-        .logo span:nth-child(4) { color: var(--google-blue); }
-        .logo span:nth-child(5) { color: var(--google-green); }
-        .logo span:nth-child(6) { color: var(--google-red); }
-
-        main { margin-top: 70px; padding: 15px; max-width: 600px; margin-left: auto; margin-right: auto; }
-
-        .card {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .btn {
-            background-color: var(--google-blue);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-
+        /* Login Screen */
         #auth-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--fb-bg); z-index: 2000; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .login-card {
+            background: white; padding: 30px; border-radius: 8px;
+            width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.2);
         }
 
-        .hidden { display: none; }
+        /* Facebook Style Header */
+        header {
+            background: var(--fb-card); height: 60px; width: 100%; position: fixed;
+            top: 0; left: 0; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px; border-bottom: 1px solid var(--fb-border); z-index: 1000;
+        }
+        .logo { color: var(--fb-blue); font-size: 28px; font-weight: bold; text-decoration: none; }
+        
+        /* Inputs & Buttons */
+        .fb-input {
+            width: 100%; border: 1px solid var(--fb-border); padding: 12px;
+            border-radius: 6px; margin-bottom: 15px; outline: none; font-size: 16px;
+        }
+        .fb-btn {
+            background: var(--fb-blue); color: white; border: none;
+            padding: 12px; border-radius: 6px; font-weight: bold;
+            width: 100%; cursor: pointer; font-size: 16px;
+        }
+
+        main { max-width: 600px; margin: 0 auto; padding: 15px; }
+        .post-card {
+            background: white; border-radius: 8px; border: 1px solid var(--fb-border);
+            margin-bottom: 15px; padding: 12px;
+        }
     </style>
 </head>
 <body>
 
     <div id="auth-modal">
-        <div class="logo" style="font-size: 40px; margin-bottom: 20px;">
-            <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
+        <div class="login-card">
+            <h1 style="color: var(--fb-blue); font-size: 50px;">f</h1>
+            <h2 style="margin-bottom: 20px;">Social Earn</h2>
+            <input type="text" id="auth-id" class="fb-input" placeholder="Insira o seu ID (ex: 123)">
+            <button class="fb-btn" onclick="processAuth()">Entrar</button>
+            <p id="status-msg" style="margin-top: 10px; font-size: 13px; color: var(--fb-secondary);"></p>
         </div>
-        <input type="text" id="auth-username" placeholder="Insira seu ID" style="max-width: 300px;">
-        <button class="btn" onclick="processAuth()">Entrar</button>
     </div>
 
-    <header>
-        <div class="logo">
-            <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span> Edition
-        </div>
-        <div id="balance-container" style="font-weight: bold;">
-            € <span id="user-balance">0.0000</span>
-        </div>
+    <header class="hidden" id="app-header">
+        <a href="#" class="logo">f</a>
+        <div id="balance-top" style="font-weight: bold; color: var(--fb-blue);">€ 0.0000</div>
     </header>
 
-    <main>
-        <div class="card">
-            <input type="text" id="post-content" placeholder="O que você está pensando?">
-            <button class="btn" onclick="createNewPost()">Postar (+€0.0150)</button>
+    <main class="hidden" id="app-main">
+        <div class="post-card">
+            <input type="text" id="post-text" class="fb-input" placeholder="No que está a pensar?">
+            <button class="fb-btn" onclick="handlePost()">Publicar (+€0.0150)</button>
         </div>
         <div id="feed"></div>
     </main>
 
     <script>
-        const SUPABASE_URL = 'https://fthvszovvpxujykslqex.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aHZzem92dnB4dWp5a3NscWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTEwNTY0MDAsImV4cCI6MjAyNjYzMjQwMH0.7x9R5-fO1lW4s3E_f_f_f_f_f_f_f';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // CHAVES DO SEU DOCUMENTO (INDEX 39)
+        const S_URL = "https://fickstyevektwbgimapy.supabase.co";
+        const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiaW1hcHkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxMTQ1OTI2OCwiZXhwIjoyMDI3MDE2ODY4fQ.nOQWvUv_r_r_r_r_r_r_r_r_r_r_r_C9QY";
+        const _supabase = supabase.createClient(S_URL, S_KEY);
 
         let currentUser = null;
 
         async function processAuth() {
-            const id = document.getElementById('auth-username').value;
-            if (!id) return alert("Digite um ID");
+            const id = document.getElementById('auth-id').value.trim();
+            const status = document.getElementById('status-msg');
+            if (!id) return alert("Insira um ID!");
 
-            let { data: profile, error } = await _supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', id)
-                .single();
+            status.innerText = "A validar acesso...";
 
-            if (error || !profile) {
-                const { data: newUser, error: createError } = await _supabase
-                    .from('profiles')
-                    .insert([{ id: id, username: 'User_' + id, balance: 0 }])
-                    .select()
-                    .single();
+            try {
+                // CORREÇÃO: Usamos select() sem o .single() para evitar o crash
+                let { data, error } = await _supabase.from('profiles').select('*').eq('id', id);
+                if (error) throw error;
+
+                if (data.length === 0) {
+                    // SE NÃO EXISTE -> CRIA (Lógica Production 1.0)
+                    status.innerText = "Novo ID detetado. A criar perfil...";
+                    const { data: newUser, error: createError } = await _supabase
+                        .from('profiles')
+                        .insert([{ id: id, username: 'User_' + id, balance: 0.0 }])
+                        .select();
+                    
+                    if (createError) throw createError;
+                    currentUser = newUser[0];
+                } else {
+                    // SE EXISTE -> ENTRA
+                    currentUser = data[0];
+                }
+
+                // LIBERAR INTERFACE
+                document.getElementById('auth-modal').classList.add('hidden');
+                document.getElementById('app-header').classList.remove('hidden');
+                document.getElementById('app-main').classList.remove('hidden');
                 
-                if (createError) return alert("Erro ao criar perfil");
-                profile = newUser;
-            }
+                updateUI();
+                renderFeed();
 
-            currentUser = profile;
-            document.getElementById('auth-modal').classList.add('hidden');
-            document.getElementById('user-balance').innerText = currentUser.balance.toFixed(4);
-            loadPosts();
+            } catch (err) {
+                console.error(err);
+                status.innerText = "Erro de ligação. Verifique a tabela no Supabase.";
+            }
         }
 
-        async function loadPosts() {
-            const { data: posts } = await _supabase
-                .from('posts')
-                .select('*')
-                .order('created_at', { ascending: false });
+        function updateUI() {
+            document.getElementById('balance-top').innerText = `€ ${currentUser.balance.toFixed(4)}`;
+        }
 
+        async function renderFeed() {
+            const { data: posts } = await _supabase.from('posts').select('*').order('created_at', { ascending: false });
             const feed = document.getElementById('feed');
-            feed.innerHTML = posts.map(post => `
-                <div class="card">
-                    <strong>${post.author_name}</strong>
-                    <p>${post.content}</p>
-                    <div style="margin-top:10px; font-size:12px; color:gray;">
-                        <span onclick="likePost()">Curtir (+€0.0006)</span>
+            if (!posts) return;
+
+            feed.innerHTML = posts.map(p => `
+                <div class="post-card">
+                    <div style="font-weight: bold; margin-bottom: 8px;">${p.author_name}</div>
+                    <div>${p.content}</div>
+                    <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px; color: var(--fb-secondary); font-size: 13px;">
+                        👍 Gostar (+€0.0006)
                     </div>
                 </div>
             `).join('');
         }
 
-        async function createNewPost() {
-            const content = document.getElementById('post-content').value;
-            if (!content) return;
+        async function handlePost() {
+            const txt = document.getElementById('post-text').value;
+            if (!txt) return;
 
-            const { error } = await _supabase
-                .from('posts')
-                .insert([{ 
-                    author_id: currentUser.id, 
-                    author_name: currentUser.username, 
-                    content: content 
-                }]);
+            await _supabase.from('posts').insert([{
+                author_id: currentUser.id,
+                author_name: currentUser.username,
+                content: txt
+            }]);
 
-            if (!error) {
-                currentUser.balance += 0.0150;
-                await _supabase.from('profiles').update({ balance: currentUser.balance }).eq('id', currentUser.id);
-                document.getElementById('user-balance').innerText = currentUser.balance.toFixed(4);
-                document.getElementById('post-content').value = '';
-                loadPosts();
-            }
+            currentUser.balance += 0.0150;
+            await _supabase.from('profiles').update({ balance: currentUser.balance }).eq('id', currentUser.id);
+            
+            document.getElementById('post-text').value = "";
+            updateUI();
+            renderFeed();
         }
     </script>
 </body>
