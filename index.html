@@ -1,94 +1,157 @@
-<style>
-    .admin-section { padding: 20px; display: none; }
-    .stats-card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #ddd; }
-    .admin-table { width: 100%; border-collapse: collapse; background: white; font-size: 12px; }
-    .admin-table th, .admin-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    .admin-table th { background: #f4f4f4; }
-</style>
-
-<main id="tab-feed">
-    <div id="posts-container"></div>
-</main>
-
-<main id="tab-stats" class="admin-section">
-    <h2 style="color:var(--google-blue)">Estatísticas Globais</h2>
-    <div id="stats-content">Carregando dados...</div>
-</main>
-
-<main id="tab-admin" class="admin-section">
-    <h2 style="color:red">Painel de Controlo</h2>
-    <div style="overflow-x:auto">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Saldo (€)</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="admin-users-list"></tbody>
-        </table>
-    </div>
-</main>
-
-<nav class="bottom-nav">
-    <a href="javascript:void(0)" class="nav-link active" onclick="showTab('feed', this)">🏠<br>FEED</a>
-    <a href="javascript:void(0)" class="nav-link" onclick="showTab('stats', this)">📊<br>ESTATÍSTICAS</a>
-    <a href="javascript:void(0)" class="nav-link" style="color:red" onclick="showTab('admin', this)">⚙️<br>PAINEL ADMIN</a>
-</nav>
-
-<script>
-    // Função para trocar as abas (Tabs)
-    function showTab(tabName, el) {
-        // Esconder todas
-        document.getElementById('tab-feed').style.display = 'none';
-        document.getElementById('tab-stats').style.display = 'none';
-        document.getElementById('tab-admin').style.display = 'none';
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Apex Social - Admin Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        :root { --google-blue: #4285F4; --bg: #f8f9fa; --admin-red: #dc2626; }
         
-        // Remover classe ativa
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        
-        // Mostrar a selecionada
-        document.getElementById('tab-' + tabName).style.display = 'block';
-        el.classList.add('active');
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); padding-top: 60px; padding-bottom: 80px; }
 
-        if(tabName === 'stats') loadStats();
-        if(tabName === 'admin') loadAdminPanel();
-    }
+        /* HEADER FIXO */
+        header {
+            position: fixed; top: 0; width: 100%; background: #fff; height: 60px;
+            display: flex; align-items: center; justify-content: center;
+            border-bottom: 1px solid #ddd; z-index: 1000;
+        }
+        .header-title { font-weight: 800; color: var(--google-blue); font-size: 18px; text-transform: uppercase; }
 
-    // Carregar Estatísticas (Total de Users e Posts)
-    async function loadStats() {
-        const { count: userCount } = await sb.from('perfis').select('*', { count: 'exact', head: true });
-        const { count: postCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
-        
-        document.getElementById('stats-content').innerHTML = `
-            <div class="stats-card"><b>Utilizadores Totais:</b> ${userCount}</div>
-            <div class="stats-card"><b>Publicações Ativas:</b> ${postCount}</div>
-        `;
-    }
+        /* SECCÕES (ABAS) */
+        .tab-content { display: none; padding: 15px; }
+        .tab-content.active { display: block; }
 
-    // Carregar Lista de Utilizadores para o Admin
-    async function loadAdminPanel() {
-        const { data: users } = await sb.from('perfis').select('*').order('saldo', { ascending: false });
-        const list = document.getElementById('admin-users-list');
-        list.innerHTML = '';
+        /* FEED VIEW (ADMIN STYLE) */
+        .post-card { background: #fff; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ddd; overflow: hidden; }
+        .post-info { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; color: #666; }
+        .post-body { padding: 12px; font-size: 15px; }
+        .post-img { width: 100%; max-height: 300px; object-fit: cover; background: #eee; }
+        .post-footer { padding: 10px 12px; background: #fafafa; display: flex; gap: 20px; font-size: 14px; font-weight: 700; }
 
-        users.forEach(u => {
-            list.innerHTML += `
+        /* PAINEL DE CONTROLO & TABELAS */
+        .admin-title { color: var(--admin-red); font-size: 24px; font-weight: 900; margin-bottom: 20px; }
+        .table-container { width: 100%; overflow-x: auto; background: #fff; border-radius: 8px; border: 1px solid #ddd; }
+        .admin-table { width: 100%; border-collapse: collapse; min-width: 300px; }
+        .admin-table th { background: #eee; padding: 12px; text-align: left; font-size: 13px; }
+        .admin-table td { padding: 12px; border-top: 1px solid #eee; font-size: 14px; }
+
+        /* NAVEGAÇÃO INFERIOR FIXA */
+        .bottom-nav { 
+            position: fixed; bottom: 0; width: 100%; background: #fff; height: 75px; 
+            display: flex; border-top: 1px solid #ddd; z-index: 1000;
+        }
+        .nav-item { 
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-decoration: none; color: #999; font-size: 10px; font-weight: 800;
+        }
+        .nav-item.active { color: var(--google-blue); }
+        .nav-item.admin-btn.active { color: var(--admin-red); }
+        .nav-icon { font-size: 20px; margin-bottom: 4px; }
+
+        .stats-box { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">APEX SOCIAL</div>
+    </header>
+
+    <main id="view-feed" class="tab-content active">
+        <div id="feed-render"></div>
+    </main>
+
+    <main id="view-stats" class="tab-content">
+        <div class="admin-title" style="color:var(--google-blue)">Estatísticas</div>
+        <div id="stats-render"></div>
+    </main>
+
+    <main id="view-admin" class="tab-content">
+        <h1 class="admin-title">Painel de Controlo</h1>
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Saldo (€)</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="users-render"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="changeTab('feed', this)">
+            <span class="nav-icon">🏠</span>FEED
+        </a>
+        <a href="#" class="nav-item" onclick="changeTab('stats', this)">
+            <span class="nav-icon">📊</span>ESTATÍSTICAS
+        </a>
+        <a href="#" class="nav-item admin-btn" onclick="changeTab('admin', this)">
+            <span class="nav-icon">⚙️</span>PAINEL ADMIN
+        </a>
+    </nav>
+
+    <script>
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+
+        function changeTab(tab, el) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById('view-' + tab).classList.add('active');
+            el.classList.add('active');
+
+            if(tab === 'feed') loadFeed();
+            if(tab === 'stats') loadStats();
+            if(tab === 'admin') loadAdmin();
+        }
+
+        async function loadFeed() {
+            const { data: posts } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+            const container = document.getElementById('feed-render');
+            container.innerHTML = posts.map(p => `
+                <div class="post-card">
+                    <div class="post-info">ID: ${p.user_id} • ${new Date(p.created_at).toLocaleDateString()}</div>
+                    <div class="post-body">${p.content || ''}</div>
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-img">` : ''}
+                    <div class="post-footer">
+                        <span>👍 ${p.likes || 0}</span>
+                        <span>💬 ${p.comments || 0}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadStats() {
+            const { count: uCount } = await sb.from('perfis').select('*', { count: 'exact', head: true });
+            const { count: pCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
+            document.getElementById('stats-render').innerHTML = `
+                <div class="stats-box"><b>Total Utilizadores:</b> ${uCount}</div>
+                <div class="stats-box"><b>Total Publicações:</b> ${pCount}</div>
+            `;
+        }
+
+        async function loadAdmin() {
+            const { data: users } = await sb.from('perfis').select('*').order('saldo', { ascending: false });
+            const tbody = document.getElementById('users-render');
+            tbody.innerHTML = users.map(u => `
                 <tr>
                     <td>${u.id}</td>
                     <td>${u.saldo.toFixed(4)}€</td>
-                    <td><button onclick="deleteUser('${u.id}')" style="color:red; font-size:10px">Banir</button></td>
+                    <td><button style="color:red; background:none; border:none; font-weight:bold;">BANIR</button></td>
                 </tr>
-            `;
-        });
-    }
-
-    // Função de moderação simples
-    async function deleteUser(id) {
-        if(confirm("Deseja banir este utilizador?")) {
-            await sb.from('perfis').delete().eq('id', id);
-            loadAdminPanel();
+            `).join('');
         }
-    }
-</script>
+
+        // Inicializar
+        loadFeed();
+    </script>
+</body>
+</html>
