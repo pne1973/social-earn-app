@@ -1,135 +1,55 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Earn Network</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --fb-blue: #1877F2; --fb-bg: #F0F2F5; --fb-card: #FFFFFF;
-            --fb-text: #050505; --fb-secondary: #65676B; --fb-border: #ced0d4;
+<script>
+    // URL e KEY que você enviou anteriormente
+    const SUPABASE_URL = 'https://fickstyevektwbdgimapy.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+
+    async function processAuth() {
+        const id = document.getElementById('auth-username').value;
+        if (!id) return alert("Digite um ID");
+
+        // 1. Tenta apenas ler o utilizador (Mapeado com as suas colunas do print)
+        let { data: profile, error } = await _supabase
+            .from('usuarios')
+            .select('id, nome, saldo_eur')
+            .eq('id', id)
+            .maybeSingle(); // maybeSingle não dá erro se não encontrar
+
+        if (error) {
+            console.error(error);
+            return alert("Erro de ligação ou RLS. Verifique o painel Supabase.");
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
-        body { background-color: var(--fb-bg); color: var(--fb-text); padding-top: 60px; }
-        .hidden { display: none !important; }
 
-        #auth-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 2000; display: flex;
-            align-items: center; justify-content: center; flex-direction: column;
-        }
-        .auth-logo { font-size: 40px; font-weight: bold; color: var(--fb-blue); margin-bottom: 20px; }
-        .fb-input { width: 100%; border: 1px solid var(--fb-border); padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 16px; outline: none; }
-        .fb-btn { background: var(--fb-blue); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
-
-        header { background: var(--fb-card); height: 60px; width: 100%; position: fixed; top: 0; left: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid var(--fb-border); z-index: 1000; }
-        .header-logo { color: var(--fb-blue); font-size: 28px; font-weight: bold; text-decoration: none; }
-        main { max-width: 600px; margin: 0 auto; padding: 12px; }
-        .card { background: white; border-radius: 8px; border: 1px solid var(--fb-border); margin-bottom: 12px; padding: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-    </style>
-</head>
-<body>
-
-    <div id="auth-modal">
-        <div class="auth-logo">f</div>
-        <div style="width: 90%; max-width: 320px; text-align: center;">
-            <input type="text" id="auth-username" class="fb-input" placeholder="ID (ex: 123)">
-            <button class="fb-btn" onclick="processAuth()">Entrar</button>
-        </div>
-    </div>
-
-    <header class="hidden" id="main-header">
-        <a href="#" class="header-logo">f</a>
-        <div style="font-weight: bold; color: var(--fb-blue);">€ <span id="user-balance">0.0000</span></div>
-    </header>
-
-    <main class="hidden" id="main-content">
-        <div class="card">
-            <input type="text" id="post-content" class="fb-input" style="border-radius: 20px; background: var(--fb-bg);" placeholder="No que está a pensar?">
-            <button class="fb-btn" style="width: auto; padding: 8px 20px;" onclick="createNewPost()">Publicar</button>
-        </div>
-        <div id="feed"></div>
-    </main>
-
-    <script>
-        const SUPABASE_URL = 'https://fickstyevektwbdgimapy.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        let currentUser = null;
-
-        async function processAuth() {
-            const id = document.getElementById('auth-username').value;
-            if (!id) return alert("Digite um ID");
-
-            // AJUSTADO PARA O SEU BANCO: Tabela 'usuarios'
-            let { data: profile, error } = await _supabase
+        // 2. Se o utilizador não existir, tenta criar (precisa de RLS Insert ativa)
+        if (!profile) {
+            const { data: newUser, error: createError } = await _supabase
                 .from('usuarios')
-                .select('*')
-                .eq('id', id)
+                .insert([{ 
+                    id: id, 
+                    nome: 'User_' + id, 
+                    saldo_eur: 0,
+                    bonus_restante: 0,
+                    is_turbo: false 
+                }])
+                .select()
                 .single();
-
-            if (error || !profile) {
-                // AJUSTADO: Colunas 'id', 'nome', 'saldo_eur'
-                const { data: newUser, error: createError } = await _supabase
-                    .from('usuarios')
-                    .insert([{ id: id, nome: 'User_' + id, saldo_eur: 0 }])
-                    .select()
-                    .single();
-                
-                if (createError) return alert("Erro ao criar perfil. Verifique as RLS no Supabase.");
-                profile = newUser;
+            
+            if (createError) {
+                console.error(createError);
+                return alert("Erro ao criar perfil. Ative a política 'INSERT' no Supabase.");
             }
-
-            currentUser = profile;
-            document.getElementById('auth-modal').classList.add('hidden');
-            document.getElementById('main-header').classList.remove('hidden');
-            document.getElementById('main-content').classList.remove('hidden');
-            // AJUSTADO: saldo_eur
-            document.getElementById('user-balance').innerText = Number(currentUser.saldo_eur).toFixed(4);
-            loadPosts();
+            profile = newUser;
         }
 
-        async function loadPosts() {
-            // AJUSTADO: Tabela 'posts' ou 'publicacoes' (assumindo posts pelo seu histórico)
-            const { data: posts } = await _supabase.from('posts').select('*').order('created_at', { ascending: false });
-            const feed = document.getElementById('feed');
-            if (!posts) return;
-
-            feed.innerHTML = posts.map(post => `
-                <div class="card">
-                    <div style="font-weight: bold; margin-bottom: 8px;">${post.author_name}</div>
-                    <p>${post.content}</p>
-                    <div style="margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 20px; color: var(--fb-secondary); font-size: 14px;">
-                        <span onclick="earn(0.0006)">👍 Gostar</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function createNewPost() {
-            const content = document.getElementById('post-content').value;
-            if (!content) return;
-
-            const { error } = await _supabase.from('posts').insert([{ 
-                author_id: currentUser.id, author_name: currentUser.nome, content: content 
-            }]);
-
-            if (!error) {
-                currentUser.saldo_eur = Number(currentUser.saldo_eur) + 0.0150;
-                await _supabase.from('usuarios').update({ saldo_eur: currentUser.saldo_eur }).eq('id', currentUser.id);
-                document.getElementById('user-balance').innerText = currentUser.saldo_eur.toFixed(4);
-                document.getElementById('post-content').value = '';
-                loadPosts();
-            }
-        }
-
-        async function earn(amount) {
-            currentUser.saldo_eur = Number(currentUser.saldo_eur) + amount;
-            await _supabase.from('usuarios').update({ saldo_eur: currentUser.saldo_eur }).eq('id', currentUser.id);
-            document.getElementById('user-balance').innerText = currentUser.saldo_eur.toFixed(4);
-        }
-    </script>
-</body>
-</html>
+        currentUser = profile;
+        document.getElementById('auth-modal').classList.add('hidden');
+        document.getElementById('main-header').classList.remove('hidden');
+        document.getElementById('main-content').classList.remove('hidden');
+        
+        // Exibe o saldo_eur conforme o seu print
+        document.getElementById('user-balance').innerText = Number(currentUser.saldo_eur).toFixed(4);
+        loadPosts();
+    }
+</script>
