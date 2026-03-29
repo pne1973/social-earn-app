@@ -3,67 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Network v33.12 - Ultra Wide</title>
+    <title>Apex Social v33.12 - Pro Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; }
+        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; overflow-x: hidden; }
 
-        /* Headers e Publicador */
+        /* Camadas Fixas */
         header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 30px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; text-transform: uppercase; color: var(--g-green); font-weight: 900; }
-        .publisher-zone { position: fixed; top: 90px; width: 100%; z-index: 900; background: white; border-bottom: 1px solid #dadce0; padding: 10px 12px; }
+        
+        /* Monetização: Banner Topo */
+        .ad-banner-top { position: fixed; top: 90px; width: 100%; z-index: 850; height: 50px; background: #fff; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
-        /* Container Principal Alargado */
-        .main-content { padding-top: 155px; padding-bottom: 80px; min-height: 100vh; width: 100%; max-width: 500px; margin: 0 auto; }
+        .publisher-zone { position: fixed; top: 140px; width: 100%; z-index: 800; background: white; border-bottom: 1px solid #dadce0; padding: 10px 12px; }
+
+        /* Container Principal */
+        .main-content { padding-top: 205px; padding-bottom: 80px; width: 100%; max-width: 500px; margin: 0 auto; }
         .tab-pane { display: none; width: 100%; }
         .tab-pane.active { display: block; }
 
-        /* Card Ultra Wide */
+        /* Card Ultra Wide com Interação Lateral */
         .post-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 8px; position: relative; overflow: hidden; display: flex; width: 100%; }
-        .post-body { flex: 1; padding: 14px; padding-right: 48px; } /* Espaço maximizado para o post */
-        
-        .side-actions { 
-            position: absolute; right: 0; top: 0; bottom: 0; width: 45px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            gap: 12px; background: rgba(255, 255, 255, 0.9); border-left: 1px solid #f8f9fa;
-        }
-        
-        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 100%; }
+        .post-body { flex: 1; padding: 14px; padding-right: 48px; }
+        .side-actions { position: absolute; right: 0; top: 0; bottom: 0; width: 45px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(255, 255, 255, 0.9); border-left: 1px solid #f8f9fa; }
         .icon-circle { width: 28px; height: 28px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.08); border: 1px solid #f1f3f4; font-size: 13px; margin-bottom: 2px; }
         .action-label { font-size: 8px; font-weight: 900; color: #70757a; text-transform: uppercase; }
 
+        /* Anúncio no Feed */
+        .feed-ad { background: #f8f9fa; border: 1px dashed #dadce0; border-radius: 12px; padding: 15px; margin-bottom: 8px; text-align: center; }
+
         /* Navegação */
         nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 2000; }
-        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9aa0a6; cursor: pointer; }
+        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; text-transform: uppercase; color: #9aa0a6; cursor: pointer; }
         .nav-link.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); }
+
+        /* Login Screen */
+        #login-screen { position: fixed; inset: 0; background: white; z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
+    <div id="login-screen">
+        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-3xl font-black mb-6 shadow-lg italic">S</div>
+        <h1 class="text-xl font-black uppercase mb-2">Bem-vindo</h1>
+        <p class="text-[10px] text-gray-400 font-black uppercase mb-8 text-center">Insira o seu ID oficial para aceder à rede</p>
+        <input id="user-id-input" type="text" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs bg-gray-100 border-none rounded-xl p-4 text-center font-black uppercase text-sm mb-4 outline-none focus:ring-2 ring-blue-500">
+        <button onclick="login()" class="w-full max-w-xs bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-xs shadow-md">Entrar na Conta</button>
+    </div>
+
     <header>
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
-            <span class="text-[10px] font-black uppercase text-blue-600">Social Network</span>
+            <span class="text-[10px] font-black uppercase text-blue-600">Apex Social</span>
         </div>
         <div id="top-bal" class="text-lg font-black text-green-600">0.0000€</div>
     </header>
 
-    <div class="status-bar">MODO NORMAL (100% GANHOS)</div>
+    <div class="status-bar">CONECTADO AO SERVIDOR • 100% XP</div>
+
+    <div class="ad-banner-top">
+        <div class="text-[9px] font-black text-gray-300 uppercase">Espaço Publicitário Reservado</div>
+    </div>
 
     <div id="pub-area" class="publisher-zone">
-        <div id="mini-input" onclick="setEditor(true)" class="bg-gray-100 rounded-full px-4 py-2 border border-gray-200 cursor-pointer">
-            <span class="text-[10px] text-gray-400 font-black uppercase">O que quer partilhar?</span>
+        <div id="mini-input" onclick="setEditor(true)" class="bg-gray-100 rounded-full px-4 py-2 border border-gray-200 cursor-pointer flex items-center gap-3">
+            <div class="w-6 h-6 bg-gray-300 rounded-full"></div>
+            <span class="text-[10px] text-gray-400 font-black uppercase text-xs">O que quer partilhar?</span>
         </div>
         <div id="full-input" class="hidden">
             <textarea id="p-content" placeholder="ESCREVA AQUI..." class="w-full border-none outline-none font-black uppercase text-xs p-2" rows="2"></textarea>
             <div class="flex gap-2 mt-2">
-                <button onclick="setEditor(false)" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Fechar</button>
-                <button onclick="handleSend()" class="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Publicar</button>
+                <button onclick="setEditor(false)" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Cancelar</button>
+                <button onclick="handleSend()" class="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Publicar (+0.0150€)</button>
             </div>
         </div>
     </div>
@@ -74,23 +90,40 @@
         </section>
 
         <section id="pane-wallet" class="tab-pane">
-            <div class="post-card p-10 flex-col text-center">
-                <p class="text-[10px] text-gray-400 uppercase font-black">Saldo Disponível</p>
+            <div class="post-card p-8 flex-col text-center">
+                <p class="text-[9px] text-gray-400 uppercase font-black">Saldo de Produção</p>
                 <h2 id="wall-bal" class="text-5xl font-black text-blue-600 my-4">0.0000€</h2>
                 <div class="w-full bg-gray-100 h-2 rounded-full mb-6">
                     <div id="wall-prog" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
                 </div>
-                <button class="w-full py-4 bg-blue-50 border border-blue-100 rounded-xl text-blue-600 font-black uppercase text-xs">Estatísticas de Ganhos</button>
+                <button class="w-full py-4 bg-gray-50 border border-gray-100 rounded-xl text-gray-400 font-black uppercase text-[10px]">Levantar (Mínimo 5.0000€)</button>
+            </div>
+        </section>
+
+        <section id="pane-admin" class="tab-pane">
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <div class="bg-white p-4 rounded-xl border border-gray-200">
+                    <p class="text-[8px] font-black uppercase text-gray-400">Total Users</p>
+                    <p id="adm-users" class="text-xl font-black">...</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-200">
+                    <p class="text-[8px] font-black uppercase text-gray-400">Total Posts</p>
+                    <p id="adm-posts" class="text-xl font-black">...</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-bottom font-black text-[10px] uppercase">Pedidos de Levantamento</div>
+                <div id="withdrawal-list" class="p-4 text-[10px] text-gray-400">Nenhum pedido pendente.</div>
             </div>
         </section>
 
         <section id="pane-menu" class="tab-pane">
             <div class="post-card p-4 flex-col">
                 <div class="flex justify-between items-center p-4 border-b border-gray-50 mb-2">
-                    <span class="text-[9px] font-black uppercase text-gray-400">ID de Conta</span>
-                    <span class="text-[9px] font-black text-blue-600">5401881400</span>
+                    <span class="text-[9px] font-black uppercase text-gray-400">Sessão Iniciada como</span>
+                    <span class="text-[9px] font-black text-blue-600" id="session-id">---</span>
                 </div>
-                <button onclick="localStorage.clear(); location.reload();" class="w-full py-4 text-red-500 font-black uppercase text-xs">Sair da aplicação</button>
+                <button onclick="logout()" class="w-full py-4 text-red-500 font-black uppercase text-xs">Sair da aplicação</button>
             </div>
         </section>
     </main>
@@ -98,6 +131,7 @@
     <nav>
         <div onclick="switchView('feed')" id="nav-feed" class="nav-link active">Feed</div>
         <div onclick="switchView('wallet')" id="nav-wallet" class="nav-link">Carteira</div>
+        <div onclick="switchView('admin')" id="nav-admin" class="nav-link hidden">Admin</div>
         <div onclick="switchView('menu')" id="nav-menu" class="nav-link">Menu</div>
     </nav>
 
@@ -105,41 +139,59 @@
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
-        let uID = localStorage.getItem('apex_uid') || "5401881400";
+        let uID = localStorage.getItem('apex_uid');
         let bal = 0;
 
-        async function init() {
-            const { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
-            if(data) bal = Number(data.saldo);
-            updateAllUI();
-            fetchPosts();
+        async function login() {
+            const input = document.getElementById('user-id-input').value;
+            if(!input) return;
+            localStorage.setItem('apex_uid', input);
+            location.reload();
         }
 
-        async function fetchPosts() {
+        function logout() {
+            localStorage.clear();
+            location.reload();
+        }
+
+        async function init() {
+            if(!uID) return;
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('session-id').innerText = uID;
+
+            // Mostrar Admin se for o ID mestre
+            if(uID === "5401881400") {
+                document.getElementById('nav-admin').classList.remove('hidden');
+                loadAdminData();
+            }
+
+            const { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
+            if(data) bal = Number(data.saldo);
+            else await sb.from('perfis').insert([{ id: uID, saldo: 0 }]);
+            
+            updateUI();
+            fetchFeed();
+        }
+
+        async function fetchFeed() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const container = document.getElementById('feed-list');
             container.innerHTML = "";
             
-            posts.forEach(p => {
+            posts.forEach((p, index) => {
                 container.innerHTML += `
-                <div class="post-card shadow-sm">
+                <div class="post-card">
                     <div class="post-body">
                         <div class="flex items-center gap-2 mb-3">
                             <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-[9px]">👤</div>
                             <span class="text-[9px] font-black text-blue-600 uppercase">${p.user_id}</span>
                         </div>
                         <p class="text-[13px] font-bold text-gray-800 leading-tight">${p.content}</p>
-                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mt-3 border border-gray-100">` : ''}
                     </div>
-                    
                     <div class="side-actions">
                         <div onclick="gain(0.0006)" class="action-item">
                             <div class="icon-circle">👍</div>
                             <span class="action-label">${Math.floor(Math.random()*99)}</span>
-                        </div>
-                        <div onclick="gain(0.0010)" class="action-item">
-                            <div class="icon-circle">💬</div>
-                            <span class="action-label">0</span>
                         </div>
                         <div onclick="gain(0.0020)" class="action-item">
                             <div class="icon-circle">🔗</div>
@@ -147,7 +199,23 @@
                         </div>
                     </div>
                 </div>`;
+
+                // Injeção de Anúncio a cada 3 posts
+                if((index + 1) % 3 === 0) {
+                    container.innerHTML += `
+                    <div class="feed-ad">
+                        <span class="text-[8px] font-black text-blue-500 uppercase block mb-1">Conteúdo Patrocinado</span>
+                        <div class="text-[10px] text-gray-400 font-bold">Publicidade Google Adsense</div>
+                    </div>`;
+                }
             });
+        }
+
+        async function loadAdminData() {
+            const { count: uCount } = await sb.from('perfis').select('*', { count: 'exact' });
+            const { count: pCount } = await sb.from('posts').select('*', { count: 'exact' });
+            document.getElementById('adm-users').innerText = uCount;
+            document.getElementById('adm-posts').innerText = pCount;
         }
 
         function switchView(view) {
@@ -163,16 +231,16 @@
             await sb.from('posts').insert([{ user_id: uID, content: txt }]);
             gain(0.0150);
             setEditor(false);
-            fetchPosts();
+            fetchFeed();
         }
 
         function gain(v) {
             bal += v;
-            updateAllUI();
+            updateUI();
             sb.from('perfis').upsert({ id: uID, saldo: bal });
         }
 
-        function updateAllUI() {
+        function updateUI() {
             const fmt = bal.toFixed(4) + "€";
             document.getElementById('top-bal').innerText = fmt;
             document.getElementById('wall-bal').innerText = fmt;
