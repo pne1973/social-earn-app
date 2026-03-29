@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.30</title>
+    <title>Apex Social v33.30 - Production</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
         .post-card { background: white; border-radius: 28px; border: 1px solid #dadce0; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .post-main { display: flex; width: 100%; }
         .post-content { flex: 1; padding: 22px; }
-        .post-sidebar { width: 85px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 15px 0; }
+        .post-sidebar { width: 85px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 15px 0; }
         
         /* COMMENTS IN FEED */
         .feed-comments-area { background: #f8f9fa; border-top: 1px solid #f1f3f4; padding: 10px 22px 20px 22px; }
@@ -30,21 +30,20 @@
         .feed-comment-item:last-child { border-bottom: none; }
 
         /* UI ELEMENTS */
-        .icon-btn { width: 46px; height: 46px; background: white; border-radius: 50%; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .sidebar-label { font-size: 10px; font-weight: 900; color: #70757a; text-transform: uppercase; margin-top: 4px; }
+        .icon-btn { width: 44px; height: 44px; background: white; border-radius: 50%; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
+        .sidebar-label { font-size: 9px; font-weight: 900; color: #70757a; text-transform: uppercase; margin-top: 2px; }
 
         /* MODALS */
         .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
         .modal-header { height: 65px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
         .modal-body { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
-        .custom-textarea { width: 100%; font-size: 22px; font-weight: 700; border: none; outline: none; resize: none; text-transform: uppercase; color: #202124; min-height: 150px; }
+        .custom-textarea { width: 100%; font-size: 20px; font-weight: 700; border: none; outline: none; resize: none; text-transform: uppercase; color: #202124; min-height: 120px; }
         
         /* ADS IN MODALS */
-        .modal-ad-banner { background: #fff8e1; border: 2px dashed #ffc107; border-radius: 15px; padding: 15px; margin-bottom: 20px; text-align: center; }
+        .modal-ad-banner { background: #f1f3f4; border-radius: 12px; padding: 12px; margin-bottom: 20px; text-align: center; border: 1px solid #dadce0; }
 
         nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -71,14 +70,14 @@
 
     <div id="modal-editor" class="modal-fullscreen">
         <div class="modal-header">
-            <button onclick="closeModal('modal-editor')" class="text-gray-400 font-black text-xs uppercase">Cancelar</button>
-            <span class="font-black uppercase text-[13px]">Novo Post</span>
+            <button onclick="closeModal('modal-editor')" class="text-gray-400 font-black text-xs uppercase">Fechar</button>
+            <span class="font-black uppercase text-[13px]">Nova Publicação</span>
             <button onclick="publish()" class="text-blue-600 font-black text-xs uppercase">Publicar</button>
         </div>
         <div class="modal-body">
             <div class="modal-ad-banner">
-                <span class="text-[9px] font-black text-yellow-700 uppercase">Anúncio Patrocinado</span>
-                <p class="text-[11px] font-bold text-gray-800">Ganhe +0.0150€ ao partilhar conteúdo original!</p>
+                <span class="text-[9px] font-black text-blue-600 uppercase">Anúncio Google Adsense</span>
+                <p class="text-[10px] font-bold text-gray-500 uppercase mt-1">Ganhe +0.0150€ por cada publicação original</p>
             </div>
             <textarea id="post-txt" placeholder="ESCREVA AQUI..." class="custom-textarea"></textarea>
             <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full p-4 bg-gray-100 rounded-xl mt-4 font-bold text-xs uppercase outline-none">
@@ -88,15 +87,15 @@
     <div id="modal-comment" class="modal-fullscreen">
         <div class="modal-header">
             <button onclick="closeModal('modal-comment')" class="text-gray-400 font-black text-xs uppercase">Voltar</button>
-            <span class="font-black uppercase text-[13px]">Comentar</span>
+            <span class="font-black uppercase text-[13px]">Interações</span>
             <button onclick="addComment()" class="text-blue-600 font-black text-xs uppercase">Enviar</button>
         </div>
         <div class="modal-body">
             <div class="modal-ad-banner">
-                <span class="text-[9px] font-black text-blue-600 uppercase">Google Adsense</span>
-                <p class="text-[11px] font-bold text-gray-800">Ganhe recompensas por interagir com a comunidade!</p>
+                <span class="text-[9px] font-black text-green-600 uppercase">Publicidade Patrocinada</span>
+                <p class="text-[10px] font-bold text-gray-500 uppercase mt-1">Interaja para aumentar os seus ganhos diários</p>
             </div>
-            <textarea id="comm-txt" placeholder="ESCREVA O SEU COMENTÁRIO..." class="custom-textarea"></textarea>
+            <textarea id="comm-txt" placeholder="ESCREVA UM COMENTÁRIO..." class="custom-textarea"></textarea>
         </div>
     </div>
 
@@ -111,12 +110,12 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
-        let uID = localStorage.getItem('apex_uid_v33') || 5401881400; 
+        let uID = 5401881400; 
         let bal = 0;
         let activePostID = null;
 
         async function init() {
-            let { data } = await sb.from('perfis').select('saldo').eq('id', parseInt(uID)).single();
+            let { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
             if(data) bal = Number(data.saldo);
             updateUI();
             await loadFeed();
@@ -131,14 +130,12 @@
             
             posts.forEach(p => {
                 const postComms = comms ? comms.filter(c => c.post_id == p.id) : [];
-                
                 let commsHTML = "";
                 if(postComms.length > 0) {
                     commsHTML = `<div class="feed-comments-area">`;
                     postComms.forEach(c => {
-                        commsHTML += `
-                        <div class="feed-comment-item">
-                            <span class="text-[9px] font-black text-blue-600 uppercase">ID ${c.user_id}</span>
+                        commsHTML += `<div class="feed-comment-item">
+                            <span class="text-[9px] font-black text-blue-600 uppercase">Utilizador ${c.user_id}</span>
                             <p class="text-[13px] font-bold text-gray-700 uppercase">${c.content || c.texto}</p>
                         </div>`;
                     });
@@ -151,14 +148,12 @@
                         <div class="post-content">
                             <span class="text-[10px] font-black text-blue-600 uppercase">Utilizador ${p.user_id}</span>
                             <p class="text-[17px] font-bold text-gray-800 mt-2 uppercase leading-tight">${p.content}</p>
-                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-2xl mt-4 border border-gray-100 shadow-sm">` : ''}
+                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-2xl mt-4">` : ''}
                         </div>
                         <div class="post-sidebar">
                             <div class="flex flex-col items-center" onclick="reward(0.0006)"><div class="icon-btn">👍</div><span class="sidebar-label">${p.likes || 0}</span></div>
-                            <div class="flex flex-col items-center" onclick="openComments('${p.id}')">
-                                <div class="icon-btn">💬</div>
-                                <span class="sidebar-label">${postComms.length}</span>
-                            </div>
+                            <div class="flex flex-col items-center" onclick="openComments('${p.id}')"><div class="icon-btn">💬</div><span class="sidebar-label">${postComms.length}</span></div>
+                            <div class="flex flex-col items-center" onclick="sharePost('${p.content}')"><div class="icon-btn">🔗</div><span class="sidebar-label">Share</span></div>
                         </div>
                     </div>
                     ${commsHTML}
@@ -166,50 +161,36 @@
             });
         }
 
+        async function sharePost(text) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Apex Social',
+                    text: `Vê este post na Apex Social: "${text}"`,
+                    url: window.location.href
+                }).then(() => reward(0.0050)).catch(() => {});
+            } else {
+                alert("A partilha não é suportada neste navegador.");
+            }
+        }
+
         async function publish() {
             const txt = document.getElementById('post-txt').value.trim();
             const url = document.getElementById('post-url').value.trim();
             if(!txt) return;
-
-            const { error } = await sb.from('posts').insert([{ 
-                user_id: parseInt(uID), content: txt, image_url: url || null, likes: 0 
-            }]);
-
-            if(!error) {
-                reward(0.0150);
-                closeModal('modal-editor');
-                document.getElementById('post-txt').value = "";
-                await loadFeed();
-            }
+            const { error } = await sb.from('posts').insert([{ user_id: uID, content: txt, image_url: url || null }]);
+            if(!error) { reward(0.0150); closeModal('modal-editor'); document.getElementById('post-txt').value = ""; await loadFeed(); }
         }
 
-        async function openComments(postID) {
-            activePostID = postID;
-            document.getElementById('comm-txt').value = "";
-            openModal('modal-comment');
-        }
+        function openComments(postID) { activePostID = postID; document.getElementById('comm-txt').value = ""; openModal('modal-comment'); }
 
         async function addComment() {
             const txt = document.getElementById('comm-txt').value.trim();
             if(!txt) return;
-
-            const { error } = await sb.from('comentarios').insert([{ 
-                post_id: activePostID, user_id: parseInt(uID), content: txt 
-            }]);
-
-            if(!error) {
-                reward(0.0010);
-                closeModal('modal-comment');
-                await loadFeed();
-            }
+            const { error } = await sb.from('comentarios').insert([{ post_id: activePostID, user_id: uID, content: txt }]);
+            if(!error) { reward(0.0010); closeModal('modal-comment'); await loadFeed(); }
         }
 
-        function reward(val) {
-            bal += val;
-            updateUI();
-            sb.from('perfis').upsert({ id: parseInt(uID), saldo: bal });
-        }
-
+        function reward(val) { bal += val; updateUI(); sb.from('perfis').upsert({ id: uID, saldo: bal }); }
         function updateUI() { document.getElementById('bal-top').innerText = bal.toFixed(4) + "€"; }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
