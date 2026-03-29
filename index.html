@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.40</title>
+    <title>Apex Social v33.45 - Facebook Style</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; padding-top: 185px; padding-bottom: 90px; }
+        :root { --fb-blue: #1877F2; --fb-bg: #F0F2F5; --g-green: #34A853; }
+        body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--fb-bg); color: #1c1e21; margin: 0; padding-top: 185px; padding-bottom: 90px; }
 
         /* HEADER & STATUS */
         header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
@@ -19,99 +19,98 @@
 
         /* FEED & POSTS */
         .feed-container { max-width: 580px; margin: 0 auto; padding: 10px; }
-        .post-card { background: white; border-radius: 28px; border: 1px solid #dadce0; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .post-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .post-main { display: flex; width: 100%; }
-        .post-content { flex: 1; padding: 20px; } /* Área alargada */
-        .post-sidebar { width: 70px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 15px 0; } /* Área reduzida */
         
-        /* AD CARD IN FEED */
-        .ad-card { background: #fff; border-radius: 28px; border: 2px dashed #dadce0; margin-bottom: 16px; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 200px; }
+        /* FACEBOOK STYLE TEXT */
+        .post-content { flex: 1; padding: 12px 16px; }
+        .post-text { font-size: 15px; line-height: 1.3333; font-weight: 400; color: #1c1e21; margin-top: 8px; word-wrap: break-word; }
+        .post-user { font-weight: 600; color: #050505; font-size: 14px; }
 
-        /* COMMENTS IN FEED */
-        .feed-comments-area { background: #f8f9fa; border-top: 1px solid #f1f3f4; padding: 10px 20px 20px 20px; }
-        .feed-comment-item { padding: 8px 0; border-bottom: 1px solid #eee; }
+        .post-sidebar { width: 70px; background: #fcfcfc; border-left: 1px solid #f0f2f5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 10px 0; }
+        
+        /* AD CARD - EQUAL TO POST */
+        .ad-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; min-height: 250px; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden; }
+        .ad-header { padding: 12px 16px; border-bottom: 1px solid #f0f2f5; display: flex; justify-content: space-between; align-items: center; }
+        .ad-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: #f9f9f9; }
 
         /* UI ELEMENTS */
-        .icon-btn { width: 40px; height: 40px; background: white; border-radius: 50%; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
-        .sidebar-label { font-size: 9px; font-weight: 900; color: #70757a; text-transform: uppercase; }
+        .icon-btn { width: 36px; height: 36px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+        .icon-btn:active { background: #d8dadf; }
+        .sidebar-label { font-size: 11px; font-weight: 600; color: #65676b; margin-top: 2px; }
 
         /* NAVIGATION */
-        nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; cursor: pointer; }
-        .nav-active { color: var(--g-blue); border-top: 3px solid var(--g-blue); }
+        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #65676b; cursor: pointer; }
+        .nav-active { color: var(--fb-blue); border-top: 3px solid var(--fb-blue); }
 
         /* MODALS */
         .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
-        .modal-header { height: 65px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-        .custom-textarea { width: 100%; font-size: 20px; font-weight: 700; border: none; outline: none; resize: none; text-transform: uppercase; color: #202124; min-height: 120px; }
+        .modal-header { height: 60px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+        .custom-textarea { width: 100%; font-size: 18px; border: none; outline: none; resize: none; color: #1c1e21; min-height: 150px; padding: 10px; }
         
-        .hidden { display: none !important; }
-        .page-content { display: none; }
         .active-page { display: block; }
+        .page-content { display: none; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="flex items-center gap-2">
-            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
-            <span class="text-[12px] font-black uppercase text-blue-600 italic">Apex Social</span>
+            <div class="w-8 h-8 bg-[#1877F2] rounded-md flex items-center justify-center text-white font-black italic text-xl">f</div>
+            <span class="text-[14px] font-bold text-[#1877F2]">Apex Social</span>
         </div>
-        <div id="bal-top" class="text-2xl font-black text-green-600">0.0000€</div>
+        <div id="bal-top" class="text-xl font-bold text-[#34A853]">0.0000€</div>
     </header>
 
-    <div class="status-bar">v33.40 • GANHOS POR ATIVIDADE ATIVOS</div>
-    <div class="ad-provider">GOOGLE ADSENSE CERTIFIED PARTNER</div>
+    <div class="status-bar">v33.45 • SISTEMA DE MONETIZAÇÃO ATIVO</div>
+    <div class="ad-provider">GOOGLE ADSENSE PARTNER NETWORK</div>
 
     <div id="page-feed" class="page-content active-page">
         <div class="publisher-zone">
-            <div onclick="openModal('modal-editor')" class="bg-gray-100 rounded-full px-6 py-3 border border-gray-200 w-full flex items-center gap-4 cursor-pointer">
-                <div class="w-7 h-7 bg-gray-300 rounded-full"></div>
-                <span class="text-[11px] text-gray-500 font-black uppercase italic">O que está a acontecer?</span>
+            <div onclick="openModal('modal-editor')" class="bg-[#f0f2f5] rounded-full px-5 py-2 w-full flex items-center gap-3 cursor-pointer hover:bg-gray-200 transition">
+                <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+                <span class="text-[14px] text-gray-600">No que está a pensar?</span>
             </div>
         </div>
         <main class="feed-container" id="feed-list"></main>
     </div>
 
     <div id="page-ranking" class="page-content">
-        <div class="feed-container">
-            <h2 class="font-black uppercase text-center py-10">Ranking Global em Breve</h2>
-        </div>
+        <div class="feed-container p-10 text-center font-bold uppercase text-gray-400">Ranking Global</div>
     </div>
 
     <div id="page-wallet" class="page-content">
-        <div class="feed-container">
-            <h2 class="font-black uppercase text-center py-10">Sua Carteira Digital</h2>
-        </div>
+        <div class="feed-container p-10 text-center font-bold uppercase text-gray-400">A Minha Carteira</div>
     </div>
 
     <div id="modal-editor" class="modal-fullscreen">
         <div class="modal-header">
-            <button onclick="closeModal('modal-editor')" class="text-gray-400 font-black text-xs uppercase">Fechar</button>
-            <span class="font-black uppercase text-[13px]">Novo Post</span>
-            <button onclick="publish()" class="text-blue-600 font-black text-xs uppercase">Publicar</button>
+            <button onclick="closeModal('modal-editor')" class="text-gray-600 font-bold">Cancelar</button>
+            <span class="font-bold">Criar Publicação</span>
+            <button onclick="publish()" class="text-[#1877F2] font-bold">Publicar</button>
         </div>
-        <div class="p-5">
-            <textarea id="post-txt" placeholder="ESCREVA AQUI..." class="custom-textarea"></textarea>
-            <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="w-full p-4 bg-gray-100 rounded-xl mt-4 font-bold text-xs uppercase outline-none">
+        <div class="p-4">
+            <textarea id="post-txt" placeholder="No que está a pensar?" class="custom-textarea"></textarea>
+            <input id="post-url" type="text" placeholder="URL da Foto" class="w-full p-3 bg-gray-100 rounded-lg mt-4 outline-none text-sm">
         </div>
     </div>
 
     <div id="modal-comment" class="modal-fullscreen">
         <div class="modal-header">
-            <button onclick="closeModal('modal-comment')" class="text-gray-400 font-black text-xs uppercase">Voltar</button>
-            <span class="font-black uppercase text-[13px]">Comentar</span>
-            <button onclick="addComment()" class="text-blue-600 font-black text-xs uppercase">Enviar</button>
+            <button onclick="closeModal('modal-comment')" class="text-gray-600 font-bold">Voltar</button>
+            <span class="font-bold">Escrever Comentário</span>
+            <button onclick="addComment()" class="text-[#1877F2] font-bold">Enviar</button>
         </div>
-        <div class="p-5">
-            <textarea id="comm-txt" placeholder="ESCREVA UM COMENTÁRIO..." class="custom-textarea"></textarea>
+        <div class="p-4">
+            <textarea id="comm-txt" placeholder="Escreva um comentário..." class="custom-textarea"></textarea>
         </div>
     </div>
 
     <nav>
-        <div class="nav-item nav-active" onclick="switchTab('feed')">Feed</div>
-        <div class="nav-item" onclick="switchTab('ranking')">Ranking</div>
-        <div class="nav-item" onclick="switchTab('wallet')">Carteira</div>
+        <div class="nav-item nav-active" onclick="switchTab('feed', this)">Feed</div>
+        <div class="nav-item" onclick="switchTab('ranking', this)">Ranking</div>
+        <div class="nav-item" onclick="switchTab('wallet', this)">Carteira</div>
     </nav>
 
     <script>
@@ -130,12 +129,11 @@
             await loadFeed();
         }
 
-        function switchTab(tab) {
+        function switchTab(tab, el) {
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-active'));
-            
             document.getElementById('page-' + tab).classList.add('active-page');
-            event.currentTarget.classList.add('nav-active');
+            el.classList.add('nav-active');
         }
 
         async function loadFeed() {
@@ -146,32 +144,43 @@
             container.innerHTML = "";
             
             posts.forEach((p, index) => {
-                // Inserir anúncio a cada 3 posts
+                // ANÚNCIO IGUAL AO POST (3 EM 3)
                 if (index > 0 && index % 3 === 0) {
                     container.innerHTML += `
                     <div class="ad-card">
-                        <span class="text-[10px] font-black text-blue-600 uppercase mb-2">Google Adsense</span>
-                        <p class="text-[14px] font-black text-gray-400 uppercase">Espaço Publicitário de Rede Parceira</p>
+                        <div class="ad-header">
+                            <span class="text-[12px] font-bold text-gray-500 uppercase">Sugestão para si</span>
+                            <span class="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-400 font-bold">AD</span>
+                        </div>
+                        <div class="ad-body">
+                            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                                <span class="text-2xl">📢</span>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Anúncio de Rede Parceira</h3>
+                            <p class="text-sm text-gray-500 mt-2">Visite os nossos parceiros para ganhar bónus extras na sua carteira Apex.</p>
+                            <button class="mt-4 px-6 py-2 bg-[#1877F2] text-white rounded-lg font-bold text-sm">Saber Mais</button>
+                        </div>
                     </div>`;
                 }
 
                 const postComms = comms ? comms.filter(c => c.post_id == p.id) : [];
-                let commsHTML = postComms.length > 0 ? `<div class="feed-comments-area">` : "";
-                postComms.forEach(c => {
-                    commsHTML += `<div class="feed-comment-item">
-                        <span class="text-[9px] font-black text-blue-600 uppercase">Utilizador ${c.user_id}</span>
-                        <p class="text-[12px] font-bold text-gray-700 uppercase">${c.content || c.texto}</p>
-                    </div>`;
-                });
-                if(postComms.length > 0) commsHTML += `</div>`;
+                let commsHTML = "";
+                if(postComms.length > 0) {
+                    commsHTML = `<div class="bg-[#f8f9fa] border-t border-gray-100 p-3 space-y-2">`;
+                    postComms.forEach(c => {
+                        commsHTML += `<div class="text-[13px]"><span class="font-bold text-[#050505]">ID ${c.user_id}</span> <span class="text-gray-700">${c.content || c.texto}</span></div>`;
+                    });
+                    commsHTML += `</div>`;
+                }
 
                 container.innerHTML += `
                 <div class="post-card">
                     <div class="post-main">
                         <div class="post-content">
-                            <span class="text-[10px] font-black text-blue-600 uppercase">Utilizador ${p.user_id}</span>
-                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-2xl my-3 shadow-sm">` : ''}
-                            <p class="text-[16px] font-bold text-gray-800 uppercase leading-tight mt-2">${p.content}</p>
+                            <div class="post-user">Utilizador ${p.user_id}</div>
+                            <div class="text-[12px] text-gray-500 mb-2">${new Date(p.created_at).toLocaleDateString()}</div>
+                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3">` : ''}
+                            <div class="post-text">${p.content}</div>
                         </div>
                         <div class="post-sidebar">
                             <div class="flex flex-col items-center" onclick="reward(0.0006)"><div class="icon-btn">👍</div><span class="sidebar-label">${p.likes || 0}</span></div>
@@ -186,8 +195,7 @@
 
         async function sharePost(text) {
             if (navigator.share) {
-                navigator.share({ title: 'Apex Social', text: text, url: window.location.href })
-                .then(() => reward(0.0050)).catch(() => {});
+                navigator.share({ title: 'Apex Social', text: text, url: window.location.href }).then(() => reward(0.0050));
             }
         }
 
