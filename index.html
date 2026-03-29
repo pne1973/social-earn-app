@@ -3,143 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.52 - Login Fix</title>
+    <title>Apex Social v33.53 - Full Tabs Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --fb-blue: #1877F2; --fb-bg: #F0F2F5; --g-green: #34A853; }
         body { font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif; background: var(--fb-bg); color: #1c1e21; margin: 0; }
         
-        /* LOGIN SCREEN */
         #login-screen { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { width: 100%; max-width: 350px; text-align: center; }
-
-        /* HEADER & BARS */
         .app-header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 32px; background: white; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--g-green); text-transform: uppercase; }
         .ad-provider { position: fixed; top: 92px; width: 100%; z-index: 900; height: 28px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #bdc1c6; text-transform: uppercase; }
         
-        .main-content { padding-top: 130px; padding-bottom: 90px; }
-        .publisher-zone { background: white; border-bottom: 1px solid #dadce0; padding: 12px 16px; height: 65px; display: flex; align-items: center; margin-bottom: 10px; }
-
-        /* FEED & CARDS */
+        .main-content { padding-top: 130px; padding-bottom: 90px; min-height: 100vh; }
         .feed-container { max-width: 580px; margin: 0 auto; padding: 10px; }
-        .post-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .post-main { display: flex; width: 100%; }
-        .post-content { flex: 1; padding: 16px; } 
-        .post-user-label { font-size: 14px; font-weight: 700; color: #050505; margin-bottom: 4px; display: block; }
-        .post-text { font-size: 15px; color: #1c1e21; line-height: 1.4; }
-        .post-sidebar { width: 70px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 15px 0; }
+        .post-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; overflow: hidden; }
         
-        /* COMMENTS */
-        .feed-comments-area { background: white; border-top: 1px solid #f0f2f5; padding: 12px 16px; }
-        .comment-bubble { background: #f0f2f5; border-radius: 18px; padding: 8px 14px; margin-bottom: 6px; display: inline-block; max-width: 95%; }
-        .comment-user { font-size: 11px; font-weight: 800; color: #050505; display: block; }
-        .comment-text { font-size: 13px; color: #1c1e21; }
-
+        /* COMENTÁRIOS ESTILO FB */
+        .comment-bubble { background: #f0f2f5; border-radius: 18px; padding: 8px 12px; margin-bottom: 6px; display: inline-block; max-width: 90%; }
+        
         /* NAV */
         nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #65676b; cursor: pointer; }
         .nav-active { color: var(--fb-blue); border-top: 3px solid var(--fb-blue); }
 
-        /* MODALS */
-        .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
-        .active-page { display: block; }
         .page-content { display: none; }
-        .icon-btn { width: 40px; height: 40px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .active-page { display: block !important; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div class="login-card">
-            <div class="w-20 h-20 bg-[#1877F2] rounded-2xl flex items-center justify-center text-white text-5xl font-black italic mb-8 mx-auto shadow-xl">f</div>
-            <h1 class="text-2xl font-black mb-2 text-gray-800">Apex Social</h1>
-            <p class="text-sm text-gray-500 mb-8 font-bold">Introduza o seu ID para continuar</p>
-            
-            <input id="login-id" type="text" placeholder="ID de Utilizador" class="w-full p-4 bg-gray-100 rounded-2xl mb-4 text-center font-black text-lg outline-none border-2 border-transparent focus:border-blue-500 shadow-inner">
-            
-            <button onclick="doLogin()" class="w-full bg-[#1877F2] text-white p-4 rounded-2xl font-black text-lg shadow-lg hover:brightness-110 active:scale-95 transition-all">ENTRAR NO FEED</button>
-            
-            <p class="text-[10px] text-gray-400 mt-10 uppercase font-black tracking-widest">Build v33.52 • Secured</p>
-        </div>
+        <div class="w-20 h-20 bg-[#1877F2] rounded-2xl flex items-center justify-center text-white text-5xl font-black italic mb-8 shadow-xl">f</div>
+        <input id="login-id" type="text" placeholder="Introduza o seu ID" class="w-full max-w-xs p-4 bg-gray-100 rounded-2xl mb-4 text-center font-black outline-none border-2 border-transparent focus:border-blue-500">
+        <button onclick="doLogin()" class="w-full max-w-xs bg-[#1877F2] text-white p-4 rounded-2xl font-black shadow-lg">ENTRAR</button>
     </div>
 
     <div id="app-ui" class="hidden">
         <header class="app-header">
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
-                <span class="text-[14px] font-black uppercase text-blue-600">Apex Social</span>
+                <span class="font-bold text-blue-600">Apex Social</span>
             </div>
             <div id="bal-top" class="text-xl font-black text-green-600">0.0000€</div>
         </header>
 
-        <div class="status-bar">SISTEMA ATIVO • 15 XP POR POST</div>
+        <div class="status-bar">v33.53 • SISTEMA DE ABAS REATIVADO</div>
         <div class="ad-provider">GOOGLE ADSENSE CERTIFIED</div>
 
         <div class="main-content">
             <div id="p-feed" class="page-content active-page">
-                <div class="publisher-zone">
-                    <div onclick="openModal('modal-editor')" class="bg-[#f0f2f5] rounded-full px-5 py-2 w-full flex items-center gap-3 cursor-pointer">
-                        <div class="w-8 h-8 bg-gray-300 rounded-full shadow-inner"></div>
-                        <span class="text-[14px] text-gray-500 font-bold">No que está a pensar?</span>
+                <div class="feed-container">
+                    <div onclick="openModal('modal-editor')" class="bg-white p-4 rounded-xl mb-4 border flex items-center gap-3 cursor-pointer">
+                        <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
+                        <span class="text-gray-400">No que está a pensar?</span>
                     </div>
+                    <div id="feed-list"></div>
                 </div>
-                <main class="feed-container" id="feed-list"></main>
             </div>
 
             <div id="p-ranking" class="page-content">
-                <div class="feed-container py-4">
-                    <h2 class="font-black text-center text-lg mb-6 uppercase text-gray-700">Top 10 Utilizadores</h2>
-                    <div id="ranking-list" class="bg-white rounded-xl border overflow-hidden"></div>
+                <div class="feed-container">
+                    <h2 class="font-black text-center mb-4 uppercase">Ranking Global</h2>
+                    <div id="ranking-list" class="bg-white rounded-xl border"></div>
                 </div>
             </div>
 
             <div id="p-wallet" class="page-content">
-                <div class="feed-container py-4">
-                    <div class="bg-white p-8 rounded-2xl border text-center shadow-sm">
-                        <p class="text-gray-400 uppercase text-[10px] font-black mb-1">Saldo Atual</p>
-                        <h1 id="wallet-val" class="text-4xl font-black text-blue-600 mb-8">0.0000€</h1>
-                        <button onclick="alert('Mínimo 5.000 XP')" class="w-full bg-green-600 text-white p-4 rounded-xl font-bold uppercase text-xs shadow-md">Solicitar Saque</button>
+                <div class="feed-container">
+                    <div class="bg-white p-8 rounded-2xl border text-center">
+                        <p class="text-gray-400 text-[10px] font-black uppercase mb-2">O seu Saldo</p>
+                        <h1 id="wallet-val" class="text-4xl font-black text-blue-600 mb-6">0.0000€</h1>
+                        <button class="bg-green-600 text-white w-full p-4 rounded-xl font-bold uppercase text-xs">Levantar XP</button>
                     </div>
                 </div>
             </div>
 
             <div id="p-admin" class="page-content">
-                <div class="feed-container py-4">
-                    <div class="bg-white p-6 rounded-xl border border-red-100 shadow-sm">
-                        <h2 class="font-black text-red-600 mb-4 uppercase text-sm">Admin Control</h2>
-                        <div class="grid grid-cols-2 gap-3 mb-6">
-                            <div class="bg-gray-50 p-4 rounded-lg text-center"><span class="block text-[10px] text-gray-400 font-bold uppercase">Users</span><span id="adm-u" class="text-xl font-black">0</span></div>
-                            <div class="bg-gray-50 p-4 rounded-lg text-center"><span class="block text-[10px] text-gray-400 font-bold uppercase">Posts</span><span id="adm-p" class="text-xl font-black">0</span></div>
+                <div class="feed-container">
+                    <div class="bg-white p-6 rounded-xl border border-red-200">
+                        <h2 class="font-black text-red-600 uppercase mb-4">Painel Admin</h2>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-50 p-4 rounded text-center"><p class="text-[10px] text-gray-400 font-bold">USERS</p><span id="adm-u" class="font-black">0</span></div>
+                            <div class="bg-gray-50 p-4 rounded text-center"><p class="text-[10px] text-gray-400 font-bold">POSTS</p><span id="adm-p" class="font-black">0</span></div>
                         </div>
-                        <button onclick="location.reload()" class="w-full bg-black text-white p-3 rounded-lg font-bold text-[10px] uppercase">Forçar Reset</button>
+                        <button onclick="location.reload()" class="w-full bg-black text-white p-3 rounded font-bold uppercase text-xs">Reset Total</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <nav id="main-nav">
-            <div class="nav-item nav-active" onclick="tab('feed', this)">FEED</div>
-            <div class="nav-item" onclick="tab('ranking', this)">RANKING</div>
-            <div class="nav-item" onclick="tab('wallet', this)">CARTEIRA</div>
-            <div id="nav-adm-btn" class="nav-item hidden" onclick="tab('admin', this)">ADMIN</div>
+            <div class="nav-item nav-active" onclick="changeTab('feed', this)">FEED</div>
+            <div class="nav-item" onclick="changeTab('ranking', this)">RANKING</div>
+            <div class="nav-item" onclick="changeTab('wallet', this)">CARTEIRA</div>
+            <div id="nav-adm-btn" class="nav-item hidden" onclick="changeTab('admin', this)">ADMIN</div>
         </nav>
     </div>
 
     <div id="modal-editor" class="modal-fullscreen">
-        <div class="flex items-center justify-between p-4 border-b">
-            <button onclick="closeModal('modal-editor')" class="text-gray-500 font-bold">Cancelar</button>
-            <span class="font-bold">Criar Post</span>
+        <div class="flex justify-between p-4 border-b">
+            <button onclick="closeModal('modal-editor')">Cancelar</button>
+            <span class="font-bold">Novo Post</span>
             <button onclick="publish()" class="text-blue-600 font-bold">Publicar</button>
         </div>
-        <div class="bg-gray-50 p-3 text-center text-[9px] font-black text-gray-400 uppercase border-b">Anúncio: Ganhe XP por cada interação</div>
         <textarea id="post-txt" placeholder="No que está a pensar?" class="flex-1 p-5 outline-none text-lg resize-none"></textarea>
-        <div class="p-4 bg-gray-50 border-t">
-            <input id="post-url" type="text" placeholder="Link da Imagem (Opcional)" class="w-full p-3 bg-white rounded-xl border outline-none text-sm">
-        </div>
     </div>
 
     <script>
@@ -152,39 +121,33 @@
         const ADMIN_ID = "5401881400";
 
         async function doLogin() {
-            const input = document.getElementById('login-id').value.trim();
-            if(!input) return;
-            
-            uID = input;
-            
-            // Força a entrada visual primeiro para evitar travamentos
+            const val = document.getElementById('login-id').value.trim();
+            if(!val) return;
+            uID = val;
+
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-ui').classList.remove('hidden');
 
             if(uID === ADMIN_ID) {
                 document.getElementById('nav-adm-btn').classList.remove('hidden');
-                loadAdmin();
             }
 
-            try {
-                // Tenta buscar saldo
-                let { data } = await sb.from('perfis').select('saldo').eq('id', uID);
-                
-                if(!data || data.length === 0) {
-                    // Se não existir, tenta criar
-                    await sb.from('perfis').insert([{ id: uID, saldo: 0 }]);
-                    bal = 0;
-                } else {
-                    bal = Number(data[0].saldo);
-                }
-            } catch (e) {
-                console.log("Erro no login, continuando como convidado");
+            // Inicializar Dados
+            await syncUser();
+            await loadFeed();
+            await loadRanking();
+            if(uID === ADMIN_ID) loadAdmin();
+        }
+
+        async function syncUser() {
+            let { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
+            if(!data) {
+                await sb.from('perfis').insert([{ id: uID, saldo: 0 }]);
                 bal = 0;
+            } else {
+                bal = Number(data.saldo);
             }
-            
             updateUI();
-            loadFeed();
-            loadRanking();
         }
 
         async function loadFeed() {
@@ -193,34 +156,25 @@
             const { data: comms } = await sb.from('comentarios').select('*').order('created_at', {ascending: true});
             
             container.innerHTML = "";
-            if(!posts) return;
-
-            posts.forEach((p, i) => {
-                if(i > 0 && i % 3 === 0) {
-                    container.innerHTML += `<div class="bg-white border p-6 mb-4 rounded-xl text-center shadow-sm"><p class="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-1">Patrocinado</p><p class="font-bold text-gray-500 text-xs">GOOGLE ADSENSE</p></div>`;
-                }
-
-                const pComms = comms ? comms.filter(c => c.post_id == p.id) : [];
-                let commsHTML = pComms.length > 0 ? `<div class="feed-comments-area">` : "";
+            posts?.forEach((p, i) => {
+                const pComms = comms?.filter(c => c.post_id == p.id) || [];
+                let cHTML = pComms.length > 0 ? `<div class="p-4 bg-white border-t">` : "";
                 pComms.forEach(c => {
-                    commsHTML += `<div class="block"><div class="comment-bubble"><span class="comment-user">ID ${c.user_id}</span><span class="comment-text">${c.content}</span></div></div>`;
+                    cHTML += `<div class="block mb-2"><div class="comment-bubble"><span class="block text-[10px] font-bold">ID ${c.user_id}</span><span class="text-sm">${c.content}</span></div></div>`;
                 });
-                if(pComms.length > 0) commsHTML += `</div>`;
+                if(pComms.length > 0) cHTML += `</div>`;
 
                 container.innerHTML += `
-                <div class="post-card">
-                    <div class="post-main">
-                        <div class="post-content">
-                            <span class="post-user-label">ID ${p.user_id}</span>
-                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3 border">` : ''}
-                            <div class="post-text">${p.content}</div>
-                        </div>
-                        <div class="post-sidebar">
-                            <div class="flex flex-col items-center" onclick="reward(0.0002)"><div class="icon-btn">👍</div><span class="sidebar-label font-bold text-xs mt-1">${p.likes || 0}</span></div>
-                            <div class="flex flex-col items-center"><div class="icon-btn">💬</div><span class="sidebar-label font-bold text-xs mt-1">${pComms.length}</span></div>
-                        </div>
+                <div class="post-card border">
+                    <div class="p-4">
+                        <span class="font-bold text-sm block">Utilizador ${p.user_id}</span>
+                        <p class="mt-2 text-md">${p.content}</p>
                     </div>
-                    ${commsHTML}
+                    <div class="flex border-t text-xs font-bold text-gray-500">
+                        <div class="flex-1 p-3 text-center border-r" onclick="reward(0.0002)">LIKE</div>
+                        <div class="flex-1 p-3 text-center">COMENTAR</div>
+                    </div>
+                    ${cHTML}
                 </div>`;
             });
         }
@@ -228,51 +182,48 @@
         async function loadRanking() {
             const { data } = await sb.from('perfis').select('id, saldo').order('saldo', {ascending: false}).limit(10);
             const list = document.getElementById('ranking-list');
-            if(!data) return;
             list.innerHTML = "";
-            data.forEach((r, i) => {
-                list.innerHTML += `<div class="flex justify-between items-center p-4 border-b">
-                    <span class="text-sm font-bold"><span class="text-gray-400 mr-2">#${i+1}</span> ID ${r.id}</span>
-                    <span class="font-black text-green-600">${Number(r.saldo).toFixed(4)}€</span>
-                </div>`;
+            data?.forEach((r, i) => {
+                list.innerHTML += `<div class="flex justify-between p-4 border-b last:border-0"><span>#${i+1} ID ${r.id}</span><span class="font-bold text-green-600">${Number(r.saldo).toFixed(4)}€</span></div>`;
             });
         }
 
         async function loadAdmin() {
-            const { count: uCount } = await sb.from('perfis').select('*', { count: 'exact' });
-            const { count: pCount } = await sb.from('posts').select('*', { count: 'exact' });
+            const { count: uCount } = await sb.from('perfis').select('*', { count: 'exact', head: true });
+            const { count: pCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
             document.getElementById('adm-u').innerText = uCount || 0;
             document.getElementById('adm-p').innerText = pCount || 0;
         }
 
+        function changeTab(t, el) {
+            // Esconder todas as abas
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
+            // Remover estado ativo da nav
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-active'));
+            
+            // Mostrar a aba certa
+            document.getElementById('p-' + t).classList.add('active-page');
+            el.classList.add('nav-active');
+
+            // Recarregar dados específicos ao mudar de aba
+            if(t === 'feed') loadFeed();
+            if(t === 'ranking') loadRanking();
+            if(t === 'admin') loadAdmin();
+        }
+
         async function publish() {
-            const t = document.getElementById('post-txt').value.trim();
-            const u = document.getElementById('post-url').value.trim();
-            if(!t || !uID) return;
-            const { error } = await sb.from('posts').insert([{ user_id: uID, content: t, image_url: u || null }]);
+            const txt = document.getElementById('post-txt').value.trim();
+            if(!txt) return;
+            const { error } = await sb.from('posts').insert([{ user_id: uID, content: txt }]);
             if(!error) { reward(0.0150); closeModal('modal-editor'); document.getElementById('post-txt').value = ""; loadFeed(); }
         }
 
-        function tab(t, e) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-active'));
-            document.getElementById('p-' + t).classList.add('active-page');
-            e.classList.add('nav-active');
-        }
-
-        function reward(v) { 
-            if(!uID) return;
-            bal += v; 
-            updateUI(); 
-            sb.from('perfis').upsert({ id: uID, saldo: bal }); 
-        }
-
+        function reward(v) { bal += v; updateUI(); sb.from('perfis').upsert({ id: uID, saldo: bal }); }
         function updateUI() { 
-            const formatted = bal.toFixed(4) + "€";
-            document.getElementById('bal-top').innerText = formatted;
-            document.getElementById('wallet-val').innerText = formatted;
+            const val = bal.toFixed(4) + "€";
+            document.getElementById('bal-top').innerText = val;
+            document.getElementById('wallet-val').innerText = val;
         }
-
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     </script>
