@@ -8,169 +8,165 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; }
+        :root { --g-blue: #4285F4; --g-green: #34A853; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; margin: 0; }
         
-        /* Cabeçalho e Publicador Fixos */
-        header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
-        .status-bar { position: fixed; top: 60px; left: 0; right: 0; z-index: 900; height: 30px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; text-transform: uppercase; color: var(--g-green); }
-        .publisher-fixed { position: fixed; top: 90px; left: 0; right: 0; z-index: 800; background: white; border-bottom: 1px solid #dadce0; padding: 10px 16px; }
+        /* Layout Fixo */
+        header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
+        .status-bar { position: fixed; top: 60px; width: 100%; z-index: 900; height: 30px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; text-transform: uppercase; color: var(--g-green); }
+        .publisher-fixed { position: fixed; top: 90px; width: 100%; z-index: 800; background: white; border-bottom: 1px solid #dadce0; padding: 10px 16px; }
         
-        /* Ajuste do Feed */
-        .content-area { padding-top: 155px; padding-bottom: 85px; }
+        /* Espaçamento do Conteúdo */
+        .content-area { padding-top: 150px; padding-bottom: 80px; }
 
-        /* Estrutura do Card Corrigida */
+        /* Card Estilo Profissional */
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
         
-        /* Alinhamento dos Balões de Estatística */
-        .stats-container { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid #f8f9fa; }
-        .stat-badge { display: flex; align-items: center; gap: 4px; background: #e8f0fe; color: #1967d2; padding: 3px 10px; border-radius: 15px; font-size: 11px; font-weight: 900; }
-        .stat-text { font-size: 10px; color: #70757a; text-transform: uppercase; }
+        /* Alinhamento dos Balões (Ajustado) */
+        .stats-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; }
+        .like-badge { display: flex; align-items: center; gap: 5px; background: #e8f0fe; color: #1967d2; padding: 4px 12px; border-radius: 20px; font-size: 11px; }
+        .comment-text { font-size: 10px; color: #70757a; text-transform: uppercase; font-weight: 900; }
 
-        /* Botões de Interação em Grelha */
-        .interaction-grid { display: flex; border-top: 1px solid #f1f3f4; }
-        .inter-btn { flex: 1; padding: 14px 0; font-size: 11px; font-weight: 900; color: #5f6368; text-transform: uppercase; text-align: center; }
-        .inter-btn:not(:last-child) { border-right: 1px solid #f1f3f4; }
-        .inter-btn:active { background: #f8f9fa; }
+        /* Grelha de Botões (Ajustada) */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid #f1f3f4; border-bottom: 1px solid #f1f3f4; }
+        .action-btn { padding: 14px 0; font-size: 11px; font-weight: 900; color: #5f6368; text-transform: uppercase; text-align: center; border: none; background: white; }
+        .action-btn:not(:last-child) { border-right: 1px solid #f1f3f4; }
+        .action-btn:active { background: #f8f9fa; }
 
-        /* Secção de Comentários */
-        .comment-zone { background: #f8f9fa; padding: 12px; }
-        .comment-bubble { background: white; border: 1px solid #e8eaed; border-radius: 12px; padding: 8px 12px; margin-bottom: 6px; font-size: 11px; width: fit-content; max-width: 90%; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        /* Comentários */
+        .comment-area { background: #f8f9fa; padding: 12px; }
+        .bubble { background: white; border: 1px solid #e8eaed; border-radius: 12px; padding: 8px 12px; margin-bottom: 6px; font-size: 11px; width: fit-content; max-width: 90%; }
 
-        /* Navegação Inferior Estável */
-        nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #dadce0; display: flex; height: 65px; z-index: 1000; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; text-transform: uppercase; color: #5f6368; }
-        .nav-btn.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); }
+        /* Navegação Inferior (Fixa e Clicável) */
+        nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
+        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; text-transform: uppercase; color: #5f6368; text-decoration: none; }
+        .nav-link.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); }
         
         .hidden { display: none; }
     </style>
 </head>
-<body class="max-w-md mx-auto">
+<body>
 
     <header>
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
             <span class="text-[10px] font-black uppercase text-blue-600">Social Network</span>
         </div>
-        <div id="balance-top" class="text-lg font-black text-green-600">0.0000€</div>
+        <div id="top-bal" class="text-lg font-black text-green-600">0.0000€</div>
     </header>
 
-    <div class="status-bar">
-        <span>Modo Normal (100% Ganhos)</span>
-    </div>
+    <div class="status-bar">MODO NORMAL (100% GANHOS)</div>
 
-    <div id="pub-box" class="publisher-fixed">
-        <div id="mini-input" onclick="togglePub(true)" class="flex items-center gap-3 bg-gray-100 rounded-full px-4 py-2 cursor-pointer">
+    <div class="publisher-fixed">
+        <div id="mini-input" onclick="setPub(true)" class="flex items-center gap-3 bg-gray-100 rounded-full px-4 py-2 cursor-pointer border border-gray-200">
             <div class="w-6 h-6 bg-gray-300 rounded-full"></div>
             <span class="text-[10px] text-gray-400 font-black uppercase">O que quer partilhar?</span>
         </div>
         <div id="full-input" class="hidden">
-            <textarea id="post-content" placeholder="ESCREVA AQUI..." class="w-full border-none outline-none font-black uppercase text-xs p-2 mb-2" rows="2"></textarea>
-            <input id="post-img" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-50 rounded-lg p-2 text-[10px] mb-3 outline-none">
+            <textarea id="p-text" placeholder="ESCREVA AQUI..." class="w-full border-none outline-none font-black uppercase text-xs p-2 mb-2" rows="2"></textarea>
             <div class="flex gap-2">
-                <button onclick="togglePub(false)" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Fechar</button>
-                <button onclick="createPost()" class="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Publicar (+0.0150€)</button>
+                <button onclick="setPub(false)" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Fechar</button>
+                <button onclick="sendP()" class="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Publicar (+0.0150€)</button>
             </div>
         </div>
     </div>
 
-    <main class="content-area px-4">
-        <div id="feed-social"></div>
+    <main class="content-area px-4 max-w-md mx-auto">
+        <div id="social-feed"></div>
     </main>
 
     <nav>
-        <button onclick="location.reload()" class="nav-btn active">Feed</button>
-        <button class="nav-btn">Carteira</button>
-        <button class="nav-btn">Menu</button>
+        <a href="#" onclick="location.reload()" class="nav-link active">Feed</a>
+        <a href="#" class="nav-link">Carteira</a>
+        <a href="#" class="nav-link">Menu</a>
     </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
-        let activeUser = localStorage.getItem('apex_uid') || "5401881400";
-        let balance = 0;
+        let uID = localStorage.getItem('apex_uid') || "5401881400";
+        let bal = 0;
 
         async function init() {
-            const { data: p } = await sb.from('perfis').select('saldo').eq('id', activeUser).single();
-            if(p) balance = Number(p.saldo);
+            const { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
+            if(data) bal = Number(data.saldo);
             updateUI();
             loadPosts();
         }
 
         async function loadPosts() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const feed = document.getElementById('feed-social');
+            const feed = document.getElementById('social-feed');
             feed.innerHTML = "";
 
             for(const p of posts) {
                 const { data: comms } = await sb.from('comentarios').select('*').eq('post_id', p.id);
                 feed.innerHTML += `
-                <div class="google-card">
-                    <div class="p-4">
+                <div class="google-card shadow-sm">
+                    <div class="p-4 pb-0">
                         <div class="flex items-center gap-2 mb-3">
-                            <div class="w-7 h-7 bg-blue-100 rounded-full"></div>
+                            <div class="w-8 h-8 bg-blue-100 rounded-full"></div>
                             <span class="text-[10px] font-black text-blue-600 uppercase">${p.user_id}</span>
                         </div>
-                        <p class="text-[13px] font-bold mb-3">${p.content}</p>
-                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-4 border">` : ''}
+                        <p class="text-[13px] font-bold text-gray-800 mb-4">${p.content}</p>
+                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-4 border border-gray-100">` : ''}
                         
-                        <div class="stats-container">
-                            <div class="stat-badge">👍 ${Math.floor(Math.random()*20)}</div>
-                            <div class="stat-text">${comms ? comms.length : 0} comentários</div>
+                        <div class="stats-row">
+                            <div class="like-badge">👍 ${Math.floor(Math.random()*15)}</div>
+                            <div class="comment-text">${comms ? comms.length : 0} comentários</div>
                         </div>
 
-                        <div class="interaction-grid">
-                            <button onclick="addReward(0.0006)" class="inter-btn">Gosto</button>
-                            <button onclick="document.getElementById('in-${p.id}').focus()" class="inter-btn">Comentar</button>
-                            <button onclick="addReward(0.0020)" class="inter-btn">Partilhar</button>
+                        <div class="action-grid">
+                            <button onclick="reward(0.0006)" class="action-btn">Gosto</button>
+                            <button onclick="document.getElementById('in-${p.id}').focus()" class="action-btn">Comentar</button>
+                            <button onclick="reward(0.0020)" class="action-btn">Partilhar</button>
                         </div>
                     </div>
 
-                    <div class="comment-zone">
-                        <div id="list-${p.id}" class="mb-3">
-                            ${(comms || []).map(c => `<div class="comment-bubble"><strong>${c.user_id}:</strong> ${c.content}</div>`).join('')}
+                    <div class="comment-area">
+                        <div id="l-${p.id}">
+                            ${(comms || []).map(c => `<div class="bubble"><strong>${c.user_id}:</strong> ${c.content}</div>`).join('')}
                         </div>
-                        <div class="flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="Escreva..." class="flex-1 bg-white border rounded-full px-4 py-2 text-[10px] outline-none">
-                            <button onclick="sendComment('${p.id}')" class="bg-blue-600 text-white px-4 rounded-full text-[9px] font-black uppercase">Ok</button>
+                        <div class="flex gap-2 mt-3">
+                            <input id="in-${p.id}" type="text" placeholder="Escreva..." class="flex-1 bg-white border border-gray-200 rounded-full px-4 py-2 text-[10px] outline-none">
+                            <button onclick="sendC('${p.id}')" class="bg-blue-600 text-white px-5 rounded-full text-[9px] font-black uppercase">Ok</button>
                         </div>
                     </div>
                 </div>`;
             }
         }
 
-        async function sendComment(pid) {
+        async function sendC(pid) {
             const val = document.getElementById(`in-${pid}`).value;
             if(!val) return;
-            await sb.from('comentarios').insert([{ post_id: pid, user_id: activeUser, content: val }]);
-            addReward(0.0010);
+            await sb.from('comentarios').insert([{ post_id: pid, user_id: uID, content: val }]);
+            reward(0.0010);
             loadPosts();
         }
 
-        async function createPost() {
-            const txt = document.getElementById('post-content').value;
-            const img = document.getElementById('post-img').value;
+        async function sendP() {
+            const txt = document.getElementById('p-text').value;
             if(!txt) return;
-            await sb.from('posts').insert([{ user_id: activeUser, content: txt, image_url: img }]);
-            addReward(0.0150);
-            togglePub(false);
+            await sb.from('posts').insert([{ user_id: uID, content: txt }]);
+            reward(0.0150);
+            setPub(false);
             loadPosts();
         }
 
-        function addReward(v) {
-            balance += v;
+        function reward(v) {
+            bal += v;
             updateUI();
-            sb.from('perfis').upsert({ id: activeUser, saldo: balance });
+            sb.from('perfis').upsert({ id: uID, saldo: bal });
         }
 
         function updateUI() {
-            document.getElementById('balance-top').innerText = balance.toFixed(4) + "€";
+            document.getElementById('top-bal').innerText = bal.toFixed(4) + "€";
         }
 
-        function togglePub(show) {
-            document.getElementById('mini-input').classList.toggle('hidden', show);
-            document.getElementById('full-input').classList.toggle('hidden', !show);
+        function setPub(s) {
+            document.getElementById('mini-input').classList.toggle('hidden', s);
+            document.getElementById('full-input').classList.toggle('hidden', !s);
         }
 
         init();
