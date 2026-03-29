@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.40 - FB Style + Ads</title>
+    <title>Apex Social v33.49</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --fb-bg: #f1f3f4; }
+        :root { --g-blue: #4285F4; --g-green: #34A853; --fb-bg: #f1f3f4; }
         body { font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif; background: var(--fb-bg); color: #1c1e21; margin: 0; padding-top: 185px; padding-bottom: 90px; }
 
         /* HEADER & BARS */
@@ -23,10 +23,16 @@
         .post-main { display: flex; width: 100%; }
         .post-content { flex: 1; padding: 16px; } 
         .post-user-label { font-size: 14px; font-weight: 600; color: #050505; margin-bottom: 4px; display: block; }
-        .post-text { font-size: 15px; line-height: 1.3333; font-weight: 400; color: #1c1e21; margin-top: 8px; word-wrap: break-word; }
+        .post-text { font-size: 15px; line-height: 1.3333; color: #1c1e21; margin-top: 8px; word-wrap: break-word; }
         .post-sidebar { width: 70px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 15px 0; }
         
-        /* AD CARDS (FEED & MODAL) */
+        /* COMENTÁRIOS SEPARADOS (ESTILO FB) */
+        .feed-comments-area { background: white; border-top: 1px solid #f0f2f5; padding: 12px 16px; }
+        .comment-bubble { background: #f0f2f5; border-radius: 18px; padding: 8px 12px; margin-bottom: 8px; display: inline-block; max-width: 90%; }
+        .comment-user { font-size: 12px; font-weight: 700; color: #050505; display: block; }
+        .comment-text { font-size: 13px; color: #1c1e21; }
+
+        /* ADS */
         .ad-card-feed { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 250px; }
         .modal-ad-banner { background: #f8f9fa; border-bottom: 1px solid #dadce0; padding: 15px; text-align: center; min-height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
@@ -58,7 +64,7 @@
         <div id="bal-top" class="text-2xl font-black text-green-600">0.0000€</div>
     </header>
 
-    <div class="status-bar">v33.40 • MONETIZAÇÃO ATIVA</div>
+    <div class="status-bar">v33.49 • DESIGN DE COMENTÁRIOS ATUALIZADO</div>
     <div class="ad-provider">GOOGLE ADSENSE CERTIFIED PARTNER</div>
 
     <div id="page-feed" class="page-content active-page">
@@ -159,11 +165,21 @@
                 }
 
                 const postComms = comms ? comms.filter(c => c.post_id == p.id) : [];
-                let commsHTML = postComms.length > 0 ? `<div class="bg-[#f8f9fa] border-t border-gray-100 p-4">` : "";
-                postComms.forEach(c => {
-                    commsHTML += `<div class="text-[13px] mb-2"><span class="font-bold text-[#050505]">ID ${c.user_id}</span> <span class="text-[#1c1e21]">${c.content || c.texto}</span></div>`;
-                });
-                if(postComms.length > 0) commsHTML += `</div>`;
+                let commsHTML = "";
+                
+                if(postComms.length > 0) {
+                    commsHTML = `<div class="feed-comments-area">`;
+                    postComms.forEach(c => {
+                        commsHTML += `
+                        <div class="block">
+                            <div class="comment-bubble">
+                                <span class="comment-user">ID ${c.user_id}</span>
+                                <span class="comment-text">${c.content}</span>
+                            </div>
+                        </div>`;
+                    });
+                    commsHTML += `</div>`;
+                }
 
                 container.innerHTML += `
                 <div class="post-card">
