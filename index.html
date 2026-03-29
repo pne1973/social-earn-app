@@ -8,100 +8,98 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-green: #34A853; --g-red: #EA4335; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; padding-top: 175px; padding-bottom: 75px; overflow-x: hidden; }
+        :root { --g-blue: #4285F4; --g-green: #34A853; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; padding-top: 175px; padding-bottom: 75px; }
 
-        /* HEADER E STATUS (Imagem 13:50) */
+        /* HEADER & STATUS */
         header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
-        .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 32px; background: white; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--g-green); text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 32px; background: white; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--g-green); text-transform: uppercase; }
         .ad-provider { position: fixed; top: 92px; width: 100%; z-index: 900; height: 28px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #bdc1c6; text-transform: uppercase; }
-        
         .publisher-zone { position: fixed; top: 120px; width: 100%; z-index: 850; background: white; border-bottom: 1px solid #dadce0; padding: 10px 16px; height: 55px; display: flex; align-items: center; }
-        .fake-input { background: #f1f3f4; border-radius: 25px; padding: 10px 20px; width: 100%; display: flex; align-items: center; gap: 12px; cursor: pointer; border: 1px solid #e8eaed; }
-        .fake-avatar { width: 24px; height: 24px; background: #dadce0; border-radius: 50%; }
 
-        /* FEED E CARDS (Estrutura da Imagem) */
+        /* FEED & CARDS (IMAGE 13:50) */
         .feed-container { max-width: 500px; margin: 0 auto; padding: 0 10px; }
         .post-card { background: white; border-radius: 18px; border: 1px solid #dadce0; margin-bottom: 14px; display: flex; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        
-        .post-content { flex: 1; padding: 15px; position: relative; }
-        .post-sidebar { width: 75px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 20px; padding: 15px 0; }
+        .post-content { flex: 1; padding: 15px; }
+        .post-sidebar { width: 75px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 10px 0; }
 
-        .author-badge { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-        .avatar-circle { width: 30px; height: 30px; background: #e8f0fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--g-blue); font-weight: 900; font-size: 11px; }
+        .author-badge { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .avatar-circle { width: 28px; height: 28px; background: #e8f0fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--g-blue); font-weight: 900; font-size: 10px; }
         .author-name { font-size: 11px; font-weight: 900; color: var(--g-blue); text-transform: uppercase; }
-        .post-body { font-size: 14px; font-weight: 700; color: #202124; line-height: 1.5; margin-bottom: 10px; }
-        .post-img { width: 100%; border-radius: 12px; object-fit: cover; margin-top: 5px; }
+        .post-body { font-size: 14px; font-weight: 700; color: #202124; line-height: 1.4; }
+        .post-img { width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid #f1f3f4; }
 
-        /* BOTÕES DE INTERAÇÃO SIDEBAR */
-        .action-group { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.1s; }
-        .action-group:active { transform: scale(0.9); }
-        .icon-box { width: 40px; height: 40px; background: white; border-radius: 50%; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.04); margin-bottom: 4px; }
-        .count-label { font-size: 9px; font-weight: 900; color: #70757a; text-transform: uppercase; }
+        /* SIDEBAR ACTIONS */
+        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .icon-circle { width: 38px; height: 38px; background: white; border-radius: 50%; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .count-text { font-size: 9px; font-weight: 900; color: #70757a; text-transform: uppercase; }
 
-        /* NAVEGAÇÃO (Imagem 13:50) */
+        /* MODALS */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 3000; display: none; flex-direction: column; padding: 20px; }
+        input, textarea { background: #f8f9fa; border: 1px solid #dadce0; border-radius: 12px; padding: 14px; font-weight: 700; outline: none; }
+
         nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; cursor: pointer; }
-        .nav-item.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); }
-
-        /* MODAIS E TELAS */
-        #login-overlay { position: fixed; inset: 0; background: white; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
-        .btn-primary { background: var(--g-blue); color: white; width: 100%; max-width: 280px; padding: 18px; border-radius: 15px; font-weight: 900; text-transform: uppercase; font-size: 12px; box-shadow: 0 4px 12px rgba(66,133,244,0.3); }
-        
-        #editor-modal { position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 3000; display: none; padding: 20px; flex-direction: column; }
+        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
+        .nav-link.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="login-overlay">
-        <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-4xl font-black italic shadow-xl mb-10">S</div>
-        <h1 class="text-2xl font-black uppercase mb-2 tracking-tight">Bem-vindo</h1>
-        <p class="text-[10px] text-gray-400 font-bold uppercase mb-8 text-center">Insira o seu ID oficial para aceder à rede</p>
-        <input id="uid-field" type="text" placeholder="ID DE UTILIZADOR" class="w-full max-w-[280px] bg-gray-100 border-none rounded-xl p-5 text-center font-black text-sm mb-4 outline-none">
-        <button onclick="auth()" class="btn-primary">Entrar na Conta</button>
+    <div id="auth-screen" class="fixed inset-0 bg-white z-[5000] flex flex-col items-center justify-center p-8">
+        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-3xl font-black italic mb-10 shadow-xl">S</div>
+        <input id="login-id" type="text" placeholder="ID UTILIZADOR" class="w-full max-w-xs text-center mb-4">
+        <button onclick="login()" class="w-full max-w-xs bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-xs">Aceder à Rede</button>
     </div>
 
     <header>
         <div class="flex items-center gap-2">
-            <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic text-lg shadow-sm">S</div>
-            <span class="text-[12px] font-black uppercase text-blue-600 tracking-tighter">Apex Social</span>
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
+            <span class="text-[11px] font-black uppercase text-blue-600">Apex Social</span>
         </div>
-        <div id="display-balance" class="text-xl font-black text-green-600 tracking-tighter">0.0000€</div>
+        <div id="bal-top" class="text-xl font-black text-green-600">0.0000€</div>
     </header>
 
-    <div class="status-bar">Servidor Ativo • 100% Ganhos de Produção</div>
+    <div class="status-bar">Produção Ativa • Ganhos Reais</div>
     <div class="ad-provider">Google Adsense Partner</div>
 
     <div class="publisher-zone">
-        <div class="fake-input" onclick="toggleEditor(true)">
-            <div class="fake-avatar"></div>
-            <span class="text-[11px] text-gray-400 font-black uppercase italic">Escreva aqui a sua publicação...</span>
+        <div onclick="openEditor()" class="bg-gray-100 rounded-full px-5 py-2 border border-gray-200 w-full flex items-center gap-3 cursor-pointer">
+            <div class="w-6 h-6 bg-gray-300 rounded-full"></div>
+            <span class="text-[11px] text-gray-400 font-black uppercase italic">O que quer partilhar?</span>
         </div>
     </div>
 
-    <main class="feed-container" id="main-feed">
-        </main>
+    <main class="feed-container" id="feed-list"></main>
 
-    <div id="editor-modal">
-        <div class="flex justify-between items-center mb-6">
-            <button onclick="toggleEditor(false)" class="text-gray-400 font-black text-xs uppercase">Cancelar</button>
+    <div id="modal-editor" class="modal-overlay">
+        <div class="flex justify-between items-center mb-8">
+            <button onclick="closeModal('modal-editor')" class="text-gray-400 font-black text-xs uppercase">Fechar</button>
             <span class="font-black uppercase text-xs">Nova Publicação</span>
+            <button onclick="publish()" class="text-blue-600 font-black text-xs uppercase">Publicar</button>
+        </div>
+        <textarea id="post-txt" placeholder="ESCREVA AQUI..." class="w-full h-32 mb-4 uppercase"></textarea>
+        <input id="post-url" type="text" placeholder="URL DA IMAGEM (WEBURL)" class="w-full mb-6 text-xs uppercase">
+        <p class="text-[10px] text-gray-400 font-bold uppercase text-center italic">Ganhe 0.0150€ por publicação</p>
+    </div>
+
+    <div id="modal-comment" class="modal-overlay">
+        <div class="flex justify-between items-center mb-8">
+            <button onclick="closeModal('modal-comment')" class="text-gray-400 font-black text-xs uppercase">Voltar</button>
+            <span class="font-black uppercase text-xs">Comentários</span>
             <div class="w-10"></div>
         </div>
-        <textarea id="post-text" placeholder="O que está a acontecer?" class="w-full flex-1 border-none outline-none font-bold text-lg uppercase py-4" maxlength="300"></textarea>
-        <div id="img-preview" class="mb-4"></div>
-        <input type="file" id="img-upload" accept="image/*" class="hidden" onchange="previewImg(event)">
-        <div class="flex gap-3">
-            <button onclick="document.getElementById('img-upload').click()" class="flex-1 bg-gray-100 text-gray-600 py-4 rounded-xl font-black text-[10px] uppercase">Adicionar Foto</button>
-            <button onclick="sendPost()" class="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-black text-[10px] uppercase shadow-lg">Publicar (+0.0150€)</button>
+        <div id="comment-list" class="flex-1 overflow-y-auto mb-4 space-y-3"></div>
+        <div class="flex gap-2">
+            <input id="comm-txt" type="text" placeholder="COMENTAR..." class="flex-1 text-xs uppercase">
+            <button onclick="addComment()" class="bg-blue-600 text-white px-6 rounded-xl font-black text-[10px] uppercase">Enviar</button>
         </div>
     </div>
 
     <nav>
-        <div class="nav-item active" onclick="navigate('feed')">Feed</div>
-        <div class="nav-item" onclick="navigate('wallet')">Carteira</div>
-        <div class="nav-item" onclick="logout()">Sair</div>
+        <div class="nav-link active">Feed</div>
+        <div class="nav-link" onclick="location.reload()">Carteira</div>
+        <div class="nav-link" onclick="logout()">Sair</div>
     </nav>
 
     <script>
@@ -109,119 +107,115 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
-        let userID = localStorage.getItem('apex_id_v33');
-        let currentBalance = 0;
-        let selectedImgData = null;
+        let uID = localStorage.getItem('apex_uid_v33');
+        let bal = 0;
+        let activePostID = null;
 
-        async function auth() {
-            const val = document.getElementById('uid-field').value.trim();
-            if(!val) return;
-            localStorage.setItem('apex_id_v33', val);
+        function login() {
+            const id = document.getElementById('login-id').value.trim();
+            if(!id) return;
+            localStorage.setItem('apex_uid_v33', id);
             location.reload();
         }
 
-        async function start() {
-            if(!userID) return;
-            document.getElementById('login-overlay').classList.add('hidden');
-            
-            const { data } = await sb.from('perfis').select('saldo').eq('id', userID).single();
-            if(data) currentBalance = Number(data.saldo);
-            
-            updateHeader();
-            loadPosts();
+        async function init() {
+            if(!uID) return;
+            document.getElementById('auth-screen').classList.add('hidden');
+            const { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
+            if(data) bal = Number(data.saldo);
+            updateUI();
+            loadFeed();
         }
 
-        async function loadPosts() {
+        async function loadFeed() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const container = document.getElementById('main-feed');
+            const container = document.getElementById('feed-list');
             container.innerHTML = "";
-            
-            posts.forEach((p, index) => {
-                const isAd = (index + 1) % 4 === 0;
-                
+
+            posts.forEach((p, i) => {
                 container.innerHTML += `
                 <div class="post-card">
                     <div class="post-content">
                         <div class="author-badge">
                             <div class="avatar-circle">P</div>
-                            <span class="author-name">Utilizador ${p.user_id}</span>
+                            <span class="author-name">ID ${p.user_id}</span>
                         </div>
-                        <p class="post-body">${p.content}</p>
+                        <p class="post-body uppercase">${p.content}</p>
                         ${p.media_url ? `<img src="${p.media_url}" class="post-img">` : ''}
                     </div>
                     <div class="post-sidebar">
-                        <div class="action-group" onclick="reward(0.0006)">
-                            <div class="icon-box">👍</div>
-                            <span class="count-label">${Math.floor(Math.random()*99)}</span>
+                        <div class="action-item" onclick="reward(0.0006)">
+                            <div class="icon-circle">👍</div>
+                            <span class="count-text">${Math.floor(Math.random()*30)}</span>
                         </div>
-                        <div class="action-group">
-                            <div class="icon-box">💬</div>
-                            <span class="count-label">0</span>
+                        <div class="action-item" onclick="openComments('${p.id}')">
+                            <div class="icon-circle">💬</div>
+                            <span class="count-text">Ver</span>
                         </div>
-                        <div class="action-group" onclick="reward(0.0020)">
-                            <div class="icon-box">🔗</div>
-                            <span class="count-label">Share</span>
+                        <div class="action-item" onclick="reward(0.0020)">
+                            <div class="icon-circle">🔗</div>
+                            <span class="count-text">Share</span>
                         </div>
                     </div>
                 </div>`;
 
-                if(isAd) {
+                if((i + 1) % 3 === 0) {
                     container.innerHTML += `
-                    <div class="post-card border-dashed border-gray-300 bg-gray-50">
+                    <div class="post-card border-dashed bg-gray-50">
                         <div class="p-6 w-full text-center">
-                            <span class="text-[8px] font-black text-blue-500 uppercase tracking-widest block mb-1">Publicidade de Rede</span>
-                            <p class="text-[10px] font-black text-gray-400 uppercase italic">Anúncio Patrocinado pela Google</p>
+                            <span class="text-[8px] font-black text-blue-500 uppercase block mb-1">Rede de Anúncios Apex</span>
+                            <p class="text-[10px] font-black text-gray-400 uppercase italic">Anúncio Google AdSense Ativo</p>
+                        </div>
+                        <div class="post-sidebar">
+                            <div class="icon-circle text-blue-500">Ads</div>
                         </div>
                     </div>`;
                 }
             });
         }
 
-        async function sendPost() {
-            const txt = document.getElementById('post-text').value;
+        async function publish() {
+            const txt = document.getElementById('post-txt').value;
+            const url = document.getElementById('post-url').value;
             if(!txt) return;
-
-            // Lógica de compressão simulada para respeitar os 50MB globais
-            await sb.from('posts').insert([{ 
-                user_id: userID, 
-                content: txt,
-                media_url: selectedImgData 
-            }]);
-
+            await sb.from('posts').insert([{ user_id: uID, content: txt, media_url: url }]);
             reward(0.0150);
-            toggleEditor(false);
-            loadPosts();
+            closeModal('modal-editor');
+            loadFeed();
+        }
+
+        async function openComments(postID) {
+            activePostID = postID;
+            document.getElementById('modal-comment').style.display = 'flex';
+            const { data } = await sb.from('comentarios').select('*').eq('post_id', postID);
+            const list = document.getElementById('comment-list');
+            list.innerHTML = data?.length ? "" : "<p class='text-center text-[10px] uppercase font-black text-gray-300 mt-10'>Sem comentários ainda</p>";
+            data?.forEach(c => {
+                list.innerHTML += `<div class="bg-gray-50 p-3 rounded-xl border border-gray-100 font-bold text-[11px] uppercase"><span class="text-blue-600 mr-2">ID ${c.user_id}:</span> ${c.texto}</div>`;
+            });
+        }
+
+        async function addComment() {
+            const txt = document.getElementById('comm-txt').value;
+            if(!txt || !activePostID) return;
+            await sb.from('comentarios').insert([{ post_id: activePostID, user_id: uID, texto: txt }]);
+            reward(0.0010);
+            document.getElementById('comm-txt').value = "";
+            openComments(activePostID);
         }
 
         function reward(val) {
-            currentBalance += val;
-            updateHeader();
-            sb.from('perfis').upsert({ id: userID, saldo: currentBalance });
+            bal += val;
+            updateUI();
+            sb.from('perfis').upsert({ id: uID, saldo: bal });
         }
 
-        function updateHeader() {
-            document.getElementById('display-balance').innerText = currentBalance.toFixed(4) + "€";
-        }
+        function updateUI() { document.getElementById('bal-top').innerText = bal.toFixed(4) + "€"; }
+        function openEditor() { document.getElementById('modal-editor').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function logout() { localStorage.clear(); location.reload(); }
 
-        function toggleEditor(show) {
-            document.getElementById('editor-modal').style.display = show ? 'flex' : 'none';
-        }
-
-        function previewImg(e) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                selectedImgData = reader.result;
-                document.getElementById('img-preview').innerHTML = `<img src="${reader.result}" class="rounded-xl h-40 w-full object-cover">`;
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-
-        function logout() {
-            localStorage.clear();
-            location.reload();
-        }
-
-        start();
+        init();
     </script>
 </body>
 </html>
