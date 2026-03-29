@@ -20,6 +20,7 @@
         #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s forwards; }
         @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
         .post-card { background: white; border-radius: 8px; border: 1px solid #dddfe2; margin-bottom: 12px; }
+        .ad-banner { background: #fdfdfd; border: 1px dashed #1877F2; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 12px; }
     </style>
 </head>
 <body class="pb-16">
@@ -33,27 +34,24 @@
     <div id="floating-earning"><div class="text-4xl font-black text-green-500" id="earning-val">+0.0000</div></div>
 
     <header class="sticky top-0 z-50 bg-white fb-shadow">
+        <div class="bg-blue-50 py-1 text-center text-[9px] font-bold text-fb-blue border-b border-blue-100 uppercase tracking-widest">Sponsored Advertisement</div>
         <div class="max-w-xl mx-auto flex items-center justify-between px-4 h-14">
             <h1 class="text-2xl font-bold fb-blue tracking-tighter">Social Network</h1>
-            <div class="flex items-center space-x-3">
-                <div class="text-right leading-none">
-                    <div id="main-balance" class="font-bold text-green-600 text-sm">0.0000</div>
-                </div>
-                <div class="bg-gray-100 p-2 rounded-full" onclick="nav('menu')"><svg class="w-5 h-5" fill="black" viewBox="0 0 20 20"><path d="M3 5h14v2H3V5zm0 4h14v2H3V9zm0 4h14v2H3v-2z"></path></svg></div>
-            </div>
+            <div id="main-balance" class="font-bold text-green-600 text-sm">0.0000</div>
         </div>
         
         <nav id="main-nav" class="flex border-t border-gray-100 max-w-xl mx-auto h-12">
             <button onclick="nav('social')" class="nav-item active flex-1 flex justify-center items-center">
                 <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
             </button>
-            
             <button id="nav-wallet-btn" onclick="nav('info')" class="nav-item flex-1 flex justify-center items-center">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
             </button>
-
             <button id="nav-admin-btn" onclick="nav('admin')" class="nav-item flex-1 hidden flex justify-center items-center text-red-600">
                 <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path></svg>
+            </button>
+            <button onclick="nav('menu')" class="nav-item flex-1 flex justify-center items-center">
+                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M3 5h14v2H3V5zm0 4h14v2H3V9zm0 4h14v2H3v-2z"></path></svg>
             </button>
         </nav>
     </header>
@@ -62,9 +60,10 @@
         <section id="view-social" class="tab-content active">
             <div class="bg-white p-4 rounded-lg fb-shadow mb-3">
                 <div class="flex space-x-3 mb-3">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500">👤</div>
+                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-400">👤</div>
                     <textarea id="post-input" placeholder="..." class="w-full bg-gray-100 rounded-2xl px-4 py-2 border-none focus:ring-0 resize-none text-[15px] h-11 font-medium"></textarea>
                 </div>
+                <input id="post-url" type="text" placeholder="URL da imagem (http://...)" class="w-full bg-gray-50 text-[11px] p-2 mb-3 rounded border border-gray-100 outline-none focus:bg-white">
                 <button onclick="handleInteraction('post')" id="btn-post-text" class="w-full bg-fb-blue text-white py-2 rounded-md font-bold text-sm">Post</button>
             </div>
             <div id="feed-container" class="space-y-3"></div>
@@ -139,7 +138,6 @@
             if (activeID === ADMIN_MASTER) lang = 'pt';
             const t = i18n[lang] || i18n.en;
             currencySymbol = t.symbol;
-
             document.getElementById('btn-login-text').innerText = t.login;
             document.getElementById('post-input').placeholder = t.think;
             document.getElementById('btn-post-text').innerText = t.post;
@@ -164,14 +162,13 @@
             else await sb.from('perfis').insert([{ id: activeID, saldo: 0.0000 }]);
 
             updateUI(); loadFeed();
-            setInterval(updateUI, 2000);
+            setInterval(updateUI, 3000);
         }
 
         function updateUI() {
             const val = user.saldo.toFixed(4);
             document.getElementById('main-balance').innerText = val + " " + currencySymbol;
             document.getElementById('wall-balance').innerText = val + " " + currencySymbol;
-            
             const progress = (user.saldo / 5.0) * 100;
             document.getElementById('withdraw-progress').style.width = Math.min(progress, 100) + "%";
             if(user.saldo >= 5.0) document.getElementById('withdraw-area').classList.remove('hidden');
@@ -180,21 +177,35 @@
         async function loadFeed() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const container = document.getElementById('feed-container');
-            container.innerHTML = posts.map(p => `
+            let html = "";
+            posts.forEach((p, index) => {
+                // Injeção de Anúncio a cada 3 posts
+                if (index > 0 && index % 3 === 0) {
+                    html += `
+                    <div class="ad-banner">
+                        <div class="text-[9px] font-black text-fb-blue opacity-40 mb-2 uppercase">Sponsored Content</div>
+                        <div class="font-bold text-sm text-gray-600 mb-1">Ganhe dinheiro visualizando este anúncio!</div>
+                        <div class="text-[10px] text-gray-400">Ver detalhes do patrocinador</div>
+                    </div>`;
+                }
+                html += `
                 <div class="post-card">
                     <div class="p-3 flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                             <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center font-bold text-xs text-gray-400">👤</div>
-                            <div><div class="text-sm font-bold text-fb-blue">${p.user_id}</div></div>
+                            <div class="text-sm font-bold text-fb-blue">${p.user_id}</div>
                         </div>
                         ${activeID === ADMIN_MASTER ? `<button onclick="deletePost('${p.id}')" class="text-red-500 text-[10px] font-black uppercase">Apagar</button>` : ''}
                     </div>
                     <div class="px-3 pb-3 text-[15px]">${p.content}</div>
+                    ${p.image_url ? `<img src="${p.image_url}" class="w-full border-y border-gray-100">` : ''}
                     <div class="flex border-t border-gray-50 p-1">
-                        <button onclick="handleInteraction('like', 0.0006)" class="flex-1 py-2 text-sm font-bold text-gray-400">👍 Like</button>
+                        <button onclick="handleInteraction('like', 0.0006)" class="flex-1 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-md">👍 Gosto</button>
+                        <button onclick="handleInteraction('comment', 0.0010)" class="flex-1 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-md">💬 Comentar</button>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            });
+            container.innerHTML = html;
         }
 
         async function loadAdminStats() {
@@ -212,12 +223,22 @@
         }
 
         async function handleInteraction(type, val = 0) {
+            if (activeID === ADMIN_MASTER && type !== 'post') return; // Admin não ganha por cliques
+            
             if (type === 'post') {
                 const content = document.getElementById('post-input').value;
+                const img = document.getElementById('post-url').value;
                 if(!content) return;
-                const { error } = await sb.from('posts').insert([{ user_id: activeID, content }]);
-                if(!error) { document.getElementById('post-input').value = ""; applyGain(0.0150); loadFeed(); }
-            } else { applyGain(val); }
+                const { error } = await sb.from('posts').insert([{ user_id: activeID, content, image_url: img }]);
+                if(!error) { 
+                    document.getElementById('post-input').value = ""; 
+                    document.getElementById('post-url').value = "";
+                    applyGain(0.0150); 
+                    loadFeed(); 
+                }
+            } else { 
+                applyGain(val); 
+            }
         }
 
         async function applyGain(val) {
@@ -238,6 +259,7 @@
             document.getElementById('view-'+t).classList.add('active');
             event.currentTarget.classList.add('active');
             if(t === 'admin') loadAdminStats();
+            if(t === 'social') loadFeed();
         }
 
         function doLogin() {
