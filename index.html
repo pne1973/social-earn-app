@@ -3,116 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Network v33.12</title>
+    <title>Social Network v33.12 - Economy Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #F0F2F5; color: #1C1E21; -webkit-tap-highlight-color: transparent; }
-        .fb-shadow { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #F0F2F5; color: #1C1E21; }
         .fb-blue { color: #1877F2; }
         .bg-fb-blue { background-color: #1877F2; }
-        .nav-item { position: relative; color: #65676B; transition: all 0.2s; cursor: pointer; }
+        .nav-item { position: relative; color: #65676B; cursor: pointer; }
         .nav-item.active { color: #1877F2; }
         .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: #1877F2; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; display: none; animation: popUp 0.8s forwards; }
-        @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
         .post-card { background: white; border-radius: 8px; border: 1px solid #dddfe2; margin-bottom: 12px; }
-        .ad-banner { background: #fdfdfd; border: 1px dashed #1877F2; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 12px; }
+        
+        /* Modal de Anúncio */
+        #ad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 20px; text-align: center; }
+        #ad-timer { font-size: 3rem; font-weight: 900; color: #1877F2; margin: 20px 0; }
+        
+        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9000; pointer-events: none; display: none; animation: popUp 0.8s forwards; }
+        @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
     </style>
 </head>
 <body class="pb-16">
 
+    <div id="ad-overlay">
+        <h2 class="text-xl font-bold mb-2">Anúncio Patrocinado</h2>
+        <p class="text-sm opacity-70">Visualiza para manter os teus ganhos a 100%</p>
+        <div id="ad-timer">15</div>
+        <div class="w-full max-w-xs bg-gray-800 h-2 rounded-full overflow-hidden mb-6">
+            <div id="ad-progress" class="bg-fb-blue h-full w-0"></div>
+        </div>
+        <button id="skip-ad-btn" onclick="degradeGains()" class="hidden text-xs text-gray-400 underline">Recusar e reduzir ganhos (0.5x)</button>
+    </div>
+
     <div id="auth-screen" class="fixed inset-0 bg-white z-[6000] flex flex-col items-center justify-center p-6" style="display:none;">
         <h1 class="text-4xl font-bold fb-blue mb-8 tracking-tighter">Social Network</h1>
         <input type="text" id="login-id" placeholder="User ID" class="w-full max-w-xs border border-gray-300 rounded-xl p-4 mb-4 outline-none focus:border-blue-500 font-semibold bg-gray-50">
-        <button onclick="doLogin()" id="btn-login-text" class="w-full max-w-xs bg-fb-blue text-white font-bold py-3 rounded-xl shadow-lg text-lg">Login</button>
+        <button onclick="doLogin()" class="w-full max-w-xs bg-fb-blue text-white font-bold py-3 rounded-xl shadow-lg text-lg">Entrar</button>
     </div>
 
     <div id="floating-earning"><div class="text-4xl font-black text-green-500" id="earning-val">+0.0000</div></div>
 
-    <header class="sticky top-0 z-50 bg-white fb-shadow">
-        <div class="bg-blue-50 py-1 text-center text-[9px] font-bold text-fb-blue border-b border-blue-100 uppercase tracking-widest">Sponsored Advertisement</div>
+    <header class="sticky top-0 z-50 bg-white shadow-sm">
         <div class="max-w-xl mx-auto flex items-center justify-between px-4 h-14">
             <h1 class="text-2xl font-bold fb-blue tracking-tighter">Social Network</h1>
-            <div id="main-balance" class="font-bold text-green-600 text-sm">0.0000</div>
+            <div class="flex flex-col items-end">
+                <div id="main-balance" class="font-bold text-green-600 text-sm">0.0000 €</div>
+                <div id="multiplier-tag" class="text-[9px] font-black uppercase text-blue-500">Modo Normal 1.0x</div>
+            </div>
         </div>
-        
-        <nav id="main-nav" class="flex border-t border-gray-100 max-w-xl mx-auto h-12">
-            <button onclick="nav('social')" class="nav-item active flex-1 flex justify-center items-center">
-                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
-            </button>
-            <button id="nav-wallet-btn" onclick="nav('info')" class="nav-item flex-1 flex justify-center items-center">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-            </button>
-            <button id="nav-admin-btn" onclick="nav('admin')" class="nav-item flex-1 hidden flex justify-center items-center text-red-600">
-                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path></svg>
-            </button>
-            <button onclick="nav('menu')" class="nav-item flex-1 flex justify-center items-center">
-                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M3 5h14v2H3V5zm0 4h14v2H3V9zm0 4h14v2H3v-2z"></path></svg>
-            </button>
+        <nav class="flex border-t border-gray-100 max-w-xl mx-auto h-12">
+            <button onclick="nav('social')" class="nav-item active flex-1 flex justify-center items-center"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg></button>
+            <button id="nav-wallet-btn" onclick="nav('info')" class="nav-item flex-1 flex justify-center items-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></button>
+            <button id="nav-admin-btn" onclick="nav('admin')" class="nav-item flex-1 hidden flex justify-center items-center text-red-600"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path></svg></button>
+            <button onclick="nav('menu')" class="nav-item flex-1 flex justify-center items-center"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M3 5h14v2H3V5zm0 4h14v2H3V9zm0 4h14v2H3v-2z"></path></svg></button>
         </nav>
     </header>
 
     <main class="max-w-xl mx-auto p-3">
         <section id="view-social" class="tab-content active">
-            <div class="bg-white p-4 rounded-lg fb-shadow mb-3">
-                <div class="flex space-x-3 mb-3">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-400">👤</div>
-                    <textarea id="post-input" placeholder="..." class="w-full bg-gray-100 rounded-2xl px-4 py-2 border-none focus:ring-0 resize-none text-[15px] h-11 font-medium"></textarea>
-                </div>
-                <input id="post-url" type="text" placeholder="URL da imagem (http://...)" class="w-full bg-gray-50 text-[11px] p-2 mb-3 rounded border border-gray-100 outline-none focus:bg-white">
-                <button onclick="handleInteraction('post')" id="btn-post-text" class="w-full bg-fb-blue text-white py-2 rounded-md font-bold text-sm">Post</button>
+            <div class="bg-white p-4 rounded-lg shadow-sm mb-3">
+                <textarea id="post-input" placeholder="No que estás a pensar?" class="w-full bg-gray-100 rounded-xl p-3 resize-none h-12 mb-2 outline-none text-sm"></textarea>
+                <input id="post-url" type="text" placeholder="URL da imagem (opcional)" class="w-full bg-gray-50 text-[10px] p-2 mb-2 rounded border border-gray-100 outline-none">
+                <button onclick="handleInteraction('post')" class="w-full bg-fb-blue text-white py-2 rounded-md font-bold text-sm">Publicar (+0.0150€)</button>
             </div>
-            <div id="feed-container" class="space-y-3"></div>
+            <div id="feed-container"></div>
         </section>
 
         <section id="view-info" class="tab-content">
-            <div class="bg-white p-6 rounded-lg fb-shadow text-center">
-                <h3 id="wallet-title" class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Balance</h3>
-                <h2 id="wall-balance" class="text-5xl font-black fb-blue mb-6">0.0000</h2>
+            <div class="bg-white p-8 rounded-lg shadow-sm text-center">
+                <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Saldo Total</h3>
+                <h2 id="wall-balance" class="text-5xl font-black fb-blue mb-6">0.0000 €</h2>
                 <div id="withdraw-area" class="hidden">
-                    <input id="pp-email" type="email" placeholder="PayPal Email" class="w-full border-2 border-fb-blue p-4 rounded-xl mb-3 text-center font-bold">
-                    <button onclick="requestWithdraw()" id="btn-withdraw-text" class="w-full bg-fb-blue text-white py-4 rounded-xl font-bold">Withdraw</button>
+                    <input id="pp-email" type="email" placeholder="Email PayPal" class="w-full border-2 border-fb-blue p-4 rounded-xl mb-3 text-center font-bold">
+                    <button class="w-full bg-fb-blue text-white py-4 rounded-xl font-bold">Solicitar Levantamento</button>
                 </div>
                 <div id="progress-container">
-                    <div class="w-full bg-gray-200 h-3 rounded-full mb-3 overflow-hidden">
-                        <div id="withdraw-progress" class="bg-fb-blue h-full w-0 transition-all duration-700"></div>
-                    </div>
-                    <p id="min-withdraw-text" class="text-[10px] text-gray-500 font-bold uppercase">Min: 5.0000</p>
+                    <div class="w-full bg-gray-200 h-3 rounded-full mb-2 overflow-hidden"><div id="withdraw-progress" class="bg-fb-blue h-full w-0 transition-all"></div></div>
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Mínimo: 5.0000€</p>
                 </div>
             </div>
         </section>
 
         <section id="view-admin" class="tab-content">
-            <div class="bg-white rounded-xl fb-shadow p-4 border-l-4 border-red-600 mb-4">
-                <h2 class="text-red-600 font-black text-lg mb-4 uppercase">Gestão Administrativa</h2>
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="bg-gray-100 p-4 rounded-xl text-center">
-                        <div class="text-[10px] uppercase font-bold opacity-50 text-gray-500">Utilizadores</div>
-                        <div id="adm-total-users" class="text-2xl font-black">0</div>
-                    </div>
-                    <div class="bg-gray-100 p-4 rounded-xl text-center">
-                        <div class="text-[10px] uppercase font-bold opacity-50 text-gray-500">Publicações</div>
-                        <div id="adm-total-posts" class="text-2xl font-black">0</div>
-                    </div>
-                </div>
-                <div id="adm-user-list" class="divide-y divide-gray-100 bg-gray-50 rounded-xl overflow-hidden"></div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-600">
+                <h2 class="text-red-600 font-black mb-4">ADMIN PANEL</h2>
+                <div id="adm-stats" class="grid grid-cols-2 gap-2 mb-4"></div>
+                <div id="adm-user-list" class="space-y-2"></div>
             </div>
         </section>
 
         <section id="view-menu" class="tab-content">
-            <div class="space-y-3">
-                <div class="bg-white p-4 rounded-lg fb-shadow flex items-center space-x-3">
-                    <div class="w-12 h-12 bg-fb-blue rounded-full flex items-center justify-center text-white text-xl">👤</div>
-                    <div class="font-bold" id="menu-user-id">ID: ---</div>
-                </div>
-                <button onclick="localStorage.clear(); location.reload();" id="btn-logout-text" class="w-full bg-white p-4 rounded-lg fb-shadow text-red-600 font-bold flex items-center space-x-3">
-                    <span>🚪</span><span>Logout</span>
-                </button>
-            </div>
+            <button onclick="localStorage.clear(); location.reload();" class="w-full bg-white p-4 rounded-lg shadow-sm text-red-600 font-bold">Sair da Conta</button>
         </section>
     </main>
 
@@ -123,128 +107,102 @@
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
         let activeID = localStorage.getItem('apex_uid');
-        let user = { saldo: 0 };
-        let currencySymbol = "€";
-
-        const i18n = {
-            pt: { login: "Entrar", post: "Publicar", think: "No que estás a pensar?", wallet: "Saldo em Carteira", withdraw: "Levantar Dinheiro", min: "Mínimo: 5.0000", logout: "Terminar Sessão", symbol: "€" },
-            en: { login: "Login", post: "Post", think: "What's on your mind?", wallet: "Wallet Balance", withdraw: "Withdraw", min: "Min: 5.0000", logout: "Logout", symbol: "$" },
-            fr: { login: "Connexion", post: "Publier", think: "À quoi pensez-vous?", wallet: "Solde", withdraw: "Retirer", min: "Min: 5.0000", logout: "Déconnexion", symbol: "€" },
-            es: { login: "Entrar", post: "Publicar", think: "¿En qué estás pensando?", wallet: "Saldo", withdraw: "Retirar", min: "Mín: 5.0000", logout: "Cerrar Sesión", symbol: "€" }
-        };
-
-        function setLang() {
-            let lang = navigator.language.split('-')[0];
-            if (activeID === ADMIN_MASTER) lang = 'pt';
-            const t = i18n[lang] || i18n.en;
-            currencySymbol = t.symbol;
-            document.getElementById('btn-login-text').innerText = t.login;
-            document.getElementById('post-input').placeholder = t.think;
-            document.getElementById('btn-post-text').innerText = t.post;
-            document.getElementById('wallet-title').innerText = t.wallet;
-            document.getElementById('btn-withdraw-text').innerText = t.withdraw;
-            document.getElementById('min-withdraw-text').innerText = t.min;
-            document.getElementById('btn-logout-text').lastElementChild.innerText = t.logout;
-        }
+        let user = { saldo: 0, interactions: 0, multiplier: 1.0 };
 
         async function init() {
             if (!activeID) { document.getElementById('auth-screen').style.display = 'flex'; return; }
-            setLang();
-            document.getElementById('menu-user-id').innerText = "ID: " + activeID;
-            
-            if(activeID === ADMIN_MASTER) {
-                document.getElementById('nav-admin-btn').classList.remove('hidden');
-                document.getElementById('nav-wallet-btn').classList.add('hidden');
-            }
+            if(activeID === ADMIN_MASTER) document.getElementById('nav-admin-btn').classList.remove('hidden');
 
             const { data } = await sb.from('perfis').select('*').eq('id', activeID).single();
-            if(data) user.saldo = Number(data.saldo) || 0;
-            else await sb.from('perfis').insert([{ id: activeID, saldo: 0.0000 }]);
-
+            if(data) {
+                user.saldo = Number(data.saldo) || 0;
+                user.multiplier = data.multiplier || 1.0;
+            } else {
+                await sb.from('perfis').insert([{ id: activeID, saldo: 0, multiplier: 1.0 }]);
+            }
             updateUI(); loadFeed();
             setInterval(updateUI, 3000);
         }
 
         function updateUI() {
-            const val = user.saldo.toFixed(4);
-            document.getElementById('main-balance').innerText = val + " " + currencySymbol;
-            document.getElementById('wall-balance').innerText = val + " " + currencySymbol;
-            const progress = (user.saldo / 5.0) * 100;
-            document.getElementById('withdraw-progress').style.width = Math.min(progress, 100) + "%";
-            if(user.saldo >= 5.0) document.getElementById('withdraw-area').classList.remove('hidden');
-        }
-
-        async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const container = document.getElementById('feed-container');
-            let html = "";
-            posts.forEach((p, index) => {
-                // Injeção de Anúncio a cada 3 posts
-                if (index > 0 && index % 3 === 0) {
-                    html += `
-                    <div class="ad-banner">
-                        <div class="text-[9px] font-black text-fb-blue opacity-40 mb-2 uppercase">Sponsored Content</div>
-                        <div class="font-bold text-sm text-gray-600 mb-1">Ganhe dinheiro visualizando este anúncio!</div>
-                        <div class="text-[10px] text-gray-400">Ver detalhes do patrocinador</div>
-                    </div>`;
-                }
-                html += `
-                <div class="post-card">
-                    <div class="p-3 flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center font-bold text-xs text-gray-400">👤</div>
-                            <div class="text-sm font-bold text-fb-blue">${p.user_id}</div>
-                        </div>
-                        ${activeID === ADMIN_MASTER ? `<button onclick="deletePost('${p.id}')" class="text-red-500 text-[10px] font-black uppercase">Apagar</button>` : ''}
-                    </div>
-                    <div class="px-3 pb-3 text-[15px]">${p.content}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="w-full border-y border-gray-100">` : ''}
-                    <div class="flex border-t border-gray-50 p-1">
-                        <button onclick="handleInteraction('like', 0.0006)" class="flex-1 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-md">👍 Gosto</button>
-                        <button onclick="handleInteraction('comment', 0.0010)" class="flex-1 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-md">💬 Comentar</button>
-                    </div>
-                </div>`;
-            });
-            container.innerHTML = html;
-        }
-
-        async function loadAdminStats() {
-            const { data: users } = await sb.from('perfis').select('*');
-            const { count: postCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
-            document.getElementById('adm-total-users').innerText = users.length;
-            document.getElementById('adm-total-posts').innerText = postCount;
-            const list = document.getElementById('adm-user-list');
-            list.innerHTML = users.map(u => `
-                <div class="p-4 flex justify-between items-center bg-white border-b">
-                    <div><div class="font-bold text-xs opacity-40">${u.id}</div><div class="text-fb-blue font-black text-sm">${Number(u.saldo).toFixed(4)}€</div></div>
-                    <button class="bg-gray-100 text-[9px] font-black p-2 rounded">GERIR</button>
-                </div>
-            `).join('');
-        }
-
-        async function handleInteraction(type, val = 0) {
-            if (activeID === ADMIN_MASTER && type !== 'post') return; // Admin não ganha por cliques
+            document.getElementById('main-balance').innerText = user.saldo.toFixed(4) + " €";
+            document.getElementById('wall-balance').innerText = user.saldo.toFixed(4) + " €";
+            document.getElementById('multiplier-tag').innerText = user.multiplier === 1 ? "Modo Normal 1.0x" : "Ganhos Reduzidos 0.5x";
+            document.getElementById('multiplier-tag').className = user.multiplier === 1 ? "text-[9px] font-black uppercase text-blue-500" : "text-[9px] font-black uppercase text-red-500";
             
-            if (type === 'post') {
-                const content = document.getElementById('post-input').value;
-                const img = document.getElementById('post-url').value;
-                if(!content) return;
-                const { error } = await sb.from('posts').insert([{ user_id: activeID, content, image_url: img }]);
-                if(!error) { 
-                    document.getElementById('post-input').value = ""; 
-                    document.getElementById('post-url').value = "";
-                    applyGain(0.0150); 
-                    loadFeed(); 
+            const prog = (user.saldo / 5) * 100;
+            document.getElementById('withdraw-progress').style.width = Math.min(prog, 100) + "%";
+            if(user.saldo >= 5) document.getElementById('withdraw-area').classList.remove('hidden');
+        }
+
+        async function handleInteraction(type, baseVal = 0) {
+            if(activeID !== ADMIN_MASTER) {
+                user.interactions++;
+                // Lógica de Anúncio: 3 posts ou 2 interações (likes/comments)
+                if((type === 'post' && user.interactions >= 3) || (type !== 'post' && user.interactions >= 2)) {
+                    triggerAdFlow();
+                    return;
                 }
-            } else { 
-                applyGain(val); 
             }
+
+            let gain = 0;
+            if(type === 'post') {
+                const content = document.getElementById('post-input').value;
+                if(!content) return;
+                await sb.from('posts').insert([{ user_id: activeID, content, image_url: document.getElementById('post-url').value }]);
+                gain = 0.0150;
+                document.getElementById('post-input').value = "";
+                loadFeed();
+            } else if(type === 'like') gain = 0.0006;
+            else if(type === 'comment') gain = 0.0010;
+            else if(type === 'share') gain = 0.0020;
+
+            applyGain(gain);
+        }
+
+        function triggerAdFlow() {
+            const overlay = document.getElementById('ad-overlay');
+            const timerTxt = document.getElementById('ad-timer');
+            const progress = document.getElementById('ad-progress');
+            const skipBtn = document.getElementById('skip-ad-btn');
+            
+            overlay.style.display = 'flex';
+            let timeLeft = 15;
+            skipBtn.classList.add('hidden');
+
+            const interval = setInterval(() => {
+                timeLeft--;
+                timerTxt.innerText = timeLeft;
+                progress.style.width = ((15 - timeLeft) / 15 * 100) + "%";
+                
+                if(timeLeft <= 10) skipBtn.classList.remove('hidden');
+                
+                if(timeLeft <= 0) {
+                    clearInterval(interval);
+                    overlay.style.display = 'none';
+                    user.interactions = 0; // Reset contador
+                    user.multiplier = 1.0;
+                    saveUserData();
+                }
+            }, 1000);
+        }
+
+        async function degradeGains() {
+            user.multiplier = 0.5;
+            user.interactions = 0;
+            document.getElementById('ad-overlay').style.display = 'none';
+            saveUserData();
         }
 
         async function applyGain(val) {
-            user.saldo = Number((user.saldo + val).toFixed(4));
-            showBigNumber(val);
-            await sb.from('perfis').upsert({ id: activeID, saldo: user.saldo });
+            const finalGain = val * user.multiplier;
+            user.saldo += finalGain;
+            showBigNumber(finalGain);
+            saveUserData();
+        }
+
+        async function saveUserData() {
+            await sb.from('perfis').upsert({ id: activeID, saldo: user.saldo, multiplier: user.multiplier });
         }
 
         function showBigNumber(val) {
@@ -254,21 +212,36 @@
             setTimeout(() => c.style.display = 'none', 800);
         }
 
+        async function loadFeed() {
+            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            const container = document.getElementById('feed-container');
+            container.innerHTML = posts.map(p => `
+                <div class="post-card">
+                    <div class="p-3 flex items-center justify-between">
+                        <div class="font-bold text-fb-blue text-sm">${p.user_id}</div>
+                        ${activeID === ADMIN_MASTER ? `<button onclick="deletePost('${p.id}')" class="text-red-500 text-[10px]">Apagar</button>` : ''}
+                    </div>
+                    <div class="px-3 pb-2 text-sm">${p.content}</div>
+                    ${p.image_url ? `<img src="${p.image_url}" class="w-full">` : ''}
+                    <div class="flex border-t border-gray-50">
+                        <button onclick="handleInteraction('like')" class="flex-1 py-2 text-xs font-bold text-gray-500">👍 Like</button>
+                        <button onclick="handleInteraction('comment')" class="flex-1 py-2 text-xs font-bold text-gray-500">💬 Comentar</button>
+                        <button onclick="handleInteraction('share')" class="flex-1 py-2 text-xs font-bold text-gray-500">🔗 Partilhar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         function nav(t) {
             document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
             document.getElementById('view-'+t).classList.add('active');
             event.currentTarget.classList.add('active');
-            if(t === 'admin') loadAdminStats();
             if(t === 'social') loadFeed();
         }
 
         function doLogin() {
             const id = document.getElementById('login-id').value.trim();
             if(id) { localStorage.setItem('apex_uid', id); location.reload(); }
-        }
-
-        async function deletePost(id) {
-            if(confirm('Eliminar?')) { await sb.from('posts').delete().eq('id', id); loadFeed(); }
         }
 
         init();
