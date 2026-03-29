@@ -52,12 +52,15 @@
             <button onclick="nav('social')" class="nav-item active flex-1 flex justify-center items-center">
                 <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
             </button>
-            <button onclick="nav('friends')" class="nav-item flex-1 flex justify-center items-center">
+            
+            <button id="nav-friends-btn" onclick="nav('friends')" class="nav-item flex-1 flex justify-center items-center">
                 <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a7 7 0 00-7 7v1h12v-1a7 7 0 00-7-7z"></path></svg>
             </button>
-            <button onclick="nav('info')" class="nav-item flex-1 flex justify-center items-center">
+            
+            <button id="nav-wallet-btn" onclick="nav('info')" class="nav-item flex-1 flex justify-center items-center">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
             </button>
+
             <button id="nav-admin-btn" onclick="nav('admin')" class="nav-item flex-1 hidden flex justify-center items-center text-red-600">
                 <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path></svg>
             </button>
@@ -65,7 +68,6 @@
     </header>
 
     <main class="max-w-xl mx-auto p-3">
-        
         <section id="view-social" class="tab-content active">
             <div class="bg-white p-4 rounded-lg fb-shadow mb-3">
                 <div class="flex space-x-3 mb-3">
@@ -105,7 +107,7 @@
 
         <section id="view-admin" class="tab-content">
             <div class="bg-white rounded-xl fb-shadow p-4 border-l-4 border-red-600 mb-4">
-                <h2 class="text-red-600 font-black text-lg mb-4">BUSINESS INTELLIGENCE</h2>
+                <h2 class="text-red-600 font-black text-lg mb-4">ADMIN DASHBOARD</h2>
                 <div class="grid grid-cols-2 gap-3 mb-6">
                     <div class="bg-gray-100 p-4 rounded-xl text-center">
                         <div class="text-[10px] uppercase font-bold opacity-50">Usuários</div>
@@ -116,11 +118,6 @@
                         <div id="adm-total-posts" class="text-2xl font-black">0</div>
                     </div>
                 </div>
-                <div class="bg-green-50 p-4 rounded-xl mb-6 border border-green-100">
-                    <div class="text-[10px] uppercase font-bold text-green-600">Dívida Total (Soma de Saldos)</div>
-                    <div id="adm-total-debt" class="text-2xl font-black text-green-700">0.0000€</div>
-                </div>
-                <div class="font-bold text-sm mb-2 uppercase opacity-50">Gestão de Contas</div>
                 <div id="adm-user-list" class="divide-y divide-gray-100 bg-gray-50 rounded-xl overflow-hidden"></div>
             </div>
         </section>
@@ -131,8 +128,8 @@
                     <div class="w-12 h-12 bg-fb-blue rounded-full flex items-center justify-center text-white text-xl">👤</div>
                     <div><div class="font-bold" id="menu-user-id">---</div><div class="text-xs text-gray-500">Ver perfil</div></div>
                 </div>
-                <button onclick="localStorage.clear(); location.reload();" class="w-full bg-white p-4 rounded-lg fb-shadow text-red-600 font-bold flex items-center space-x-3 hover:bg-red-50 transition">
-                    <span>🚪</span><span>Terminar Sessão</span>
+                <button onclick="localStorage.clear(); location.reload();" class="w-full bg-white p-4 rounded-lg fb-shadow text-red-600 font-bold flex items-center space-x-3">
+                    <span>🚪</span><span>Sair da Conta</span>
                 </button>
             </div>
         </section>
@@ -149,37 +146,33 @@
 
         async function init() {
             if (!activeID) { document.getElementById('auth-screen').style.display = 'flex'; return; }
-            document.getElementById('display-uid' && 'menu-user-id').innerText = "ID: " + activeID;
+            document.getElementById('menu-user-id').innerText = "ID: " + activeID;
             
-            // Ativa aba Admin se for o Master
+            // LÓGICA DE VISIBILIDADE DE ABAS PARA ADMIN
             if(activeID === ADMIN_MASTER) {
                 document.getElementById('nav-admin-btn').classList.remove('hidden');
+                document.getElementById('nav-friends-btn').classList.add('hidden');
+                document.getElementById('nav-wallet-btn').classList.add('hidden');
             }
 
             const { data } = await sb.from('perfis').select('*').eq('id', activeID).single();
             if(data) user.saldo = Number(data.saldo) || 0;
             else await sb.from('perfis').insert([{ id: activeID, saldo: 0.0000 }]);
 
-            updateUI(); 
-            loadFeed();
-            loadFriends();
+            updateUI(); loadFeed(); loadFriends();
             setInterval(updateUI, 2000);
         }
 
         function updateUI() {
             const cur = user.saldo;
-            const brl = cur * 6.1245;
             document.getElementById('main-eur').innerText = cur.toFixed(4) + "€";
             document.getElementById('wall-eur').innerText = cur.toFixed(4) + "€";
-            document.getElementById('main-brl').innerText = brl.toFixed(4) + " BRL";
-            document.getElementById('wall-brl-sub').innerText = brl.toFixed(4) + " BRL";
+            document.getElementById('main-brl').innerText = (cur * 6.1245).toFixed(4) + " BRL";
+            document.getElementById('wall-brl-sub').innerText = (cur * 6.1245).toFixed(4) + " BRL";
             
             const progress = (cur / 5.0) * 100;
             document.getElementById('withdraw-progress').style.width = Math.min(progress, 100) + "%";
-            if(cur >= 5.0) {
-                document.getElementById('withdraw-area').classList.remove('hidden');
-                document.getElementById('progress-container').classList.add('hidden');
-            }
+            if(cur >= 5.0) document.getElementById('withdraw-area').classList.remove('hidden');
         }
 
         async function loadFeed() {
@@ -190,7 +183,7 @@
                     <div class="p-3 flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                             <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center font-bold text-xs text-gray-400">👤</div>
-                            <div><div class="text-sm font-bold text-fb-blue">${p.user_id}</div><div class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Publicado agora</div></div>
+                            <div><div class="text-sm font-bold text-fb-blue">${p.user_id}</div><div class="text-[10px] text-gray-400 font-bold uppercase">Online</div></div>
                         </div>
                         ${activeID === ADMIN_MASTER ? `<button onclick="deletePost('${p.id}')" class="text-red-500 text-[10px] font-black uppercase">Eliminar</button>` : ''}
                     </div>
@@ -205,40 +198,26 @@
         }
 
         async function loadFriends() {
-            const { data: users } = await sb.from('perfis').select('id').limit(15);
+            const { data: users } = await sb.from('perfis').select('id').limit(10);
             const container = document.getElementById('friends-list');
-            container.innerHTML = users.map(u => `
+            if(container) container.innerHTML = users.map(u => `
                 <div class="flex items-center justify-between py-2">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-400">👤</div>
-                        <div class="font-bold text-sm">${u.id}</div>
-                    </div>
+                    <div class="flex items-center space-x-3"><div class="w-12 h-12 bg-gray-200 rounded-full"></div><div class="font-bold text-sm">${u.id}</div></div>
                     <button class="bg-fb-blue text-white px-4 py-1.5 rounded-lg font-bold text-xs">Adicionar</button>
                 </div>
             `).join('');
         }
 
         async function loadAdminStats() {
-            if(activeID !== ADMIN_MASTER) return;
             const { data: users } = await sb.from('perfis').select('*');
             const { count: postCount } = await sb.from('posts').select('*', { count: 'exact', head: true });
-            
-            let totalDebt = users.reduce((acc, u) => acc + Number(u.saldo), 0);
-            
             document.getElementById('adm-total-users').innerText = users.length;
             document.getElementById('adm-total-posts').innerText = postCount;
-            document.getElementById('adm-total-debt').innerText = totalDebt.toFixed(4) + "€";
-
             const list = document.getElementById('adm-user-list');
             list.innerHTML = users.map(u => `
-                <div class="p-4 flex justify-between items-center bg-white">
-                    <div>
-                        <div class="font-bold text-[10px] opacity-50">${u.id}</div>
-                        <div class="text-fb-blue font-black text-sm">${Number(u.saldo).toFixed(4)}€</div>
-                    </div>
-                    <div class="flex space-x-2">
-                         <button onclick="banUser('${u.id}')" class="bg-red-100 text-red-600 text-[9px] font-black p-2 rounded uppercase">Banir</button>
-                    </div>
+                <div class="p-4 flex justify-between items-center bg-white border-b">
+                    <div><div class="font-bold text-xs">${u.id}</div><div class="text-fb-blue font-black text-sm">${Number(u.saldo).toFixed(4)}€</div></div>
+                    <button class="bg-red-100 text-red-600 text-[9px] font-black p-2 rounded uppercase">Gerir</button>
                 </div>
             `).join('');
         }
@@ -249,12 +228,7 @@
                 const url = document.getElementById('post-url').value;
                 if(!content) return;
                 const { error } = await sb.from('posts').insert([{ user_id: activeID, content, image_url: url }]);
-                if(!error) {
-                    document.getElementById('post-input').value = "";
-                    document.getElementById('post-url').value = "";
-                    applyGain(0.0150);
-                    loadFeed();
-                }
+                if(!error) { document.getElementById('post-input').value = ""; applyGain(0.0150); loadFeed(); }
             } else { applyGain(val); }
         }
 
@@ -276,7 +250,6 @@
             document.getElementById('view-'+t).classList.add('active');
             event.currentTarget.classList.add('active');
             if(t === 'admin') loadAdminStats();
-            if(t === 'social') loadFeed();
         }
 
         function doLogin() {
@@ -285,10 +258,7 @@
         }
 
         async function deletePost(id) {
-            if(confirm('Apagar permanentemente?')) {
-                await sb.from('posts').delete().eq('id', id);
-                loadFeed();
-            }
+            if(confirm('Eliminar post?')) { await sb.from('posts').delete().eq('id', id); loadFeed(); }
         }
 
         init();
