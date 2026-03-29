@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Network v33.12 - Lateral UI</title>
+    <title>Social Network v33.12 - Wide UI</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
@@ -21,21 +21,21 @@
         .tab-pane { display: none; }
         .tab-pane.active { display: block; }
 
-        /* Card com Interação Lateral */
+        /* Card Alargado com Interação Lateral Compacta */
         .post-card { background: white; border: 1px solid #dadce0; border-radius: 16px; margin-bottom: 12px; position: relative; overflow: hidden; display: flex; }
-        .post-body { flex: 1; padding: 16px; padding-right: 60px; } /* Espaço para a lateral */
+        .post-body { flex: 1; padding: 16px; padding-right: 55px; } /* Espaço otimizado */
         
         .side-actions { 
-            position: absolute; right: 0; top: 0; bottom: 0; width: 60px; 
+            position: absolute; right: 0; top: 0; bottom: 0; width: 50px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            gap: 20px; background: rgba(248, 249, 250, 0.5); border-left: 1px solid #f1f3f4;
+            gap: 15px; background: rgba(255, 255, 255, 0.8); border-left: 1px solid #f8f9fa;
         }
         
         .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .icon-circle { width: 35px; height: 35px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #dadce0; font-size: 16px; margin-bottom: 4px; }
-        .action-label { font-size: 9px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
+        .icon-circle { width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #f1f3f4; font-size: 14px; margin-bottom: 2px; }
+        .action-label { font-size: 8px; font-weight: 900; color: #70757a; text-transform: uppercase; }
 
-        /* Navegação */
+        /* Navegação Inferior */
         nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 2000; }
         .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9aa0a6; cursor: pointer; }
         .nav-link.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); }
@@ -63,7 +63,7 @@
             <textarea id="p-content" placeholder="ESCREVA AQUI..." class="w-full border-none outline-none font-black uppercase text-xs p-2" rows="2"></textarea>
             <div class="flex gap-2 mt-2">
                 <button onclick="setEditor(false)" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Fechar</button>
-                <button onclick="handleSend()" class="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Publicar</button>
+                <button onclick="handleSend()" class="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md">Publicar</button>
             </div>
         </div>
     </div>
@@ -75,18 +75,22 @@
 
         <section id="pane-wallet" class="tab-pane">
             <div class="post-card p-10 flex-col text-center">
-                <p class="text-[10px] text-gray-400 uppercase">Saldo Disponível</p>
+                <p class="text-[10px] text-gray-400 uppercase font-black">Saldo Disponível</p>
                 <h2 id="wall-bal" class="text-5xl font-black text-blue-600 my-4">0.0000€</h2>
                 <div class="w-full bg-gray-100 h-2 rounded-full mb-6">
                     <div id="wall-prog" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
                 </div>
-                <button class="w-full py-4 bg-gray-50 rounded-xl text-gray-400 font-black uppercase text-[10px]">Levantar (Mín. 5€)</button>
+                <button class="w-full py-4 bg-blue-50 border border-blue-100 rounded-xl text-blue-600 font-black uppercase text-[10px]">Estatísticas de Ganhos</button>
             </div>
         </section>
 
         <section id="pane-menu" class="tab-pane">
             <div class="post-card p-4 flex-col">
-                <button onclick="localStorage.clear(); location.reload();" class="w-full py-4 text-red-500 font-black uppercase text-xs">Terminar Sessão</button>
+                <div class="flex justify-between items-center p-4 border-b border-gray-50 mb-2">
+                    <span class="text-[9px] font-black uppercase text-gray-400">ID de Conta</span>
+                    <span class="text-[9px] font-black text-blue-600">5401881400</span>
+                </div>
+                <button onclick="localStorage.clear(); location.reload();" class="w-full py-4 text-red-500 font-black uppercase text-xs">Sair da aplicação</button>
             </div>
         </section>
     </main>
@@ -122,7 +126,7 @@
                     <div class="post-body">
                         <div class="flex items-center gap-2 mb-3">
                             <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-[10px]">👤</div>
-                            <span class="text-[10px] font-black text-blue-600 uppercase">${p.user_id}</span>
+                            <span class="text-[9px] font-black text-blue-600 uppercase">${p.user_id}</span>
                         </div>
                         <p class="text-[13px] font-bold text-gray-800 leading-snug">${p.content}</p>
                         ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mt-3 border border-gray-100">` : ''}
@@ -131,7 +135,7 @@
                     <div class="side-actions">
                         <div onclick="gain(0.0006)" class="action-item">
                             <div class="icon-circle">👍</div>
-                            <span class="action-label">${Math.floor(Math.random()*50)}</span>
+                            <span class="action-label">${Math.floor(Math.random()*99)}</span>
                         </div>
                         <div onclick="gain(0.0010)" class="action-item">
                             <div class="icon-circle">💬</div>
