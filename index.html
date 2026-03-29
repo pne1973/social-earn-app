@@ -1,71 +1,261 @@
-async function loadFeed() {
-    // Busca os posts ordenando pelos mais recentes
-    const { data: posts, error } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-    if(error) return console.error("Erro ao carregar feed:", error);
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Apex Social v33.20 - Final Production</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --g-blue: #4285F4; --g-green: #34A853; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; padding-top: 185px; padding-bottom: 80px; }
 
-    const container = document.getElementById('feed-list');
-    container.innerHTML = "";
+        /* CABEÇALHO FIXO */
+        header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
+        .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 32px; background: white; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--g-green); text-transform: uppercase; }
+        .ad-provider { position: fixed; top: 92px; width: 100%; z-index: 900; height: 28px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #bdc1c6; text-transform: uppercase; }
+        .publisher-zone { position: fixed; top: 120px; width: 100%; z-index: 850; background: white; border-bottom: 1px solid #dadce0; padding: 10px 16px; height: 65px; display: flex; align-items: center; }
 
-    posts.forEach(p => {
-        container.innerHTML += `
-        <div class="post-card">
-            <div class="post-content">
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-black text-[10px]">P</div>
-                    <span class="text-[11px] font-black text-blue-600 uppercase">Utilizador ${p.user_id}</span>
-                </div>
-                <p class="text-[17px] font-bold text-gray-800 leading-snug uppercase mb-4">${p.content}</p>
-                ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-2xl border border-gray-100 shadow-sm">` : ''}
+        /* FEED */
+        .feed-container { max-width: 580px; margin: 0 auto; padding: 10px; }
+        .post-card { background: white; border-radius: 28px; border: 1px solid #dadce0; margin-bottom: 16px; display: flex; overflow: hidden; width: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .post-content { flex: 1; padding: 22px; }
+        .post-sidebar { width: 85px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 15px 0; }
+
+        .icon-btn { width: 46px; height: 46px; background: white; border-radius: 50%; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .sidebar-label { font-size: 10px; font-weight: 900; color: #70757a; text-transform: uppercase; margin-top: 4px; }
+
+        /* MODAIS UNIFICADOS */
+        .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
+        .modal-header { height: 65px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .modal-body { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
+        
+        .custom-textarea { width: 100%; flex: 1; font-size: 22px; font-weight: 700; border: none; outline: none; resize: none; text-transform: uppercase; color: #202124; min-height: 150px; }
+        .url-field { width: 100%; padding: 18px; background: #f1f3f4; border: 1px solid #dadce0; border-radius: 18px; font-size: 13px; font-weight: 700; outline: none; margin-bottom: 10px; }
+
+        .modal-footer-ad { padding: 20px; text-align: center; border-top: 1px solid #f1f3f4; background: #f8f9fa; }
+        .ad-tag { font-size: 9px; font-weight: 900; color: var(--g-blue); text-transform: uppercase; }
+
+        /* NAVEGAÇÃO */
+        nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
+        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="auth-screen" class="fixed inset-0 bg-white z-[7000] flex flex-col items-center justify-center p-10">
+        <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-4xl font-black italic mb-10 shadow-xl">S</div>
+        <input id="login-id" type="number" placeholder="O SEU ID (NÚMERO)" class="w-full max-w-xs bg-gray-100 p-6 rounded-2xl text-center font-black mb-5 outline-none border-2 border-transparent focus:border-blue-600">
+        <button onclick="login()" class="w-full max-w-xs bg-blue-600 text-white py-5 rounded-2xl font-black uppercase text-xs">Aceder à Rede</button>
+    </div>
+
+    <header>
+        <div class="flex items-center gap-2">
+            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
+            <span class="text-[12px] font-black uppercase text-blue-600">Apex Social</span>
+        </div>
+        <div id="bal-top" class="text-2xl font-black text-green-600">0.0000€</div>
+    </header>
+
+    <div class="status-bar">Produção v33.20 • Servidor OK</div>
+    <div class="ad-provider">Network Adsense Partner</div>
+
+    <div class="publisher-zone">
+        <div onclick="openModal('modal-editor')" class="bg-gray-100 rounded-full px-6 py-3 border border-gray-200 w-full flex items-center gap-4 cursor-pointer">
+            <div class="w-7 h-7 bg-gray-300 rounded-full"></div>
+            <span class="text-[12px] text-gray-500 font-black uppercase italic">Publicar nova atualização...</span>
+        </div>
+    </div>
+
+    <main class="feed-container" id="feed-list"></main>
+
+    <div id="modal-editor" class="modal-fullscreen">
+        <div class="modal-header">
+            <button onclick="closeModal('modal-editor')" class="text-gray-400 font-black text-xs uppercase">Fechar</button>
+            <span class="font-black uppercase text-[13px]">Nova Publicação</span>
+            <button id="btn-pub" onclick="publish()" class="text-blue-600 font-black text-xs uppercase">Publicar</button>
+        </div>
+        <div class="modal-body">
+            <textarea id="post-txt" placeholder="ESCREVA AQUI..." class="custom-textarea"></textarea>
+            <input id="post-url" type="text" placeholder="URL DA IMAGEM (OPCIONAL)" class="url-field">
+        </div>
+        <div class="modal-footer-ad">
+            <span class="ad-tag">Anúncio Google Adsense</span>
+            <p class="text-[10px] text-gray-400 font-bold uppercase mt-1">Ganhos de +0.0150€ ao publicar</p>
+        </div>
+    </div>
+
+    <div id="modal-comment" class="modal-fullscreen">
+        <div class="modal-header">
+            <button onclick="closeModal('modal-comment')" class="text-gray-400 font-black text-xs uppercase">Voltar</button>
+            <span class="font-black uppercase text-[13px]">Interações</span>
+            <div class="w-10"></div>
+        </div>
+        <div id="comment-list" class="modal-body bg-gray-50">
             </div>
-            <div class="post-sidebar">
-                <div class="flex flex-col items-center" onclick="reward(0.0006)">
-                    <div class="icon-btn">👍</div>
-                    <span class="sidebar-label">${p.likes || 0}</span>
-                </div>
-                <div class="flex flex-col items-center" onclick="openComments('${p.id}')">
-                    <div class="icon-btn">💬</div>
-                    <span class="sidebar-label">${p.comments_count || 'Ver'}</span>
-                </div>
+        <div class="p-4 border-t border-gray-100">
+            <div class="flex gap-3">
+                <input id="comm-txt" type="text" placeholder="ESCREVA UM COMENTÁRIO..." class="flex-1 bg-gray-100 p-4 rounded-xl font-bold text-xs outline-none uppercase">
+                <button onclick="addComment()" class="bg-blue-600 text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase">Enviar</button>
             </div>
-        </div>`;
-    });
-}
+        </div>
+    </div>
 
-async function publish() {
-    const txt = document.getElementById('post-txt').value.trim();
-    const url = document.getElementById('post-url').value.trim();
-    const btn = document.getElementById('btn-pub');
+    <nav>
+        <div class="nav-item active">Feed</div>
+        <div class="nav-item" onclick="location.reload()">Ranking</div>
+        <div class="nav-item" onclick="logout()">Sair</div>
+    </nav>
 
-    if(!txt) return alert("Escreva algo primeiro!");
+    <script>
+        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
+        const sb = window.supabase.createClient(SB_URL, SB_KEY);
+        
+        let uID = localStorage.getItem('apex_uid_v33');
+        let bal = 0;
+        let activePostID = null;
 
-    btn.innerText = "A ENVIAR...";
-    btn.disabled = true;
-
-    // CORREÇÕES BASEADAS NA SUA IMAGEM:
-    // 1. user_id convertido para Number (pois é int8)
-    // 2. Usando image_url em vez de media_url
-    const { error } = await sb.from('posts').insert([
-        { 
-            user_id: parseInt(uID), 
-            content: txt, 
-            image_url: url || null,
-            likes: 0,
-            comments_count: 0
+        function login() {
+            const id = document.getElementById('login-id').value.trim();
+            if(!id) return;
+            localStorage.setItem('apex_uid_v33', id);
+            location.reload();
         }
-    ]);
 
-    if (error) {
-        alert("Erro Técnico: " + error.message);
-        console.error(error);
-        btn.innerText = "PUBLICAR";
-        btn.disabled = false;
-    } else {
-        reward(0.0150);
-        closeModal('modal-editor');
-        document.getElementById('post-txt').value = "";
-        document.getElementById('post-url').value = "";
-        btn.innerText = "PUBLICAR";
-        btn.disabled = false;
-        await loadFeed(); // Atualiza o feed na hora
-    }
-}
+        async function init() {
+            if(!uID) return;
+            document.getElementById('auth-screen').classList.add('hidden');
+            
+            let { data } = await sb.from('perfis').select('saldo').eq('id', parseInt(uID)).single();
+            if(!data) {
+                await sb.from('perfis').insert([{ id: parseInt(uID), saldo: 0 }]);
+                bal = 0;
+            } else {
+                bal = Number(data.saldo);
+            }
+            
+            updateUI();
+            await loadFeed();
+        }
+
+        async function loadFeed() {
+            const { data: posts, error } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            if(error) return;
+
+            const container = document.getElementById('feed-list');
+            container.innerHTML = "";
+
+            posts.forEach(p => {
+                container.innerHTML += `
+                <div class="post-card">
+                    <div class="post-content">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-black text-[10px]">P</div>
+                            <span class="text-[11px] font-black text-blue-600 uppercase">Utilizador ${p.user_id}</span>
+                        </div>
+                        <p class="text-[17px] font-bold text-gray-800 leading-snug uppercase mb-4">${p.content}</p>
+                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-2xl border border-gray-100">` : ''}
+                    </div>
+                    <div class="post-sidebar">
+                        <div class="flex flex-col items-center" onclick="reward(0.0006)">
+                            <div class="icon-btn">👍</div>
+                            <span class="sidebar-label">${p.likes || 0}</span>
+                        </div>
+                        <div class="flex flex-col items-center" onclick="openComments('${p.id}')">
+                            <div class="icon-btn">💬</div>
+                            <span class="sidebar-label">Ver</span>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        }
+
+        async function publish() {
+            const txt = document.getElementById('post-txt').value.trim();
+            const url = document.getElementById('post-url').value.trim();
+            const btn = document.getElementById('btn-pub');
+
+            if(!txt) return alert("O campo de texto está vazio.");
+
+            btn.innerText = "A ENVIAR...";
+            btn.disabled = true;
+
+            const { error } = await sb.from('posts').insert([
+                { 
+                    user_id: parseInt(uID), 
+                    content: txt, 
+                    image_url: url || null,
+                    likes: 0
+                }
+            ]);
+
+            if (error) {
+                alert("Erro: " + error.message);
+                btn.innerText = "PUBLICAR";
+                btn.disabled = false;
+            } else {
+                reward(0.0150);
+                closeModal('modal-editor');
+                document.getElementById('post-txt').value = "";
+                document.getElementById('post-url').value = "";
+                btn.innerText = "PUBLICAR";
+                btn.disabled = false;
+                await loadFeed();
+            }
+        }
+
+        async function openComments(postID) {
+            activePostID = postID;
+            openModal('modal-comment');
+            renderComments();
+        }
+
+        async function renderComments() {
+            const { data } = await sb.from('comentarios').select('*').eq('post_id', activePostID).order('created_at', {ascending: true});
+            const list = document.getElementById('comment-list');
+            list.innerHTML = "";
+            
+            if(!data || data.length === 0) {
+                list.innerHTML = `<div class="flex-1 flex items-center justify-center opacity-20 font-black uppercase text-xs">Sem interações</div>`;
+                return;
+            }
+
+            data.forEach(c => {
+                list.innerHTML += `<div class="p-4 border-b border-gray-100">
+                    <span class="text-[9px] font-black text-blue-600 block uppercase">Utilizador ${c.user_id}</span>
+                    <p class="text-xs font-bold uppercase text-gray-700">${c.texto}</p>
+                </div>`;
+            });
+        }
+
+        async function addComment() {
+            const txt = document.getElementById('comm-txt').value.trim();
+            if(!txt) return;
+
+            const { error } = await sb.from('comentarios').insert([{ post_id: activePostID, user_id: parseInt(uID), texto: txt }]);
+            if(!error) {
+                reward(0.0010);
+                document.getElementById('comm-txt').value = "";
+                renderComments();
+            }
+        }
+
+        async function reward(val) {
+            bal += val;
+            updateUI();
+            await sb.from('perfis').upsert({ id: parseInt(uID), saldo: bal });
+        }
+
+        function updateUI() { document.getElementById('bal-top').innerText = bal.toFixed(4) + "€"; }
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function logout() { localStorage.clear(); location.reload(); }
+
+        init();
+    </script>
+</body>
+</html>
