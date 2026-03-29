@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.12 - Fixed UI</title>
+    <title>Apex Social v33.12 - Pro Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
@@ -11,33 +11,39 @@
         :root { --g-blue: #4285F4; --g-green: #34A853; }
         body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; }
 
-        /* Estrutura Fixa Superior */
+        /* Estrutura Superior */
         header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 30px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; text-transform: uppercase; color: var(--g-green); font-weight: 900; }
         .ad-banner-top { position: fixed; top: 90px; width: 100%; z-index: 850; height: 40px; background: #fff; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; color: #dadce0; text-transform: uppercase; }
         .publisher-zone { position: fixed; top: 130px; width: 100%; z-index: 800; background: white; border-bottom: 1px solid #dadce0; padding: 12px; }
 
-        /* Ajuste do Feed para Scannability */
+        /* Content Area */
         .main-content { padding-top: 195px; padding-bottom: 80px; width: 100%; max-width: 500px; margin: 0 auto; }
         .tab-pane { display: none; width: 100%; }
         .tab-pane.active { display: block; }
 
-        /* Card Corrigido */
-        .post-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 10px; position: relative; display: flex; overflow: hidden; }
-        .post-body { flex: 1; padding: 16px; padding-right: 55px; } /* Espaço garantido para o texto */
-        
-        .side-actions { 
-            position: absolute; right: 0; top: 0; bottom: 0; width: 50px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
-            padding-top: 16px; gap: 15px; background: #fafafa; border-left: 1px solid #eee;
+        /* POST CARD & AD CARD (TAMANHO IGUAL) */
+        .post-card, .ad-card { 
+            background: white; border: 1px solid #dadce0; border-radius: 12px; 
+            margin-bottom: 10px; position: relative; display: flex; 
+            min-height: 110px; overflow: hidden;
         }
         
-        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .icon-circle { width: 30px; height: 30px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #eee; font-size: 14px; margin-bottom: 4px; }
-        .action-label { font-size: 8px; font-weight: 900; color: #70757a; }
+        .post-body, .ad-body { flex: 1; padding: 16px; padding-right: 55px; display: flex; flex-direction: column; justify-content: center; }
+        
+        /* Barra Lateral Simétrica */
+        .side-actions, .ad-side { 
+            position: absolute; right: 0; top: 0; bottom: 0; width: 50px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            gap: 12px; background: #fafafa; border-left: 1px solid #eee;
+        }
+        
+        .icon-circle { width: 30px; height: 30px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #eee; font-size: 14px; }
+        .action-label { font-size: 8px; font-weight: 900; color: #70757a; text-transform: uppercase; margin-top: 2px; }
 
-        /* Anúncios */
-        .feed-ad { background: #f8f9fa; border: 1px dashed #dadce0; border-radius: 12px; padding: 20px; margin-bottom: 10px; text-align: center; }
+        /* Estilo Específico do Anúncio para diferenciar visualmente sem quebrar o tamanho */
+        .ad-card { border: 1px dashed #4285F4; background: #fdfdfd; }
+        .ad-tag { font-size: 7px; font-weight: 900; color: #4285F4; border: 1px solid #4285F4; padding: 1px 4px; border-radius: 3px; margin-bottom: 8px; width: fit-content; }
 
         /* Navegação */
         nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 2000; }
@@ -46,7 +52,6 @@
 
         /* Login */
         #login-screen { position: fixed; inset: 0; background: white; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; }
-        
         .hidden { display: none !important; }
     </style>
 </head>
@@ -54,10 +59,10 @@
 
     <div id="login-screen">
         <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-3xl font-black mb-6 italic shadow-lg">S</div>
-        <h1 class="text-xl font-black uppercase mb-2">Login de Acesso</h1>
-        <p class="text-[10px] text-gray-400 font-black uppercase mb-8">Insira o seu ID oficial de utilizador</p>
-        <input id="user-id-input" type="text" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs bg-gray-50 border border-gray-200 rounded-xl p-4 text-center font-black text-sm mb-4 outline-none focus:ring-2 ring-blue-500">
-        <button onclick="handleLogin()" class="w-full max-w-xs bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-xs shadow-md">Entrar Agora</button>
+        <h1 class="text-xl font-black uppercase mb-2 text-center">Acesso à Rede</h1>
+        <p class="text-[10px] text-gray-400 font-black uppercase mb-8">Introduza o ID atribuído</p>
+        <input id="user-id-input" type="text" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs bg-gray-50 border border-gray-200 rounded-xl p-4 text-center font-black text-sm mb-4 outline-none">
+        <button onclick="handleLogin()" class="w-full max-w-xs bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-xs shadow-md">Conectar</button>
     </div>
 
     <header>
@@ -69,17 +74,17 @@
     </header>
 
     <div class="status-bar">Modo Produção • 100% Ganhos</div>
-    <div class="ad-banner-top">Espaço Publicitário Google</div>
+    <div class="ad-banner-top">Google Adsense Partner</div>
 
     <div id="pub-area" class="publisher-zone">
         <div id="mini-input" onclick="setEditor(true)" class="bg-gray-100 rounded-full px-4 py-2 border border-gray-200 cursor-pointer flex items-center gap-3">
             <div class="w-6 h-6 bg-gray-300 rounded-full"></div>
-            <span class="text-[11px] text-gray-400 font-black uppercase">O que quer partilhar?</span>
+            <span class="text-[11px] text-gray-400 font-black uppercase">Escreva aqui a sua publicação...</span>
         </div>
         <div id="full-input" class="hidden">
-            <textarea id="p-content" placeholder="ESCREVA AQUI..." class="w-full border-none outline-none font-black uppercase text-xs p-2" rows="2"></textarea>
+            <textarea id="p-content" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none outline-none font-black uppercase text-xs p-2" rows="2"></textarea>
             <div class="flex gap-2 mt-2">
-                <button onclick="setEditor(false)" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Voltar</button>
+                <button onclick="setEditor(false)" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Cancelar</button>
                 <button onclick="handleSend()" class="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Publicar (+0.0150€)</button>
             </div>
         </div>
@@ -90,39 +95,35 @@
         
         <section id="pane-wallet" class="tab-pane">
             <div class="post-card p-10 flex-col text-center">
-                <p class="text-[9px] text-gray-400 font-black uppercase">Saldo Atual</p>
+                <p class="text-[9px] text-gray-400 font-black uppercase italic">Saldo na Carteira</p>
                 <h2 id="wall-bal" class="text-5xl font-black text-blue-600 my-4">0.0000€</h2>
                 <div class="w-full bg-gray-100 h-2 rounded-full mb-6">
                     <div id="wall-prog" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
                 </div>
-                <button class="w-full py-4 bg-gray-50 text-gray-400 rounded-xl font-black uppercase text-[10px]">Levantamento (Mínimo 5€)</button>
+                <button class="w-full py-4 bg-gray-50 text-gray-300 rounded-xl font-black uppercase text-[10px]">Mínimo para Levantamento: 5.0000€</button>
             </div>
         </section>
 
         <section id="pane-admin" class="tab-pane">
             <div class="grid grid-cols-2 gap-2 mb-4">
                 <div class="bg-white p-4 rounded-xl border border-gray-200">
-                    <p class="text-[8px] font-black text-gray-400 uppercase">Utilizadores</p>
+                    <p class="text-[8px] font-black text-gray-400 uppercase">Users</p>
                     <p id="adm-users" class="text-xl font-black italic">...</p>
                 </div>
                 <div class="bg-white p-4 rounded-xl border border-gray-200">
-                    <p class="text-[8px] font-black text-gray-400 uppercase">Posts Totais</p>
+                    <p class="text-[8px] font-black text-gray-400 uppercase">Posts</p>
                     <p id="adm-posts" class="text-xl font-black italic">...</p>
                 </div>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 font-black uppercase text-[10px]">
-                <p class="text-blue-600 mb-2 italic">Painel Admin v33.12</p>
-                <p class="text-gray-400">ID MESTRE: 5401881400</p>
             </div>
         </section>
 
         <section id="pane-menu" class="tab-pane">
             <div class="post-card p-4 flex-col">
-                <div class="flex justify-between items-center p-4 border-b border-gray-50 mb-2 text-[10px] font-black uppercase">
-                    <span class="text-gray-400">ID da Sessão</span>
+                <div class="flex justify-between items-center p-4 border-b border-gray-50 mb-2 text-[10px] font-black uppercase italic">
+                    <span class="text-gray-400">ID Ativo</span>
                     <span class="text-blue-600" id="session-id">---</span>
                 </div>
-                <button onclick="logout()" class="w-full py-4 text-red-500 font-black uppercase text-xs">Sair da Conta</button>
+                <button onclick="logout()" class="w-full py-4 text-red-500 font-black uppercase text-xs">Desconectar</button>
             </div>
         </section>
     </main>
@@ -154,16 +155,12 @@
             if(!uID) return;
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('session-id').innerText = uID;
-            
             if(uID === "5401881400") {
                 document.getElementById('nav-admin').classList.remove('hidden');
                 loadStats();
             }
-
             const { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
             if(data) bal = Number(data.saldo);
-            else await sb.from('perfis').insert([{ id: uID, saldo: 0 }]);
-            
             updateUI();
             fetchPosts();
         }
@@ -174,32 +171,40 @@
             container.innerHTML = "";
             
             posts.forEach((p, i) => {
+                // Template de Post Normal
                 container.innerHTML += `
-                <div class="post-card">
+                <div class="post-card shadow-sm">
                     <div class="post-body">
-                        <div class="flex items-center gap-2 mb-3">
-                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-[9px] font-black">P</div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-[8px] font-black">P</div>
                             <span class="text-[9px] font-black text-blue-600 uppercase">Utilizador ${p.user_id}</span>
                         </div>
                         <p class="text-[13px] font-bold text-gray-800 leading-snug">${p.content}</p>
                     </div>
                     <div class="side-actions">
-                        <div onclick="gain(0.0006)" class="action-item">
+                        <div onclick="gain(0.0006)" class="flex flex-col items-center">
                             <div class="icon-circle">👍</div>
-                            <span class="action-label">${Math.floor(Math.random()*50)}</span>
+                            <span class="action-label">${Math.floor(Math.random()*40)}</span>
                         </div>
-                        <div onclick="gain(0.0020)" class="action-item">
+                        <div onclick="gain(0.0020)" class="flex flex-col items-center">
                             <div class="icon-circle">🔗</div>
                             <span class="action-label">SHARE</span>
                         </div>
                     </div>
                 </div>`;
 
+                // INJEÇÃO DE ANÚNCIO (MESMO TAMANHO DO POST)
                 if((i + 1) % 3 === 0) {
                     container.innerHTML += `
-                    <div class="feed-ad">
-                        <span class="text-[8px] font-black text-blue-500 uppercase block mb-1">Publicidade de Rede</span>
-                        <div class="text-[10px] text-gray-400 font-bold uppercase italic">Anúncio Patrocinado</div>
+                    <div class="ad-card shadow-sm">
+                        <div class="ad-body">
+                            <div class="ad-tag">PUBLICIDADE</div>
+                            <p class="text-[11px] font-black text-gray-400 uppercase italic">Espaço reservado para rede de publicidade parceira da Apex Social.</p>
+                        </div>
+                        <div class="ad-side">
+                            <div class="icon-circle text-blue-500">ℹ️</div>
+                            <span class="action-label">INFO</span>
+                        </div>
                     </div>`;
                 }
             });
