@@ -47,12 +47,11 @@
             <button onclick="nav('social')" class="nav-item active flex-1 flex justify-center items-center">
                 <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
             </button>
-            <button id="nav-friends-btn" onclick="nav('friends')" class="nav-item flex-1 flex justify-center items-center">
-                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a7 7 0 00-7 7v1h12v-1a7 7 0 00-7-7z"></path></svg>
-            </button>
+            
             <button id="nav-wallet-btn" onclick="nav('info')" class="nav-item flex-1 flex justify-center items-center">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
             </button>
+
             <button id="nav-admin-btn" onclick="nav('admin')" class="nav-item flex-1 hidden flex justify-center items-center text-red-600">
                 <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path></svg>
             </button>
@@ -69,13 +68,6 @@
                 <button onclick="handleInteraction('post')" id="btn-post-text" class="w-full bg-fb-blue text-white py-2 rounded-md font-bold text-sm">Post</button>
             </div>
             <div id="feed-container" class="space-y-3"></div>
-        </section>
-
-        <section id="view-friends" class="tab-content">
-            <div class="bg-white rounded-lg fb-shadow p-4">
-                <h2 id="friends-title" class="text-xl font-bold mb-4">Suggestions</h2>
-                <div id="friends-list" class="space-y-4"></div>
-            </div>
         </section>
 
         <section id="view-info" class="tab-content">
@@ -136,10 +128,10 @@
         let currencySymbol = "€";
 
         const i18n = {
-            pt: { login: "Entrar", post: "Publicar", think: "No que estás a pensar?", suggestions: "Sugestões", wallet: "Saldo em Carteira", withdraw: "Levantar Dinheiro", min: "Mínimo: 5.0000", logout: "Terminar Sessão", symbol: "€" },
-            en: { login: "Login", post: "Post", think: "What's on your mind?", suggestions: "Suggestions", wallet: "Wallet Balance", withdraw: "Withdraw", min: "Min: 5.0000", logout: "Logout", symbol: "$" },
-            fr: { login: "Connexion", post: "Publier", think: "À quoi pensez-vous?", suggestions: "Suggestions", wallet: "Solde", withdraw: "Retirer", min: "Min: 5.0000", logout: "Déconnexion", symbol: "€" },
-            es: { login: "Entrar", post: "Publicar", think: "¿En qué estás pensando?", suggestions: "Sugerencias", wallet: "Saldo", withdraw: "Retirar", min: "Mín: 5.0000", logout: "Cerrar Sesión", symbol: "€" }
+            pt: { login: "Entrar", post: "Publicar", think: "No que estás a pensar?", wallet: "Saldo em Carteira", withdraw: "Levantar Dinheiro", min: "Mínimo: 5.0000", logout: "Terminar Sessão", symbol: "€" },
+            en: { login: "Login", post: "Post", think: "What's on your mind?", wallet: "Wallet Balance", withdraw: "Withdraw", min: "Min: 5.0000", logout: "Logout", symbol: "$" },
+            fr: { login: "Connexion", post: "Publier", think: "À quoi pensez-vous?", wallet: "Solde", withdraw: "Retirer", min: "Min: 5.0000", logout: "Déconnexion", symbol: "€" },
+            es: { login: "Entrar", post: "Publicar", think: "¿En qué estás pensando?", wallet: "Saldo", withdraw: "Retirar", min: "Mín: 5.0000", logout: "Cerrar Sesión", symbol: "€" }
         };
 
         function setLang() {
@@ -151,7 +143,6 @@
             document.getElementById('btn-login-text').innerText = t.login;
             document.getElementById('post-input').placeholder = t.think;
             document.getElementById('btn-post-text').innerText = t.post;
-            document.getElementById('friends-title').innerText = t.suggestions;
             document.getElementById('wallet-title').innerText = t.wallet;
             document.getElementById('btn-withdraw-text').innerText = t.withdraw;
             document.getElementById('min-withdraw-text').innerText = t.min;
@@ -165,7 +156,6 @@
             
             if(activeID === ADMIN_MASTER) {
                 document.getElementById('nav-admin-btn').classList.remove('hidden');
-                document.getElementById('nav-friends-btn').classList.add('hidden');
                 document.getElementById('nav-wallet-btn').classList.add('hidden');
             }
 
@@ -173,7 +163,7 @@
             if(data) user.saldo = Number(data.saldo) || 0;
             else await sb.from('perfis').insert([{ id: activeID, saldo: 0.0000 }]);
 
-            updateUI(); loadFeed(); loadFriends();
+            updateUI(); loadFeed();
             setInterval(updateUI, 2000);
         }
 
@@ -200,21 +190,9 @@
                         ${activeID === ADMIN_MASTER ? `<button onclick="deletePost('${p.id}')" class="text-red-500 text-[10px] font-black uppercase">Apagar</button>` : ''}
                     </div>
                     <div class="px-3 pb-3 text-[15px]">${p.content}</div>
-                    ${p.image_url ? `<img src="${p.image_url}" class="w-full">` : ''}
                     <div class="flex border-t border-gray-50 p-1">
                         <button onclick="handleInteraction('like', 0.0006)" class="flex-1 py-2 text-sm font-bold text-gray-400">👍 Like</button>
                     </div>
-                </div>
-            `).join('');
-        }
-
-        async function loadFriends() {
-            const { data: users } = await sb.from('perfis').select('id').limit(10);
-            const container = document.getElementById('friends-list');
-            if(container) container.innerHTML = users.map(u => `
-                <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                    <div class="flex items-center space-x-3"><div class="w-10 h-10 bg-gray-100 rounded-full"></div><div class="font-bold text-sm">${u.id}</div></div>
-                    <button class="bg-fb-blue text-white px-3 py-1 rounded-lg font-bold text-xs">Add</button>
                 </div>
             `).join('');
         }
