@@ -3,40 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Network v33.12 - Top Fixed</title>
+    <title>Social Earn Network v33.12 - Fixed Tabs</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-red: #EA4335; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; font-weight: 700; overflow-x: hidden; }
         
-        /* Cabeçalhos Fixos */
-        header { position: fixed; top: 0; left: 0; right: 0; z-index: 500; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
-        .status-bar { position: fixed; top: 60px; left: 0; right: 0; z-index: 400; height: 30px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; text-transform: uppercase; color: var(--g-green); }
+        /* Estrutura de Camadas Fixas */
+        header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
+        .status-bar { position: fixed; top: 60px; left: 0; right: 0; z-index: 900; height: 30px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; text-transform: uppercase; color: var(--g-green); }
+        .publisher-fixed { position: fixed; top: 90px; left: 0; right: 0; z-index: 800; background: white; border-bottom: 2px solid #dadce0; padding: 8px 12px; }
         
-        /* Publicador Fixado e Reduzido */
-        .publisher-fixed { position: fixed; top: 90px; left: 0; right: 0; z-index: 300; background: white; border-bottom: 2px solid #dadce0; padding: 8px 12px; }
-        #mini-pub { display: flex; align-items: center; gap: 10px; background: #f1f3f4; border-radius: 20px; padding: 6px 15px; cursor: pointer; }
-        #mini-pub span { font-size: 11px; color: #5f6368; text-transform: uppercase; }
+        /* Ajuste de Margem para o Conteúdo não sumir sob o Header */
+        .content-area { padding-top: 155px; padding-bottom: 80px; }
         
-        #expanded-post { display: none; background: white; padding: 5px 0; }
-        #post-input { width: 100%; border: none; outline: none; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; min-height: 40px; }
-        #post-url { width: 100%; border: 1px solid #e8eaed; border-radius: 8px; padding: 5px 10px; font-size: 10px; outline: none; margin-bottom: 8px; }
-        
-        /* Ajuste do Feed para não ficar por baixo do topo fixo */
-        #feed-container { margin-top: 160px; padding: 12px; }
-        
-        /* Estilo dos Cards */
+        /* Cards e Elementos Visuais */
         .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
         .stat-bubble { display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; background: #e8f0fe; font-size: 10px; color: #1967d2; font-weight: 900; }
-        .interaction-btn { flex: 1; padding: 10px 0; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; text-align: center; }
-        .comment-item { background: #f1f3f4; border-radius: 10px; padding: 6px 10px; margin-bottom: 4px; font-size: 11px; width: fit-content; }
+        .interaction-btn { flex: 1; padding: 12px 0; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; text-align: center; border-radius: 8px; }
+        .interaction-btn:active { background: #f1f3f4; }
         
-        /* Barra de Navegação */
-        nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #dadce0; display: flex; height: 60px; z-index: 500; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; text-transform: uppercase; color: #5f6368; }
-        .nav-item.active { color: var(--g-blue); }
+        /* Lista de Comentários */
+        .comment-list { background: #f8f9fa; padding: 10px; border-top: 1px solid #f1f3f4; }
+        .comment-item { background: white; border: 1px solid #e8eaed; border-radius: 10px; padding: 6px 10px; margin-bottom: 4px; font-size: 11px; width: fit-content; max-width: 90%; }
+        
+        /* Navegação Inferior */
+        nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #dadce0; display: flex; height: 65px; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; text-transform: uppercase; color: #5f6368; border-top: 4px solid transparent; }
+        .nav-item.active { color: var(--g-blue); border-top-color: var(--g-blue); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        #floating-earning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; pointer-events: none; display: none; animation: popUp 0.8s forwards; }
+        @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } }
     </style>
 </head>
 <body>
@@ -46,120 +48,170 @@
             <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
             <span class="text-[10px] font-black uppercase text-blue-600">Social Network</span>
         </div>
-        <div class="text-right">
-            <div id="main-balance" class="text-lg font-black text-green-600">0.0000€</div>
-        </div>
+        <div id="main-balance" class="text-lg font-black text-green-600">0.0000€</div>
     </header>
 
     <div class="status-bar">
-        <span id="multiplier-tag">Modo Normal (100% Ganhos)</span>
+        <span id="multiplier-status">Modo Normal (100% Ganhos)</span>
     </div>
 
-    <div class="publisher-fixed">
-        <div id="mini-pub" onclick="expandPublisher()">
+    <div id="pub-container" class="publisher-fixed">
+        <div id="mini-pub" onclick="expandPublisher()" class="flex items-center gap-3 bg-gray-100 rounded-full px-4 py-2 cursor-pointer">
             <div class="w-6 h-6 bg-gray-300 rounded-full"></div>
-            <span>Partilhe algo novo...</span>
+            <span class="text-[10px] text-gray-400 font-black uppercase">Partilhe algo novo...</span>
         </div>
-        
-        <div id="expanded-post">
-            <textarea id="post-input" placeholder="O QUE ESTÁ A PENSAR?"></textarea>
-            <input id="post-url" type="text" placeholder="URL DA IMAGEM">
+        <div id="expanded-post" class="hidden">
+            <textarea id="post-input" placeholder="O QUE ESTÁ A PENSAR?" class="w-full border-none outline-none font-black uppercase text-xs p-2" rows="2"></textarea>
+            <input id="post-url" type="text" placeholder="URL DA IMAGEM" class="w-full bg-gray-50 rounded-lg p-2 text-[10px] mb-2 border-none outline-none">
             <div class="flex gap-2">
-                <button onclick="collapsePublisher()" class="flex-1 text-[10px] uppercase font-black text-gray-400">Fechar</button>
+                <button onclick="collapsePublisher()" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Fechar</button>
                 <button onclick="handleInteraction('post')" class="flex-[2] bg-blue-600 text-white py-2 rounded-lg font-black text-[10px] uppercase">Publicar</button>
             </div>
         </div>
     </div>
 
-    <main id="feed-container"></main>
+    <div id="floating-earning"><div class="text-4xl font-black text-green-600" id="earning-val">+0.0000€</div></div>
+
+    <main class="content-area max-w-lg mx-auto px-4">
+        <section id="view-social" class="tab-content active">
+            <div id="feed-container"></div>
+        </section>
+
+        <section id="view-info" class="tab-content">
+            <div class="google-card p-10 text-center">
+                <p class="text-[10px] font-black text-gray-300 uppercase mb-2">O seu saldo total</p>
+                <h1 id="wall-balance" class="text-5xl font-black text-blue-600 mb-6">0.0000€</h1>
+                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                    <div id="withdraw-progress" class="bg-blue-600 h-full w-0 transition-all"></div>
+                </div>
+                <p class="text-[8px] text-gray-400 mt-2 uppercase">Levantamento mínimo: 5.0000€</p>
+            </div>
+        </section>
+
+        <section id="view-menu" class="tab-content">
+            <div class="google-card p-4">
+                <button onclick="localStorage.clear(); location.reload();" class="w-full py-4 text-red-600 font-black uppercase text-xs">Terminar Sessão</button>
+            </div>
+        </section>
+    </main>
 
     <nav>
-        <button onclick="location.reload()" class="nav-item active">Feed</button>
-        <button class="nav-item">Carteira</button>
-        <button class="nav-item">Menu</button>
+        <button onclick="changeTab('social')" class="nav-item active" id="nav-social">Feed</button>
+        <button onclick="changeTab('info')" class="nav-item" id="nav-info">Carteira</button>
+        <button onclick="changeTab('menu')" class="nav-item" id="nav-menu">Menu</button>
     </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
-        let activeID = localStorage.getItem('apex_uid') || "5401881400"; // Test ID
+        let activeID = localStorage.getItem('apex_uid') || "5401881400";
+        let user = { saldo: 0, multiplier: 1.0 };
+
+        async function init() {
+            const { data } = await sb.from('perfis').select('*').eq('id', activeID).single();
+            if(data) user.saldo = Number(data.saldo);
+            loadFeed();
+            updateUI();
+        }
 
         async function loadFeed() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const container = document.getElementById('feed-container');
             container.innerHTML = "";
 
-            posts.forEach(p => {
-                const cms = p.comments || [];
+            for (const p of posts) {
+                const { data: comments } = await sb.from('comentarios').select('*').eq('post_id', p.id).order('created_at', {ascending: true});
+                
                 container.innerHTML += `
                 <div class="google-card">
                     <div class="p-4">
                         <div class="flex items-center gap-2 mb-2">
-                            <div class="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center text-[9px]">👤</div>
+                            <div class="w-7 h-7 bg-gray-200 rounded-full"></div>
                             <span class="text-[10px] font-black text-blue-600 uppercase">${p.user_id}</span>
                         </div>
-                        <p class="text-xs font-bold mb-3">${p.content}</p>
+                        <p class="text-[12px] font-bold mb-3">${p.content}</p>
                         ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3 border">` : ''}
                         
                         <div class="flex justify-between items-center mb-2">
-                            <div class="stat-bubble">👍 ${Math.floor(Math.random()*15)}</div>
-                            <div class="text-[9px] text-gray-400 uppercase font-black">${cms.length} comentários</div>
+                            <div class="stat-bubble">👍 ${Math.floor(Math.random()*12)}</div>
+                            <div class="text-[9px] text-gray-400 uppercase font-black">${comments ? comments.length : 0} comentários</div>
                         </div>
 
                         <div class="flex border-y border-gray-50 mb-3">
-                            <button onclick="handleInteraction('like')" class="interaction-btn">Gosto</button>
+                            <button onclick="applyGain(0.0006)" class="interaction-btn">Gosto</button>
                             <button onclick="document.getElementById('in-${p.id}').focus()" class="interaction-btn border-x">Comentar</button>
-                            <button onclick="handleInteraction('share')" class="interaction-btn">Partilhar</button>
+                            <button onclick="applyGain(0.0020)" class="interaction-btn">Partilhar</button>
                         </div>
 
-                        <div class="space-y-1 mb-3">
-                            ${cms.slice(0, 3).map(c => `<div class="comment-item"><strong>${c.user}:</strong> ${c.text}</div>`).join('')}
-                        </div>
-
-                        <div class="flex gap-2">
-                            <input id="in-${p.id}" type="text" placeholder="Escreva..." class="flex-1 bg-gray-100 rounded-full px-3 py-1 text-[10px] outline-none">
-                            <button onclick="addComment('${p.id}')" class="bg-blue-600 text-white px-3 rounded-full text-[9px] font-black uppercase">Ok</button>
+                        <div class="comment-list">
+                            <div id="list-${p.id}" class="mb-3">
+                                ${(comments || []).map(c => `<div class="comment-item"><strong>${c.user_id}:</strong> ${c.content}</div>`).join('')}
+                            </div>
+                            <div class="flex gap-2">
+                                <input id="in-${p.id}" type="text" placeholder="Escreva um comentário..." class="flex-1 bg-white border border-gray-200 rounded-full px-3 py-1.5 text-[10px] outline-none">
+                                <button onclick="addComment('${p.id}')" class="bg-blue-600 text-white px-4 rounded-full text-[9px] font-black uppercase">Ok</button>
+                            </div>
                         </div>
                     </div>
                 </div>`;
-            });
+            }
         }
 
         async function addComment(pid) {
-            const input = document.getElementById(`in-${pid}`);
-            if(!input.value) return;
-            const { data: p } = await sb.from('posts').select('comments').eq('id', pid).single();
-            let cms = p.comments || [];
-            cms.push({ user: activeID, text: input.value });
-            await sb.from('posts').update({ comments: cms }).eq('id', pid);
-            input.value = "";
-            loadFeed();
-        }
-
-        function expandPublisher() {
-            document.getElementById('mini-pub').style.display = 'none';
-            document.getElementById('expanded-post').style.display = 'block';
-        }
-
-        function collapsePublisher() {
-            document.getElementById('mini-pub').style.display = 'flex';
-            document.getElementById('expanded-post').style.display = 'none';
+            const val = document.getElementById(`in-${pid}`).value;
+            if(!val) return;
+            const { error } = await sb.from('comentarios').insert([{ post_id: pid, user_id: activeID, content: val }]);
+            if(!error) { applyGain(0.0010); loadFeed(); }
         }
 
         async function handleInteraction(type) {
             if(type === 'post') {
                 const content = document.getElementById('post-input').value;
-                const img = document.getElementById('post-url').value;
                 if(!content) return;
-                await sb.from('posts').insert([{ user_id: activeID, content, image_url: img }]);
-                collapsePublisher();
-                loadFeed();
+                await sb.from('posts').insert([{ user_id: activeID, content, image_url: document.getElementById('post-url').value }]);
+                applyGain(0.0150); collapsePublisher(); loadFeed();
             }
-            // A lógica de ganhos e anúncios continua processada em background
         }
 
-        loadFeed();
+        function applyGain(val) {
+            const gain = val * user.multiplier;
+            user.saldo += gain;
+            showBigNumber(gain);
+            updateUI();
+            sb.from('perfis').upsert({ id: activeID, saldo: user.saldo });
+        }
+
+        function updateUI() {
+            document.getElementById('main-balance').innerText = user.saldo.toFixed(4) + "€";
+            document.getElementById('wall-balance').innerText = user.saldo.toFixed(4) + "€";
+            const progress = (user.saldo / 5) * 100;
+            document.getElementById('withdraw-progress').style.width = Math.min(progress, 100) + "%";
+        }
+
+        function changeTab(t) {
+            document.querySelectorAll('.tab-content, .nav-item').forEach(e => e.classList.remove('active'));
+            document.getElementById('view-' + t).classList.add('active');
+            document.getElementById('nav-' + t).classList.add('active');
+            document.getElementById('pub-container').style.display = (t === 'social') ? 'block' : 'none';
+        }
+
+        function expandPublisher() { 
+            document.getElementById('mini-pub').classList.add('hidden'); 
+            document.getElementById('expanded-post').classList.remove('hidden'); 
+        }
+        function collapsePublisher() { 
+            document.getElementById('mini-pub').classList.remove('hidden'); 
+            document.getElementById('expanded-post').classList.add('hidden'); 
+        }
+        function showBigNumber(val) {
+            const c = document.getElementById('floating-earning');
+            document.getElementById('earning-val').innerText = "+" + val.toFixed(4) + "€";
+            c.style.display = 'block';
+            setTimeout(() => c.style.display = 'none', 800);
+        }
+
+        init();
     </script>
 </body>
 </html>
