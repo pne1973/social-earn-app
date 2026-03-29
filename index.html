@@ -9,68 +9,69 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; padding-top: 180px; padding-bottom: 75px; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; padding-top: 185px; padding-bottom: 80px; }
 
-        /* HEADER E BARRAS FIXAS */
+        /* HEADER & BARS */
         header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 32px; background: white; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--g-green); text-transform: uppercase; }
         .ad-provider { position: fixed; top: 92px; width: 100%; z-index: 900; height: 28px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #bdc1c6; text-transform: uppercase; }
-        .publisher-zone { position: fixed; top: 120px; width: 100%; z-index: 850; background: white; border-bottom: 1px solid #dadce0; padding: 10px 16px; height: 60px; display: flex; align-items: center; }
+        .publisher-zone { position: fixed; top: 120px; width: 100%; z-index: 850; background: white; border-bottom: 1px solid #dadce0; padding: 10px 16px; height: 65px; display: flex; align-items: center; }
 
-        /* FEED - CARDS AMPLIADOS */
-        .feed-container { max-width: 650px; margin: 0 auto; padding: 0 8px; }
-        .post-card { background: white; border-radius: 24px; border: 1px solid #dadce0; margin-bottom: 16px; display: flex; overflow: hidden; }
-        .post-content { flex: 1; padding: 24px; }
-        .post-sidebar { width: 85px; background: #fcfdfe; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 15px 0; }
+        /* FEED - CARDS GRANDES (CORREÇÃO DE TAMANHO) */
+        .feed-container { max-width: 600px; margin: 0 auto; padding: 10px; }
+        .post-card { background: white; border-radius: 24px; border: 1px solid #dadce0; margin-bottom: 20px; display: flex; overflow: hidden; width: 100%; }
+        .post-content { flex: 1; padding: 25px; }
+        .post-sidebar { width: 90px; background: #fcfdfe; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 25px; padding: 20px 0; }
 
-        .icon-circle { width: 44px; height: 44px; background: white; border-radius: 50%; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .count-text { font-size: 10px; font-weight: 900; color: #70757a; text-transform: uppercase; margin-top: 4px; }
+        .icon-circle { width: 48px; height: 48px; background: white; border-radius: 50%; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .count-text { font-size: 11px; font-weight: 900; color: #70757a; text-transform: uppercase; margin-top: 5px; }
 
-        /* MODAL UNIFICADO (NOVA PUBLICAÇÃO E COMENTÁRIOS) */
+        /* MODAIS IDENTICOS (PUBLICAÇÃO E COMENTÁRIOS) */
         .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
-        .modal-header { height: 65px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .modal-header { height: 65px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: white; }
         .modal-body { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: white; }
         
-        .custom-textarea { width: 100%; flex: 1; padding: 25px; font-size: 20px; font-weight: 700; border: none; outline: none; resize: none; text-transform: uppercase; color: #202124; min-height: 200px; }
-        .url-input-container { padding: 15px 20px; border-top: 1px solid #f1f3f4; }
-        .url-input { width: 100%; padding: 16px; background: #f8f9fa; border: 1px solid #dadce0; border-radius: 16px; font-size: 12px; font-weight: 700; outline: none; }
+        .custom-textarea { width: 100%; flex: 1; padding: 25px; font-size: 22px; font-weight: 700; border: none; outline: none; resize: none; text-transform: uppercase; color: #202124; }
+        .url-box { padding: 20px; border-top: 1px solid #f1f3f4; background: #fff; }
+        .url-input { width: 100%; padding: 18px; background: #f8f9fa; border: 1px solid #dadce0; border-radius: 18px; font-size: 13px; font-weight: 700; outline: none; }
 
-        .modal-ad-footer { background: #f8f9fa; border-top: 1px solid #e8eaed; padding: 20px; text-align: center; }
-        .ad-tag { font-size: 8px; font-weight: 900; color: var(--g-blue); text-transform: uppercase; letter-spacing: 1px; }
+        /* ANÚNCIO NO FUNDO DOS MODAIS */
+        .modal-ad-banner { background: #f8f9fa; border-top: 1px solid #e8eaed; padding: 20px; text-align: center; }
+        .ad-label { font-size: 9px; font-weight: 900; color: var(--g-blue); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* LISTA DE COMENTÁRIOS NO MODAL */
-        .comment-item { padding: 15px 25px; border-bottom: 1px solid #f1f3f4; }
-        .comment-footer { padding: 15px 20px; border-top: 1px solid #dadce0; display: flex; gap: 10px; background: white; align-items: center; }
+        /* LISTA DE COMENTÁRIOS */
+        .comment-row { padding: 18px 25px; border-bottom: 1px solid #f1f3f4; }
+        .comment-input-area { padding: 15px 20px; border-top: 1px solid #dadce0; display: flex; gap: 12px; background: white; align-items: center; }
 
-        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
-        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
-        .nav-link.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
+        nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
+        .nav-item.active { color: var(--g-blue); border-top: 4px solid var(--g-blue); }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen" class="fixed inset-0 bg-white z-[6000] flex flex-col items-center justify-center p-8">
-        <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-4xl font-black italic mb-10 shadow-xl">S</div>
-        <input id="login-id" type="text" placeholder="ID UTILIZADOR" class="w-full max-w-xs bg-gray-100 p-6 rounded-2xl text-center font-black mb-4 outline-none border-2 border-transparent focus:border-blue-600">
-        <button onclick="login()" class="w-full max-w-xs bg-blue-600 text-white py-5 rounded-2xl font-black uppercase text-sm">Entrar na Conta</button>
+    <div id="auth-screen" class="fixed inset-0 bg-white z-[6000] flex flex-col items-center justify-center p-10">
+        <div class="w-24 h-24 bg-blue-600 rounded-3xl flex items-center justify-center text-white text-5xl font-black italic mb-12 shadow-2xl">S</div>
+        <input id="login-id" type="text" placeholder="ID DE ACESSO" class="w-full max-w-xs bg-gray-100 p-6 rounded-2xl text-center font-black mb-6 outline-none border-2 border-transparent focus:border-blue-600 text-lg">
+        <button onclick="login()" class="w-full max-w-xs bg-blue-600 text-white py-5 rounded-2xl font-black uppercase text-sm tracking-widest">Entrar</button>
     </div>
 
     <header>
         <div class="flex items-center gap-2">
-            <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-sm">S</div>
-            <span class="text-[12px] font-black uppercase text-blue-600">Apex Social</span>
+            <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">S</div>
+            <span class="text-[13px] font-black uppercase text-blue-600 tracking-tighter">Apex Social</span>
         </div>
-        <div id="bal-top" class="text-2xl font-black text-green-600">0.0000€</div>
+        <div id="bal-top" class="text-2xl font-black text-green-600 tabular-nums">0.0000€</div>
     </header>
 
-    <div class="status-bar">Produção Ativa • Ganhos Reais</div>
-    <div class="ad-provider">Google Adsense Partner</div>
+    <div class="status-bar">v33.12 FINAL • SERVIDOR EM PRODUÇÃO</div>
+    <div class="ad-provider">Network Adsense Partner</div>
 
     <div class="publisher-zone">
-        <div onclick="openModal('modal-editor')" class="bg-gray-100 rounded-full px-6 py-3 border border-gray-200 w-full flex items-center gap-4">
-            <div class="w-7 h-7 bg-gray-300 rounded-full"></div>
-            <span class="text-[12px] text-gray-500 font-black uppercase italic">Escreva aqui a sua publicação...</span>
+        <div onclick="openModal('modal-editor')" class="bg-gray-100 rounded-full px-7 py-3 border border-gray-200 w-full flex items-center gap-4 cursor-pointer">
+            <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+            <span class="text-[13px] text-gray-500 font-black uppercase italic">Partilhe algo novo...</span>
         </div>
     </div>
 
@@ -78,43 +79,42 @@
 
     <div id="modal-editor" class="modal-fullscreen">
         <div class="modal-header">
-            <button onclick="closeModal('modal-editor')" class="text-gray-400 font-black text-xs uppercase">Fechar</button>
-            <span class="font-black uppercase text-sm">Nova Publicação</span>
+            <button onclick="closeModal('modal-editor')" class="text-gray-400 font-black text-xs uppercase">Cancelar</button>
+            <span class="font-black uppercase text-sm">Criar Post</span>
             <button onclick="publish()" class="text-blue-600 font-black text-xs uppercase">Publicar</button>
         </div>
         <div class="modal-body">
-            <textarea id="post-txt" placeholder="ESCREVA AQUI..." class="custom-textarea"></textarea>
-            <div class="url-input-container">
-                <input id="post-url" type="text" placeholder="URL DA IMAGEM (WEBURL)" class="url-input">
+            <textarea id="post-txt" placeholder="O QUE ESTÁ A PENSAR?" class="custom-textarea"></textarea>
+            <div class="url-box">
+                <input id="post-url" type="text" placeholder="LINK DA IMAGEM (WEBURL)" class="url-input">
             </div>
         </div>
-        <div class="modal-ad-footer">
-            <span class="ad-tag">Anúncio de Rede Parceira</span>
-            <p class="text-[9px] font-black text-gray-400 uppercase mt-2">Ganhos de +0.0150€ aplicados ao publicar</p>
+        <div class="modal-ad-banner">
+            <span class="ad-label">Google Adsense Partner</span>
+            <p class="text-[10px] font-black text-gray-400 uppercase mt-2 italic">Ganhos: +0.0150€ por envio</p>
         </div>
     </div>
 
     <div id="modal-comment" class="modal-fullscreen">
         <div class="modal-header">
             <button onclick="closeModal('modal-comment')" class="text-gray-400 font-black text-xs uppercase">Voltar</button>
-            <span class="font-black uppercase text-sm">Interações</span>
-            <div class="w-10"></div>
+            <span class="font-black uppercase text-sm">Comentários</span>
+            <button onclick="addComment()" class="text-blue-600 font-black text-xs uppercase">Enviar</button>
         </div>
-        <div id="comment-list" class="modal-body bg-gray-50">
+        <div class="modal-body bg-gray-50" id="comment-list">
             </div>
-        <div class="modal-ad-footer">
-            <span class="ad-tag">Publicidade Patrocinada</span>
+        <div class="modal-ad-banner">
+            <span class="ad-label">Publicidade Sugerida</span>
         </div>
-        <div class="comment-footer">
-            <input id="comm-txt" type="text" placeholder="COMENTAR..." class="flex-1 bg-gray-100 p-5 rounded-2xl font-bold text-xs outline-none uppercase border-2 border-transparent focus:border-blue-600">
-            <button onclick="addComment()" class="bg-blue-600 text-white px-8 py-5 rounded-2xl font-black text-[11px] uppercase shadow-md">Enviar</button>
+        <div class="comment-input-area">
+            <input id="comm-txt" type="text" placeholder="ESCREVA UM COMENTÁRIO..." class="flex-1 bg-gray-100 p-5 rounded-2xl font-bold text-xs outline-none uppercase border-2 border-transparent focus:border-blue-600">
         </div>
     </div>
 
     <nav>
-        <div class="nav-link active">Feed</div>
-        <div class="nav-link" onclick="location.reload()">Carteira</div>
-        <div class="nav-link" onclick="logout()">Sair</div>
+        <div class="nav-item active">Feed</div>
+        <div class="nav-item" onclick="location.reload()">Ranking</div>
+        <div class="nav-item" onclick="logout()">Sair</div>
     </nav>
 
     <script>
@@ -147,41 +147,39 @@
             if(error) return;
 
             const container = document.getElementById('feed-list');
-            container.innerHTML = "";
+            container.innerHTML = ""; // Limpa o feed para garantir atualização
 
             posts.forEach(p => {
-                container.innerHTML += `
-                <div class="post-card">
+                const card = document.createElement('div');
+                card.className = "post-card";
+                card.innerHTML = `
                     <div class="post-content">
                         <div class="flex items-center gap-3 mb-4">
-                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-black text-[11px]">P</div>
-                            <span class="text-[12px] font-black text-blue-600 uppercase">Utilizador ${p.user_id}</span>
+                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-[11px]">U</div>
+                            <span class="text-[13px] font-black text-blue-600 uppercase">Utilizador ${p.user_id}</span>
                         </div>
-                        <p class="text-[17px] font-bold text-gray-800 leading-snug uppercase mb-4">${p.content}</p>
-                        ${p.media_url ? `<img src="${p.media_url}" class="w-full rounded-2xl border border-gray-100 shadow-sm">` : ''}
+                        <p class="text-[18px] font-bold text-gray-800 leading-tight uppercase mb-5">${p.content}</p>
+                        ${p.media_url ? `<img src="${p.media_url}" class="w-full rounded-3xl border border-gray-100 shadow-sm mb-2">` : ''}
                     </div>
                     <div class="post-sidebar">
                         <div class="flex flex-col items-center" onclick="reward(0.0006)">
                             <div class="icon-circle">👍</div>
-                            <span class="count-text">${Math.floor(Math.random()*50)}</span>
+                            <span class="count-text">${Math.floor(Math.random()*90)}</span>
                         </div>
                         <div class="flex flex-col items-center" onclick="openComments('${p.id}')">
                             <div class="icon-circle">💬</div>
                             <span class="count-text">Ver</span>
                         </div>
-                        <div class="flex flex-col items-center" onclick="reward(0.0020)">
-                            <div class="icon-circle">🔗</div>
-                            <span class="count-text">Share</span>
-                        </div>
                     </div>
-                </div>`;
+                `;
+                container.appendChild(card);
             });
         }
 
         async function publish() {
             const txt = document.getElementById('post-txt').value.trim();
             const url = document.getElementById('post-url').value.trim();
-            if(!txt) return alert("Escreva algo!");
+            if(!txt) return alert("Escreva um texto!");
 
             const { error } = await sb.from('posts').insert([{ user_id: uID, content: txt, media_url: url }]);
             if(!error) {
@@ -189,33 +187,30 @@
                 closeModal('modal-editor');
                 document.getElementById('post-txt').value = "";
                 document.getElementById('post-url').value = "";
-                // Recarga garantida
-                setTimeout(loadFeed, 300);
+                await loadFeed(); // Recarrega feed imediatamente
             }
         }
 
         async function openComments(postID) {
             activePostID = postID;
             document.getElementById('modal-comment').style.display = 'flex';
-            renderComments();
+            await loadComments();
         }
 
-        async function renderComments() {
+        async function loadComments() {
             const { data } = await sb.from('comentarios').select('*').eq('post_id', activePostID).order('created_at', {ascending: true});
             const list = document.getElementById('comment-list');
+            list.innerHTML = "";
             
             if(!data || data.length === 0) {
-                list.innerHTML = `<div class="flex-1 flex flex-col items-center justify-center p-10 opacity-20">
-                    <span class="font-black uppercase text-[12px]">Nenhuma interação registada</span>
-                </div>`;
+                list.innerHTML = `<div class="p-20 text-center opacity-30 font-black uppercase text-xs">Sem comentários ainda</div>`;
                 return;
             }
 
-            list.innerHTML = "";
             data.forEach(c => {
-                list.innerHTML += `<div class="comment-item">
+                list.innerHTML += `<div class="comment-row">
                     <span class="text-[10px] font-black text-blue-600 block mb-1 uppercase">Utilizador ${c.user_id}</span>
-                    <p class="text-sm font-bold uppercase text-gray-700 leading-tight">${c.texto}</p>
+                    <p class="text-sm font-bold uppercase text-gray-700">${c.texto}</p>
                 </div>`;
             });
             list.scrollTop = list.scrollHeight;
@@ -229,7 +224,7 @@
             if(!error) {
                 reward(0.0010);
                 document.getElementById('comm-txt').value = "";
-                renderComments();
+                await loadComments();
             }
         }
 
