@@ -3,40 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Network v33.12 - Final UI</title>
+    <title>Social Network v33.12 - Lateral UI</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; padding: 0; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; }
 
-        /* Estrutura Fixa Superior */
+        /* Headers e Publicador */
         header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 30px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; text-transform: uppercase; color: var(--g-green); font-weight: 900; }
         .publisher-zone { position: fixed; top: 90px; width: 100%; z-index: 900; background: white; border-bottom: 1px solid #dadce0; padding: 10px 16px; }
 
-        /* Área de Conteúdo */
-        .main-container { padding-top: 155px; padding-bottom: 80px; min-height: 100vh; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        /* Container Principal */
+        .main-content { padding-top: 155px; padding-bottom: 80px; min-height: 100vh; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
 
-        /* Card e Balões (Correção Visual) */
-        .google-card { background: white; border: 1px solid #dadce0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .stats-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f1f3f4; }
-        .like-pill { display: flex; align-items: center; gap: 6px; background: #e8f0fe; color: #1967d2; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 900; }
-        .comment-label { font-size: 10px; color: #70757a; text-transform: uppercase; font-weight: 900; }
+        /* Card com Interação Lateral */
+        .post-card { background: white; border: 1px solid #dadce0; border-radius: 16px; margin-bottom: 12px; position: relative; overflow: hidden; display: flex; }
+        .post-body { flex: 1; padding: 16px; padding-right: 60px; } /* Espaço para a lateral */
+        
+        .side-actions { 
+            position: absolute; right: 0; top: 0; bottom: 0; width: 60px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            gap: 20px; background: rgba(248, 249, 250, 0.5); border-left: 1px solid #f1f3f4;
+        }
+        
+        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .icon-circle { width: 35px; height: 35px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #dadce0; font-size: 16px; margin-bottom: 4px; }
+        .action-label { font-size: 9px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
 
-        /* Botões de Ação (Grelha Perfeita) */
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; }
-        .action-btn { padding: 16px 0; font-size: 11px; font-weight: 900; color: #5f6368; text-transform: uppercase; text-align: center; border: none; background: white; outline: none; transition: background 0.2s; }
-        .action-btn:not(:last-child) { border-right: 1px solid #f1f3f4; }
-        .action-btn:active { background: #f8f9fa; }
-
-        /* Navegação Inferior (Correção de Cliques) */
+        /* Navegação */
         nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 2000; }
-        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9aa0a6; cursor: pointer; border-top: 3px solid transparent; }
-        .nav-link.active { color: var(--g-blue); border-top-color: var(--g-blue); }
+        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9aa0a6; cursor: pointer; }
+        .nav-link.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); }
 
         .hidden { display: none; }
     </style>
@@ -48,135 +50,135 @@
             <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic shadow-sm">S</div>
             <span class="text-[10px] font-black uppercase text-blue-600">Social Network</span>
         </div>
-        <div id="top-balance" class="text-lg font-black text-green-600">0.0000€</div>
+        <div id="top-bal" class="text-lg font-black text-green-600">0.0000€</div>
     </header>
 
     <div class="status-bar">MODO NORMAL (100% GANHOS)</div>
 
-    <div id="pub-wrapper" class="publisher-zone">
-        <div id="mini-pub" onclick="togglePub(true)" class="flex items-center gap-3 bg-gray-100 rounded-full px-4 py-2 cursor-pointer border border-gray-200">
-            <div class="w-6 h-6 bg-gray-300 rounded-full"></div>
+    <div id="pub-area" class="publisher-zone">
+        <div id="mini-input" onclick="setEditor(true)" class="bg-gray-100 rounded-full px-4 py-2 border border-gray-200 cursor-pointer">
             <span class="text-[10px] text-gray-400 font-black uppercase">O que quer partilhar?</span>
         </div>
-        <div id="full-pub" class="hidden">
-            <textarea id="post-txt" placeholder="ESCREVA AQUI..." class="w-full border-none outline-none font-black uppercase text-xs p-2 mb-2" rows="2"></textarea>
-            <div class="flex gap-2">
-                <button onclick="togglePub(false)" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Fechar</button>
-                <button onclick="handlePost()" class="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-md">Publicar</button>
+        <div id="full-input" class="hidden">
+            <textarea id="p-content" placeholder="ESCREVA AQUI..." class="w-full border-none outline-none font-black uppercase text-xs p-2" rows="2"></textarea>
+            <div class="flex gap-2 mt-2">
+                <button onclick="setEditor(false)" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Fechar</button>
+                <button onclick="handleSend()" class="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Publicar</button>
             </div>
         </div>
     </div>
 
-    <main class="main-container px-4 max-w-md mx-auto">
-        <section id="view-feed" class="tab-content active">
-            <div id="posts-container"></div>
+    <main class="main-content px-4 max-w-md mx-auto">
+        <section id="pane-feed" class="tab-pane active">
+            <div id="feed-list"></div>
         </section>
 
-        <section id="view-wallet" class="tab-content">
-            <div class="google-card p-10 text-center mt-4">
-                <p class="text-[10px] text-gray-400 uppercase font-black">O seu saldo</p>
-                <h2 id="wallet-balance" class="text-5xl font-black text-blue-600 my-4">0.0000€</h2>
-                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-6">
-                    <div id="progress-bar" class="bg-blue-600 h-full w-0 transition-all duration-1000"></div>
+        <section id="pane-wallet" class="tab-pane">
+            <div class="post-card p-10 flex-col text-center">
+                <p class="text-[10px] text-gray-400 uppercase">Saldo Disponível</p>
+                <h2 id="wall-bal" class="text-5xl font-black text-blue-600 my-4">0.0000€</h2>
+                <div class="w-full bg-gray-100 h-2 rounded-full mb-6">
+                    <div id="wall-prog" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
                 </div>
-                <button class="w-full bg-blue-50 text-blue-600 py-4 rounded-xl font-black uppercase text-xs border border-blue-100">Levantar Fundos</button>
+                <button class="w-full py-4 bg-gray-50 rounded-xl text-gray-400 font-black uppercase text-[10px]">Levantar (Mín. 5€)</button>
             </div>
         </section>
 
-        <section id="view-menu" class="tab-content">
-            <div class="google-card p-4 mt-4">
-                <div class="flex items-center justify-between p-4 border-b border-gray-50">
-                    <span class="text-[10px] font-black uppercase">ID de Utilizador</span>
-                    <span class="text-[10px] text-blue-600 font-black" id="user-display-id">5401881400</span>
-                </div>
-                <button onclick="localStorage.clear(); location.reload();" class="w-full py-6 text-red-500 font-black uppercase text-xs text-center">Terminar Sessão</button>
+        <section id="pane-menu" class="tab-pane">
+            <div class="post-card p-4 flex-col">
+                <button onclick="localStorage.clear(); location.reload();" class="w-full py-4 text-red-500 font-black uppercase text-xs">Terminar Sessão</button>
             </div>
         </section>
     </main>
 
     <nav>
-        <div onclick="changeTab('feed')" id="nav-feed" class="nav-link active">Feed</div>
-        <div onclick="changeTab('wallet')" id="nav-wallet" class="nav-link">Carteira</div>
-        <div onclick="changeTab('menu')" id="nav-menu" class="nav-link">Menu</div>
+        <div onclick="switchView('feed')" id="nav-feed" class="nav-link active">Feed</div>
+        <div onclick="switchView('wallet')" id="nav-wallet" class="nav-link">Carteira</div>
+        <div onclick="switchView('menu')" id="nav-menu" class="nav-link">Menu</div>
     </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
-        let activeID = localStorage.getItem('apex_uid') || "5401881400";
-        let balance = 0;
+        let uID = localStorage.getItem('apex_uid') || "5401881400";
+        let bal = 0;
 
         async function init() {
-            document.getElementById('user-display-id').innerText = activeID;
-            const { data } = await sb.from('perfis').select('saldo').eq('id', activeID).single();
-            if(data) balance = Number(data.saldo);
-            refreshUI();
-            loadPosts();
+            const { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
+            if(data) bal = Number(data.saldo);
+            updateAllUI();
+            fetchPosts();
         }
 
-        async function loadPosts() {
+        async function fetchPosts() {
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const container = document.getElementById('posts-container');
+            const container = document.getElementById('feed-list');
             container.innerHTML = "";
+            
             posts.forEach(p => {
                 container.innerHTML += `
-                <div class="google-card">
-                    <div class="p-4 pb-0">
+                <div class="post-card shadow-sm">
+                    <div class="post-body">
                         <div class="flex items-center gap-2 mb-3">
-                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-[10px]">👤</div>
+                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-[10px]">👤</div>
                             <span class="text-[10px] font-black text-blue-600 uppercase">${p.user_id}</span>
                         </div>
-                        <p class="text-[13px] font-bold text-gray-800 mb-4">${p.content}</p>
-                        
-                        <div class="stats-row">
-                            <div class="like-pill">👍 ${Math.floor(Math.random()*30)}</div>
-                            <div class="comment-label">0 comentários</div>
+                        <p class="text-[13px] font-bold text-gray-800 leading-snug">${p.content}</p>
+                        ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-xl mt-3 border border-gray-100">` : ''}
+                    </div>
+                    
+                    <div class="side-actions">
+                        <div onclick="gain(0.0006)" class="action-item">
+                            <div class="icon-circle">👍</div>
+                            <span class="action-label">${Math.floor(Math.random()*50)}</span>
                         </div>
-
-                        <div class="action-grid">
-                            <button onclick="addGain(0.0006)" class="action-btn">Gosto</button>
-                            <button class="action-btn">Comentar</button>
-                            <button onclick="addGain(0.0020)" class="action-btn">Partilhar</button>
+                        <div onclick="gain(0.0010)" class="action-item">
+                            <div class="icon-circle">💬</div>
+                            <span class="action-label">0</span>
+                        </div>
+                        <div onclick="gain(0.0020)" class="action-item">
+                            <div class="icon-circle">🔗</div>
+                            <span class="action-label">Share</span>
                         </div>
                     </div>
                 </div>`;
             });
         }
 
-        function changeTab(tab) {
-            document.querySelectorAll('.tab-content, .nav-link').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + tab).classList.add('active');
-            document.getElementById('nav-' + tab).classList.add('active');
-            document.getElementById('pub-wrapper').style.display = (tab === 'feed') ? 'block' : 'none';
+        function switchView(view) {
+            document.querySelectorAll('.tab-pane, .nav-link').forEach(el => el.classList.remove('active'));
+            document.getElementById('pane-' + view).classList.add('active');
+            document.getElementById('nav-' + view).classList.add('active');
+            document.getElementById('pub-area').style.display = (view === 'feed') ? 'block' : 'none';
         }
 
-        async function handlePost() {
-            const val = document.getElementById('post-txt').value;
-            if(!val) return;
-            await sb.from('posts').insert([{ user_id: activeID, content: val }]);
-            addGain(0.0150);
-            togglePub(false);
-            loadPosts();
+        async function handleSend() {
+            const txt = document.getElementById('p-content').value;
+            if(!txt) return;
+            await sb.from('posts').insert([{ user_id: uID, content: txt }]);
+            gain(0.0150);
+            setEditor(false);
+            fetchPosts();
         }
 
-        function addGain(v) {
-            balance += v;
-            refreshUI();
-            sb.from('perfis').upsert({ id: activeID, saldo: balance });
+        function gain(v) {
+            bal += v;
+            updateAllUI();
+            sb.from('perfis').upsert({ id: uID, saldo: bal });
         }
 
-        function refreshUI() {
-            const fmt = balance.toFixed(4) + "€";
-            document.getElementById('top-balance').innerText = fmt;
-            document.getElementById('wallet-balance').innerText = fmt;
-            const prog = (balance / 5) * 100;
-            document.getElementById('progress-bar').style.width = Math.min(prog, 100) + "%";
+        function updateAllUI() {
+            const fmt = bal.toFixed(4) + "€";
+            document.getElementById('top-bal').innerText = fmt;
+            document.getElementById('wall-bal').innerText = fmt;
+            const prog = (bal / 5) * 100;
+            document.getElementById('wall-prog').style.width = Math.min(prog, 100) + "%";
         }
 
-        function togglePub(s) {
-            document.getElementById('mini-pub').classList.toggle('hidden', s);
-            document.getElementById('full-pub').classList.toggle('hidden', !s);
+        function setEditor(s) {
+            document.getElementById('mini-input').classList.toggle('hidden', s);
+            document.getElementById('full-input').classList.toggle('hidden', !s);
         }
 
         init();
