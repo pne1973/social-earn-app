@@ -3,149 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.12 - Final Layout</title>
+    <title>Apex Social v33.12 - Produção</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --g-blue: #4285F4; --g-green: #34A853; }
-        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; overflow-x: hidden; }
+        body { font-family: 'Roboto', sans-serif; background: #f1f3f4; color: #3c4043; margin: 0; padding-top: 180px; padding-bottom: 70px; }
 
-        /* Headers Estáticos */
+        /* Headers e Fixed Areas */
         header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
-        .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 30px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; text-transform: uppercase; color: var(--g-green); font-weight: 900; }
-        .ad-banner-top { position: fixed; top: 90px; width: 100%; z-index: 850; height: 40px; background: #fff; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; color: #dadce0; text-transform: uppercase; }
-        .publisher-zone { position: fixed; top: 130px; width: 100%; z-index: 800; background: white; border-bottom: 1px solid #dadce0; padding: 12px; }
+        .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 35px; background: white; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--g-green); text-transform: uppercase; }
+        .ad-banner-top { position: fixed; top: 95px; width: 100%; z-index: 900; height: 30px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; color: #bdc1c6; text-transform: uppercase; letter-spacing: 1px; }
+        .publisher-zone { position: fixed; top: 125px; width: 100%; z-index: 850; background: white; border-bottom: 1px solid #dadce0; padding: 12px 16px; }
 
-        /* Layout de Feed (Baseado na versão 13:27 - Alargado) */
-        .main-content { padding-top: 200px; padding-bottom: 80px; width: 100%; max-width: 500px; margin: 0 auto; }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; }
-
+        /* Estilo dos Cards (Exatamente como a imagem) */
+        .feed-container { max-width: 500px; margin: 0 auto; padding: 0 12px; }
         .feed-item { 
-            background: white; border: 1px solid #dadce0; border-radius: 12px; 
-            margin-bottom: 12px; position: relative; display: flex; 
-            min-height: 140px; overflow: hidden;
+            background: white; border-radius: 20px; border: 1px solid #e8eaed; 
+            margin-bottom: 16px; display: flex; overflow: hidden; 
+            box-shadow: 0 1px 2px rgba(60,64,67,0.08); 
         }
         
-        /* Ajuste de Largura Restaurado */
-        .item-body { flex: 1; padding: 18px; padding-right: 65px; }
-        
-        .item-side { 
-            position: absolute; right: 0; top: 0; bottom: 0; width: 60px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            gap: 15px; background: rgba(250, 250, 250, 0.8); border-left: 1px solid #f0f0f0;
+        .item-main { flex: 1; padding: 16px; }
+        .item-sidebar { 
+            width: 70px; background: #f8f9fa; border-left: 1px solid #f1f3f4; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 10px 0;
         }
-        
-        .icon-btn { width: 34px; height: 34px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #eee; font-size: 14px; cursor: pointer; }
-        .icon-label { font-size: 8px; font-weight: 900; color: #70757a; text-transform: uppercase; margin-top: 2px; }
 
-        /* Publicidade */
-        .is-ad { border: 1px dashed var(--g-blue); background: #fcfdfe; }
-        .ad-pill { font-size: 7px; font-weight: 900; color: var(--g-blue); border: 1px solid var(--g-blue); padding: 2px 6px; border-radius: 4px; margin-bottom: 8px; width: fit-content; text-transform: uppercase; }
+        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .user-avatar { width: 32px; height: 32px; background: #e8f0fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--g-blue); font-weight: bold; font-size: 12px; }
+        .user-name { font-size: 11px; font-weight: 900; color: var(--g-blue); text-transform: uppercase; }
+        .post-text { font-size: 14px; font-weight: 700; color: #202124; line-height: 1.4; }
+        .post-image { width: 100%; border-radius: 12px; margin-top: 12px; object-fit: cover; }
 
-        /* Navegação */
-        nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 2000; }
-        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; text-transform: uppercase; color: #9aa0a6; }
+        /* Botões Laterais */
+        .side-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .btn-circle { width: 38px; height: 38px; background: white; border-radius: 50%; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-label { font-size: 8px; font-weight: 900; color: #70757a; text-transform: uppercase; }
+
+        /* Publicidade Intercalada */
+        .ad-card { border: 1px dashed #dadce0; background: #fafafa; }
+        .ad-tag { font-size: 8px; font-weight: 900; color: var(--g-blue); text-transform: uppercase; margin-bottom: 8px; }
+
+        /* Navegação Inferior */
+        nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 2000; }
+        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; text-transform: uppercase; color: #5f6368; }
         .nav-link.active { color: var(--g-blue); border-top: 3px solid var(--g-blue); }
 
-        /* Tabela de Ganhos */
-        .earnings-table { width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 15px; }
-        .earnings-table th { text-align: left; padding: 8px; background: #f8f9fa; border-bottom: 2px solid #eee; text-transform: uppercase; color: #70757a; }
-        .earnings-table td { padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; }
-        .earnings-table tr:last-child td { border-bottom: none; }
-
-        #login-screen { position: fixed; inset: 0; background: white; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; }
+        #login-screen { position: fixed; inset: 0; background: white; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-3xl font-black mb-6 italic shadow-lg">S</div>
-        <h1 class="text-xl font-black uppercase mb-2">Entrar na Rede</h1>
-        <input id="user-id-input" type="text" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs bg-gray-50 border border-gray-200 rounded-xl p-4 text-center font-black text-sm mb-4 outline-none">
-        <button onclick="handleLogin()" class="w-full max-w-xs bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-xs">Aceder</button>
+        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-3xl font-black italic shadow-xl mb-8">S</div>
+        <h1 class="text-xl font-black uppercase mb-6">Bem-vindo</h1>
+        <input id="user-id-input" type="text" placeholder="ID DE UTILIZADOR" class="w-full max-w-xs bg-gray-50 border border-gray-200 rounded-xl p-5 text-center font-black text-sm mb-4 outline-none">
+        <button onclick="handleLogin()" class="w-full max-w-xs bg-blue-600 text-white py-5 rounded-xl font-black uppercase text-xs shadow-lg">Entrar na Conta</button>
     </div>
 
     <header>
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
-            <span class="text-[10px] font-black uppercase text-blue-600">Apex Social</span>
+            <span class="text-[11px] font-black uppercase text-blue-600 tracking-tighter">Apex Social</span>
         </div>
-        <div id="top-bal" class="text-lg font-black text-green-600">0.0000€</div>
+        <div id="top-bal" class="text-xl font-black text-green-600">0.0000€</div>
     </header>
 
     <div class="status-bar">Modo Produção • 100% Ganhos</div>
-    <div class="ad-banner-top italic">Google Adsense Partner</div>
+    <div class="ad-banner-top">Google Adsense Partner</div>
 
     <div id="pub-area" class="publisher-zone">
-        <div id="mini-input" onclick="setEditor(true)" class="bg-gray-100 rounded-full px-4 py-2 border border-gray-200 cursor-pointer flex items-center gap-3">
+        <div id="mini-input" onclick="setEditor(true)" class="bg-gray-100 rounded-full px-5 py-3 border border-gray-200 cursor-pointer flex items-center gap-3">
             <div class="w-6 h-6 bg-gray-300 rounded-full"></div>
-            <span class="text-[11px] text-gray-400 font-black uppercase italic">Escreva aqui a sua publicação...</span>
+            <span class="text-[11px] text-gray-500 font-bold uppercase italic">Escreva aqui a sua publicação...</span>
         </div>
         <div id="full-input" class="hidden">
-            <textarea id="p-content" placeholder="O QUE QUER PARTILHAR?" class="w-full border-none outline-none font-black uppercase text-xs p-2" rows="2"></textarea>
-            <div class="flex gap-2 mt-2">
+            <textarea id="p-content" placeholder="O QUE QUER PARTILHAR?" class="w-full border-none outline-none font-bold uppercase text-xs p-2 mb-2" rows="2"></textarea>
+            <div class="flex gap-2">
                 <button onclick="setEditor(false)" class="flex-1 text-[9px] font-black text-gray-400 uppercase">Voltar</button>
-                <button onclick="handleSend()" class="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Publicar (+0.0150€)</button>
+                <button onclick="handleSend()" class="flex-[3] bg-blue-600 text-white py-3 rounded-xl font-black text-[10px] uppercase">Publicar (+0.0150€)</button>
             </div>
         </div>
     </div>
 
-    <main class="main-content px-3">
-        <section id="pane-feed" class="tab-pane active"><div id="feed-list"></div></section>
-        
-        <section id="pane-wallet" class="tab-pane">
-            <div class="feed-item p-10 flex-col text-center">
-                <p class="text-[9px] text-gray-400 font-black uppercase italic">O Teu Saldo</p>
-                <h2 id="wall-bal" class="text-5xl font-black text-blue-600 my-4">0.0000€</h2>
-                <div class="w-full bg-gray-100 h-2 rounded-full mb-6">
-                    <div id="wall-prog" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
-                </div>
-                <button class="w-full py-4 bg-gray-50 text-gray-300 rounded-xl font-black uppercase text-[10px]">Mínimo 5€ para levantamento</button>
-                
-                <table class="earnings-table">
-                    <thead><tr><th>Ação XP</th><th>Ganho Base</th></tr></thead>
-                    <tbody>
-                        <tr><td>Criar Post</td><td class="text-blue-600">0.0150€</td></tr>
-                        <tr><td>Partilhar Post</td><td class="text-blue-600">0.0020€</td></tr>
-                        <tr><td>Comentar Post</td><td class="text-blue-600">0.0010€</td></tr>
-                        <tr><td>Gostar de Post</td><td class="text-blue-600">0.0006€</td></tr>
-                    </tbody>
-                </table>
+    <main class="feed-container">
+        <div id="feed-list">
             </div>
-        </section>
-
-        <section id="pane-admin" class="tab-pane">
-            <div class="grid grid-cols-2 gap-2 mb-4">
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                    <p class="text-[8px] font-black text-gray-400 uppercase italic">Utilizadores</p>
-                    <p id="adm-users" class="text-xl font-black italic">...</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                    <p class="text-[8px] font-black text-gray-400 uppercase italic">Posts Totais</p>
-                    <p id="adm-posts" class="text-xl font-black italic">...</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="pane-menu" class="tab-pane">
-            <div class="feed-item p-4 flex-col">
-                <div class="flex justify-between items-center p-4 border-b border-gray-50 mb-2 text-[10px] font-black uppercase">
-                    <span class="text-gray-400 italic">ID da Conta</span>
-                    <span class="text-blue-600" id="session-id">---</span>
-                </div>
-                <button onclick="logout()" class="w-full py-4 text-red-500 font-black uppercase text-xs italic">Terminar Sessão</button>
-            </div>
-        </section>
     </main>
 
     <nav>
-        <div onclick="switchView('feed')" id="nav-feed" class="nav-link active">Feed</div>
-        <div onclick="switchView('wallet')" id="nav-wallet" class="nav-link">Carteira</div>
-        <div onclick="switchView('admin')" id="nav-admin" class="nav-link hidden">Admin</div>
-        <div onclick="switchView('menu')" id="nav-menu" class="nav-link">Menu</div>
+        <div onclick="switchView('feed')" class="nav-link active">Feed</div>
+        <div onclick="switchView('wallet')" class="nav-link">Carteira</div>
+        <div onclick="switchView('menu')" class="nav-link">Sair</div>
     </nav>
 
     <script>
@@ -162,16 +114,9 @@
             location.reload();
         }
 
-        function logout() { localStorage.removeItem('apex_uid'); location.reload(); }
-
         async function init() {
             if(!uID) return;
             document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('session-id').innerText = uID;
-            if(uID === "5401881400") {
-                document.getElementById('nav-admin').classList.remove('hidden');
-                loadStats();
-            }
             const { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
             if(data) bal = Number(data.saldo);
             updateUI();
@@ -184,57 +129,46 @@
             container.innerHTML = "";
             
             posts.forEach((p, i) => {
-                // Template de Post Normal Restaurado
+                // Template de Post (Igual à imagem)
                 container.innerHTML += `
-                <div class="feed-item shadow-sm">
-                    <div class="item-body">
-                        <div class="flex items-center gap-2 mb-3">
-                            <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-[9px] font-black italic">P</div>
-                            <span class="text-[9px] font-black text-blue-600 uppercase">Utilizador ${p.user_id}</span>
+                <div class="feed-item">
+                    <div class="item-main">
+                        <div class="user-info">
+                            <div class="user-avatar">${p.user_id.toString().substring(0,1)}</div>
+                            <span class="user-name">Utilizador ${p.user_id}</span>
                         </div>
-                        <p class="text-[14px] font-bold text-gray-800 leading-snug">${p.content}</p>
+                        <p class="post-text">${p.content}</p>
+                        ${i % 2 !== 0 ? '<img src="https://picsum.photos/seed/'+i+'/400/250" class="post-image">' : ''}
                     </div>
-                    <div class="item-side">
-                        <div onclick="gain(0.0006)" class="flex flex-col items-center">
-                            <div class="icon-btn">👍</div>
-                            <span class="icon-label">${Math.floor(Math.random()*20)}</span>
+                    <div class="item-sidebar">
+                        <div class="side-btn" onclick="gain(0.0006)">
+                            <div class="btn-circle">👍</div>
+                            <span class="btn-label">${Math.floor(Math.random()*50)}</span>
                         </div>
-                        <div onclick="gain(0.0020)" class="flex flex-col items-center">
-                            <div class="icon-btn">🔗</div>
-                            <span class="icon-label">SHARE</span>
+                        <div class="side-btn">
+                            <div class="btn-circle">💬</div>
+                            <span class="btn-label">0</span>
+                        </div>
+                        <div class="side-btn" onclick="gain(0.0020)">
+                            <div class="btn-circle">🔗</div>
+                            <span class="btn-label">Share</span>
                         </div>
                     </div>
                 </div>`;
 
-                // INJEÇÃO DE ANÚNCIO (MESMA ESTRUTURA DO POST)
                 if((i + 1) % 3 === 0) {
                     container.innerHTML += `
-                    <div class="feed-item is-ad shadow-sm">
-                        <div class="item-body">
-                            <div class="ad-pill">Patrocinado</div>
-                            <p class="text-[11px] font-black text-gray-400 uppercase italic">Publicidade oficial da rede parceira.</p>
+                    <div class="feed-item ad-card">
+                        <div class="item-main">
+                            <div class="ad-tag">Publicidade de Rede</div>
+                            <p class="text-[11px] font-black text-gray-400 uppercase italic">Anúncio Patrocinado</p>
                         </div>
-                        <div class="item-side">
-                            <div class="icon-btn text-blue-500">ℹ️</div>
-                            <span class="icon-label">ADS</span>
+                        <div class="item-sidebar">
+                            <div class="btn-circle text-blue-500">ℹ️</div>
                         </div>
                     </div>`;
                 }
             });
-        }
-
-        async function loadStats() {
-            const { count: u } = await sb.from('perfis').select('*', { count: 'exact' });
-            const { count: p } = await sb.from('posts').select('*', { count: 'exact' });
-            document.getElementById('adm-users').innerText = u || 0;
-            document.getElementById('adm-posts').innerText = p || 0;
-        }
-
-        function switchView(v) {
-            document.querySelectorAll('.tab-pane, .nav-link').forEach(el => el.classList.remove('active'));
-            document.getElementById('pane-' + v).classList.add('active');
-            document.getElementById('nav-' + v).classList.add('active');
-            document.getElementById('pub-area').style.display = (v === 'feed') ? 'block' : 'none';
         }
 
         async function handleSend() {
@@ -253,10 +187,7 @@
         }
 
         function updateUI() {
-            const fmt = bal.toFixed(4) + "€";
-            document.getElementById('top-bal').innerText = fmt;
-            document.getElementById('wall-bal').innerText = fmt;
-            document.getElementById('wall-prog').style.width = Math.min((bal/5)*100, 100) + "%";
+            document.getElementById('top-bal').innerText = bal.toFixed(4) + "€";
         }
 
         function setEditor(s) {
