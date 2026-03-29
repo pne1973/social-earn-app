@@ -3,196 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.49</title>
+    <title>Apex Social v33.50 - Full System</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-green: #34A853; --fb-bg: #f1f3f4; }
-        body { font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif; background: var(--fb-bg); color: #1c1e21; margin: 0; padding-top: 185px; padding-bottom: 90px; }
+        :root { --fb-blue: #1877F2; --fb-bg: #F0F2F5; --g-green: #34A853; }
+        body { font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif; background: var(--fb-bg); color: #1c1e21; margin: 0; padding-bottom: 90px; }
+        
+        /* LOGIN */
+        #login-screen { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 
         /* HEADER & BARS */
-        header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
+        .app-header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 32px; background: white; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--g-green); text-transform: uppercase; }
         .ad-provider { position: fixed; top: 92px; width: 100%; z-index: 900; height: 28px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #bdc1c6; text-transform: uppercase; }
-        .publisher-zone { position: fixed; top: 120px; width: 100%; z-index: 850; background: white; border-bottom: 1px solid #dadce0; padding: 10px 16px; height: 65px; display: flex; align-items: center; }
+        .publisher-zone { margin-top: 120px; background: white; border-bottom: 1px solid #dadce0; padding: 12px 16px; height: 65px; display: flex; align-items: center; }
 
-        /* FEED & POSTS */
+        /* FEED & CARDS */
         .feed-container { max-width: 580px; margin: 0 auto; padding: 10px; }
-        .post-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .post-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .post-main { display: flex; width: 100%; }
         .post-content { flex: 1; padding: 16px; } 
         .post-user-label { font-size: 14px; font-weight: 600; color: #050505; margin-bottom: 4px; display: block; }
-        .post-text { font-size: 15px; line-height: 1.3333; color: #1c1e21; margin-top: 8px; word-wrap: break-word; }
+        .post-text { font-size: 15px; line-height: 1.3333; color: #1c1e21; margin-top: 8px; }
         .post-sidebar { width: 70px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 15px 0; }
         
-        /* COMENTÁRIOS SEPARADOS (ESTILO FB) */
+        /* COMMENTS */
         .feed-comments-area { background: white; border-top: 1px solid #f0f2f5; padding: 12px 16px; }
-        .comment-bubble { background: #f0f2f5; border-radius: 18px; padding: 8px 12px; margin-bottom: 8px; display: inline-block; max-width: 90%; }
-        .comment-user { font-size: 12px; font-weight: 700; color: #050505; display: block; }
+        .comment-bubble { background: #f0f2f5; border-radius: 18px; padding: 8px 12px; margin-bottom: 6px; display: inline-block; max-width: 92%; }
+        .comment-user { font-size: 11px; font-weight: 700; color: #050505; display: block; }
         .comment-text { font-size: 13px; color: #1c1e21; }
 
-        /* ADS */
-        .ad-card-feed { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 250px; }
-        .modal-ad-banner { background: #f8f9fa; border-bottom: 1px solid #dadce0; padding: 15px; text-align: center; min-height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
-        /* UI ELEMENTS */
-        .icon-btn { width: 36px; height: 36px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
-        .sidebar-label { font-size: 11px; font-weight: 600; color: #65676b; margin-top: 2px; }
-
         /* NAVIGATION */
-        nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; cursor: pointer; }
-        .nav-active { color: var(--g-blue); border-top: 3px solid var(--g-blue); }
+        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #65676b; cursor: pointer; }
+        .nav-active { color: var(--fb-blue); border-top: 3px solid var(--fb-blue); }
 
         /* MODALS */
         .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
-        .modal-header { height: 60px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; }
-        .custom-textarea { width: 100%; font-size: 18px; border: none; outline: none; resize: none; color: #1c1e21; min-height: 150px; padding: 16px; }
+        .modal-ad-banner { background: #f8f9fa; border-bottom: 1px solid #dadce0; padding: 12px; text-align: center; }
         
         .page-content { display: none; }
         .active-page { display: block; }
+        .icon-btn { width: 36px; height: 36px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="flex items-center gap-2">
-            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
-            <span class="text-[12px] font-black uppercase text-blue-600 italic">Apex Social</span>
+    <div id="login-screen">
+        <div class="w-16 h-16 bg-[#1877F2] rounded-2xl flex items-center justify-center text-white text-4xl font-black italic mb-6 shadow-lg">f</div>
+        <h1 class="text-xl font-bold mb-4">Introduza o seu ID Apex</h1>
+        <input id="login-id" type="number" placeholder="ID de Utilizador" class="w-full max-w-xs p-4 bg-gray-100 rounded-xl mb-4 text-center font-bold outline-none border-2 border-transparent focus:border-blue-500">
+        <button onclick="doLogin()" class="w-full max-w-xs bg-[#1877F2] text-white p-4 rounded-xl font-bold shadow-md">ENTRAR</button>
+        <p class="text-xs text-gray-400 mt-6 uppercase font-bold">Secure Access v33.50</p>
+    </div>
+
+    <div id="app-ui" class="hidden">
+        <header class="app-header">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
+                <span class="text-[14px] font-bold text-blue-600">Apex Social</span>
+            </div>
+            <div id="bal-top" class="text-xl font-black text-green-600">0.0000€</div>
+        </header>
+
+        <div class="status-bar">SISTEMA ATIVO • 1 XP = 0.0001€</div>
+        <div class="ad-provider">GOOGLE ADSENSE CERTIFIED</div>
+
+        <div id="p-feed" class="page-content active-page">
+            <div class="publisher-zone">
+                <div onclick="openModal('modal-editor')" class="bg-[#f0f2f5] rounded-full px-5 py-2 w-full flex items-center gap-3 cursor-pointer">
+                    <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+                    <span class="text-[14px] text-gray-500">No que está a pensar?</span>
+                </div>
+            </div>
+            <main class="feed-container" id="feed-list"></main>
         </div>
-        <div id="bal-top" class="text-2xl font-black text-green-600">0.0000€</div>
-    </header>
 
-    <div class="status-bar">v33.49 • DESIGN DE COMENTÁRIOS ATUALIZADO</div>
-    <div class="ad-provider">GOOGLE ADSENSE CERTIFIED PARTNER</div>
-
-    <div id="page-feed" class="page-content active-page">
-        <div class="publisher-zone">
-            <div onclick="openModal('modal-editor')" class="bg-[#f0f2f5] rounded-full px-6 py-2 w-full flex items-center gap-4 cursor-pointer">
-                <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
-                <span class="text-[14px] text-gray-500">No que está a pensar?</span>
+        <div id="p-ranking" class="page-content">
+            <div class="feed-container py-10">
+                <h2 class="font-bold text-center text-lg mb-6">TOP 10 RANKING XP</h2>
+                <div id="ranking-list" class="bg-white rounded-xl border"></div>
             </div>
         </div>
-        <main class="feed-container" id="feed-list"></main>
-    </div>
 
-    <div id="page-ranking" class="page-content">
-        <div class="feed-container p-10 text-center font-bold text-gray-400">RANKING GLOBAL</div>
-    </div>
+        <div id="p-wallet" class="page-content py-20">
+            <div class="feed-container bg-white p-6 rounded-2xl border text-center">
+                <p class="text-gray-500 uppercase text-xs font-bold mb-2">Saldo Disponível</p>
+                <h1 id="wallet-val" class="text-4xl font-black text-blue-600 mb-6">0.0000€</h1>
+                <div class="grid grid-cols-2 gap-4">
+                    <button class="bg-gray-100 p-4 rounded-xl font-bold text-sm">HISTÓRICO</button>
+                    <button onclick="alert('Mínimo 5000 XP para levantar')" class="bg-green-600 text-white p-4 rounded-xl font-bold text-sm">LEVANTAR</button>
+                </div>
+            </div>
+        </div>
 
-    <div id="page-wallet" class="page-content">
-        <div class="feed-container p-10 text-center font-bold text-gray-400">CARTEIRA</div>
+        <div id="p-admin" class="page-content py-20">
+            <div class="feed-container bg-white p-6 rounded-2xl border">
+                <h2 class="font-black text-red-600 mb-4 uppercase">Painel de Controlo Admin</h2>
+                <div id="admin-stats" class="grid grid-cols-2 gap-2 mb-6 text-xs font-bold uppercase text-gray-500">
+                    <div class="bg-gray-50 p-3 rounded">Users: <span id="adm-u" class="text-black">0</span></div>
+                    <div class="bg-gray-50 p-3 rounded">Posts: <span id="adm-p" class="text-black">0</span></div>
+                </div>
+                <button onclick="location.reload()" class="w-full bg-black text-white p-3 rounded font-bold text-xs mb-4">FORÇAR ATUALIZAÇÃO</button>
+                <div id="admin-actions" class="text-sm"></div>
+            </div>
+        </div>
+
+        <nav id="main-nav">
+            <div class="nav-item nav-active" onclick="tab('feed', this)">Feed</div>
+            <div class="nav-item" onclick="tab('ranking', this)">Ranking</div>
+            <div class="nav-item" onclick="tab('wallet', this)">Carteira</div>
+            <div id="nav-adm-btn" class="nav-item hidden" onclick="tab('admin', this)">Admin</div>
+        </nav>
     </div>
 
     <div id="modal-editor" class="modal-fullscreen">
-        <div class="modal-header">
-            <button onclick="closeModal('modal-editor')" class="text-gray-500 font-bold">Cancelar</button>
-            <span class="font-bold">Criar publicação</span>
+        <div class="flex items-center justify-between p-4 border-b">
+            <button onclick="closeModal('modal-editor')" class="text-gray-500">Cancelar</button>
+            <span class="font-bold">Nova Publicação</span>
             <button onclick="publish()" class="text-blue-600 font-bold">Publicar</button>
         </div>
-        <div class="modal-ad-banner">
-            <span class="text-[9px] font-black text-blue-500 uppercase">Patrocinado</span>
-            <p class="text-[11px] font-bold text-gray-400">GANHE +100 XP AO CONVIDAR AMIGOS</p>
-        </div>
-        <div class="flex-1 overflow-y-auto">
-            <textarea id="post-txt" placeholder="No que está a pensar?" class="custom-textarea"></textarea>
-            <div class="px-4 pb-4">
-                <input id="post-url" type="text" placeholder="URL da imagem (opcional)" class="w-full p-3 bg-gray-100 rounded-xl outline-none text-sm border border-gray-200">
-            </div>
-        </div>
+        <div class="modal-ad-banner text-[10px] font-bold text-gray-400">ANÚNCIO: CONVIDE AMIGOS E GANHE 100 XP</div>
+        <textarea id="post-txt" placeholder="No que está a pensar?" class="custom-textarea flex-1 p-5 outline-none text-lg"></textarea>
+        <input id="post-url" type="text" placeholder="URL da Foto (Opcional)" class="m-4 p-3 bg-gray-100 rounded-xl outline-none">
     </div>
-
-    <div id="modal-comment" class="modal-fullscreen">
-        <div class="modal-header">
-            <button onclick="closeModal('modal-comment')" class="text-gray-500 font-bold">Voltar</button>
-            <span class="font-bold">Comentar</span>
-            <button onclick="addComment()" class="text-blue-600 font-bold">Enviar</button>
-        </div>
-        <div class="modal-ad-banner">
-            <span class="text-[9px] font-black text-blue-500 uppercase">Google AdSense</span>
-            <p class="text-[11px] font-bold text-gray-400">ANÚNCIO DE REDE PARCEIRA APEX</p>
-        </div>
-        <div class="flex-1 overflow-y-auto">
-            <textarea id="comm-txt" placeholder="Escreva um comentário..." class="custom-textarea"></textarea>
-        </div>
-    </div>
-
-    <nav>
-        <div class="nav-item nav-active" onclick="switchTab('feed', this)">Feed</div>
-        <div class="nav-item" onclick="switchTab('ranking', this)">Ranking</div>
-        <div class="nav-item" onclick="switchTab('wallet', this)">Carteira</div>
-    </nav>
 
     <script>
         const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
-        let uID = 5401881400; 
+        let uID = null;
         let bal = 0;
-        let activePostID = null;
+        const ADMIN_ID = 5401881400;
 
-        async function init() {
-            let { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
-            if(data) bal = Number(data.saldo);
+        async function doLogin() {
+            const input = document.getElementById('login-id').value;
+            if(!input) return;
+            uID = parseInt(input);
+            
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-ui').classList.remove('hidden');
+
+            if(uID === ADMIN_ID) {
+                document.getElementById('nav-adm-btn').classList.remove('hidden');
+                loadAdmin();
+            }
+
+            let { data } = await sb.from('perfis').select('*').eq('id', uID).single();
+            if(!data) {
+                await sb.from('perfis').insert([{ id: uID, saldo: 0 }]);
+                bal = 0;
+            } else {
+                bal = Number(data.saldo);
+            }
+            
             updateUI();
-            await loadFeed();
-        }
-
-        function switchTab(tab, el) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-active'));
-            document.getElementById('page-' + tab).classList.add('active-page');
-            el.classList.add('nav-active');
+            loadFeed();
+            loadRanking();
         }
 
         async function loadFeed() {
+            const container = document.getElementById('feed-list');
             const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
             const { data: comms } = await sb.from('comentarios').select('*').order('created_at', {ascending: true});
-
-            const container = document.getElementById('feed-list');
-            container.innerHTML = "";
             
-            posts.forEach((p, index) => {
-                if (index > 0 && index % 3 === 0) {
-                    container.innerHTML += `
-                    <div class="ad-card-feed">
-                        <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">Publicidade</span>
-                        <p class="text-[14px] font-bold text-gray-600 uppercase">Anúncio de Rede Parceira</p>
-                        <button class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold uppercase">Saber Mais</button>
-                    </div>`;
+            container.innerHTML = "";
+            posts.forEach((p, i) => {
+                if(i > 0 && i % 3 === 0) {
+                    container.innerHTML += `<div class="bg-white border p-10 mb-4 rounded-xl text-center"><span class="text-[10px] block text-gray-400 font-bold mb-2">GOOGLE ADSENSE</span><p class="font-bold text-gray-600">ANÚNCIO DE REDE PARCEIRA</p></div>`;
                 }
 
-                const postComms = comms ? comms.filter(c => c.post_id == p.id) : [];
-                let commsHTML = "";
-                
-                if(postComms.length > 0) {
-                    commsHTML = `<div class="feed-comments-area">`;
-                    postComms.forEach(c => {
-                        commsHTML += `
-                        <div class="block">
-                            <div class="comment-bubble">
-                                <span class="comment-user">ID ${c.user_id}</span>
-                                <span class="comment-text">${c.content}</span>
-                            </div>
-                        </div>`;
-                    });
-                    commsHTML += `</div>`;
-                }
+                const pComms = comms ? comms.filter(c => c.post_id == p.id) : [];
+                let commsHTML = pComms.length > 0 ? `<div class="feed-comments-area">` : "";
+                pComms.forEach(c => {
+                    commsHTML += `<div class="block"><div class="comment-bubble"><span class="comment-user">ID ${c.user_id}</span><span class="comment-text">${c.content}</span></div></div>`;
+                });
+                if(pComms.length > 0) commsHTML += `</div>`;
 
                 container.innerHTML += `
                 <div class="post-card">
                     <div class="post-main">
                         <div class="post-content">
                             <span class="post-user-label">Utilizador ${p.user_id}</span>
-                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3 border border-gray-100">` : ''}
+                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3 border">` : ''}
                             <div class="post-text">${p.content}</div>
                         </div>
                         <div class="post-sidebar">
-                            <div class="flex flex-col items-center" onclick="reward(0.0006)"><div class="icon-btn">👍</div><span class="sidebar-label">${p.likes || 0}</span></div>
-                            <div class="flex flex-col items-center" onclick="openComments('${p.id}')"><div class="icon-btn">💬</div><span class="sidebar-label">${postComms.length}</span></div>
-                            <div class="flex flex-col items-center" onclick="sharePost('${p.content}')"><div class="icon-btn">🔗</div><span class="sidebar-label">Share</span></div>
+                            <div class="flex flex-col items-center" onclick="reward(0.0002)"><div class="icon-btn">👍</div><span class="sidebar-label">${p.likes || 0}</span></div>
+                            <div class="flex flex-col items-center"><div class="icon-btn">💬</div><span class="sidebar-label">${pComms.length}</span></div>
                         </div>
                     </div>
                     ${commsHTML}
@@ -200,30 +201,45 @@
             });
         }
 
+        async function loadRanking() {
+            const { data } = await sb.from('perfis').select('id, saldo').order('saldo', {ascending: false}).limit(10);
+            const list = document.getElementById('ranking-list');
+            list.innerHTML = "";
+            data.forEach((r, i) => {
+                list.innerHTML += `<div class="flex justify-between p-4 border-b"><span>#${i+1} ID ${r.id}</span><span class="font-bold text-green-600">${Number(r.saldo).toFixed(4)}€</span></div>`;
+            });
+        }
+
+        async function loadAdmin() {
+            const { count: uCount } = await sb.from('perfis').select('*', { count: 'exact' });
+            const { count: pCount } = await sb.from('posts').select('*', { count: 'exact' });
+            document.getElementById('adm-u').innerText = uCount;
+            document.getElementById('adm-p').innerText = pCount;
+        }
+
         async function publish() {
-            const txt = document.getElementById('post-txt').value.trim();
-            const url = document.getElementById('post-url').value.trim();
-            if(!txt) return;
-            const { error } = await sb.from('posts').insert([{ user_id: uID, content: txt, image_url: url || null }]);
-            if(!error) { reward(0.0150); closeModal('modal-editor'); document.getElementById('post-txt').value = ""; await loadFeed(); }
+            const t = document.getElementById('post-txt').value;
+            const u = document.getElementById('post-url').value;
+            if(!t) return;
+            const { error } = await sb.from('posts').insert([{ user_id: uID, content: t, image_url: u || null }]);
+            if(!error) { reward(0.0015); closeModal('modal-editor'); loadFeed(); }
         }
 
-        function openComments(postID) { activePostID = postID; document.getElementById('comm-txt').value = ""; openModal('modal-comment'); }
-
-        async function addComment() {
-            const txt = document.getElementById('comm-txt').value.trim();
-            if(!txt) return;
-            const { error } = await sb.from('comentarios').insert([{ post_id: activePostID, user_id: uID, content: txt }]);
-            if(!error) { reward(0.0010); closeModal('modal-comment'); await loadFeed(); }
+        function tab(t, e) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-active'));
+            document.getElementById('p-' + t).classList.add('active-page');
+            e.classList.add('nav-active');
         }
 
-        function reward(val) { bal += val; updateUI(); sb.from('perfis').upsert({ id: uID, saldo: bal }); }
-        function updateUI() { document.getElementById('bal-top').innerText = bal.toFixed(4) + "€"; }
+        function reward(v) { bal += v; updateUI(); sb.from('perfis').upsert({ id: uID, saldo: bal }); }
+        function updateUI() { 
+            const formatted = bal.toFixed(4) + "€";
+            document.getElementById('bal-top').innerText = formatted;
+            document.getElementById('wallet-val').innerText = formatted;
+        }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function sharePost(t) { if(navigator.share) navigator.share({title:'Apex', text:t, url:window.location.href}).then(()=>reward(0.0050)); }
-
-        init();
     </script>
 </body>
 </html>
