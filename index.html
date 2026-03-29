@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.45 - Facebook Style</title>
+    <title>Apex Social v33.46</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --fb-blue: #1877F2; --fb-bg: #F0F2F5; --g-green: #34A853; }
         body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--fb-bg); color: #1c1e21; margin: 0; padding-top: 185px; padding-bottom: 90px; }
@@ -22,32 +22,26 @@
         .post-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .post-main { display: flex; width: 100%; }
         
-        /* FACEBOOK STYLE TEXT */
         .post-content { flex: 1; padding: 12px 16px; }
-        .post-text { font-size: 15px; line-height: 1.3333; font-weight: 400; color: #1c1e21; margin-top: 8px; word-wrap: break-word; }
+        .post-text { font-size: 15px; line-height: 1.33; color: #1c1e21; margin-top: 8px; word-wrap: break-word; }
         .post-user { font-weight: 600; color: #050505; font-size: 14px; }
-
         .post-sidebar { width: 70px; background: #fcfcfc; border-left: 1px solid #f0f2f5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 10px 0; }
         
-        /* AD CARD - EQUAL TO POST */
-        .ad-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; min-height: 250px; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden; }
+        /* AD CARD */
+        .ad-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; min-height: 300px; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden; }
         .ad-header { padding: 12px 16px; border-bottom: 1px solid #f0f2f5; display: flex; justify-content: space-between; align-items: center; }
-        .ad-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: #f9f9f9; }
+        .ad-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
 
-        /* UI ELEMENTS */
-        .icon-btn { width: 36px; height: 36px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: background 0.2s; }
-        .icon-btn:active { background: #d8dadf; }
-        .sidebar-label { font-size: 11px; font-weight: 600; color: #65676b; margin-top: 2px; }
+        .icon-btn { width: 36px; height: 36px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
+        .sidebar-label { font-size: 11px; font-weight: 600; color: #65676b; }
 
         /* NAVIGATION */
         nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #65676b; cursor: pointer; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #65676b; cursor: pointer; border-top: 3px solid transparent; }
         .nav-active { color: var(--fb-blue); border-top: 3px solid var(--fb-blue); }
 
-        /* MODALS */
         .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
         .modal-header { height: 60px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
-        .custom-textarea { width: 100%; font-size: 18px; border: none; outline: none; resize: none; color: #1c1e21; min-height: 150px; padding: 10px; }
         
         .active-page { display: block; }
         .page-content { display: none; }
@@ -63,47 +57,38 @@
         <div id="bal-top" class="text-xl font-bold text-[#34A853]">0.0000€</div>
     </header>
 
-    <div class="status-bar">v33.45 • SISTEMA DE MONETIZAÇÃO ATIVO</div>
+    <div class="status-bar">v33.46 • GANHOS POR ATIVIDADE ATIVOS</div>
     <div class="ad-provider">GOOGLE ADSENSE PARTNER NETWORK</div>
 
     <div id="page-feed" class="page-content active-page">
         <div class="publisher-zone">
-            <div onclick="openModal('modal-editor')" class="bg-[#f0f2f5] rounded-full px-5 py-2 w-full flex items-center gap-3 cursor-pointer hover:bg-gray-200 transition">
+            <div onclick="openModal('modal-editor')" class="bg-[#f0f2f5] rounded-full px-5 py-2 w-full flex items-center gap-3 cursor-pointer">
                 <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
-                <span class="text-[14px] text-gray-600">No que está a pensar?</span>
+                <span class="text-[14px] text-gray-600">O que está a acontecer?</span>
             </div>
         </div>
-        <main class="feed-container" id="feed-list"></main>
+        <main class="feed-container" id="feed-list">
+            <div class="text-center py-10 font-bold text-gray-400">A CARREGAR FEED...</div>
+        </main>
     </div>
 
     <div id="page-ranking" class="page-content">
-        <div class="feed-container p-10 text-center font-bold uppercase text-gray-400">Ranking Global</div>
+        <div class="feed-container p-10 text-center font-bold text-gray-400">RANKING GLOBAL</div>
     </div>
 
     <div id="page-wallet" class="page-content">
-        <div class="feed-container p-10 text-center font-bold uppercase text-gray-400">A Minha Carteira</div>
+        <div class="feed-container p-10 text-center font-bold text-gray-400">CARTEIRA</div>
     </div>
 
     <div id="modal-editor" class="modal-fullscreen">
         <div class="modal-header">
             <button onclick="closeModal('modal-editor')" class="text-gray-600 font-bold">Cancelar</button>
-            <span class="font-bold">Criar Publicação</span>
+            <span class="font-bold">Nova Publicação</span>
             <button onclick="publish()" class="text-[#1877F2] font-bold">Publicar</button>
         </div>
         <div class="p-4">
-            <textarea id="post-txt" placeholder="No que está a pensar?" class="custom-textarea"></textarea>
-            <input id="post-url" type="text" placeholder="URL da Foto" class="w-full p-3 bg-gray-100 rounded-lg mt-4 outline-none text-sm">
-        </div>
-    </div>
-
-    <div id="modal-comment" class="modal-fullscreen">
-        <div class="modal-header">
-            <button onclick="closeModal('modal-comment')" class="text-gray-600 font-bold">Voltar</button>
-            <span class="font-bold">Escrever Comentário</span>
-            <button onclick="addComment()" class="text-[#1877F2] font-bold">Enviar</button>
-        </div>
-        <div class="p-4">
-            <textarea id="comm-txt" placeholder="Escreva um comentário..." class="custom-textarea"></textarea>
+            <textarea id="post-txt" placeholder="Escreva aqui..." class="w-full text-lg outline-none resize-none h-40"></textarea>
+            <input id="post-url" type="text" placeholder="URL da Imagem (Opcional)" class="w-full p-3 bg-gray-100 rounded-lg mt-4 outline-none">
         </div>
     </div>
 
@@ -118,15 +103,16 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
         const sb = window.supabase.createClient(SB_URL, SB_KEY);
         
-        let uID = 5401881400; 
+        const uID = 5401881400; 
         let bal = 0;
-        let activePostID = null;
 
         async function init() {
-            let { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
-            if(data) bal = Number(data.saldo);
-            updateUI();
-            await loadFeed();
+            try {
+                let { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
+                if(data) bal = Number(data.saldo);
+                updateUI();
+                await loadFeed();
+            } catch (e) { console.error("Erro init:", e); }
         }
 
         function switchTab(tab, el) {
@@ -137,40 +123,30 @@
         }
 
         async function loadFeed() {
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const { data: comms } = await sb.from('comentarios').select('*').order('created_at', {ascending: true});
-
             const container = document.getElementById('feed-list');
-            container.innerHTML = "";
             
+            // Sincronizado com as colunas reais: content e image_url
+            const { data: posts, error: pErr } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+            
+            if (pErr) {
+                container.innerHTML = `<div class="text-center p-5 text-red-500 font-bold uppercase">Erro ao carregar posts: ${pErr.message}</div>`;
+                return;
+            }
+
+            container.innerHTML = "";
             posts.forEach((p, index) => {
-                // ANÚNCIO IGUAL AO POST (3 EM 3)
+                // Injeção de Anúncio (Mesmo tamanho do post)
                 if (index > 0 && index % 3 === 0) {
                     container.innerHTML += `
                     <div class="ad-card">
-                        <div class="ad-header">
-                            <span class="text-[12px] font-bold text-gray-500 uppercase">Sugestão para si</span>
-                            <span class="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-400 font-bold">AD</span>
-                        </div>
+                        <div class="ad-header"><span class="text-[11px] font-bold text-gray-400">PUBLICIDADE</span></div>
                         <div class="ad-body">
-                            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
-                                <span class="text-2xl">📢</span>
-                            </div>
-                            <h3 class="font-bold text-gray-800">Anúncio de Rede Parceira</h3>
-                            <p class="text-sm text-gray-500 mt-2">Visite os nossos parceiros para ganhar bónus extras na sua carteira Apex.</p>
-                            <button class="mt-4 px-6 py-2 bg-[#1877F2] text-white rounded-lg font-bold text-sm">Saber Mais</button>
+                            <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-3">📢</div>
+                            <div class="font-bold text-gray-800">Parceiro Google AdSense</div>
+                            <div class="text-xs text-gray-500 mt-2 px-10">Este espaço é reservado para anúncios de rede.</div>
+                            <button class="mt-5 px-8 py-2 bg-[#1877F2] text-white rounded-md font-bold text-sm">Visitar</button>
                         </div>
                     </div>`;
-                }
-
-                const postComms = comms ? comms.filter(c => c.post_id == p.id) : [];
-                let commsHTML = "";
-                if(postComms.length > 0) {
-                    commsHTML = `<div class="bg-[#f8f9fa] border-t border-gray-100 p-3 space-y-2">`;
-                    postComms.forEach(c => {
-                        commsHTML += `<div class="text-[13px]"><span class="font-bold text-[#050505]">ID ${c.user_id}</span> <span class="text-gray-700">${c.content || c.texto}</span></div>`;
-                    });
-                    commsHTML += `</div>`;
                 }
 
                 container.innerHTML += `
@@ -178,48 +154,47 @@
                     <div class="post-main">
                         <div class="post-content">
                             <div class="post-user">Utilizador ${p.user_id}</div>
-                            <div class="text-[12px] text-gray-500 mb-2">${new Date(p.created_at).toLocaleDateString()}</div>
-                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3">` : ''}
+                            <div class="text-[11px] text-gray-400 mb-2">${new Date(p.created_at).toLocaleString()}</div>
+                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3 border border-gray-100">` : ''}
                             <div class="post-text">${p.content}</div>
                         </div>
                         <div class="post-sidebar">
                             <div class="flex flex-col items-center" onclick="reward(0.0006)"><div class="icon-btn">👍</div><span class="sidebar-label">${p.likes || 0}</span></div>
-                            <div class="flex flex-col items-center" onclick="openComments('${p.id}')"><div class="icon-btn">💬</div><span class="sidebar-label">${postComms.length}</span></div>
-                            <div class="flex flex-col items-center" onclick="sharePost('${p.content}')"><div class="icon-btn">🔗</div><span class="sidebar-label">Share</span></div>
+                            <div class="flex flex-col items-center"><div class="icon-btn">💬</div><span class="sidebar-label">${p.comments_count || 0}</span></div>
+                            <div class="flex flex-col items-center" onclick="sharePost()"><div class="icon-btn">🔗</div><span class="sidebar-label">Share</span></div>
                         </div>
                     </div>
-                    ${commsHTML}
                 </div>`;
             });
-        }
-
-        async function sharePost(text) {
-            if (navigator.share) {
-                navigator.share({ title: 'Apex Social', text: text, url: window.location.href }).then(() => reward(0.0050));
-            }
         }
 
         async function publish() {
             const txt = document.getElementById('post-txt').value.trim();
             const url = document.getElementById('post-url').value.trim();
             if(!txt) return;
-            const { error } = await sb.from('posts').insert([{ user_id: uID, content: txt, image_url: url || null }]);
-            if(!error) { reward(0.0150); closeModal('modal-editor'); document.getElementById('post-txt').value = ""; await loadFeed(); }
-        }
 
-        function openComments(postID) { activePostID = postID; document.getElementById('comm-txt').value = ""; openModal('modal-comment'); }
+            const { error } = await sb.from('posts').insert([{ 
+                user_id: uID, 
+                content: txt, 
+                image_url: url || null 
+            }]);
 
-        async function addComment() {
-            const txt = document.getElementById('comm-txt').value.trim();
-            if(!txt) return;
-            const { error } = await sb.from('comentarios').insert([{ post_id: activePostID, user_id: uID, content: txt }]);
-            if(!error) { reward(0.0010); closeModal('modal-comment'); await loadFeed(); }
+            if(!error) {
+                reward(0.0150);
+                closeModal('modal-editor');
+                document.getElementById('post-txt').value = "";
+                document.getElementById('post-url').value = "";
+                await loadFeed();
+            } else {
+                alert("Erro ao publicar: " + error.message);
+            }
         }
 
         function reward(val) { bal += val; updateUI(); sb.from('perfis').upsert({ id: uID, saldo: bal }); }
         function updateUI() { document.getElementById('bal-top').innerText = bal.toFixed(4) + "€"; }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function sharePost() { if(navigator.share) navigator.share({title:'Apex', url:window.location.href}).then(()=>reward(0.0050)); }
 
         init();
     </script>
