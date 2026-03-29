@@ -3,50 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.50 - Full System</title>
+    <title>Apex Social v33.51 - Fix Login</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --fb-blue: #1877F2; --fb-bg: #F0F2F5; --g-green: #34A853; }
-        body { font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif; background: var(--fb-bg); color: #1c1e21; margin: 0; padding-bottom: 90px; }
+        body { font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif; background: var(--fb-bg); color: #1c1e21; margin: 0; }
         
-        /* LOGIN */
+        /* TELA DE LOGIN */
         #login-screen { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 
         /* HEADER & BARS */
         .app-header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 32px; background: white; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--g-green); text-transform: uppercase; }
         .ad-provider { position: fixed; top: 92px; width: 100%; z-index: 900; height: 28px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #bdc1c6; text-transform: uppercase; }
-        .publisher-zone { margin-top: 120px; background: white; border-bottom: 1px solid #dadce0; padding: 12px 16px; height: 65px; display: flex; align-items: center; }
+        
+        .main-content { padding-top: 130px; padding-bottom: 90px; }
+        .publisher-zone { background: white; border-bottom: 1px solid #dadce0; padding: 12px 16px; height: 65px; display: flex; align-items: center; margin-bottom: 10px; }
 
-        /* FEED & CARDS */
+        /* FEED & POSTS */
         .feed-container { max-width: 580px; margin: 0 auto; padding: 10px; }
         .post-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .post-main { display: flex; width: 100%; }
         .post-content { flex: 1; padding: 16px; } 
         .post-user-label { font-size: 14px; font-weight: 600; color: #050505; margin-bottom: 4px; display: block; }
-        .post-text { font-size: 15px; line-height: 1.3333; color: #1c1e21; margin-top: 8px; }
+        .post-text { font-size: 15px; color: #1c1e21; }
         .post-sidebar { width: 70px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 15px 0; }
         
-        /* COMMENTS */
+        /* COMMENTS STYLE */
         .feed-comments-area { background: white; border-top: 1px solid #f0f2f5; padding: 12px 16px; }
         .comment-bubble { background: #f0f2f5; border-radius: 18px; padding: 8px 12px; margin-bottom: 6px; display: inline-block; max-width: 92%; }
         .comment-user { font-size: 11px; font-weight: 700; color: #050505; display: block; }
         .comment-text { font-size: 13px; color: #1c1e21; }
 
-        /* NAVIGATION */
+        /* NAV */
         nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #65676b; cursor: pointer; }
         .nav-active { color: var(--fb-blue); border-top: 3px solid var(--fb-blue); }
 
         /* MODALS */
         .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
-        .modal-ad-banner { background: #f8f9fa; border-bottom: 1px solid #dadce0; padding: 12px; text-align: center; }
-        
-        .page-content { display: none; }
         .active-page { display: block; }
+        .page-content { display: none; }
         .icon-btn { width: 36px; height: 36px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -54,9 +55,9 @@
     <div id="login-screen">
         <div class="w-16 h-16 bg-[#1877F2] rounded-2xl flex items-center justify-center text-white text-4xl font-black italic mb-6 shadow-lg">f</div>
         <h1 class="text-xl font-bold mb-4">Introduza o seu ID Apex</h1>
-        <input id="login-id" type="number" placeholder="ID de Utilizador" class="w-full max-w-xs p-4 bg-gray-100 rounded-xl mb-4 text-center font-bold outline-none border-2 border-transparent focus:border-blue-500">
-        <button onclick="doLogin()" class="w-full max-w-xs bg-[#1877F2] text-white p-4 rounded-xl font-bold shadow-md">ENTRAR</button>
-        <p class="text-xs text-gray-400 mt-6 uppercase font-bold">Secure Access v33.50</p>
+        <input id="login-id" type="text" placeholder="ID de Utilizador" class="w-full max-w-xs p-4 bg-gray-100 rounded-xl mb-4 text-center font-bold outline-none border-2 border-transparent focus:border-blue-500 shadow-inner">
+        <button onclick="doLogin()" class="w-full max-w-xs bg-[#1877F2] text-white p-4 rounded-xl font-bold shadow-md hover:bg-blue-700 transition-all">ENTRAR</button>
+        <p class="text-[10px] text-gray-400 mt-6 uppercase font-black tracking-widest">Secure Access v33.51</p>
     </div>
 
     <div id="app-ui" class="hidden">
@@ -68,66 +69,70 @@
             <div id="bal-top" class="text-xl font-black text-green-600">0.0000€</div>
         </header>
 
-        <div class="status-bar">SISTEMA ATIVO • 1 XP = 0.0001€</div>
-        <div class="ad-provider">GOOGLE ADSENSE CERTIFIED</div>
+        <div class="status-bar">SISTEMA ATIVO • 15 XP POR POST</div>
+        <div class="ad-provider">GOOGLE ADSENSE CERTIFIED PARTNER</div>
 
-        <div id="p-feed" class="page-content active-page">
-            <div class="publisher-zone">
-                <div onclick="openModal('modal-editor')" class="bg-[#f0f2f5] rounded-full px-5 py-2 w-full flex items-center gap-3 cursor-pointer">
-                    <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
-                    <span class="text-[14px] text-gray-500">No que está a pensar?</span>
+        <div class="main-content">
+            <div id="p-feed" class="page-content active-page">
+                <div class="publisher-zone">
+                    <div onclick="openModal('modal-editor')" class="bg-[#f0f2f5] rounded-full px-5 py-2 w-full flex items-center gap-3 cursor-pointer">
+                        <div class="w-8 h-8 bg-gray-300 rounded-full shadow-inner"></div>
+                        <span class="text-[14px] text-gray-500">No que está a pensar?</span>
+                    </div>
+                </div>
+                <main class="feed-container" id="feed-list"></main>
+            </div>
+
+            <div id="p-ranking" class="page-content">
+                <div class="feed-container py-4">
+                    <h2 class="font-black text-center text-lg mb-6 uppercase text-gray-700">Top 10 Utilizadores</h2>
+                    <div id="ranking-list" class="bg-white rounded-xl border overflow-hidden"></div>
                 </div>
             </div>
-            <main class="feed-container" id="feed-list"></main>
-        </div>
 
-        <div id="p-ranking" class="page-content">
-            <div class="feed-container py-10">
-                <h2 class="font-bold text-center text-lg mb-6">TOP 10 RANKING XP</h2>
-                <div id="ranking-list" class="bg-white rounded-xl border"></div>
-            </div>
-        </div>
-
-        <div id="p-wallet" class="page-content py-20">
-            <div class="feed-container bg-white p-6 rounded-2xl border text-center">
-                <p class="text-gray-500 uppercase text-xs font-bold mb-2">Saldo Disponível</p>
-                <h1 id="wallet-val" class="text-4xl font-black text-blue-600 mb-6">0.0000€</h1>
-                <div class="grid grid-cols-2 gap-4">
-                    <button class="bg-gray-100 p-4 rounded-xl font-bold text-sm">HISTÓRICO</button>
-                    <button onclick="alert('Mínimo 5000 XP para levantar')" class="bg-green-600 text-white p-4 rounded-xl font-bold text-sm">LEVANTAR</button>
+            <div id="p-wallet" class="page-content">
+                <div class="feed-container py-4">
+                    <div class="bg-white p-8 rounded-2xl border text-center shadow-sm">
+                        <p class="text-gray-400 uppercase text-[10px] font-black mb-1">Saldo Acumulado</p>
+                        <h1 id="wallet-val" class="text-4xl font-black text-blue-600 mb-8">0.0000€</h1>
+                        <button onclick="alert('Mínimo 5.000 XP (0.50€) para saque')" class="w-full bg-green-600 text-white p-4 rounded-xl font-bold uppercase text-xs tracking-wider shadow-md">Efetuar Levantamento</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div id="p-admin" class="page-content py-20">
-            <div class="feed-container bg-white p-6 rounded-2xl border">
-                <h2 class="font-black text-red-600 mb-4 uppercase">Painel de Controlo Admin</h2>
-                <div id="admin-stats" class="grid grid-cols-2 gap-2 mb-6 text-xs font-bold uppercase text-gray-500">
-                    <div class="bg-gray-50 p-3 rounded">Users: <span id="adm-u" class="text-black">0</span></div>
-                    <div class="bg-gray-50 p-3 rounded">Posts: <span id="adm-p" class="text-black">0</span></div>
+            <div id="p-admin" class="page-content">
+                <div class="feed-container py-4">
+                    <div class="bg-white p-6 rounded-xl border border-red-100 shadow-sm">
+                        <h2 class="font-black text-red-600 mb-4 uppercase text-sm">Painel do Administrador</h2>
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg text-center"><span class="block text-[10px] text-gray-400 font-bold uppercase">Utilizadores</span><span id="adm-u" class="text-xl font-black">0</span></div>
+                            <div class="bg-gray-50 p-4 rounded-lg text-center"><span class="block text-[10px] text-gray-400 font-bold uppercase">Total Posts</span><span id="adm-p" class="text-xl font-black">0</span></div>
+                        </div>
+                        <button onclick="location.reload()" class="w-full bg-black text-white p-3 rounded-lg font-bold text-[10px] uppercase">Reiniciar Sistema</button>
+                    </div>
                 </div>
-                <button onclick="location.reload()" class="w-full bg-black text-white p-3 rounded font-bold text-xs mb-4">FORÇAR ATUALIZAÇÃO</button>
-                <div id="admin-actions" class="text-sm"></div>
             </div>
         </div>
 
         <nav id="main-nav">
-            <div class="nav-item nav-active" onclick="tab('feed', this)">Feed</div>
-            <div class="nav-item" onclick="tab('ranking', this)">Ranking</div>
-            <div class="nav-item" onclick="tab('wallet', this)">Carteira</div>
-            <div id="nav-adm-btn" class="nav-item hidden" onclick="tab('admin', this)">Admin</div>
+            <div class="nav-item nav-active" onclick="tab('feed', this)">FEED</div>
+            <div class="nav-item" onclick="tab('ranking', this)">RANKING</div>
+            <div class="nav-item" onclick="tab('wallet', this)">CARTEIRA</div>
+            <div id="nav-adm-btn" class="nav-item hidden" onclick="tab('admin', this)">ADMIN</div>
         </nav>
     </div>
 
     <div id="modal-editor" class="modal-fullscreen">
         <div class="flex items-center justify-between p-4 border-b">
-            <button onclick="closeModal('modal-editor')" class="text-gray-500">Cancelar</button>
+            <button onclick="closeModal('modal-editor')" class="text-gray-500 font-bold">Cancelar</button>
             <span class="font-bold">Nova Publicação</span>
             <button onclick="publish()" class="text-blue-600 font-bold">Publicar</button>
         </div>
-        <div class="modal-ad-banner text-[10px] font-bold text-gray-400">ANÚNCIO: CONVIDE AMIGOS E GANHE 100 XP</div>
-        <textarea id="post-txt" placeholder="No que está a pensar?" class="custom-textarea flex-1 p-5 outline-none text-lg"></textarea>
-        <input id="post-url" type="text" placeholder="URL da Foto (Opcional)" class="m-4 p-3 bg-gray-100 rounded-xl outline-none">
+        <div class="bg-blue-50 p-3 text-center text-[10px] font-black text-blue-600 uppercase border-b">Bónus: Ganhe +0.0150€ por cada publicação</div>
+        <textarea id="post-txt" placeholder="No que está a pensar?" class="flex-1 p-5 outline-none text-lg resize-none"></textarea>
+        <div class="p-4 bg-gray-50 border-t">
+            <input id="post-url" type="text" placeholder="URL da Foto (Opcional)" class="w-full p-3 bg-white rounded-xl border outline-none text-sm">
+        </div>
     </div>
 
     <script>
@@ -137,12 +142,13 @@
         
         let uID = null;
         let bal = 0;
-        const ADMIN_ID = 5401881400;
+        const ADMIN_ID = "5401881400"; // ID como string para compatibilidade total
 
         async function doLogin() {
-            const input = document.getElementById('login-id').value;
+            const input = document.getElementById('login-id').value.trim();
             if(!input) return;
-            uID = parseInt(input);
+            
+            uID = input; // Salva como string
             
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-ui').classList.remove('hidden');
@@ -152,8 +158,11 @@
                 loadAdmin();
             }
 
-            let { data } = await sb.from('perfis').select('*').eq('id', uID).single();
+            // Tenta buscar o perfil do utilizador
+            let { data, error } = await sb.from('perfis').select('*').eq('id', uID).single();
+            
             if(!data) {
+                // Cria novo perfil se não existir
                 await sb.from('perfis').insert([{ id: uID, saldo: 0 }]);
                 bal = 0;
             } else {
@@ -171,24 +180,35 @@
             const { data: comms } = await sb.from('comentarios').select('*').order('created_at', {ascending: true});
             
             container.innerHTML = "";
+            if(!posts) return;
+
             posts.forEach((p, i) => {
+                // Injeção de Anúncios a cada 3 posts
                 if(i > 0 && i % 3 === 0) {
-                    container.innerHTML += `<div class="bg-white border p-10 mb-4 rounded-xl text-center"><span class="text-[10px] block text-gray-400 font-bold mb-2">GOOGLE ADSENSE</span><p class="font-bold text-gray-600">ANÚNCIO DE REDE PARCEIRA</p></div>`;
+                    container.innerHTML += `
+                    <div class="bg-white border p-8 mb-4 rounded-xl text-center shadow-sm">
+                        <span class="text-[9px] block text-blue-500 font-black mb-2 uppercase tracking-widest">Publicidade</span>
+                        <p class="font-bold text-gray-500 text-sm">GOOGLE ADSENSE PARTNER</p>
+                    </div>`;
                 }
 
                 const pComms = comms ? comms.filter(c => c.post_id == p.id) : [];
-                let commsHTML = pComms.length > 0 ? `<div class="feed-comments-area">` : "";
-                pComms.forEach(c => {
-                    commsHTML += `<div class="block"><div class="comment-bubble"><span class="comment-user">ID ${c.user_id}</span><span class="comment-text">${c.content}</span></div></div>`;
-                });
-                if(pComms.length > 0) commsHTML += `</div>`;
+                let commsHTML = "";
+                
+                if(pComms.length > 0) {
+                    commsHTML = `<div class="feed-comments-area">`;
+                    pComms.forEach(c => {
+                        commsHTML += `<div class="block"><div class="comment-bubble"><span class="comment-user">ID ${c.user_id}</span><span class="comment-text">${c.content}</span></div></div>`;
+                    });
+                    commsHTML += `</div>`;
+                }
 
                 container.innerHTML += `
                 <div class="post-card">
                     <div class="post-main">
                         <div class="post-content">
                             <span class="post-user-label">Utilizador ${p.user_id}</span>
-                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3 border">` : ''}
+                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3 border border-gray-100">` : ''}
                             <div class="post-text">${p.content}</div>
                         </div>
                         <div class="post-sidebar">
@@ -204,25 +224,34 @@
         async function loadRanking() {
             const { data } = await sb.from('perfis').select('id, saldo').order('saldo', {ascending: false}).limit(10);
             const list = document.getElementById('ranking-list');
+            if(!data) return;
             list.innerHTML = "";
             data.forEach((r, i) => {
-                list.innerHTML += `<div class="flex justify-between p-4 border-b"><span>#${i+1} ID ${r.id}</span><span class="font-bold text-green-600">${Number(r.saldo).toFixed(4)}€</span></div>`;
+                list.innerHTML += `<div class="flex justify-between items-center p-4 border-b last:border-0">
+                    <span class="text-sm"><b class="text-gray-400 mr-2">#${i+1}</b> ID ${r.id}</span>
+                    <span class="font-black text-green-600">${Number(r.saldo).toFixed(4)}€</span>
+                </div>`;
             });
         }
 
         async function loadAdmin() {
             const { count: uCount } = await sb.from('perfis').select('*', { count: 'exact' });
             const { count: pCount } = await sb.from('posts').select('*', { count: 'exact' });
-            document.getElementById('adm-u').innerText = uCount;
-            document.getElementById('adm-p').innerText = pCount;
+            document.getElementById('adm-u').innerText = uCount || 0;
+            document.getElementById('adm-p').innerText = pCount || 0;
         }
 
         async function publish() {
-            const t = document.getElementById('post-txt').value;
-            const u = document.getElementById('post-url').value;
+            const t = document.getElementById('post-txt').value.trim();
+            const u = document.getElementById('post-url').value.trim();
             if(!t) return;
             const { error } = await sb.from('posts').insert([{ user_id: uID, content: t, image_url: u || null }]);
-            if(!error) { reward(0.0015); closeModal('modal-editor'); loadFeed(); }
+            if(!error) { 
+                reward(0.0150); // Recompensa de 15 XP
+                closeModal('modal-editor'); 
+                document.getElementById('post-txt').value = "";
+                loadFeed(); 
+            }
         }
 
         function tab(t, e) {
@@ -232,12 +261,18 @@
             e.classList.add('nav-active');
         }
 
-        function reward(v) { bal += v; updateUI(); sb.from('perfis').upsert({ id: uID, saldo: bal }); }
+        function reward(v) { 
+            bal += v; 
+            updateUI(); 
+            sb.from('perfis').upsert({ id: uID, saldo: bal }); 
+        }
+
         function updateUI() { 
             const formatted = bal.toFixed(4) + "€";
             document.getElementById('bal-top').innerText = formatted;
             document.getElementById('wallet-val').innerText = formatted;
         }
+
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     </script>
