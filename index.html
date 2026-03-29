@@ -17,26 +17,25 @@
         .ad-provider { position: fixed; top: 92px; width: 100%; z-index: 900; height: 28px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #bdc1c6; text-transform: uppercase; }
         .publisher-zone { position: fixed; top: 120px; width: 100%; z-index: 850; background: white; border-bottom: 1px solid #dadce0; padding: 10px 16px; height: 55px; display: flex; align-items: center; }
 
-        /* FEED & CARDS (IMAGE 13:50) */
+        /* FEED CARDS */
         .feed-container { max-width: 500px; margin: 0 auto; padding: 0 10px; }
-        .post-card { background: white; border-radius: 18px; border: 1px solid #dadce0; margin-bottom: 14px; display: flex; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .post-card { background: white; border-radius: 18px; border: 1px solid #dadce0; margin-bottom: 14px; display: flex; overflow: hidden; }
         .post-content { flex: 1; padding: 15px; }
         .post-sidebar { width: 75px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 10px 0; }
 
-        .author-badge { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-        .avatar-circle { width: 28px; height: 28px; background: #e8f0fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--g-blue); font-weight: 900; font-size: 10px; }
-        .author-name { font-size: 11px; font-weight: 900; color: var(--g-blue); text-transform: uppercase; }
-        .post-body { font-size: 14px; font-weight: 700; color: #202124; line-height: 1.4; }
-        .post-img { width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid #f1f3f4; }
+        /* MODAIS FULLSCREEN */
+        .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
+        .modal-header { height: 60px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .custom-textarea { width: 100%; flex: 1; padding: 20px; font-size: 18px; font-weight: 700; border: none; outline: none; resize: none; text-transform: uppercase; }
+        .url-input { width: calc(100% - 40px); margin: 0 20px 20px 20px; padding: 15px; background: #f8f9fa; border: 1px solid #dadce0; border-radius: 12px; font-size: 12px; font-weight: 700; outline: none; }
 
-        /* SIDEBAR ACTIONS */
-        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .icon-circle { width: 38px; height: 38px; background: white; border-radius: 50%; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .count-text { font-size: 9px; font-weight: 900; color: #70757a; text-transform: uppercase; }
+        /* ANÚNCIOS NOS MODAIS */
+        .modal-ad-zone { background: #fcfdfe; border-top: 1px solid #e8eaed; padding: 15px; text-align: center; border-bottom: 1px solid #e8eaed; }
+        .ad-mini-tag { font-size: 8px; font-weight: 900; color: var(--g-blue); text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .ad-box-text { font-size: 10px; font-weight: 700; color: #9aa0a6; text-transform: uppercase; font-style: italic; }
 
-        /* MODALS */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 3000; display: none; flex-direction: column; padding: 20px; }
-        input, textarea { background: #f8f9fa; border: 1px solid #dadce0; border-radius: 12px; padding: 14px; font-weight: 700; outline: none; }
+        .comment-item { padding: 12px 20px; border-bottom: 1px solid #f1f3f4; }
+        .comment-footer { padding: 15px 20px; border-top: 1px solid #dadce0; display: flex; gap: 10px; background: white; }
 
         nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
         .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #5f6368; text-transform: uppercase; }
@@ -46,10 +45,10 @@
 </head>
 <body>
 
-    <div id="auth-screen" class="fixed inset-0 bg-white z-[5000] flex flex-col items-center justify-center p-8">
-        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-3xl font-black italic mb-10 shadow-xl">S</div>
-        <input id="login-id" type="text" placeholder="ID UTILIZADOR" class="w-full max-w-xs text-center mb-4">
-        <button onclick="login()" class="w-full max-w-xs bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-xs">Aceder à Rede</button>
+    <div id="auth-screen" class="fixed inset-0 bg-white z-[6000] flex flex-col items-center justify-center p-8">
+        <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-4xl font-black italic mb-10 shadow-xl">S</div>
+        <input id="login-id" type="text" placeholder="ID UTILIZADOR" class="w-full max-w-xs bg-gray-100 p-5 rounded-xl text-center font-black mb-4 outline-none">
+        <button onclick="login()" class="w-full max-w-xs bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-xs shadow-lg">Entrar</button>
     </div>
 
     <header>
@@ -64,34 +63,48 @@
     <div class="ad-provider">Google Adsense Partner</div>
 
     <div class="publisher-zone">
-        <div onclick="openEditor()" class="bg-gray-100 rounded-full px-5 py-2 border border-gray-200 w-full flex items-center gap-3 cursor-pointer">
+        <div onclick="openModal('modal-editor')" class="bg-gray-100 rounded-full px-5 py-2 border border-gray-200 w-full flex items-center gap-3 cursor-pointer">
             <div class="w-6 h-6 bg-gray-300 rounded-full"></div>
-            <span class="text-[11px] text-gray-400 font-black uppercase italic">O que quer partilhar?</span>
+            <span class="text-[11px] text-gray-400 font-black uppercase italic">Escreva aqui a sua publicação...</span>
         </div>
     </div>
 
     <main class="feed-container" id="feed-list"></main>
 
-    <div id="modal-editor" class="modal-overlay">
-        <div class="flex justify-between items-center mb-8">
+    <div id="modal-editor" class="modal-fullscreen">
+        <div class="modal-header">
             <button onclick="closeModal('modal-editor')" class="text-gray-400 font-black text-xs uppercase">Fechar</button>
             <span class="font-black uppercase text-xs">Nova Publicação</span>
             <button onclick="publish()" class="text-blue-600 font-black text-xs uppercase">Publicar</button>
         </div>
-        <textarea id="post-txt" placeholder="ESCREVA AQUI..." class="w-full h-32 mb-4 uppercase"></textarea>
-        <input id="post-url" type="text" placeholder="URL DA IMAGEM (WEBURL)" class="w-full mb-6 text-xs uppercase">
-        <p class="text-[10px] text-gray-400 font-bold uppercase text-center italic">Ganhe 0.0150€ por publicação</p>
+        <textarea id="post-txt" placeholder="O QUE ESTÁ A ACONTECER?" class="custom-textarea"></textarea>
+        <input id="post-url" type="text" placeholder="URL DA IMAGEM (WEBURL)" class="url-input">
+        
+        <div class="modal-ad-zone">
+            <span class="ad-mini-tag">Publicidade Patrocinada</span>
+            <p class="ad-box-text">Anúncio Google Adsense Partner Network</p>
+        </div>
+
+        <div class="p-4 text-center bg-gray-50">
+            <p class="text-[9px] text-gray-400 font-black uppercase italic">Ganhe 0.0150€ por post</p>
+        </div>
     </div>
 
-    <div id="modal-comment" class="modal-overlay">
-        <div class="flex justify-between items-center mb-8">
+    <div id="modal-comment" class="modal-fullscreen">
+        <div class="modal-header">
             <button onclick="closeModal('modal-comment')" class="text-gray-400 font-black text-xs uppercase">Voltar</button>
             <span class="font-black uppercase text-xs">Comentários</span>
             <div class="w-10"></div>
         </div>
-        <div id="comment-list" class="flex-1 overflow-y-auto mb-4 space-y-3"></div>
-        <div class="flex gap-2">
-            <input id="comm-txt" type="text" placeholder="COMENTAR..." class="flex-1 text-xs uppercase">
+        <div id="comment-list" class="flex-1 overflow-y-auto"></div>
+        
+        <div class="modal-ad-zone">
+            <span class="ad-mini-tag">Publicidade Patrocinada</span>
+            <p class="ad-box-text">Conteúdo sugerido por parceiros Apex</p>
+        </div>
+
+        <div class="comment-footer">
+            <input id="comm-txt" type="text" placeholder="COMENTAR..." class="flex-1 bg-gray-100 p-4 rounded-xl font-bold text-xs outline-none uppercase">
             <button onclick="addComment()" class="bg-blue-600 text-white px-6 rounded-xl font-black text-[10px] uppercase">Enviar</button>
         </div>
     </div>
@@ -136,41 +149,28 @@
                 container.innerHTML += `
                 <div class="post-card">
                     <div class="post-content">
-                        <div class="author-badge">
-                            <div class="avatar-circle">P</div>
-                            <span class="author-name">ID ${p.user_id}</span>
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-black text-[10px]">P</div>
+                            <span class="text-[11px] font-black text-blue-600 uppercase">Utilizador ${p.user_id}</span>
                         </div>
-                        <p class="post-body uppercase">${p.content}</p>
-                        ${p.media_url ? `<img src="${p.media_url}" class="post-img">` : ''}
+                        <p class="text-sm font-bold text-gray-800 leading-relaxed uppercase">${p.content}</p>
+                        ${p.media_url ? `<img src="${p.media_url}" class="w-full rounded-xl mt-3">` : ''}
                     </div>
                     <div class="post-sidebar">
-                        <div class="action-item" onclick="reward(0.0006)">
+                        <div class="flex flex-col items-center" onclick="reward(0.0006)">
                             <div class="icon-circle">👍</div>
-                            <span class="count-text">${Math.floor(Math.random()*30)}</span>
+                            <span class="count-text">${Math.floor(Math.random()*40)}</span>
                         </div>
-                        <div class="action-item" onclick="openComments('${p.id}')">
+                        <div class="flex flex-col items-center" onclick="openComments('${p.id}')">
                             <div class="icon-circle">💬</div>
                             <span class="count-text">Ver</span>
                         </div>
-                        <div class="action-item" onclick="reward(0.0020)">
+                        <div class="flex flex-col items-center" onclick="reward(0.0020)">
                             <div class="icon-circle">🔗</div>
                             <span class="count-text">Share</span>
                         </div>
                     </div>
                 </div>`;
-
-                if((i + 1) % 3 === 0) {
-                    container.innerHTML += `
-                    <div class="post-card border-dashed bg-gray-50">
-                        <div class="p-6 w-full text-center">
-                            <span class="text-[8px] font-black text-blue-500 uppercase block mb-1">Rede de Anúncios Apex</span>
-                            <p class="text-[10px] font-black text-gray-400 uppercase italic">Anúncio Google AdSense Ativo</p>
-                        </div>
-                        <div class="post-sidebar">
-                            <div class="icon-circle text-blue-500">Ads</div>
-                        </div>
-                    </div>`;
-                }
             });
         }
 
@@ -189,9 +189,12 @@
             document.getElementById('modal-comment').style.display = 'flex';
             const { data } = await sb.from('comentarios').select('*').eq('post_id', postID);
             const list = document.getElementById('comment-list');
-            list.innerHTML = data?.length ? "" : "<p class='text-center text-[10px] uppercase font-black text-gray-300 mt-10'>Sem comentários ainda</p>";
+            list.innerHTML = data?.length ? "" : "<div class='p-10 text-center font-black text-gray-300 text-[10px] uppercase'>Sem interações</div>";
             data?.forEach(c => {
-                list.innerHTML += `<div class="bg-gray-50 p-3 rounded-xl border border-gray-100 font-bold text-[11px] uppercase"><span class="text-blue-600 mr-2">ID ${c.user_id}:</span> ${c.texto}</div>`;
+                list.innerHTML += `<div class="comment-item">
+                    <span class="text-[10px] font-black text-blue-600 block uppercase">Utilizador ${c.user_id}</span>
+                    <p class="text-xs font-bold uppercase text-gray-700">${c.texto}</p>
+                </div>`;
             });
         }
 
@@ -211,7 +214,7 @@
         }
 
         function updateUI() { document.getElementById('bal-top').innerText = bal.toFixed(4) + "€"; }
-        function openEditor() { document.getElementById('modal-editor').style.display = 'flex'; }
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function logout() { localStorage.clear(); location.reload(); }
 
