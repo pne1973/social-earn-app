@@ -17,7 +17,7 @@
         .ad-provider { position: fixed; top: 92px; width: 100%; z-index: 900; height: 28px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #bdc1c6; text-transform: uppercase; }
         .publisher-zone { position: fixed; top: 120px; width: 100%; z-index: 850; background: white; border-bottom: 1px solid #dadce0; padding: 10px 16px; height: 65px; display: flex; align-items: center; }
 
-        /* FEED */
+        /* FEED (image_7.png) */
         .feed-container { max-width: 580px; margin: 0 auto; padding: 10px; }
         .post-card { background: white; border-radius: 28px; border: 1px solid #dadce0; margin-bottom: 16px; display: flex; overflow: hidden; width: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .post-content { flex: 1; padding: 22px; }
@@ -26,7 +26,7 @@
         .icon-btn { width: 46px; height: 46px; background: white; border-radius: 50%; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
         .sidebar-label { font-size: 10px; font-weight: 900; color: #70757a; text-transform: uppercase; margin-top: 4px; }
 
-        /* MODAIS UNIFICADOS */
+        /* MODAIS UNIFICADOS (image_15.png) */
         .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
         .modal-header { height: 65px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
         .modal-body { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
@@ -36,6 +36,10 @@
 
         .modal-footer-ad { padding: 20px; text-align: center; border-top: 1px solid #f1f3f4; background: #f8f9fa; }
         .ad-tag { font-size: 9px; font-weight: 900; color: var(--g-blue); text-transform: uppercase; }
+
+        /* LISTA DE COMENTÁRIOS */
+        .comment-item { padding: 15px; border-bottom: 1px solid #f1f3f4; }
+        .comment-input-area { padding: 15px; border-top: 1px solid #dadce0; display: flex; gap: 10px; background: white; align-items: center; }
 
         /* NAVEGAÇÃO */
         nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
@@ -49,7 +53,7 @@
     <div id="auth-screen" class="fixed inset-0 bg-white z-[7000] flex flex-col items-center justify-center p-10">
         <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-4xl font-black italic mb-10 shadow-xl">S</div>
         <input id="login-id" type="number" placeholder="O SEU ID (NÚMERO)" class="w-full max-w-xs bg-gray-100 p-6 rounded-2xl text-center font-black mb-5 outline-none border-2 border-transparent focus:border-blue-600">
-        <button onclick="login()" class="w-full max-w-xs bg-blue-600 text-white py-5 rounded-2xl font-black uppercase text-xs">Aceder à Rede</button>
+        <button onclick="login()" class="w-full max-w-xs bg-blue-600 text-white py-5 rounded-2xl font-black uppercase text-xs">Aceder</button>
     </div>
 
     <header>
@@ -60,7 +64,7 @@
         <div id="bal-top" class="text-2xl font-black text-green-600">0.0000€</div>
     </header>
 
-    <div class="status-bar">Produção v33.20 • Servidor OK</div>
+    <div class="status-bar">v33.20 FINAL • SERVIDOR OK</div>
     <div class="ad-provider">Network Adsense Partner</div>
 
     <div class="publisher-zone">
@@ -92,21 +96,21 @@
         <div class="modal-header">
             <button onclick="closeModal('modal-comment')" class="text-gray-400 font-black text-xs uppercase">Voltar</button>
             <span class="font-black uppercase text-[13px]">Interações</span>
-            <div class="w-10"></div>
+            <button onclick="addComment()" class="text-blue-600 font-black text-xs uppercase">Enviar</button>
         </div>
-        <div id="comment-list" class="modal-body bg-gray-50">
-            </div>
-        <div class="p-4 border-t border-gray-100">
-            <div class="flex gap-3">
-                <input id="comm-txt" type="text" placeholder="ESCREVA UM COMENTÁRIO..." class="flex-1 bg-gray-100 p-4 rounded-xl font-bold text-xs outline-none uppercase">
-                <button onclick="addComment()" class="bg-blue-600 text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase">Enviar</button>
-            </div>
+        <div class="modal-body">
+            <textarea id="comm-txt" placeholder="ESCREVA UM COMENTÁRIO..." class="custom-textarea h-full"></textarea>
+            <div id="comment-list" class="flex-1 overflow-y-auto mt-4 space-y-3 hidden">
+                </div>
+        </div>
+        <div class="modal-footer-ad">
+            <span class="ad-tag">Publicidade Patrocinada</span>
         </div>
     </div>
 
     <nav>
         <div class="nav-item active">Feed</div>
-        <div class="nav-item" onclick="location.reload()">Ranking</div>
+        <div class="nav-item" onclick="location.reload()">Carteira</div>
         <div class="nav-item" onclick="logout()">Sair</div>
     </nav>
 
@@ -130,6 +134,7 @@
             if(!uID) return;
             document.getElementById('auth-screen').classList.add('hidden');
             
+            // Inicia perfil do utilizador
             let { data } = await sb.from('perfis').select('saldo').eq('id', parseInt(uID)).single();
             if(!data) {
                 await sb.from('perfis').insert([{ id: parseInt(uID), saldo: 0 }]);
@@ -184,6 +189,7 @@
             btn.innerText = "A ENVIAR...";
             btn.disabled = true;
 
+            // Insere post usando image_url (image_13.png) e parseInt(user_id)
             const { error } = await sb.from('posts').insert([
                 { 
                     user_id: parseInt(uID), 
@@ -208,46 +214,39 @@
             }
         }
 
-        async function openComments(postID) {
+        function openComments(postID) {
             activePostID = postID;
             openModal('modal-comment');
-            renderComments();
-        }
-
-        async function renderComments() {
-            const { data } = await sb.from('comentarios').select('*').eq('post_id', activePostID).order('created_at', {ascending: true});
-            const list = document.getElementById('comment-list');
-            list.innerHTML = "";
-            
-            if(!data || data.length === 0) {
-                list.innerHTML = `<div class="flex-1 flex items-center justify-center opacity-20 font-black uppercase text-xs">Sem interações</div>`;
-                return;
-            }
-
-            data.forEach(c => {
-                list.innerHTML += `<div class="p-4 border-b border-gray-100">
-                    <span class="text-[9px] font-black text-blue-600 block uppercase">Utilizador ${c.user_id}</span>
-                    <p class="text-xs font-bold uppercase text-gray-700">${c.texto}</p>
-                </div>`;
-            });
+            // Limpa o input de comentários ao abrir
+            document.getElementById('comm-txt').value = ""; 
         }
 
         async function addComment() {
             const txt = document.getElementById('comm-txt').value.trim();
-            if(!txt) return;
+            if(!txt) return alert("Escreva um comentário.");
 
-            const { error } = await sb.from('comentarios').insert([{ post_id: activePostID, user_id: parseInt(uID), texto: txt }]);
+            const { error } = await sb.from('comentarios').insert([
+                { 
+                    post_id: activePostID, 
+                    user_id: parseInt(uID), // Envia como número (image_13.png)
+                    texto: txt 
+                }
+            ]);
+
             if(!error) {
                 reward(0.0010);
-                document.getElementById('comm-txt').value = "";
-                renderComments();
+                closeModal('modal-comment');
+                alert("Comentário enviado com sucesso!");
+                await loadFeed(); // Atualiza feed para ver se algo mudou
+            } else {
+                alert("Erro ao enviar comentário: " + error.message);
             }
         }
 
-        async function reward(val) {
+        function reward(val) {
             bal += val;
             updateUI();
-            await sb.from('perfis').upsert({ id: parseInt(uID), saldo: bal });
+            sb.from('perfis').upsert({ id: parseInt(uID), saldo: bal });
         }
 
         function updateUI() { document.getElementById('bal-top').innerText = bal.toFixed(4) + "€"; }
