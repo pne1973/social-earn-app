@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.40 - FB Style</title>
+    <title>Apex Social v33.40 - FB Style + Ads</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; }
-        /* Fonte do sistema similar ao Facebook para o corpo e posts */
-        body { font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif; background: #f1f3f4; color: #1c1e21; margin: 0; padding-top: 185px; padding-bottom: 90px; }
+        :root { --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853; --fb-bg: #f1f3f4; }
+        body { font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif; background: var(--fb-bg); color: #1c1e21; margin: 0; padding-top: 185px; padding-bottom: 90px; }
 
-        /* HEADER & STATUS */
+        /* HEADER & BARS */
         header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
         .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 32px; background: white; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--g-green); text-transform: uppercase; }
         .ad-provider { position: fixed; top: 92px; width: 100%; z-index: 900; height: 28px; background: #f8f9fa; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #bdc1c6; text-transform: uppercase; }
@@ -22,20 +21,14 @@
         .feed-container { max-width: 580px; margin: 0 auto; padding: 10px; }
         .post-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .post-main { display: flex; width: 100%; }
-        
-        /* Tipografia Estilo Facebook */
         .post-content { flex: 1; padding: 16px; } 
         .post-user-label { font-size: 14px; font-weight: 600; color: #050505; margin-bottom: 4px; display: block; }
         .post-text { font-size: 15px; line-height: 1.3333; font-weight: 400; color: #1c1e21; margin-top: 8px; word-wrap: break-word; }
-
         .post-sidebar { width: 70px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 15px 0; }
         
-        /* AD CARD IN FEED */
-        .ad-card { background: #fff; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 250px; }
-
-        /* COMMENTS IN FEED */
-        .feed-comments-area { background: #f8f9fa; border-top: 1px solid #f1f3f4; padding: 12px 16px; }
-        .feed-comment-item { padding: 6px 0; font-size: 13px; }
+        /* AD CARDS (FEED & MODAL) */
+        .ad-card-feed { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 250px; }
+        .modal-ad-banner { background: #f8f9fa; border-bottom: 1px solid #dadce0; padding: 15px; text-align: center; min-height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
         /* UI ELEMENTS */
         .icon-btn { width: 36px; height: 36px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
@@ -48,8 +41,8 @@
 
         /* MODALS */
         .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
-        .modal-header { height: 65px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-        .custom-textarea { width: 100%; font-size: 18px; border: none; outline: none; resize: none; color: #1c1e21; min-height: 120px; padding: 10px; }
+        .modal-header { height: 60px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; }
+        .custom-textarea { width: 100%; font-size: 18px; border: none; outline: none; resize: none; color: #1c1e21; min-height: 150px; padding: 16px; }
         
         .page-content { display: none; }
         .active-page { display: block; }
@@ -65,7 +58,7 @@
         <div id="bal-top" class="text-2xl font-black text-green-600">0.0000€</div>
     </header>
 
-    <div class="status-bar">v33.40 • GANHOS POR ATIVIDADE ATIVOS</div>
+    <div class="status-bar">v33.40 • MONETIZAÇÃO ATIVA</div>
     <div class="ad-provider">GOOGLE ADSENSE CERTIFIED PARTNER</div>
 
     <div id="page-feed" class="page-content active-page">
@@ -92,9 +85,15 @@
             <span class="font-bold">Criar publicação</span>
             <button onclick="publish()" class="text-blue-600 font-bold">Publicar</button>
         </div>
-        <div class="p-5">
+        <div class="modal-ad-banner">
+            <span class="text-[9px] font-black text-blue-500 uppercase">Patrocinado</span>
+            <p class="text-[11px] font-bold text-gray-400">GANHE +100 XP AO CONVIDAR AMIGOS</p>
+        </div>
+        <div class="flex-1 overflow-y-auto">
             <textarea id="post-txt" placeholder="No que está a pensar?" class="custom-textarea"></textarea>
-            <input id="post-url" type="text" placeholder="URL da imagem (opcional)" class="w-full p-3 bg-gray-100 rounded-xl mt-4 outline-none">
+            <div class="px-4 pb-4">
+                <input id="post-url" type="text" placeholder="URL da imagem (opcional)" class="w-full p-3 bg-gray-100 rounded-xl outline-none text-sm border border-gray-200">
+            </div>
         </div>
     </div>
 
@@ -104,7 +103,11 @@
             <span class="font-bold">Comentar</span>
             <button onclick="addComment()" class="text-blue-600 font-bold">Enviar</button>
         </div>
-        <div class="p-5">
+        <div class="modal-ad-banner">
+            <span class="text-[9px] font-black text-blue-500 uppercase">Google AdSense</span>
+            <p class="text-[11px] font-bold text-gray-400">ANÚNCIO DE REDE PARCEIRA APEX</p>
+        </div>
+        <div class="flex-1 overflow-y-auto">
             <textarea id="comm-txt" placeholder="Escreva um comentário..." class="custom-textarea"></textarea>
         </div>
     </div>
@@ -148,19 +151,17 @@
             posts.forEach((p, index) => {
                 if (index > 0 && index % 3 === 0) {
                     container.innerHTML += `
-                    <div class="ad-card">
+                    <div class="ad-card-feed">
                         <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">Publicidade</span>
-                        <p class="text-[14px] font-bold text-gray-600 uppercase">Sugestão para si</p>
+                        <p class="text-[14px] font-bold text-gray-600 uppercase">Anúncio de Rede Parceira</p>
+                        <button class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold uppercase">Saber Mais</button>
                     </div>`;
                 }
 
                 const postComms = comms ? comms.filter(c => c.post_id == p.id) : [];
-                let commsHTML = postComms.length > 0 ? `<div class="feed-comments-area">` : "";
+                let commsHTML = postComms.length > 0 ? `<div class="bg-[#f8f9fa] border-t border-gray-100 p-4">` : "";
                 postComms.forEach(c => {
-                    commsHTML += `<div class="feed-comment-item">
-                        <span class="font-bold text-[#050505]">ID ${c.user_id}</span>
-                        <span class="text-[#1c1e21]">${c.content || c.texto}</span>
-                    </div>`;
+                    commsHTML += `<div class="text-[13px] mb-2"><span class="font-bold text-[#050505]">ID ${c.user_id}</span> <span class="text-[#1c1e21]">${c.content || c.texto}</span></div>`;
                 });
                 if(postComms.length > 0) commsHTML += `</div>`;
 
@@ -169,7 +170,7 @@
                     <div class="post-main">
                         <div class="post-content">
                             <span class="post-user-label">Utilizador ${p.user_id}</span>
-                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3">` : ''}
+                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3 border border-gray-100">` : ''}
                             <div class="post-text">${p.content}</div>
                         </div>
                         <div class="post-sidebar">
@@ -181,13 +182,6 @@
                     ${commsHTML}
                 </div>`;
             });
-        }
-
-        async function sharePost(text) {
-            if (navigator.share) {
-                navigator.share({ title: 'Apex Social', text: text, url: window.location.href })
-                .then(() => reward(0.0050)).catch(() => {});
-            }
         }
 
         async function publish() {
@@ -210,10 +204,8 @@
         function reward(val) { bal += val; updateUI(); sb.from('perfis').upsert({ id: uID, saldo: bal }); }
         function updateUI() { document.getElementById('bal-top').innerText = bal.toFixed(4) + "€"; }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.none; } // Corrigido para .style.display = 'none' internamente
-
-        // Pequena correção na função closeModal original
-        window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function sharePost(t) { if(navigator.share) navigator.share({title:'Apex', text:t, url:window.location.href}).then(()=>reward(0.0050)); }
 
         init();
     </script>
