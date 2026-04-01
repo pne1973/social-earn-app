@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Real Estate v33.22</title>
+    <title>Apex Real Estate v33.23</title>
     <style>
         :root { 
             --google-blue: #1a73e8; --google-green: #34a853; --google-red: #ea4335; 
@@ -11,168 +11,144 @@
         }
         body { font-family: 'Roboto', sans-serif; background: var(--dark-bg); margin: 0; padding: 0; color: #fff; }
 
-        /* Banner de Anúncio Superior */
-        .ad-top-banner { background: #fff; color: #70757a; text-align: center; padding: 8px; font-size: 11px; border-bottom: 1px solid #ddd; }
-
         .header-app { background: #1f1f1f; padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
-        .nav-tabs { display: flex; gap: 10px; margin-top: 10px; }
-        .tab-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #333; color: #aaa; font-weight: bold; cursor: pointer; }
-        .tab-btn.active { background: var(--google-blue); color: white; }
-
         .main-wallet { 
             background: linear-gradient(135deg, #1a73e8, #0b51b7); 
-            margin: 15px; padding: 25px; border-radius: 20px; text-align: center;
+            margin: 15px; padding: 20px; border-radius: 20px; text-align: center;
         }
 
         .container { padding: 0 15px 100px 15px; }
+        
+        /* Card de Imóvel Ativo */
         .property-card { 
             background: #ffffff; color: #202124; 
             border-radius: 18px; padding: 20px; margin-bottom: 15px;
-            position: relative;
+            position: relative; border-left: 5px solid var(--google-blue);
         }
 
-        .income-amount { font-size: 26px; font-weight: 700; color: var(--google-green); }
+        /* Card de Antevisão (Próximos Níveis) */
+        .preview-card {
+            background: #2a2a2a; color: #888;
+            border-radius: 18px; padding: 15px; margin-bottom: 10px;
+            border: 1px dashed #444; opacity: 0.7;
+            display: flex; justify-content: space-between; align-items: center;
+        }
 
-        /* Botões de Monetização */
-        .btn-ad-gold { 
-            background: var(--google-yellow); color: #000; border: none; 
-            padding: 12px; border-radius: 25px; font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer;
+        .income-amount { font-size: 24px; font-weight: 700; color: var(--google-green); }
+        .lock-icon { font-size: 18px; filter: grayscale(1); }
+
+        .btn-upgrade { 
+            background: var(--google-blue); color: white; border: none; 
+            padding: 12px; border-radius: 25px; font-weight: bold; width: 100%; cursor: pointer;
         }
         
-        .crisis-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.9); border-radius: 18px;
-            display: flex; flex-direction: column; justify-content: center;
-            align-items: center; color: white; text-align: center; padding: 20px; z-index: 10;
-        }
-
+        .section-title { font-size: 12px; color: #aaa; margin: 20px 0 10px 5px; font-weight: bold; text-transform: uppercase; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="ad-top-banner">PUBLICIDADE: Aumente os seus rendimentos com o Apex Premium</div>
-
     <div class="header-app">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <b style="color: var(--google-blue);">APEX REAL ESTATE</b>
-            <span style="font-size: 11px; opacity: 0.6;">ID: 5401881400</span>
-        </div>
-        <div class="nav-tabs">
-            <button class="tab-btn active" id="tab-emp" onclick="switchTab('empire')">IMÓVEIS</button>
-            <button class="tab-btn" id="tab-wal" onclick="switchTab('wallet')">CARTEIRA</button>
+            <span style="font-size: 11px; opacity: 0.6;">Admin: 5401881400</span>
         </div>
     </div>
 
-    <div id="tab-empire" class="container">
+    <div class="container">
         <div class="main-wallet">
-            <div style="font-size: 11px; opacity: 0.9;">SALDO DISPONÍVEL</div>
+            <div style="font-size: 11px; opacity: 0.9;">SALDO ACUMULADO</div>
             <div style="font-size: 32px; font-weight: 800; margin: 5px 0;">€ <span id="total-balance">0.0000</span></div>
-            <button onclick="showRewardAd('boost')" class="btn-ad-gold" style="padding: 8px; font-size: 11px;">⚡ VER VÍDEO: RENDA 2X (2m)</button>
+            <div id="investor-rank" style="font-size: 10px; color: var(--google-yellow);">RANK: INVESTIDOR INICIANTE</div>
         </div>
 
-        <div id="properties-list">
-            <div class="property-card" id="prop-0">
-                <div id="crisis-0" class="crisis-overlay hidden">
-                    <h3 style="color: var(--google-red);">⚠️ ALERTA DE MANUTENÇÃO</h3>
-                    <p style="font-size: 12px;">O imóvel sofreu danos estruturais e a renda parou.</p>
-                    <button onclick="showRewardAd('repair', 0)" class="btn-ad-gold">REPARAR COM VÍDEO (GRÁTIS)</button>
-                    <button onclick="fixWithCash(0)" style="background: transparent; color: #fff; border: 1px solid #555; margin-top: 10px; padding: 5px; cursor: pointer; border-radius: 5px;">Reparar com Dinheiro (€0.0200)</button>
-                </div>
-
-                <div style="display: flex; justify-content: space-between;">
-                    <span id="p0-name" style="font-weight: bold; color: var(--google-blue);">🏠 QUARTO ALUGADO</span>
-                    <span style="font-size: 11px; color: #70757a;">Estado: <span id="p0-health-txt">100</span>%</span>
-                </div>
-
-                <div style="margin: 15px 0;">
-                    <div style="font-size: 12px; color: #70757a;">RENDA PENDENTE</div>
-                    <div class="income-amount">€ <span id="p0-acc">0.0000</span></div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <button onclick="collectRent(0)" style="background: var(--google-blue); color: white; border: none; padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer;">RECOLHER</button>
-                    <button onclick="upgradeProp(0)" style="background: #f1f3f4; color: #202124; border: 1px solid #dadce0; padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer;">REFORMA</button>
-                </div>
+        <div class="section-title">Imóvel Atual</div>
+        <div id="active-property" class="property-card">
+            <div style="display: flex; justify-content: space-between;">
+                <span id="p-name" style="font-weight: bold; color: var(--google-blue);">🏠 QUARTO ALUGADO</span>
+                <span style="font-size: 11px; color: #70757a;">Renda Ativa</span>
             </div>
+            <div style="margin: 15px 0;">
+                <div class="income-amount">€ <span id="p-acc">0.0000</span></div>
+                <div style="font-size: 10px; color: #999;">Taxa: <span id="p-speed">0.0001</span> €/seg</div>
+            </div>
+            <button onclick="collectRent()" class="btn-upgrade" style="background: var(--google-green); margin-bottom: 8px;">RECOLHER RENDA</button>
+            <button onclick="upgradeProp()" class="btn-upgrade">UPGRADE PARA <span id="next-label">APARTAMENTO</span> (€<span id="up-cost">0.0500</span>)</button>
         </div>
-    </div>
 
-    <div id="tab-wallet" class="container hidden">
-        <div class="property-card" style="margin-top: 20px; text-align: center;">
-            <p style="color: #70757a; font-size: 12px;">Levantamento PayPal</p>
-            <h2 style="color: var(--google-blue); margin-bottom: 30px;">Mínimo: € 50.00</h2>
-            <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; font-size: 11px; margin-bottom: 20px;">
-                DICA: Ver anúncios de "Reparação" aumenta a sua pontuação de confiança interna.
+        <div class="section-title">Próximos Níveis de Património</div>
+        <div id="previews">
             </div>
-            <button disabled style="width: 100%; padding: 15px; border-radius: 30px; border: none; background: #ccc; color: #666; font-weight: bold;">SOLICITAR PAGAMENTO</button>
-        </div>
-        <div style="background: #fff; padding: 20px; border-radius: 15px; text-align: center; color: #202124;">
-            <small>ANÚNCIO PARCEIRO</small>
-            <div style="height: 100px; background: #eee; margin-top: 10px; display: flex; align-items: center; justify-content: center;">
-                [Espaço para Banner AdSense/Telegram]
-            </div>
-        </div>
     </div>
 
     <script>
         let mainBalance = 0.0000;
-        let adMultiplier = 1.0;
-        let props = [{ id: 0, acc: 0.0, speed: 0.0001, health: 100, crisis: false }];
+        let currentLevel = 0;
+        let accRent = 0.0000;
+        let speed = 0.0001;
+        let upgradeCost = 0.0500;
+
+        const levels = [
+            { name: "QUARTO ALUGADO", icon: "🏠", mult: 1 },
+            { name: "APARTAMENTO T1", icon: "🏢", mult: 2.4 },
+            { name: "VIVENDA LUXO", icon: "🏡", mult: 5.8 },
+            { name: "MANSÃO APEX", icon: "🏰", mult: 14.0 },
+            { name: "HOTEL 5 ESTRELAS", icon: "🏨", mult: 35.0 }
+        ];
 
         function gameLoop() {
-            props.forEach((p, i) => {
-                if (!p.crisis) {
-                    p.acc += (p.speed * adMultiplier);
-                    p.health -= 0.1;
-                    if (p.health <= 0) { p.health = 0; p.crisis = true; }
-                }
-                updateUI(i);
-            });
+            accRent += speed;
+            document.getElementById('p-acc').innerText = accRent.toFixed(4);
             document.getElementById('total-balance').innerText = mainBalance.toFixed(4);
+            updatePreviews();
         }
 
-        function updateUI(i) {
-            let p = props[i];
-            document.getElementById(`p0-acc`).innerText = p.acc.toFixed(4);
-            document.getElementById(`p0-health-txt`).innerText = Math.floor(p.health);
-            document.getElementById(`crisis-0`).classList.toggle('hidden', !p.crisis);
+        function collectRent() {
+            mainBalance += accRent;
+            accRent = 0;
+            if (mainBalance > 10) document.getElementById('investor-rank').innerText = "RANK: INVESTIDOR PROFISSIONAL";
         }
 
-        function showRewardAd(type, index) {
-            // Simulação de chamada de anúncio (Reward Video)
-            alert("A carregar vídeo publicitário...");
-            setTimeout(() => {
-                if (type === 'repair') {
-                    props[index].health = 100;
-                    props[index].crisis = false;
-                    alert("Imóvel Reparado e Integridade 100%!");
-                } else if (type === 'boost') {
-                    adMultiplier = 2.0;
-                    alert("BÓNUS ATIVO: Renda duplicada por 2 minutos!");
-                    setTimeout(() => { adMultiplier = 1.0; alert("O bónus de renda expirou."); }, 120000);
+        function upgradeProp() {
+            if (mainBalance >= upgradeCost && currentLevel < levels.length - 1) {
+                mainBalance -= upgradeCost;
+                currentLevel++;
+                speed *= 2.4;
+                upgradeCost *= 3.5;
+                
+                // Update UI
+                let next = levels[currentLevel];
+                document.getElementById('p-name').innerText = next.icon + " " + next.name;
+                document.getElementById('p-speed').innerText = speed.toFixed(4);
+                document.getElementById('up-cost').innerText = upgradeCost.toFixed(4);
+                
+                if (currentLevel < levels.length - 1) {
+                    document.getElementById('next-label').innerText = levels[currentLevel+1].name.split(' ')[0];
+                } else {
+                    document.getElementById('next-label').innerText = "MAX";
                 }
-            }, 2000);
+            } else {
+                alert("Saldo insuficiente para expandir o património!");
+            }
         }
 
-        function fixWithCash(i) {
-            if (mainBalance >= 0.02) {
-                mainBalance -= 0.02;
-                props[i].health = 100;
-                props[i].crisis = false;
-            } else { alert("Saldo insuficiente. Veja um anúncio para reparar grátis!"); }
-        }
-
-        function collectRent(i) {
-            mainBalance += props[i].acc;
-            props[i].acc = 0;
-        }
-
-        function switchTab(tab) {
-            document.getElementById('tab-empire').classList.toggle('hidden', tab !== 'empire');
-            document.getElementById('tab-wallet').classList.toggle('hidden', tab !== 'wallet');
-            document.getElementById('tab-emp').classList.toggle('active', tab === 'empire');
-            document.getElementById('tab-wal').classList.toggle('active', tab === 'wallet');
+        function updatePreviews() {
+            let container = document.getElementById('previews');
+            container.innerHTML = "";
+            
+            for (let i = currentLevel + 1; i < levels.length; i++) {
+                let l = levels[i];
+                let estIncome = (0.0001 * l.mult).toFixed(4);
+                container.innerHTML += `
+                    <div class="preview-card">
+                        <div>
+                            <div style="font-size: 13px; font-weight: bold;">${l.icon} ${l.name}</div>
+                            <div style="font-size: 10px;">Renda Estimada: € ${estIncome}/seg</div>
+                        </div>
+                        <div class="lock-icon">🔒</div>
+                    </div>
+                `;
+            }
         }
 
         setInterval(gameLoop, 1000);
