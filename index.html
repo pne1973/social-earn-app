@@ -3,157 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.18</title>
+    <title>Apex Real Estate v33.19</title>
     <style>
         :root { 
             --google-blue: #1a73e8; 
             --google-red: #ea4335; 
             --google-green: #34a853; 
-            --bg-gray: #f1f3f4; 
+            --gold: #f9ab00;
         }
-        body { font-family: 'Roboto', sans-serif; background: #202124; margin: 0; padding: 15px; }
+        body { font-family: 'Roboto', sans-serif; background: #202124; margin: 0; padding: 15px; display: flex; justify-content: center; }
 
-        /* Card Principal com Fundo Branco Forçado */
-        .card-google { 
+        .card-property { 
             background: #ffffff !important; 
-            border-radius: 12px; 
-            padding: 20px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
-            max-width: 400px; 
-            margin: auto;
-            color: #202124 !important;
+            border-radius: 16px; 
+            padding: 24px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
+            max-width: 380px; 
+            width: 100%;
+            color: #202124;
+            position: relative;
         }
 
-        .level-badge { 
-            background: #e8f0fe; 
-            color: var(--google-blue); 
+        .header-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        .property-badge { 
+            background: #f1f3f4; 
             padding: 6px 12px; 
             border-radius: 20px; 
             font-size: 11px; 
             font-weight: bold; 
+            color: #5f6368;
+            border: 1px solid #dadce0;
         }
 
-        .balance-display { 
-            font-size: 32px; 
+        .rent-display { 
+            font-size: 36px; 
             font-weight: 700; 
-            color: var(--google-blue); 
-            margin: 15px 0; 
+            color: var(--google-green); 
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* Alerta de Hacker Estilizado */
-        .event-alert {
-            background: var(--google-red);
-            color: white !important;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
+        /* Alerta de Crise: Inquilino ou Avaria */
+        .crisis-alert {
+            background: #fff0f0;
+            border: 1px solid var(--google-red);
+            color: var(--google-red);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
             font-size: 13px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            animation: pulse 1s infinite;
+            flex-direction: column;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
         }
 
-        .btn-defend {
-            background: white;
-            color: var(--google-red);
-            border: none;
-            padding: 5px 15px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-upgrade {
+        .btn-action {
             width: 100%;
             padding: 14px;
-            background: white;
-            color: var(--google-blue);
-            border: 1px solid #dadce0;
             border-radius: 24px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 15px;
+            border: none;
+            transition: 0.2s;
+            font-size: 14px;
         }
+
+        .btn-upgrade { background: var(--google-blue); color: white; margin-top: 20px; }
+        .btn-repair { background: var(--google-red); color: white; }
+        .btn-ad-boost { background: var(--gold); color: #000; border: 1px solid #cc8e00; margin-top: 10px; }
+
+        .status-bar { height: 6px; background: #eee; border-radius: 3px; margin: 10px 0; overflow: hidden; }
+        #condition-fill { height: 100%; width: 100%; background: var(--google-blue); transition: 0.5s; }
 
         .hidden { display: none !important; }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.8; }
-            100% { opacity: 1; }
-        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="card-google">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="level-badge" id="location-name">📍 GARAGEM (LISBOA)</span>
-            <span id="p-level" style="font-size: 11px; font-weight: bold; color: #5f6368;">NÍVEL 1</span>
+    <div class="card-property">
+        <div class="header-info">
+            <span class="property-badge" id="prop-type">🏠 QUARTO ALUGADO</span>
+            <span style="font-size: 11px; font-weight: bold; color: #9aa0a6;">ID: 5401881400</span>
         </div>
 
-        <div id="hacker-alert" class="event-alert hidden">
-            <span>⚠️ ATAQUE HACKER!</span>
-            <button onclick="defendSystem()" class="btn-defend">DEFENDER</button>
+        <div style="font-size: 14px; color: #5f6368;">Renda Acumulada:</div>
+        <div class="rent-display">
+            € <span id="balance">0.0000</span>
         </div>
 
-        <div class="balance-display">
-            € <span id="p-balance">0.0000</span>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; color: #70757a;">
+            <span>Estado do Imóvel</span>
+            <span><span id="condition-val">100</span>%</span>
         </div>
-        
-        <p style="font-size: 12px; color: #5f6368; margin-top: -10px;">Processamento de Dados Ativo</p>
+        <div class="status-bar">
+            <div id="condition-fill"></div>
+        </div>
 
-        <button onclick="upgradeServer()" class="btn-upgrade">
-            EXPANDIR DATACENTER (€<span id="up-cost">0.0500</span>)
-        </button>
+        <div id="event-box" class="crisis-alert hidden">
+            <b id="event-title">⚠️ CANO REBENTADO!</b>
+            <span id="event-desc">A renda parou até que o conserto seja feito.</span>
+            <button onclick="repairProperty()" class="btn-action btn-repair">CONSERTAR AGORA (CLIQUE)</button>
+            <button onclick="adBoost()" class="btn-action btn-ad-boost">VER VÍDEO: SEGURO TOTAL 🛡️</button>
+        </div>
+
+        <div id="main-actions">
+            <button onclick="upgradeProperty()" class="btn-action btn-upgrade">
+                INVESTIR EM REFORMA (€<span id="up-cost">0.0500</span>)
+            </button>
+            <p style="text-align: center; font-size: 11px; color: #9aa0a6; margin-top: 15px;">
+                Taxa de Renda: <span id="rent-speed">0.0001</span> €/seg
+            </p>
+        </div>
     </div>
 
     <script>
         let balance = 0.0000;
         let speed = 0.0001;
         let upgradeCost = 0.0500;
-        let cityLevel = 1;
-        let locations = ["Garagem (Lisboa)", "Escritório (Porto)", "Bunker (Londres)", "Data Center (Frankfurt)"];
+        let condition = 100;
+        let isStopped = false;
+        let propLevel = 0;
+        const propNames = ["🏠 QUARTO ALUGADO", "🏢 APARTAMENTO T1", "🏡 VIVENDA LUXO", "🏰 MANSÃO APEX", "🏨 HOTEL 5 ESTRELAS"];
 
         function update() {
-            balance += speed;
-            document.getElementById('p-balance').innerText = balance.toFixed(4);
+            if (!isStopped) {
+                balance += speed;
+                condition -= 0.15; // Desgaste natural
+
+                if (condition <= 0) {
+                    condition = 0;
+                    triggerCrisis("⚠️ IMÓVEL DEGRADADO!", "O inquilino recusa-se a pagar renda nestas condições.");
+                }
+            }
+            render();
         }
 
-        function upgradeServer() {
+        function render() {
+            document.getElementById('balance').innerText = balance.toFixed(4);
+            document.getElementById('condition-val').innerText = Math.floor(condition);
+            document.getElementById('condition-fill').style.width = condition + "%";
+            document.getElementById('rent-speed').innerText = speed.toFixed(4);
+
+            // Cor da barra de estado
+            const fill = document.getElementById('condition-fill');
+            if (condition < 30) fill.style.background = "var(--google-red)";
+            else if (condition < 70) fill.style.background = "var(--gold)";
+            else fill.style.background = "var(--google-blue)";
+        }
+
+        function triggerCrisis(title, desc) {
+            isStopped = true;
+            document.getElementById('event-title').innerText = title;
+            document.getElementById('event-desc').innerText = desc;
+            document.getElementById('event-box').classList.remove('hidden');
+            document.getElementById('main-actions').classList.add('hidden');
+        }
+
+        function repairProperty() {
+            condition += 10;
+            if (condition >= 50) {
+                isStopped = false;
+                document.getElementById('event-box').classList.add('hidden');
+                document.getElementById('main-actions').classList.remove('hidden');
+            }
+            render();
+        }
+
+        function adBoost() {
+            alert("A acionar seguro residencial...");
+            setTimeout(() => {
+                condition = 100;
+                isStopped = false;
+                document.getElementById('event-box').classList.add('hidden');
+                document.getElementById('main-actions').classList.remove('hidden');
+                render();
+            }, 1500);
+        }
+
+        function upgradeProperty() {
             if (balance >= upgradeCost) {
                 balance -= upgradeCost;
-                speed *= 2.2;
-                upgradeCost *= 3;
-                cityLevel++;
+                speed *= 2.5;
+                upgradeCost *= 4;
                 
-                if(cityLevel <= locations.length) {
-                    document.getElementById('location-name').innerText = "📍 " + locations[cityLevel-1].toUpperCase();
-                    document.getElementById('p-level').innerText = "NÍVEL " + cityLevel;
+                if (propLevel < propNames.length - 1) {
+                    propLevel++;
+                    document.getElementById('prop-type').innerText = propNames[propLevel];
                 }
-                
+
                 document.getElementById('up-cost').innerText = upgradeCost.toFixed(4);
-                document.getElementById('p-balance').innerText = balance.toFixed(4);
+                render();
             } else {
-                alert("Saldo insuficiente!");
+                alert("Saldo insuficiente para reforma!");
             }
         }
 
-        // Simulação de Evento (Hacker)
-        function triggerHacker() {
-            if (Math.random() > 0.7) {
-                document.getElementById('hacker-alert').classList.remove('hidden');
+        // Eventos aleatórios (ex: Inquilino saiu sem pagar)
+        setInterval(() => {
+            if (!isStopped && Math.random() > 0.9) {
+                triggerCrisis("⚠️ INQUILINO SAIU!", "Precisa de limpar o imóvel para novos inquilinos entrarem.");
             }
-        }
-
-        function defendSystem() {
-            document.getElementById('hacker-alert').classList.add('hidden');
-            alert("Sistema Protegido!");
-        }
+        }, 30000);
 
         setInterval(update, 1000);
-        setInterval(triggerHacker, 15000); // Tenta um ataque a cada 15 seg
     </script>
 </body>
 </html>
