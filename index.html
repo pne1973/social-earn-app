@@ -3,174 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.13 - Production</title>
+    <title>Apex Social v33.15 - Tycoon Edition</title>
     <style>
         :root { --google-blue: #1a73e8; --google-red: #ea4335; --google-yellow: #fbbc05; --google-green: #34a853; --bg-gray: #f8f9fa; }
         body { font-family: 'Roboto', sans-serif; background: var(--bg-gray); margin: 0; padding: 0; color: #202124; }
         
-        /* Sistema de Tabs */
         .nav-tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; position: sticky; top: 0; z-index: 100; }
         .tab { flex: 1; text-align: center; padding: 15px 0; font-size: 14px; font-weight: 500; color: #5f6368; cursor: pointer; }
         .tab.active { color: var(--google-blue); border-bottom: 3px solid var(--google-blue); }
 
-        /* Container do Jogo Miner */
         .miner-container { padding: 20px; max-width: 500px; margin: auto; }
-        .miner-card { background: #fff; border-radius: 12px; border: 1px solid #dadce0; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .miner-card { background: #fff; border-radius: 12px; border: 1px solid #dadce0; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; }
         .balance-display { font-size: 32px; font-weight: 700; color: var(--google-blue); margin: 10px 0; }
-        .temp-bg { width: 100%; height: 12px; background: #e8eaed; border-radius: 6px; margin: 15px 0; overflow: hidden; }
-        #temp-fill { height: 100%; width: 30%; background: var(--google-green); transition: width 0.4s, background 0.4s; }
         
-        /* Botões Estilo Google */
-        .btn-google { width: 100%; padding: 14px; border-radius: 24px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        /* Barras de Status */
+        .status-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; font-weight: 500; }
+        .bar-bg { width: 100%; height: 8px; background: #e8eaed; border-radius: 4px; margin-bottom: 12px; overflow: hidden; }
+        .bar-fill { height: 100%; transition: width 0.4s; }
+        
+        .btn-google { width: 100%; padding: 14px; border-radius: 24px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 10px; }
         .btn-blue { background: var(--google-blue); color: white; }
         .btn-outline { background: white; color: var(--google-blue); border: 1px solid #dadce0; }
         .btn-red { background: white; color: var(--google-red); border: 1px solid var(--google-red); }
 
-        /* Feed e Monetização */
         .ad-banner { background: #fff; border: 1px solid #dadce0; margin: 10px; padding: 10px; text-align: center; font-size: 12px; color: #70757a; }
         .hidden { display: none; }
+        .boost-tag { background: var(--google-yellow); color: #000; padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-left: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="ad-banner">ANÚNCIO: Patrocinado por Apex Ads</div>
+    <div class="ad-banner">ANÚNCIO: Ganhos aumentados em 2x este fim de semana!</div>
 
     <div class="nav-tabs">
-        <div class="tab" onclick="switchTab('feed')">FEED</div>
-        <div class="tab active" onclick="switchTab('miner')">MINERAR (€)</div>
+        <div class="tab active" onclick="switchTab('miner')">MINERAR</div>
         <div class="tab" onclick="switchTab('perfil')">CARTEIRA</div>
     </div>
 
     <div id="tab-miner" class="miner-container">
+        
         <div class="miner-card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 12px; font-weight: bold; color: #5f6368;">STATUS DO HARDWARE</span>
-                <span id="miner-status-text" style="color: var(--google-green); font-weight: bold;">ATIVO</span>
+                <span style="font-size: 11px; font-weight: bold; color: #5f6368;">APEX HARDWARE v33.15</span>
+                <span id="miner-status-text" style="color: var(--google-green); font-weight: bold; font-size: 12px;">● ATIVO</span>
             </div>
             
             <div class="balance-display">€ <span id="m-balance">0.0000</span></div>
-            <p style="font-size: 12px; color: #70757a; margin: 0;">Ganhos acumulados nesta sessão</p>
-
-            <div style="margin-top: 25px;">
-                <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                    <span>Temperatura: <span id="m-temp">30</span>°C</span>
-                    <span id="m-speed-text">0.0001 €/s</span>
-                </div>
-                <div class="temp-bg">
-                    <div id="temp-fill"></div>
-                </div>
+            
+            <div class="status-label">
+                <span>Temperatura</span>
+                <span><span id="m-temp">30</span>°C</span>
+            </div>
+            <div class="bar-bg">
+                <div id="temp-fill" class="bar-fill" style="width: 30%; background: var(--google-green);"></div>
             </div>
 
-            <div id="miner-actions" style="margin-top: 20px;">
-                <button id="btn-upgrade" onclick="minerUpgrade()" class="btn-google btn-outline">MELHORAR GPU (Custo: €0.0500)</button>
+            <div class="status-label">
+                <span>Integridade das Peças</span>
+                <span><span id="m-health">100</span>%</span>
+            </div>
+            <div class="bar-bg">
+                <div id="health-fill" class="bar-fill" style="width: 100%; background: var(--google-blue);"></div>
+            </div>
+
+            <div id="miner-actions">
+                <div id="normal-actions">
+                    <button id="btn-upgrade" onclick="minerUpgrade()" class="btn-google btn-outline">UPGRADE GPU (€<span id="up-cost">0.0500</span>)</button>
+                </div>
                 
                 <div id="overheat-actions" class="hidden">
-                    <button onclick="manualCool()" class="btn-google btn-blue">ARREFECER MANUAL (Clique)</button>
+                    <button onclick="manualCool()" class="btn-google btn-blue">ARREFECER (Clique)</button>
                     <button onclick="adCooling()" class="btn-google btn-red">VÍDEO: ARREFECER 100% ⚡</button>
+                </div>
+
+                <div id="broken-actions" class="hidden">
+                    <button onclick="adRepair()" class="btn-google btn-red" style="background: var(--google-red); color: white;">REPARAR HARDWARE (VER VÍDEO)</button>
                 </div>
             </div>
         </div>
+
+        <div class="miner-card" style="text-align: center; border-style: dashed; border-color: var(--google-yellow);">
+            <h4 style="margin: 0; color: #202124;">Multiplicador Social <span class="boost-tag">x<span id="m-boost">1.0</span></span></h4>
+            <p style="font-size: 12px; color: #5f6368; margin: 8px 0;">Convide amigos para aumentar a sua velocidade permanentemente!</p>
+            <button onclick="inviteFriend()" class="btn-google btn-outline" style="border-color: var(--google-yellow); color: #856404;">CONVIDAR AMIGO (+0.2x)</button>
+        </div>
         
-        <p style="text-align: center; font-size: 11px; color: #9aa0a6; margin-top: 15px;">
-            ID de Minerador: 5401881400 | v33.13 Stable
-        </p>
+        <p style="text-align: center; font-size: 11px; color: #9aa0a6;">ID: 5401881400 | Server: Portugal-1</p>
     </div>
 
-    <div id="tab-feed" class="hidden" style="padding: 20px; text-align: center;">
-        <p>O seu Feed de Posts será carregado aqui...</p>
+    <div id="tab-perfil" class="hidden" style="padding: 20px;">
+        <div class="miner-card" style="text-align: center;">
+            <h3 style="color: var(--google-blue); margin-top: 0;">Saldo Total</h3>
+            <p style="font-size: 36px; font-weight: bold; margin: 10px 0;">€ <span id="wallet-total">0.0000</span></p>
+            <p style="font-size: 12px; color: #5f6368;">Próximo levantamento disponível em 50.00€</p>
+            <button class="btn-google btn-blue" style="opacity: 0.5;">Levantar via PayPal</button>
+        </div>
     </div>
 
     <script>
-        // Configurações Base v33.13
         let balance = 0.0000;
         let temp = 30;
-        let speed = 0.0001;
+        let health = 100;
+        let baseSpeed = 0.0001;
+        let boost = 1.0;
         let upgradeCost = 0.0500;
         let isOverheated = false;
+        let isBroken = false;
 
         function updateMiner() {
-            if (!isOverheated) {
-                balance += speed;
-                temp += 0.3; // Taxa de aquecimento
-
-                if (temp >= 100) {
-                    temp = 100;
-                    isOverheated = true;
-                    showOverheatUI();
-                }
+            if (!isOverheated && !isBroken) {
+                balance += (baseSpeed * boost);
+                temp += 0.4; 
+                
+                if (temp >= 100) { temp = 100; isOverheated = true; showUI('overheat'); }
+            } else if (isOverheated && !isBroken) {
+                // Perder integridade enquanto está quente
+                health -= 0.5;
+                if (health <= 0) { health = 0; isBroken = true; showUI('broken'); }
             }
             renderUI();
         }
 
         function renderUI() {
             document.getElementById('m-balance').innerText = balance.toFixed(4);
+            document.getElementById('wallet-total').innerText = balance.toFixed(4);
             document.getElementById('m-temp').innerText = Math.floor(temp);
-            document.getElementById('m-speed-text').innerText = speed.toFixed(4) + " €/s";
+            document.getElementById('m-health').innerText = Math.floor(health);
+            document.getElementById('m-boost').innerText = boost.toFixed(1);
+
+            // Barras
+            document.getElementById('temp-fill').style.width = temp + "%";
+            document.getElementById('health-fill').style.width = health + "%";
             
-            const fill = document.getElementById('temp-fill');
-            fill.style.width = temp + "%";
-            
-            // Cores de Alerta
-            if (temp < 60) fill.style.background = "#34a853";
-            else if (temp < 85) fill.style.background = "#fbbc05";
-            else fill.style.background = "#ea4335";
+            // Cores
+            document.getElementById('temp-fill').style.background = temp > 80 ? "var(--google-red)" : (temp > 60 ? "var(--google-yellow)" : "var(--google-green)");
+            document.getElementById('health-fill').style.background = health < 30 ? "var(--google-red)" : "var(--google-blue)";
         }
 
-        function showOverheatUI() {
-            document.getElementById('miner-status-text').innerText = "SOBREAQUECIDO";
-            document.getElementById('miner-status-text').style.color = "#ea4335";
-            document.getElementById('btn-upgrade').classList.add('hidden');
-            document.getElementById('overheat-actions').classList.remove('hidden');
+        function showUI(state) {
+            document.getElementById('normal-actions').classList.add('hidden');
+            document.getElementById('overheat-actions').classList.add('hidden');
+            document.getElementById('broken-actions').classList.add('hidden');
+
+            if (state === 'overheat') {
+                document.getElementById('overheat-actions').classList.remove('hidden');
+                document.getElementById('miner-status-text').innerText = "● QUENTE";
+                document.getElementById('miner-status-text').style.color = "var(--google-yellow)";
+            } else if (state === 'broken') {
+                document.getElementById('broken-actions').classList.remove('hidden');
+                document.getElementById('miner-status-text').innerText = "● AVARIADO";
+                document.getElementById('miner-status-text').style.color = "var(--google-red)";
+            } else {
+                document.getElementById('normal-actions').classList.remove('hidden');
+                document.getElementById('miner-status-text').innerText = "● ATIVO";
+                document.getElementById('miner-status-text').style.color = "var(--google-green)";
+            }
         }
 
         function manualCool() {
-            temp -= 5;
-            if (temp <= 40) resumeMining();
+            temp -= 8;
+            if (temp <= 40) { isOverheated = false; showUI('normal'); }
             renderUI();
         }
 
-        function resumeMining() {
-            isOverheated = false;
-            document.getElementById('miner-status-text').innerText = "ATIVO";
-            document.getElementById('miner-status-text').style.color = "#34a853";
-            document.getElementById('btn-upgrade').classList.remove('hidden');
-            document.getElementById('overheat-actions').classList.add('hidden');
+        function adCooling() {
+            alert("Resfriando sistema...");
+            setTimeout(() => { temp = 30; isOverheated = false; showUI('normal'); renderUI(); }, 1000);
         }
 
-        function adCooling() {
-            // Gatilho para o seu sistema de anúncios
-            console.log("Chamando anúncio para ID 5401881400");
-            alert("A carregar vídeo de recompensa...");
-            setTimeout(() => {
-                temp = 30;
-                resumeMining();
-                renderUI();
-            }, 2000);
+        function adRepair() {
+            alert("A reparar hardware...");
+            setTimeout(() => { health = 100; temp = 30; isBroken = false; isOverheated = false; showUI('normal'); renderUI(); }, 2000);
         }
 
         function minerUpgrade() {
             if (balance >= upgradeCost) {
                 balance -= upgradeCost;
-                speed *= 2;
+                baseSpeed *= 2.0;
                 upgradeCost *= 2.5;
-                document.getElementById('btn-upgrade').innerText = `MELHORAR GPU (Custo: €${upgradeCost.toFixed(4)})`;
-                alert("GPU Atualizada! Produção duplicada.");
+                document.getElementById('up-cost').innerText = upgradeCost.toFixed(4);
                 renderUI();
-            } else {
-                alert("Saldo insuficiente para upgrade.");
-            }
+            } else { alert("Saldo insuficiente."); }
+        }
+
+        function inviteFriend() {
+            boost += 0.2;
+            alert("Amigo convidado! Multiplicador subiu para " + boost.toFixed(1) + "x");
+            renderUI();
         }
 
         function switchTab(tabName) {
             document.getElementById('tab-miner').classList.add('hidden');
-            document.getElementById('tab-feed').classList.add('hidden');
+            document.getElementById('tab-perfil').classList.add('hidden');
             document.getElementById('tab-' + tabName).classList.remove('hidden');
-            
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.currentTarget.classList.add('active');
         }
 
-        // Loop de Execução (1 segundo)
         setInterval(updateMiner, 1000);
     </script>
 </body>
