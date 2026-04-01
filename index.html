@@ -1,200 +1,93 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.16 - Data Processing Edition</title>
-    <style>
-        :root { --google-blue: #1a73e8; --google-red: #ea4335; --google-yellow: #fbbc05; --google-green: #34a853; --bg-gray: #f8f9fa; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg-gray); margin: 0; padding: 0; color: #202124; }
-        
-        .nav-tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; position: sticky; top: 0; z-index: 100; }
-        .tab { flex: 1; text-align: center; padding: 15px 0; font-size: 14px; font-weight: 500; color: #5f6368; cursor: pointer; }
-        .tab.active { color: var(--google-blue); border-bottom: 3px solid var(--google-blue); }
+<style>
+    .event-alert {
+        background: var(--google-red);
+        color: white;
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 12px;
+        text-align: center;
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+    .level-badge {
+        background: #e8f0fe;
+        color: var(--google-blue);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+</style>
 
-        .app-container { padding: 20px; max-width: 500px; margin: auto; }
-        .card-google { background: #fff; border-radius: 12px; border: 1px solid #dadce0; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        .balance-display { font-size: 32px; font-weight: 700; color: var(--google-blue); margin: 10px 0; }
-        
-        .status-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; font-weight: 500; color: #5f6368; }
-        .bar-bg { width: 100%; height: 8px; background: #e8eaed; border-radius: 4px; margin-bottom: 12px; overflow: hidden; }
-        .bar-fill { height: 100%; transition: width 0.4s; }
-        
-        .btn-google { width: 100%; padding: 14px; border-radius: 24px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-        .btn-blue { background: var(--google-blue); color: white; }
-        .btn-outline { background: white; color: var(--google-blue); border: 1px solid #dadce0; }
-        .btn-red { background: white; color: var(--google-red); border: 1px solid var(--google-red); }
-
-        .ad-banner { background: #fff; border: 1px solid #dadce0; margin: 10px; padding: 10px; text-align: center; font-size: 12px; color: #70757a; }
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
-
-    <div class="ad-banner">ANÚNCIO: Servidores Apex operando em capacidade máxima!</div>
-
-    <div class="nav-tabs">
-        <div class="tab active" onclick="switchTab('process')">PROCESSAR</div>
-        <div class="tab" onclick="switchTab('perfil')">CARTEIRA</div>
+<div class="card-google">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <span class="level-badge" id="location-name">📍 GARAGEM (LISBOA)</span>
+        <span id="p-level" style="font-size: 11px; font-weight: bold;">NÍVEL 1</span>
     </div>
 
-    <div id="tab-process" class="app-container">
-        
-        <div class="card-google">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 11px; font-weight: bold; color: #5f6368;">SISTEMA DE CLOUD v33.16</span>
-                <span id="status-text" style="color: var(--google-green); font-weight: bold; font-size: 12px;">● EXECUTANDO</span>
-            </div>
+    <div id="hacker-alert" class="hidden event-alert">
+        ⚠️ ATAQUE HACKER EM CURSO! 
+        <button onclick="defendSystem()" style="background: white; color: var(--google-red); border: none; padding: 4px 8px; border-radius: 4px; margin-left: 10px; font-weight: bold; cursor: pointer;">DEFENDER</button>
+    </div>
+
+    <div class="balance-display">€ <span id="p-balance">0.0000</span></div>
+    
+    <div id="actions-zone">
+        <button id="btn-upgrade" onclick="upgradeServer()" class="btn-google btn-outline">EXPANDIR DATACENTER (€<span id="up-cost">0.0500</span>)</button>
+    </div>
+</div>
+
+<script>
+    // Novas variáveis de estado
+    let cityLevel = 1;
+    let locations = ["Garagem (Lisboa)", "Escritório (Porto)", "Bunker (Londres)", "Data Center (Frankfurt)"];
+    
+    // Função de Evento Aleatório (Executada a cada 1 minuto)
+    function randomEvent() {
+        if (Math.random() > 0.8 && !isBroken) { // 20% de chance
+            document.getElementById('hacker-alert').classList.remove('hidden');
+            // Se não defender em 15 segundos, perde saldo
+            setTimeout(() => {
+                if (!document.getElementById('hacker-alert').classList.contains('hidden')) {
+                    balance *= 0.95; // Perde 5%
+                    alert("Ataque bem sucedido! Perdeu 5% do saldo.");
+                    document.getElementById('hacker-alert').classList.add('hidden');
+                    render();
+                }
+            }, 15000);
+        }
+    }
+
+    function defendSystem() {
+        document.getElementById('hacker-alert').classList.add('hidden');
+        alert("Ataque repelido com sucesso!");
+    }
+
+    // Melhoria na função de Upgrade
+    function upgradeServer() {
+        if (balance >= upgradeCost) {
+            balance -= upgradeCost;
+            pSpeed *= 2.2;
+            upgradeCost *= 3;
             
-            <div class="balance-display">€ <span id="p-balance">0.0000</span></div>
-            
-            <div class="status-label">
-                <span>Carga do Processador</span>
-                <span><span id="p-load">30</span>%</span>
-            </div>
-            <div class="bar-bg">
-                <div id="load-fill" class="bar-fill" style="width: 30%; background: var(--google-green);"></div>
-            </div>
-
-            <div class="status-label">
-                <span>Estabilidade do Link</span>
-                <span><span id="p-health">100</span>%</span>
-            </div>
-            <div class="bar-bg">
-                <div id="health-fill" class="bar-fill" style="width: 100%; background: var(--google-blue);"></div>
-            </div>
-
-            <div id="actions-zone">
-                <div id="normal-ops">
-                    <button id="btn-upgrade" onclick="upgradeServer()" class="btn-google btn-outline">MELHORAR SERVIDOR (€<span id="up-cost">0.0500</span>)</button>
-                </div>
-                
-                <div id="overheat-ops" class="hidden">
-                    <button onclick="manualCool()" class="btn-google btn-blue">REDUZIR CARGA (Clique)</button>
-                    <button onclick="adCooling()" class="btn-google btn-red">VÍDEO: OTIMIZAR INSTANTÂNEO ⚡</button>
-                </div>
-
-                <div id="broken-ops" class="hidden">
-                    <button onclick="adRepair()" class="btn-google btn-red" style="background: var(--google-red); color: white;">REPARAR LINK (VER VÍDEO)</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card-google" style="text-align: center; border: 1px dashed var(--google-blue);">
-            <h4 style="margin: 0;">Rede de Parceiros <span style="color:var(--google-blue)">+<span id="p-boost">0</span>%</span></h4>
-            <p style="font-size: 12px; color: #5f6368; margin: 8px 0;">Expanda a sua rede para aumentar a velocidade de processamento.</p>
-            <button onclick="inviteFriend()" class="btn-google btn-outline">ADICIONAR NÓ À REDE</button>
-        </div>
-        
-        <p style="text-align: center; font-size: 11px; color: #9aa0a6;">ID: 5401881400 | Licença Ativa</p>
-    </div>
-
-    <div id="tab-perfil" class="hidden" style="padding: 20px;">
-        <div class="card-google" style="text-align: center;">
-            <h3 style="color: var(--google-blue); margin-top: 0;">Saldo para Levantamento</h3>
-            <p style="font-size: 36px; font-weight: bold; margin: 10px 0;">€ <span id="wallet-total">0.0000</span></p>
-            <button class="btn-google btn-blue" style="opacity: 0.5;">Levantar via PayPal</button>
-            <p style="font-size: 11px; color: #5f6368; margin-top: 15px;">Os pagamentos são processados após verificação de atividade real.</p>
-        </div>
-    </div>
-
-    <script>
-        let balance = 0.0000;
-        let load = 30;
-        let health = 100;
-        let pSpeed = 0.0001;
-        let boost = 0;
-        let upgradeCost = 0.0500;
-        let isOverloaded = false;
-        let isBroken = false;
-
-        function processCycle() {
-            if (!isOverloaded && !isBroken) {
-                balance += pSpeed + (pSpeed * (boost / 100));
-                load += 0.4; 
-                
-                if (load >= 100) { load = 100; isOverloaded = true; updateUIState('overloaded'); }
-            } else if (isOverloaded && !isBroken) {
-                health -= 0.5;
-                if (health <= 0) { health = 0; isBroken = true; updateUIState('broken'); }
+            cityLevel++;
+            if(cityLevel <= locations.length) {
+                document.getElementById('location-name').innerText = "📍 " + locations[cityLevel-1].toUpperCase();
+                document.getElementById('p-level').innerText = "NÍVEL " + cityLevel;
             }
+
+            document.getElementById('up-cost').innerText = upgradeCost.toFixed(4);
             render();
+        } else {
+            alert("Saldo insuficiente para expandir a infraestrutura.");
         }
+    }
 
-        function render() {
-            document.getElementById('p-balance').innerText = balance.toFixed(4);
-            document.getElementById('wallet-total').innerText = balance.toFixed(4);
-            document.getElementById('p-load').innerText = Math.floor(load);
-            document.getElementById('p-health').innerText = Math.floor(health);
-            document.getElementById('p-boost').innerText = boost;
-
-            document.getElementById('load-fill').style.width = load + "%";
-            document.getElementById('health-fill').style.width = health + "%";
-            
-            document.getElementById('load-fill').style.background = load > 80 ? "var(--google-red)" : (load > 60 ? "var(--google-yellow)" : "var(--google-green)");
-        }
-
-        function updateUIState(state) {
-            document.getElementById('normal-ops').classList.add('hidden');
-            document.getElementById('overheat-ops').classList.add('hidden');
-            document.getElementById('broken-ops').classList.add('hidden');
-
-            if (state === 'overloaded') {
-                document.getElementById('overheat-ops').classList.remove('hidden');
-                document.getElementById('status-text').innerText = "● SOBRECARGA";
-                document.getElementById('status-text').style.color = "var(--google-yellow)";
-            } else if (state === 'broken') {
-                document.getElementById('broken-ops').classList.remove('hidden');
-                document.getElementById('status-text').innerText = "● OFFLINE";
-                document.getElementById('status-text').style.color = "var(--google-red)";
-            } else {
-                document.getElementById('normal-ops').classList.remove('hidden');
-                document.getElementById('status-text').innerText = "● EXECUTANDO";
-                document.getElementById('status-text').style.color = "var(--google-green)";
-            }
-        }
-
-        function manualCool() {
-            load -= 8;
-            if (load <= 40) { isOverloaded = false; updateUIState('normal'); }
-            render();
-        }
-
-        function adCooling() {
-            alert("Otimizando servidores...");
-            setTimeout(() => { load = 30; isOverloaded = false; updateUIState('normal'); render(); }, 1000);
-        }
-
-        function adRepair() {
-            alert("Sincronizando link de dados...");
-            setTimeout(() => { health = 100; load = 30; isBroken = false; isOverloaded = false; updateUIState('normal'); render(); }, 2000);
-        }
-
-        function upgradeServer() {
-            if (balance >= upgradeCost) {
-                balance -= upgradeCost;
-                pSpeed *= 2.0;
-                upgradeCost *= 2.5;
-                document.getElementById('up-cost').innerText = upgradeCost.toFixed(4);
-                render();
-            } else { alert("Saldo insuficiente."); }
-        }
-
-        function inviteFriend() {
-            boost += 10;
-            alert("Novo nó adicionado! Velocidade +10%");
-            render();
-        }
-
-        function switchTab(name) {
-            document.getElementById('tab-process').classList.add('hidden');
-            document.getElementById('tab-perfil').classList.add('hidden');
-            document.getElementById('tab-' + name).classList.remove('hidden');
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-        }
-
-        setInterval(processCycle, 1000);
-    </script>
-</body>
-</html>
+    // Iniciar monitor de eventos
+    setInterval(randomEvent, 60000);
+</script>
