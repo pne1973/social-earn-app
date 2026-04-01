@@ -3,155 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Real Estate v33.23</title>
+    <title>Apex Real Estate v33.27</title>
     <style>
-        :root { 
-            --google-blue: #1a73e8; --google-green: #34a853; --google-red: #ea4335; 
-            --google-yellow: #fbbc05; --dark-bg: #121212;
-        }
-        body { font-family: 'Roboto', sans-serif; background: var(--dark-bg); margin: 0; padding: 0; color: #fff; }
-
-        .header-app { background: #1f1f1f; padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
-        .main-wallet { 
-            background: linear-gradient(135deg, #1a73e8, #0b51b7); 
-            margin: 15px; padding: 20px; border-radius: 20px; text-align: center;
-        }
-
-        .container { padding: 0 15px 100px 15px; }
+        :root { --google-blue: #1a73e8; --google-green: #34a853; --google-red: #ea4335; --google-yellow: #fbbc05; --dark-bg: #121212; }
+        body { font-family: 'Roboto', sans-serif; background: var(--dark-bg); margin: 0; padding: 0; color: #fff; -webkit-user-select: none; }
         
-        /* Card de Imóvel Ativo */
-        .property-card { 
-            background: #ffffff; color: #202124; 
-            border-radius: 18px; padding: 20px; margin-bottom: 15px;
-            position: relative; border-left: 5px solid var(--google-blue);
-        }
-
-        /* Card de Antevisão (Próximos Níveis) */
-        .preview-card {
-            background: #2a2a2a; color: #888;
-            border-radius: 18px; padding: 15px; margin-bottom: 10px;
-            border: 1px dashed #444; opacity: 0.7;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .income-amount { font-size: 24px; font-weight: 700; color: var(--google-green); }
-        .lock-icon { font-size: 18px; filter: grayscale(1); }
-
-        .btn-upgrade { 
-            background: var(--google-blue); color: white; border: none; 
-            padding: 12px; border-radius: 25px; font-weight: bold; width: 100%; cursor: pointer;
-        }
+        .header-app { background: #1f1f1f; padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; text-align: center; }
+        .main-wallet { background: linear-gradient(135deg, #1a73e8, #0b51b7); margin: 15px; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
         
-        .section-title { font-size: 12px; color: #aaa; margin: 20px 0 10px 5px; font-weight: bold; text-transform: uppercase; }
+        .container { padding: 0 15px 100px 15px; max-width: 450px; margin: auto; }
+        .property-card { background: #ffffff; color: #202124; border-radius: 18px; padding: 20px; margin-bottom: 15px; border-left: 6px solid var(--google-blue); position: relative; }
+        
+        .income-amount { font-size: 28px; font-weight: 800; color: var(--google-green); margin: 5px 0; }
+        .btn-main { width: 100%; padding: 14px; border-radius: 28px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .btn-collect { background: var(--google-green); color: white; margin-bottom: 10px; }
+        .btn-upgrade { background: var(--google-blue); color: white; }
+        .btn-boost { background: var(--google-yellow); color: black; font-size: 11px; padding: 8px; margin-top: 10px; }
+
+        .status-bar { height: 6px; background: #eee; border-radius: 3px; margin: 10px 0; overflow: hidden; }
+        .status-fill { height: 100%; transition: width 0.4s; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; color: #202124; padding: 30px; border-radius: 24px; width: 85%; text-align: center; }
+        
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="header-app">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <b style="color: var(--google-blue);">APEX REAL ESTATE</b>
-            <span style="font-size: 11px; opacity: 0.6;">Admin: 5401881400</span>
+    <div id="offline-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 style="color: var(--google-blue); margin-top: 0;">Bem-vindo!</h2>
+            <p>Os seus imóveis geraram renda passiva:</p>
+            <div class="income-amount" style="font-size: 36px;">€ <span id="off-val">0.0000</span></div>
+            <button onclick="claimWithAd()" class="btn-main" style="background: var(--google-yellow); color: black;">📺 ASSISTIR E RESGATAR</button>
+            <button onclick="closeModal()" style="background: transparent; border: none; color: #999; margin-top: 15px; cursor: pointer;">Continuar sem o bónus</button>
         </div>
+    </div>
+
+    <div class="header-app">
+        <b style="color: var(--google-blue); letter-spacing: 1px;">APEX REAL ESTATE</b>
+        <div style="font-size: 9px; opacity: 0.5; margin-top: 4px;">ID: 5401881400 | v33.27</div>
     </div>
 
     <div class="container">
         <div class="main-wallet">
-            <div style="font-size: 11px; opacity: 0.9;">SALDO ACUMULADO</div>
-            <div style="font-size: 32px; font-weight: 800; margin: 5px 0;">€ <span id="total-balance">0.0000</span></div>
-            <div id="investor-rank" style="font-size: 10px; color: var(--google-yellow);">RANK: INVESTIDOR INICIANTE</div>
+            <div style="font-size: 11px; opacity: 0.8; font-weight: bold;">SALDO TOTAL ACUMULADO</div>
+            <div class="income-amount" style="color: white; font-size: 38px;">€ <span id="total-balance">0.0000</span></div>
+            <button onclick="activateBoost()" class="btn-main btn-boost" id="boost-btn">⚡ ATIVAR RENDA 2X (VÍDEO)</button>
         </div>
 
-        <div class="section-title">Imóvel Atual</div>
-        <div id="active-property" class="property-card">
-            <div style="display: flex; justify-content: space-between;">
-                <span id="p-name" style="font-weight: bold; color: var(--google-blue);">🏠 QUARTO ALUGADO</span>
-                <span style="font-size: 11px; color: #70757a;">Renda Ativa</span>
+        <div class="property-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span id="p-name" style="font-weight: 800; font-size: 14px;">🏠 QUARTO ALUGADO</span>
+                <span style="font-size: 11px; color: #70757a;">Estado: <span id="cond-perc">100</span>%</span>
             </div>
-            <div style="margin: 15px 0;">
+            
+            <div class="status-bar"><div id="cond-fill" class="status-fill" style="width: 100%; background: var(--google-green);"></div></div>
+
+            <div style="margin: 20px 0;">
+                <div style="font-size: 12px; color: #70757a;">RENDA PENDENTE</div>
                 <div class="income-amount">€ <span id="p-acc">0.0000</span></div>
-                <div style="font-size: 10px; color: #999;">Taxa: <span id="p-speed">0.0001</span> €/seg</div>
+                <div style="font-size: 10px; color: #999;">Taxa: <span id="p-speed">0.0001</span> €/s</div>
             </div>
-            <button onclick="collectRent()" class="btn-upgrade" style="background: var(--google-green); margin-bottom: 8px;">RECOLHER RENDA</button>
-            <button onclick="upgradeProp()" class="btn-upgrade">UPGRADE PARA <span id="next-label">APARTAMENTO</span> (€<span id="up-cost">0.0500</span>)</button>
-        </div>
 
-        <div class="section-title">Próximos Níveis de Património</div>
-        <div id="previews">
-            </div>
+            <button onclick="collectRent()" class="btn-main btn-collect">RECOLHER RENDA</button>
+            <button onclick="upgradeProp()" class="btn-main btn-upgrade">UPGRADE (€<span id="up-cost">0.0500</span>)</button>
+            
+            <button id="repair-ad-btn" onclick="repairWithAd()" class="btn-main hidden" style="background: var(--google-red); color: white; margin-top: 10px;">🛠️ REPARAR IMÓVEL (VÍDEO)</button>
+        </div>
     </div>
 
     <script>
-        let mainBalance = 0.0000;
-        let currentLevel = 0;
-        let accRent = 0.0000;
-        let speed = 0.0001;
-        let upgradeCost = 0.0500;
-
         const levels = [
             { name: "QUARTO ALUGADO", icon: "🏠", mult: 1 },
-            { name: "APARTAMENTO T1", icon: "🏢", mult: 2.4 },
-            { name: "VIVENDA LUXO", icon: "🏡", mult: 5.8 },
-            { name: "MANSÃO APEX", icon: "🏰", mult: 14.0 },
-            { name: "HOTEL 5 ESTRELAS", icon: "🏨", mult: 35.0 }
+            { name: "APARTAMENTO T1", icon: "🏢", mult: 2.5 },
+            { name: "VIVENDA LUXO", icon: "🏡", mult: 6.0 },
+            { name: "MANSÃO APEX", icon: "🏰", mult: 15.0 },
+            { name: "HOTEL 5 ESTRELAS", icon: "🏨", mult: 40.0 }
         ];
 
+        let balance = parseFloat(localStorage.getItem('apex_bal')) || 0;
+        let currentLvl = parseInt(localStorage.getItem('apex_lvl')) || 0;
+        let speed = parseFloat(localStorage.getItem('apex_spd')) || 0.0001;
+        let upCost = parseFloat(localStorage.getItem('apex_cost')) || 0.0500;
+        let condition = 100;
+        let accRent = 0;
+        let boostActive = false;
+
         function gameLoop() {
-            accRent += speed;
+            if (condition > 0) {
+                let currentSpeed = boostActive ? speed * 2 : speed;
+                accRent += currentSpeed;
+                condition -= 0.12; // Degradação balanceada para CPM 1€
+                if (condition < 0) condition = 0;
+            }
+            
+            if (condition < 20) document.getElementById('repair-ad-btn').classList.remove('hidden');
+            else document.getElementById('repair-ad-btn').classList.add('hidden');
+
+            render();
+            localStorage.setItem('apex_last', Date.now());
+        }
+
+        function render() {
+            document.getElementById('total-balance').innerText = balance.toFixed(4);
             document.getElementById('p-acc').innerText = accRent.toFixed(4);
-            document.getElementById('total-balance').innerText = mainBalance.toFixed(4);
-            updatePreviews();
+            document.getElementById('p-speed').innerText = (boostActive ? speed * 2 : speed).toFixed(4);
+            document.getElementById('up-cost').innerText = upCost.toFixed(4);
+            document.getElementById('p-name').innerText = levels[currentLvl].icon + " " + levels[currentLvl].name;
+            
+            document.getElementById('cond-perc').innerText = Math.floor(condition);
+            let fill = document.getElementById('cond-fill');
+            fill.style.width = condition + "%";
+            fill.style.background = condition < 30 ? "var(--google-red)" : (condition < 70 ? "var(--google-yellow)" : "var(--google-green)");
         }
 
         function collectRent() {
-            mainBalance += accRent;
+            balance += accRent;
             accRent = 0;
-            if (mainBalance > 10) document.getElementById('investor-rank').innerText = "RANK: INVESTIDOR PROFISSIONAL";
+            save();
         }
 
         function upgradeProp() {
-            if (mainBalance >= upgradeCost && currentLevel < levels.length - 1) {
-                mainBalance -= upgradeCost;
-                currentLevel++;
-                speed *= 2.4;
-                upgradeCost *= 3.5;
-                
-                // Update UI
-                let next = levels[currentLevel];
-                document.getElementById('p-name').innerText = next.icon + " " + next.name;
-                document.getElementById('p-speed').innerText = speed.toFixed(4);
-                document.getElementById('up-cost').innerText = upgradeCost.toFixed(4);
-                
-                if (currentLevel < levels.length - 1) {
-                    document.getElementById('next-label').innerText = levels[currentLevel+1].name.split(' ')[0];
-                } else {
-                    document.getElementById('next-label').innerText = "MAX";
+            if (balance >= upCost && currentLvl < levels.length -1) {
+                balance -= upCost;
+                currentLvl++;
+                speed *= 2.5;
+                upCost *= 3.8;
+                condition = 100;
+                save();
+            } else { alert("Saldo insuficiente!"); }
+        }
+
+        function activateBoost() {
+            alert("A carregar vídeo de bónus...");
+            setTimeout(() => {
+                boostActive = true;
+                document.getElementById('boost-btn').innerText = "🚀 RENDA 2X ATIVA (2min)";
+                setTimeout(() => { 
+                    boostActive = false; 
+                    document.getElementById('boost-btn').innerText = "⚡ ATIVAR RENDA 2X (VÍDEO)";
+                }, 120000);
+            }, 1500);
+        }
+
+        function repairWithAd() {
+            alert("A carregar vídeo de manutenção...");
+            setTimeout(() => { condition = 100; render(); }, 1500);
+        }
+
+        function claimWithAd() {
+            alert("Resgatando ganhos offline...");
+            setTimeout(() => {
+                balance += parseFloat(document.getElementById('off-val').innerText);
+                closeModal();
+                save();
+            }, 1500);
+        }
+
+        function closeModal() { document.getElementById('offline-modal').classList.add('hidden'); }
+
+        function save() {
+            localStorage.setItem('apex_bal', balance);
+            localStorage.setItem('apex_lvl', currentLvl);
+            localStorage.setItem('apex_spd', speed);
+            localStorage.setItem('apex_cost', upCost);
+        }
+
+        window.onload = () => {
+            let last = localStorage.getItem('apex_last');
+            if (last) {
+                let away = Math.floor((Date.now() - parseInt(last)) / 1000);
+                if (away > 60) {
+                    let earned = Math.min(away * speed, speed * 28800);
+                    document.getElementById('off-val').innerText = earned.toFixed(4);
+                    document.getElementById('offline-modal').classList.remove('hidden');
                 }
-            } else {
-                alert("Saldo insuficiente para expandir o património!");
             }
-        }
-
-        function updatePreviews() {
-            let container = document.getElementById('previews');
-            container.innerHTML = "";
-            
-            for (let i = currentLevel + 1; i < levels.length; i++) {
-                let l = levels[i];
-                let estIncome = (0.0001 * l.mult).toFixed(4);
-                container.innerHTML += `
-                    <div class="preview-card">
-                        <div>
-                            <div style="font-size: 13px; font-weight: bold;">${l.icon} ${l.name}</div>
-                            <div style="font-size: 10px;">Renda Estimada: € ${estIncome}/seg</div>
-                        </div>
-                        <div class="lock-icon">🔒</div>
-                    </div>
-                `;
-            }
-        }
-
-        setInterval(gameLoop, 1000);
+            setInterval(gameLoop, 1000);
+        };
     </script>
 </body>
 </html>
