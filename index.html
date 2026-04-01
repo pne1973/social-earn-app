@@ -3,219 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Real Estate v33.33 - Empire</title>
+    <title>Apex Estate v33.33</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root { 
             --google-blue: #1a73e8; --google-green: #34a853; --google-red: #ea4335; 
-            --google-yellow: #fbbc05; --dark-bg: #121212;
+            --google-yellow: #fbbc05; --dark-bg: #121212; --card-bg: #1f1f1f;
         }
         body { font-family: 'Roboto', sans-serif; background: var(--dark-bg); margin: 0; padding: 0; color: #fff; -webkit-user-select: none; }
         
-        .header-app { background: #1f1f1f; padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
-        .main-wallet { background: linear-gradient(135deg, #1a73e8, #0b51b7); margin: 15px; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        /* Header */
+        .header-app { padding: 15px; display: flex; justify-content: space-between; align-items: center; background: var(--dark-bg); }
+        .header-app b { color: var(--google-blue); font-size: 18px; letter-spacing: 0.5px; }
+        .admin-id { background: #333; padding: 4px 10px; border-radius: 12px; font-size: 10px; color: #aaa; }
 
-        .container { padding: 0 15px 120px 15px; max-width: 450px; margin: auto; }
-        .property-card { background: #ffffff; color: #202124; border-radius: 18px; padding: 20px; margin-bottom: 15px; border-left: 6px solid var(--google-blue); position: relative; }
+        /* Wallet Section */
+        .main-wallet { background: var(--google-blue); margin: 15px; padding: 30px 20px; border-radius: 28px; text-align: center; box-shadow: 0 10px 25px rgba(26, 115, 232, 0.3); }
+        .wallet-label { font-size: 11px; font-weight: 500; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .wallet-balance { font-size: 42px; font-weight: 900; margin-bottom: 20px; }
+        .wallet-btns { display: flex; justify-content: center; gap: 10px; }
+        .btn-action { border: none; border-radius: 20px; padding: 10px 18px; font-weight: bold; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .btn-boost { background: var(--google-yellow); color: #000; }
+        .btn-withdraw { background: var(--google-green); color: #fff; }
+
+        /* Property Card */
+        .container { padding: 0 15px 120px 15px; max-width: 500px; margin: auto; }
+        .card { background: #fff; color: #202124; border-radius: 24px; padding: 25px; margin-top: -30px; position: relative; z-index: 2; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .prop-title { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .prop-status { font-size: 12px; font-weight: 500; color: #70757a; }
         
-        .income-amount { font-size: 28px; font-weight: 800; color: var(--google-green); margin: 5px 0; }
-        .btn-main { width: 100%; padding: 14px; border-radius: 28px; border: none; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s; }
-        .btn-collect { background: var(--google-green); color: white; margin-bottom: 10px; }
-        .btn-upgrade { background: var(--google-blue); color: white; }
-        .btn-license { background: var(--google-yellow); color: black; margin-bottom: 10px; }
-        .btn-boost { background: #333; color: var(--google-yellow); border: 1px solid var(--google-yellow); font-size: 11px; padding: 8px; margin-top: 10px; width: auto; border-radius: 15px; }
+        .progress-container { height: 6px; background: #eee; border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; transition: width 0.5s ease; }
 
-        .status-bar { height: 6px; background: #eee; border-radius: 3px; margin: 10px 0; overflow: hidden; }
-        .status-fill { height: 100%; transition: width 0.4s ease; }
+        .label-small { font-size: 12px; color: #70757a; margin-bottom: 5px; text-transform: uppercase; font-weight: 500; }
+        .pending-val { font-size: 32px; font-weight: 900; color: var(--google-green); margin-bottom: 5px; }
+        .tax-val { font-size: 11px; color: #9aa0a6; margin-bottom: 25px; }
 
-        .preview-card { background: #2a2a2a; color: #888; border-radius: 16px; padding: 12px 18px; margin-bottom: 8px; border: 1px dashed #444; display: flex; justify-content: space-between; align-items: center; opacity: 0.7; }
+        .btn-large { width: 100%; padding: 16px; border-radius: 30px; border: none; font-weight: 700; font-size: 16px; margin-bottom: 12px; cursor: pointer; text-transform: uppercase; }
+        .btn-collect { background: var(--google-green); color: #fff; }
+        .btn-upgrade { background: var(--google-blue); color: #fff; }
+        .btn-repair { background: var(--google-red); color: #fff; }
+        .btn-license { background: var(--google-yellow); color: #000; border: 2px solid #000; }
 
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .modal-content { background: white; color: #202124; padding: 30px; border-radius: 24px; width: 85%; text-align: center; }
-        
+        /* Previews */
+        .section-title { font-size: 13px; font-weight: 700; color: #aaa; margin: 25px 0 15px 5px; text-transform: uppercase; }
+        .preview-item { background: #1f1f1f; border-radius: 18px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border: 1px solid #333; opacity: 0.6; }
+        .preview-info b { display: block; font-size: 14px; margin-bottom: 2px; }
+        .preview-info span { font-size: 11px; color: #888; }
+
+        /* Modals */
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 1000; display:flex; align-items:center; justify-content:center; }
+        .modal-content { background: #fff; color: #000; padding: 30px; border-radius: 28px; width: 80%; text-align: center; }
         .hidden { display: none !important; }
-        .badge { font-size: 10px; padding: 3px 8px; border-radius: 10px; background: #f1f3f4; color: #5f6368; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="offline-modal" class="modal hidden">
+    <div id="modal-offline" class="modal hidden">
         <div class="modal-content">
-            <h2 style="color: var(--google-blue); margin-top: 0;">Relatório de Ausência</h2>
-            <p id="offline-desc">Os seus imóveis renderam enquanto estiveste fora:</p>
-            <div class="income-amount" style="font-size: 36px;">€ <span id="off-val">0.0000</span></div>
-            <p style="font-size: 11px; color: var(--google-red);" id="incident-msg" class="hidden">⚠️ ALERTA: Incidente de manutenção detetado! Renda em risco.</p>
-            <button onclick="claimOffline(true)" class="btn-main" style="background: var(--google-yellow); color: black; margin-top: 15px;">📺 ATIVAR SEGURO (VÍDEO)</button>
-            <button onclick="claimOffline(false)" style="background: transparent; border: none; color: #999; margin-top: 15px; cursor: pointer; font-size: 11px;">Ignorar e perder bónus</button>
+            <h2 style="color: var(--google-blue); margin-top: 0;">Bem-vindo!</h2>
+            <p>Seu património rendeu enquanto estavas fora:</p>
+            <div id="off-val" style="font-size: 36px; font-weight: 900; color: var(--google-green); margin: 20px 0;">€ 0.0000</div>
+            <button onclick="handleAd('offline')" class="btn-large" style="background: var(--google-yellow);">📺 RESGATAR COM SEGURO</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:#888; cursor:pointer;">Continuar sem o bónus</button>
         </div>
     </div>
 
     <div class="header-app">
-        <b style="color: var(--google-blue);">APEX ESTATE</b>
-        <div class="badge">ADMIN: 5401881400</div>
+        <b>APEX ESTATE</b>
+        <div class="admin-id">ADMIN: 5401881400</div>
+    </div>
+
+    <div class="main-wallet">
+        <div class="wallet-label">Saldo para levantamento (Mín. €5)</div>
+        <div class="wallet-balance">€ <span id="bal-total">0.0000</span></div>
+        <div class="wallet-btns">
+            <button onclick="handleAd('boost')" class="btn-action btn-boost" id="boost-timer">⚡ BOOST 2X (VÍDEO)</button>
+            <button onclick="withdraw()" class="btn-action btn-withdraw">💳 LEVANTAR</button>
+        </div>
     </div>
 
     <div class="container">
-        <div class="main-wallet">
-            <div style="font-size: 11px; opacity: 0.8;">SALDO PARA LEVANTAMENTO (MÍN. €5)</div>
-            <div class="income-amount" style="color: white; font-size: 38px;">€ <span id="total-balance">0.0000</span></div>
-            <div style="display: flex; justify-content: center; gap: 10px;">
-                <button onclick="showAd('boost')" class="btn-boost" id="boost-btn">⚡ BOOST 2X (VÍDEO)</button>
-                <button onclick="checkWithdrawal()" class="btn-boost" style="border-color: var(--google-green); color: var(--google-green);">💳 LEVANTAR</button>
+        <div class="card">
+            <div class="card-header">
+                <div class="prop-title" id="prop-name">🏠 QUARTO ALUGADO</div>
+                <div class="prop-status"><span id="cond-text">100</span>%</div>
             </div>
-        </div>
-
-        <div class="property-card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span id="p-name" style="font-weight: 800; font-size: 14px;">🏠 QUARTO ALUGADO</span>
-                <span id="p-cond" style="font-size: 11px; font-weight: bold;">100%</span>
-            </div>
-            <div class="status-bar"><div id="cond-fill" class="status-fill" style="width: 100%; background: var(--google-green);"></div></div>
-
-            <div style="margin: 20px 0;">
-                <div style="font-size: 12px; color: #70757a;">RENDA PENDENTE</div>
-                <div class="income-amount">€ <span id="p-acc">0.0000</span></div>
-                <div style="font-size: 10px; color: #999;">Taxa: <span id="p-speed">0.00002</span> €/s</div>
+            <div class="progress-container">
+                <div id="cond-fill" class="progress-fill" style="width: 100%; background: var(--google-green);"></div>
             </div>
 
-            <button onclick="collect()" class="btn-main btn-collect">RECOLHER RENDA</button>
+            <div class="label-small">Renda Pendente</div>
+            <div class="pending-val">€ <span id="prop-acc">0.0000</span></div>
+            <div class="tax-val">Taxa: <span id="prop-tax">0.00002</span> €/s</div>
+
+            <button onclick="collect()" class="btn-large btn-collect">Recolher Renda</button>
             
-            <div id="upgrade-area">
-                <button onclick="upgrade()" class="btn-main btn-upgrade" id="up-btn">UPGRADE (€<span id="up-cost">0.0500</span>)</button>
+            <div id="action-area">
+                <button onclick="upgrade()" class="btn-large btn-upgrade">Upgrade (€<span id="up-cost">0.0500</span>)</button>
             </div>
             
-            <button id="repair-btn" onclick="showAd('repair')" class="btn-main hidden" style="background: var(--google-red); color: white; margin-top: 10px;">🛠️ REPARAR ATIVO (VÍDEO)</button>
+            <button id="repair-btn" onclick="handleAd('repair')" class="btn-large btn-repair hidden">🛠️ REPARAR ATIVO (VÍDEO)</button>
         </div>
 
-        <div id="license-notice" class="preview-card hidden" style="border-color: var(--google-yellow); background: #222;">
-            <div style="font-size: 11px; color: var(--google-yellow);">🔒 LICENÇA PENDENTE: Assina 3 contratos para evoluir.</div>
-            <div id="license-dots" style="color: var(--google-yellow); font-weight: bold;">○○○</div>
-        </div>
-
-        <div style="font-size: 12px; color: #aaa; margin: 20px 0 10px 5px; font-weight: bold;">PRÓXIMOS INVESTIMENTOS</div>
-        <div id="previews"></div>
+        <div class="section-title">Próximos Investimentos</div>
+        <div id="previews-list"></div>
     </div>
 
     <script>
-        // Economia Blindada (v33.33) [cite: 2026-03-22, 2026-03-24]
+        // Configuração de Negócio (Arbitragem de Lucro)
         const levels = [
-            { name: "QUARTO ALUGADO", icon: "🏠", income: 0.00002, upgrade: 0.0500, license: 0 },
-            { name: "APARTAMENTO T1", icon: "🏢", income: 0.00005, upgrade: 0.2500, license: 0 },
-            { name: "VIVENDA LUXO", icon: "🏡", income: 0.00015, upgrade: 0.9000, license: 0 },
-            { name: "MANSÃO APEX", icon: "🏰", income: 0.00045, upgrade: 4.5000, license: 3 }, // Exige 3 vídeos [cite: 2026-03-22]
-            { name: "HOTEL 5 ESTRELAS", icon: "🏨", income: 0.00120, upgrade: 15.0000, license: 5 },
-            { name: "CENTRO COMERCIAL", icon: "🛍️", income: 0.00500, upgrade: 80.0000, license: 10 }
+            { name: "QUARTO ALUGADO", icon: "🏠", income: 0.00002, cost: 0.05, license: 0 },
+            { name: "APARTAMENTO T1", icon: "🏢", income: 0.00005, cost: 0.25, license: 0 },
+            { name: "VIVENDA LUXO", icon: "🏡", income: 0.00015, cost: 0.90, license: 0 },
+            { name: "MANSÃO APEX", icon: "🏰", income: 0.00045, cost: 4.50, license: 3 },
+            { name: "HOTEL 5 ESTRELAS", icon: "🏨", income: 0.00120, cost: 15.0, license: 5 },
+            { name: "ARRANHA-CÉUS", icon: "🏙️", income: 0.00500, cost: 80.0, license: 10 }
         ];
 
-        let bal = parseFloat(localStorage.getItem('ap_bal')) || 0;
-        let lvl = parseInt(localStorage.getItem('ap_lvl')) || 0;
-        let cond = 100;
-        let acc = 0;
-        let boost = 1;
-        let licensesObserved = 0;
+        let balance = parseFloat(localStorage.getItem('apx_bal')) || 0;
+        let currentLvl = parseInt(localStorage.getItem('apx_lvl')) || 0;
+        let condition = 100;
+        let accumulated = 0;
+        let boostMult = 1;
+        let licensesDone = 0;
 
-        function tick() {
-            if (cond > 0) {
-                acc += (levels[lvl].income * boost);
-                cond -= 0.15; // Desgaste para incentivar vídeos [cite: 2026-03-22]
-                if (cond < 0) cond = 0;
+        function update() {
+            if (condition > 0) {
+                let speed = levels[currentLvl].income * boostMult;
+                accumulated += speed;
+                condition -= 0.08; // Desgaste para forçar vídeos
             }
+
+            // UI Updates
+            document.getElementById('bal-total').innerText = balance.toFixed(4);
+            document.getElementById('prop-acc').innerText = accumulated.toFixed(4);
+            document.getElementById('cond-text').innerText = Math.floor(condition);
             
-            document.getElementById('total-balance').innerText = bal.toFixed(4);
-            document.getElementById('p-acc').innerText = acc.toFixed(4);
-            document.getElementById('p-cond').innerText = Math.floor(cond) + "%";
-            document.getElementById('cond-fill').style.width = cond + "%";
-            
-            if (cond < 25) document.getElementById('repair-btn').classList.remove('hidden');
+            let fill = document.getElementById('cond-fill');
+            fill.style.width = condition + "%";
+            fill.style.background = condition < 30 ? "var(--google-red)" : (condition < 60 ? "var(--google-yellow)" : "var(--google-green)");
+
+            if (condition < 20) document.getElementById('repair-btn').classList.remove('hidden');
             else document.getElementById('repair-btn').classList.add('hidden');
 
-            localStorage.setItem('ap_last', Date.now());
-            checkLicenseRequirement();
+            renderActionArea();
+            localStorage.setItem('apx_last', Date.now());
         }
 
-        function checkLicenseRequirement() {
-            let next = levels[lvl + 1];
-            let area = document.getElementById('upgrade-area');
-            let notice = document.getElementById('license-notice');
+        function renderActionArea() {
+            let next = levels[currentLvl + 1];
+            let area = document.getElementById('action-area');
             
-            if (next && next.license > 0 && licensesObserved < next.license) {
-                area.innerHTML = `<button onclick="showAd('license')" class="btn-main btn-license">✍️ ASSINAR CONTRATO DE LICENÇA (${licensesObserved}/${next.license})</button>`;
-                notice.classList.remove('hidden');
-                document.getElementById('license-dots').innerText = "●".repeat(licensesObserved) + "○".repeat(next.license - licensesObserved);
+            if (!next) {
+                area.innerHTML = `<button class="btn-large" style="background:#eee; color:#aaa;" disabled>NÍVEL MÁXIMO</button>`;
+                return;
+            }
+
+            if (next.license > 0 && licensesDone < next.license) {
+                area.innerHTML = `<button onclick="handleAd('license')" class="btn-large btn-license">✍️ LICENÇA: ASSINAR CONTRATO (${licensesDone}/${next.license})</button>`;
             } else {
-                area.innerHTML = `<button onclick="upgrade()" class="btn-main btn-upgrade">UPGRADE (€${levels[lvl].upgrade.toFixed(4)})</button>`;
-                notice.classList.add('hidden');
+                area.innerHTML = `<button onclick="upgrade()" class="btn-large btn-upgrade">UPGRADE (€${next.cost.toFixed(4)})</button>`;
             }
         }
 
-        function showAd(type) {
-            alert("A carregar patrocínio corporativo..."); // [cite: 2026-03-24]
+        function handleAd(type) {
+            alert("A carregar patrocínio corporativo...");
             setTimeout(() => {
-                if (type === 'repair') cond = 100;
+                if (type === 'repair') condition = 100;
+                if (type === 'license') { licensesDone++; renderActionArea(); }
                 if (type === 'boost') {
-                    boost = 2;
-                    document.getElementById('boost-btn').innerText = "🚀 2X ATIVO";
-                    setTimeout(() => { boost = 1; document.getElementById('boost-btn').innerText = "⚡ BOOST 2X (VÍDEO)"; }, 60000);
+                    boostMult = 2;
+                    let btn = document.getElementById('boost-timer');
+                    btn.innerText = "🚀 ATIVO (60s)";
+                    setTimeout(() => { boostMult = 1; btn.innerText = "⚡ BOOST 2X (VÍDEO)"; }, 60000);
                 }
-                if (type === 'license') licensesObserved++;
-                alert("Bónus aplicado com sucesso!");
-            }, 1200);
+                if (type === 'offline') {
+                    balance += parseFloat(document.getElementById('off-val').innerText);
+                    closeModal();
+                    save();
+                }
+                alert("Sucesso! Benefício aplicado.");
+            }, 1500);
         }
 
         function collect() {
-            bal += acc;
-            acc = 0;
+            if (accumulated <= 0) return;
+            balance += accumulated;
+            accumulated = 0;
             save();
         }
 
         function upgrade() {
-            let p = levels[lvl];
-            if (bal >= p.upgrade && lvl < levels.length - 1) {
-                bal -= p.upgrade;
-                lvl++;
-                licensesObserved = 0;
-                cond = 100;
+            let next = levels[currentLvl + 1];
+            if (balance >= next.cost) {
+                balance -= next.cost;
+                currentLvl++;
+                licensesDone = 0;
+                condition = 100;
                 save();
-                updatePreviews();
-            } else { alert("Saldo insuficiente!"); }
-        }
-
-        function checkWithdrawal() {
-            if (bal >= 5.0) alert("Admin (5401881400) notificado. Processamento em 24h.");
-            else alert("O levantamento mínimo é de €5.0000.");
-        }
-
-        function updatePreviews() {
-            let container = document.getElementById('previews');
-            container.innerHTML = "";
-            for (let i = lvl + 1; i < levels.length; i++) {
-                container.innerHTML += `<div class="preview-card"><span>${levels[i].icon} ${levels[i].name}</span><span>🔒</span></div>`;
+                renderPreviews();
+            } else {
+                alert("Saldo insuficiente para expandir o império!");
             }
         }
 
-        function claimOffline(withAd) {
-            if (withAd) bal += parseFloat(document.getElementById('off-val').innerText);
-            document.getElementById('offline-modal').classList.add('hidden');
-            save();
+        function renderPreviews() {
+            let list = document.getElementById('previews-list');
+            list.innerHTML = "";
+            document.getElementById('prop-name').innerText = levels[currentLvl].icon + " " + levels[currentLvl].name;
+            document.getElementById('prop-tax').innerText = levels[currentLvl].income.toFixed(5) + " €/s";
+
+            for (let i = currentLvl + 1; i < levels.length; i++) {
+                list.innerHTML += `
+                    <div class="preview-item">
+                        <div class="preview-info">
+                            <b>${levels[i].icon} ${levels[i].name}</b>
+                            <span>Renda: € ${levels[i].income.toFixed(5)}/seg</span>
+                        </div>
+                        <div style="color: #555;">🔒</div>
+                    </div>`;
+            }
+        }
+
+        function withdraw() {
+            if (balance >= 5) alert("Pedido de levantamento enviado para Admin: 5401881400");
+            else alert("O limite mínimo para levantamento é €5.0000");
         }
 
         function save() {
-            localStorage.setItem('ap_bal', bal);
-            localStorage.setItem('ap_lvl', lvl);
+            localStorage.setItem('apx_bal', balance);
+            localStorage.setItem('apx_lvl', currentLvl);
         }
 
+        function closeModal() { document.getElementById('modal-offline').classList.add('hidden'); }
+
         window.onload = () => {
-            let last = localStorage.getItem('ap_last');
+            let last = localStorage.getItem('apx_last');
             if (last) {
                 let diff = Math.floor((Date.now() - parseInt(last)) / 1000);
                 if (diff > 60) {
-                    let off = Math.min(diff * levels[lvl].income, 0.5);
-                    document.getElementById('off-val').innerText = off.toFixed(4);
-                    document.getElementById('offline-modal').classList.remove('hidden');
-                    if (Math.random() > 0.7) document.getElementById('incident-msg').classList.remove('hidden');
+                    let earned = Math.min(diff * levels[currentLvl].income, 0.5);
+                    document.getElementById('off-val').innerText = "€ " + earned.toFixed(4);
+                    document.getElementById('modal-offline').classList.remove('hidden');
                 }
             }
-            updatePreviews();
-            setInterval(tick, 1000);
+            renderPreviews();
+            setInterval(update, 1000);
         };
     </script>
 </body>
