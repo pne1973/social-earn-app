@@ -1,265 +1,177 @@
 <!DOCTYPE html>
-<html lang="pt-pt">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Social v33.54 - Master Production</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Apex Social v33.13 - Production</title>
     <style>
-        :root { --fb-blue: #1877F2; --fb-bg: #F0F2F5; --g-green: #34A853; }
-        body { font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif; background: var(--fb-bg); color: #1c1e21; margin: 0; }
+        :root { --google-blue: #1a73e8; --google-red: #ea4335; --google-yellow: #fbbc05; --google-green: #34a853; --bg-gray: #f8f9fa; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg-gray); margin: 0; padding: 0; color: #202124; }
         
-        /* LOGIN */
-        #login-screen { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        /* Sistema de Tabs */
+        .nav-tabs { display: flex; background: #fff; border-bottom: 1px solid #dadce0; position: sticky; top: 0; z-index: 100; }
+        .tab { flex: 1; text-align: center; padding: 15px 0; font-size: 14px; font-weight: 500; color: #5f6368; cursor: pointer; }
+        .tab.active { color: var(--google-blue); border-bottom: 3px solid var(--google-blue); }
 
-        /* FIXED ELEMENTS */
-        .app-header { position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px; background: white; border-bottom: 1px solid #dadce0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; }
-        .status-bar { position: fixed; top: 60px; width: 100%; z-index: 950; height: 32px; background: white; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--g-green); text-transform: uppercase; }
-        .fixed-ad { position: fixed; top: 92px; width: 100%; z-index: 900; height: 40px; background: #fff; border-bottom: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; }
-
-        .main-content { padding-top: 140px; padding-bottom: 90px; min-height: 100vh; }
-        .feed-container { max-width: 580px; margin: 0 auto; padding: 10px; }
-
-        /* POST CARD */
-        .post-card { background: white; border-radius: 12px; border: 1px solid #dadce0; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .post-main { display: flex; width: 100%; }
-        .post-content { flex: 1; padding: 16px; } 
-        .post-user-label { font-size: 14px; font-weight: 700; color: #050505; margin-bottom: 4px; display: block; }
-        .post-sidebar { width: 70px; background: #f8f9fa; border-left: 1px solid #f1f3f4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 15px 0; }
+        /* Container do Jogo Miner */
+        .miner-container { padding: 20px; max-width: 500px; margin: auto; }
+        .miner-card { background: #fff; border-radius: 12px; border: 1px solid #dadce0; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .balance-display { font-size: 32px; font-weight: 700; color: var(--google-blue); margin: 10px 0; }
+        .temp-bg { width: 100%; height: 12px; background: #e8eaed; border-radius: 6px; margin: 15px 0; overflow: hidden; }
+        #temp-fill { height: 100%; width: 30%; background: var(--google-green); transition: width 0.4s, background 0.4s; }
         
-        /* COMMENTS */
-        .feed-comments-area { background: white; border-top: 1px solid #f0f2f5; padding: 12px 16px; }
-        .comment-bubble { background: #f0f2f5; border-radius: 18px; padding: 8px 14px; margin-bottom: 6px; display: inline-block; max-width: 95%; }
-        .comment-user { font-size: 11px; font-weight: 800; color: #050505; display: block; }
-        
-        /* NAV */
-        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; border-top: 1px solid #dadce0; display: flex; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #65676b; cursor: pointer; }
-        .nav-active { color: var(--fb-blue); border-top: 3px solid var(--fb-blue); }
+        /* Botões Estilo Google */
+        .btn-google { width: 100%; padding: 14px; border-radius: 24px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn-blue { background: var(--google-blue); color: white; }
+        .btn-outline { background: white; color: var(--google-blue); border: 1px solid #dadce0; }
+        .btn-red { background: white; color: var(--google-red); border: 1px solid var(--google-red); }
 
-        .page-content { display: none; }
-        .active-page { display: block !important; }
-        .icon-btn { width: 38px; height: 38px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .hidden { display: none !important; }
-        .modal-fullscreen { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
+        /* Feed e Monetização */
+        .ad-banner { background: #fff; border: 1px solid #dadce0; margin: 10px; padding: 10px; text-align: center; font-size: 12px; color: #70757a; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-5xl font-black italic mb-6 shadow-xl">f</div>
-        <h1 class="text-xl font-black mb-4 uppercase tracking-tight">Apex Social Network</h1>
-        <input id="login-id" type="text" placeholder="ID de Utilizador" class="w-full max-w-xs p-4 bg-gray-100 rounded-2xl mb-4 text-center font-black outline-none border-2 border-transparent focus:border-blue-500">
-        <button onclick="doLogin()" class="w-full max-w-xs bg-blue-600 text-white p-4 rounded-2xl font-black shadow-lg">ACEDER À CONTA</button>
+    <div class="ad-banner">ANÚNCIO: Patrocinado por Apex Ads</div>
+
+    <div class="nav-tabs">
+        <div class="tab" onclick="switchTab('feed')">FEED</div>
+        <div class="tab active" onclick="switchTab('miner')">MINERAR (€)</div>
+        <div class="tab" onclick="switchTab('perfil')">CARTEIRA</div>
     </div>
 
-    <div id="app-ui" class="hidden">
-        <header class="app-header">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">S</div>
-                <span class="font-black text-blue-600 uppercase text-xs">Apex Social</span>
+    <div id="tab-miner" class="miner-container">
+        <div class="miner-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 12px; font-weight: bold; color: #5f6368;">STATUS DO HARDWARE</span>
+                <span id="miner-status-text" style="color: var(--google-green); font-weight: bold;">ATIVO</span>
             </div>
-            <div id="bal-top" class="text-xl font-black text-green-600">0.0000€</div>
-        </header>
+            
+            <div class="balance-display">€ <span id="m-balance">0.0000</span></div>
+            <p style="font-size: 12px; color: #70757a; margin: 0;">Ganhos acumulados nesta sessão</p>
 
-        <div class="status-bar">SISTEMA ATIVO • +15 XP POST • +2 XP LIKE</div>
-        <div class="fixed-ad">
-            <span class="text-[9px] font-black text-blue-500 mr-2 uppercase">Patrocinado:</span>
-            <marquee class="text-[11px] font-bold text-gray-500 w-64">GANHE 100 XP POR CADA AMIGO CONVIDADO! • GOOGLE ADSENSE VERIFIED • APEX SOCIAL v33.54</marquee>
-        </div>
-
-        <div class="main-content">
-            <div id="p-feed" class="page-content active-page">
-                <div class="feed-container">
-                    <div onclick="openModal('modal-editor')" class="bg-white p-4 rounded-xl mb-4 border flex items-center gap-3 cursor-pointer shadow-sm">
-                        <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
-                        <span class="text-gray-400 font-bold">No que está a pensar?</span>
-                    </div>
-                    <div id="feed-list"></div>
+            <div style="margin-top: 25px;">
+                <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                    <span>Temperatura: <span id="m-temp">30</span>°C</span>
+                    <span id="m-speed-text">0.0001 €/s</span>
+                </div>
+                <div class="temp-bg">
+                    <div id="temp-fill"></div>
                 </div>
             </div>
 
-            <div id="p-ranking" class="page-content">
-                <div class="feed-container py-4">
-                    <div class="bg-white rounded-2xl border overflow-hidden shadow-sm">
-                        <div class="p-4 bg-gray-50 border-b font-black text-center uppercase text-sm">Top 10 Utilizadores</div>
-                        <div id="ranking-list"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="p-wallet" class="page-content">
-                <div class="feed-container py-4">
-                    <div class="bg-white p-8 rounded-2xl border text-center shadow-sm">
-                        <h2 class="text-gray-400 font-black text-[10px] uppercase mb-1">O seu Saldo Atual</h2>
-                        <h1 id="wallet-val" class="text-4xl font-black text-blue-600 mb-8">0.0000€</h1>
-                        <div class="text-left bg-gray-50 p-4 rounded-xl mb-6">
-                            <h3 class="font-black text-[10px] uppercase mb-2 border-b pb-1">Tabela de Ganhos</h3>
-                            <div class="flex justify-between text-xs mb-1"><span>Post Público</span><span class="text-green-600 font-bold">+0.0015€</span></div>
-                            <div class="flex justify-between text-xs mb-1"><span>Like Dado</span><span class="text-green-600 font-bold">+0.0002€</span></div>
-                            <div class="flex justify-between text-xs"><span>Novo Amigo</span><span class="text-green-600 font-bold">+0.0100€</span></div>
-                        </div>
-                        <button onclick="alert('Mínimo 5000 XP (0.50€)')" class="w-full bg-green-600 text-white p-4 rounded-xl font-bold uppercase text-xs">Levantar via PayPal</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="p-admin" class="page-content">
-                <div class="feed-container py-4">
-                    <div class="bg-white p-6 rounded-xl border border-red-200 shadow-sm">
-                        <h2 class="font-black text-red-600 uppercase mb-4 text-sm">Painel do Administrador</h2>
-                        <div class="grid grid-cols-2 gap-4 mb-6">
-                            <div class="bg-gray-50 p-4 rounded text-center"><p class="text-[9px] text-gray-400 font-black">USERS</p><span id="adm-u" class="text-xl font-black">0</span></div>
-                            <div class="bg-gray-50 p-4 rounded text-center"><p class="text-[9px] text-gray-400 font-black">POSTS</p><span id="adm-p" class="text-xl font-black">0</span></div>
-                        </div>
-                        <h3 class="font-black text-[10px] uppercase mb-2">Gestão de Conteúdo</h3>
-                        <div id="admin-posts" class="max-h-60 overflow-y-auto border rounded p-2 text-xs"></div>
-                    </div>
+            <div id="miner-actions" style="margin-top: 20px;">
+                <button id="btn-upgrade" onclick="minerUpgrade()" class="btn-google btn-outline">MELHORAR GPU (Custo: €0.0500)</button>
+                
+                <div id="overheat-actions" class="hidden">
+                    <button onclick="manualCool()" class="btn-google btn-blue">ARREFECER MANUAL (Clique)</button>
+                    <button onclick="adCooling()" class="btn-google btn-red">VÍDEO: ARREFECER 100% ⚡</button>
                 </div>
             </div>
         </div>
-
-        <nav>
-            <div class="nav-item nav-active" onclick="tab('feed', this)">FEED</div>
-            <div class="nav-item" onclick="tab('ranking', this)">RANKING</div>
-            <div class="nav-item" onclick="tab('wallet', this)">CARTEIRA</div>
-            <div id="nav-adm-btn" class="nav-item hidden" onclick="tab('admin', this)">ADMIN</div>
-        </nav>
+        
+        <p style="text-align: center; font-size: 11px; color: #9aa0a6; margin-top: 15px;">
+            ID de Minerador: 5401881400 | v33.13 Stable
+        </p>
     </div>
 
-    <div id="modal-editor" class="modal-fullscreen">
-        <div class="flex justify-between p-4 border-b">
-            <button onclick="closeModal('modal-editor')" class="font-bold text-gray-500">Fechar</button>
-            <span class="font-black uppercase text-sm">Nova Publicação</span>
-            <button onclick="publish()" class="text-blue-600 font-black">PUBLICAR</button>
-        </div>
-        <textarea id="post-txt" placeholder="O que queres partilhar?" class="flex-1 p-6 text-xl outline-none resize-none"></textarea>
-        <div class="p-4 border-t bg-gray-50">
-            <input id="post-url" type="text" placeholder="URL da Imagem (opcional)" class="w-full p-3 border rounded-xl outline-none text-sm">
-        </div>
+    <div id="tab-feed" class="hidden" style="padding: 20px; text-align: center;">
+        <p>O seu Feed de Posts será carregado aqui...</p>
     </div>
 
     <script>
-        const SB_URL = "https://fickstyevektwbgimapy.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY2tzdHlldmVrdHdiZ2ltYXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNTgsImV4cCI6MjA4OTYxNTE1OH0.lx4kyyzXemOjndyB70QN2zVW_kGSsBEsaDOB3eqC9QY";
-        const sb = window.supabase.createClient(SB_URL, SB_KEY);
-        
-        let uID = null;
-        let bal = 0;
-        const ADMIN_ID = "5401881400";
+        // Configurações Base v33.13
+        let balance = 0.0000;
+        let temp = 30;
+        let speed = 0.0001;
+        let upgradeCost = 0.0500;
+        let isOverheated = false;
 
-        async function doLogin() {
-            const val = document.getElementById('login-id').value.trim();
-            if(!val) return;
-            uID = val;
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('app-ui').classList.remove('hidden');
-            if(uID === ADMIN_ID) document.getElementById('nav-adm-btn').classList.remove('hidden');
-            await sync();
-            await loadFeed();
-            await loadRanking();
-            if(uID === ADMIN_ID) loadAdmin();
-        }
+        function updateMiner() {
+            if (!isOverheated) {
+                balance += speed;
+                temp += 0.3; // Taxa de aquecimento
 
-        async function sync() {
-            let { data } = await sb.from('perfis').select('saldo').eq('id', uID).single();
-            if(!data) { await sb.from('perfis').insert([{ id: uID, saldo: 0 }]); bal = 0; }
-            else { bal = Number(data.saldo); }
-            updateUI();
-        }
-
-        async function loadFeed() {
-            const container = document.getElementById('feed-list');
-            const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
-            const { data: comms } = await sb.from('comentarios').select('*').order('created_at', {ascending: true});
-            
-            container.innerHTML = "";
-            posts?.forEach((p, i) => {
-                if(i > 0 && i % 3 === 0) {
-                    container.innerHTML += `<div class="bg-white border p-6 mb-4 rounded-xl text-center shadow-sm"><span class="text-[9px] font-black text-blue-500 uppercase">Anúncio Apex</span><p class="font-bold text-gray-500 text-xs">GOOGLE ADSENSE PARTNER CONTENT</p></div>`;
+                if (temp >= 100) {
+                    temp = 100;
+                    isOverheated = true;
+                    showOverheatUI();
                 }
-
-                const pComms = comms?.filter(c => c.post_id == p.id) || [];
-                let cHTML = pComms.length > 0 ? `<div class="feed-comments-area">` : "";
-                pComms.forEach(c => {
-                    cHTML += `<div class="block"><div class="comment-bubble"><span class="comment-user">ID ${c.user_id}</span><span class="text-sm">${c.content}</span></div></div>`;
-                });
-                if(pComms.length > 0) cHTML += `</div>`;
-
-                container.innerHTML += `
-                <div class="post-card">
-                    <div class="post-main">
-                        <div class="post-content">
-                            <span class="post-user-label">Utilizador ${p.user_id}</span>
-                            ${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-lg mb-3 border">` : ''}
-                            <div class="text-[15px]">${p.content}</div>
-                        </div>
-                        <div class="post-sidebar">
-                            <div class="flex flex-col items-center" onclick="reward(0.0002)"><div class="icon-btn">👍</div><span class="text-[10px] font-black mt-1">${p.likes || 0}</span></div>
-                            <div class="flex flex-col items-center"><div class="icon-btn">💬</div><span class="text-[10px] font-black mt-1">${pComms.length}</span></div>
-                        </div>
-                    </div>
-                    ${cHTML}
-                </div>`;
-            });
+            }
+            renderUI();
         }
 
-        async function loadRanking() {
-            const { data } = await sb.from('perfis').select('id, saldo').order('saldo', {ascending: false}).limit(10);
-            const list = document.getElementById('ranking-list');
-            list.innerHTML = "";
-            data?.forEach((r, i) => {
-                list.innerHTML += `<div class="flex justify-between p-4 border-b last:border-0 text-sm"><span><b>#${i+1}</b> ID ${r.id}</span><span class="font-black text-green-600">${Number(r.saldo).toFixed(4)}€</span></div>`;
-            });
-        }
-
-        async function loadAdmin() {
-            const { count: u } = await sb.from('perfis').select('*', { count: 'exact', head: true });
-            const { count: p } = await sb.from('posts').select('*', { count: 'exact', head: true });
-            const { data: posts } = await sb.from('posts').select('id, content').limit(10);
-            document.getElementById('adm-u').innerText = u || 0;
-            document.getElementById('adm-p').innerText = p || 0;
+        function renderUI() {
+            document.getElementById('m-balance').innerText = balance.toFixed(4);
+            document.getElementById('m-temp').innerText = Math.floor(temp);
+            document.getElementById('m-speed-text').innerText = speed.toFixed(4) + " €/s";
             
-            const list = document.getElementById('admin-posts');
-            list.innerHTML = "";
-            posts?.forEach(pt => {
-                list.innerHTML += `<div class="flex justify-between mb-2 border-b pb-1"><span>ID:${pt.id}</span><button onclick="delPost('${pt.id}')" class="text-red-600 font-bold">APAGAR</button></div>`;
-            });
+            const fill = document.getElementById('temp-fill');
+            fill.style.width = temp + "%";
+            
+            // Cores de Alerta
+            if (temp < 60) fill.style.background = "#34a853";
+            else if (temp < 85) fill.style.background = "#fbbc05";
+            else fill.style.background = "#ea4335";
         }
 
-        async function delPost(id) {
-            await sb.from('posts').delete().eq('id', id);
-            loadAdmin(); loadFeed();
+        function showOverheatUI() {
+            document.getElementById('miner-status-text').innerText = "SOBREAQUECIDO";
+            document.getElementById('miner-status-text').style.color = "#ea4335";
+            document.getElementById('btn-upgrade').classList.add('hidden');
+            document.getElementById('overheat-actions').classList.remove('hidden');
         }
 
-        function tab(t, el) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-active'));
-            document.getElementById('p-' + t).classList.add('active-page');
-            el.classList.add('nav-active');
-            if(t==='feed') loadFeed();
-            if(t==='ranking') loadRanking();
-            if(t==='admin') loadAdmin();
+        function manualCool() {
+            temp -= 5;
+            if (temp <= 40) resumeMining();
+            renderUI();
         }
 
-        async function publish() {
-            const txt = document.getElementById('post-txt').value.trim();
-            const url = document.getElementById('post-url').value.trim();
-            if(!txt) return;
-            const { error } = await sb.from('posts').insert([{ user_id: uID, content: txt, image_url: url || null }]);
-            if(!error) { reward(0.0150); closeModal('modal-editor'); document.getElementById('post-txt').value=""; loadFeed(); }
+        function resumeMining() {
+            isOverheated = false;
+            document.getElementById('miner-status-text').innerText = "ATIVO";
+            document.getElementById('miner-status-text').style.color = "#34a853";
+            document.getElementById('btn-upgrade').classList.remove('hidden');
+            document.getElementById('overheat-actions').classList.add('hidden');
         }
 
-        function reward(v) { bal += v; updateUI(); sb.from('perfis').upsert({ id: uID, saldo: bal }); }
-        function updateUI() { 
-            const f = bal.toFixed(4) + "€";
-            document.getElementById('bal-top').innerText = f;
-            document.getElementById('wallet-val').innerText = f;
+        function adCooling() {
+            // Gatilho para o seu sistema de anúncios
+            console.log("Chamando anúncio para ID 5401881400");
+            alert("A carregar vídeo de recompensa...");
+            setTimeout(() => {
+                temp = 30;
+                resumeMining();
+                renderUI();
+            }, 2000);
         }
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function minerUpgrade() {
+            if (balance >= upgradeCost) {
+                balance -= upgradeCost;
+                speed *= 2;
+                upgradeCost *= 2.5;
+                document.getElementById('btn-upgrade').innerText = `MELHORAR GPU (Custo: €${upgradeCost.toFixed(4)})`;
+                alert("GPU Atualizada! Produção duplicada.");
+                renderUI();
+            } else {
+                alert("Saldo insuficiente para upgrade.");
+            }
+        }
+
+        function switchTab(tabName) {
+            document.getElementById('tab-miner').classList.add('hidden');
+            document.getElementById('tab-feed').classList.add('hidden');
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        // Loop de Execução (1 segundo)
+        setInterval(updateMiner, 1000);
     </script>
 </body>
 </html>
