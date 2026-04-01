@@ -1,93 +1,159 @@
-<style>
-    .event-alert {
-        background: var(--google-red);
-        color: white;
-        padding: 10px;
-        border-radius: 8px;
-        margin-top: 10px;
-        font-size: 12px;
-        text-align: center;
-        animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.02); }
-        100% { transform: scale(1); }
-    }
-    .level-badge {
-        background: #e8f0fe;
-        color: var(--google-blue);
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: bold;
-    }
-</style>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Apex Social v33.18</title>
+    <style>
+        :root { 
+            --google-blue: #1a73e8; 
+            --google-red: #ea4335; 
+            --google-green: #34a853; 
+            --bg-gray: #f1f3f4; 
+        }
+        body { font-family: 'Roboto', sans-serif; background: #202124; margin: 0; padding: 15px; }
 
-<div class="card-google">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <span class="level-badge" id="location-name">📍 GARAGEM (LISBOA)</span>
-        <span id="p-level" style="font-size: 11px; font-weight: bold;">NÍVEL 1</span>
+        /* Card Principal com Fundo Branco Forçado */
+        .card-google { 
+            background: #ffffff !important; 
+            border-radius: 12px; 
+            padding: 20px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+            max-width: 400px; 
+            margin: auto;
+            color: #202124 !important;
+        }
+
+        .level-badge { 
+            background: #e8f0fe; 
+            color: var(--google-blue); 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 11px; 
+            font-weight: bold; 
+        }
+
+        .balance-display { 
+            font-size: 32px; 
+            font-weight: 700; 
+            color: var(--google-blue); 
+            margin: 15px 0; 
+        }
+
+        /* Alerta de Hacker Estilizado */
+        .event-alert {
+            background: var(--google-red);
+            color: white !important;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: pulse 1s infinite;
+        }
+
+        .btn-defend {
+            background: white;
+            color: var(--google-red);
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-upgrade {
+            width: 100%;
+            padding: 14px;
+            background: white;
+            color: var(--google-blue);
+            border: 1px solid #dadce0;
+            border-radius: 24px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .hidden { display: none !important; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-google">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="level-badge" id="location-name">📍 GARAGEM (LISBOA)</span>
+            <span id="p-level" style="font-size: 11px; font-weight: bold; color: #5f6368;">NÍVEL 1</span>
+        </div>
+
+        <div id="hacker-alert" class="event-alert hidden">
+            <span>⚠️ ATAQUE HACKER!</span>
+            <button onclick="defendSystem()" class="btn-defend">DEFENDER</button>
+        </div>
+
+        <div class="balance-display">
+            € <span id="p-balance">0.0000</span>
+        </div>
+        
+        <p style="font-size: 12px; color: #5f6368; margin-top: -10px;">Processamento de Dados Ativo</p>
+
+        <button onclick="upgradeServer()" class="btn-upgrade">
+            EXPANDIR DATACENTER (€<span id="up-cost">0.0500</span>)
+        </button>
     </div>
 
-    <div id="hacker-alert" class="hidden event-alert">
-        ⚠️ ATAQUE HACKER EM CURSO! 
-        <button onclick="defendSystem()" style="background: white; color: var(--google-red); border: none; padding: 4px 8px; border-radius: 4px; margin-left: 10px; font-weight: bold; cursor: pointer;">DEFENDER</button>
-    </div>
+    <script>
+        let balance = 0.0000;
+        let speed = 0.0001;
+        let upgradeCost = 0.0500;
+        let cityLevel = 1;
+        let locations = ["Garagem (Lisboa)", "Escritório (Porto)", "Bunker (Londres)", "Data Center (Frankfurt)"];
 
-    <div class="balance-display">€ <span id="p-balance">0.0000</span></div>
-    
-    <div id="actions-zone">
-        <button id="btn-upgrade" onclick="upgradeServer()" class="btn-google btn-outline">EXPANDIR DATACENTER (€<span id="up-cost">0.0500</span>)</button>
-    </div>
-</div>
+        function update() {
+            balance += speed;
+            document.getElementById('p-balance').innerText = balance.toFixed(4);
+        }
 
-<script>
-    // Novas variáveis de estado
-    let cityLevel = 1;
-    let locations = ["Garagem (Lisboa)", "Escritório (Porto)", "Bunker (Londres)", "Data Center (Frankfurt)"];
-    
-    // Função de Evento Aleatório (Executada a cada 1 minuto)
-    function randomEvent() {
-        if (Math.random() > 0.8 && !isBroken) { // 20% de chance
-            document.getElementById('hacker-alert').classList.remove('hidden');
-            // Se não defender em 15 segundos, perde saldo
-            setTimeout(() => {
-                if (!document.getElementById('hacker-alert').classList.contains('hidden')) {
-                    balance *= 0.95; // Perde 5%
-                    alert("Ataque bem sucedido! Perdeu 5% do saldo.");
-                    document.getElementById('hacker-alert').classList.add('hidden');
-                    render();
+        function upgradeServer() {
+            if (balance >= upgradeCost) {
+                balance -= upgradeCost;
+                speed *= 2.2;
+                upgradeCost *= 3;
+                cityLevel++;
+                
+                if(cityLevel <= locations.length) {
+                    document.getElementById('location-name').innerText = "📍 " + locations[cityLevel-1].toUpperCase();
+                    document.getElementById('p-level').innerText = "NÍVEL " + cityLevel;
                 }
-            }, 15000);
-        }
-    }
-
-    function defendSystem() {
-        document.getElementById('hacker-alert').classList.add('hidden');
-        alert("Ataque repelido com sucesso!");
-    }
-
-    // Melhoria na função de Upgrade
-    function upgradeServer() {
-        if (balance >= upgradeCost) {
-            balance -= upgradeCost;
-            pSpeed *= 2.2;
-            upgradeCost *= 3;
-            
-            cityLevel++;
-            if(cityLevel <= locations.length) {
-                document.getElementById('location-name').innerText = "📍 " + locations[cityLevel-1].toUpperCase();
-                document.getElementById('p-level').innerText = "NÍVEL " + cityLevel;
+                
+                document.getElementById('up-cost').innerText = upgradeCost.toFixed(4);
+                document.getElementById('p-balance').innerText = balance.toFixed(4);
+            } else {
+                alert("Saldo insuficiente!");
             }
-
-            document.getElementById('up-cost').innerText = upgradeCost.toFixed(4);
-            render();
-        } else {
-            alert("Saldo insuficiente para expandir a infraestrutura.");
         }
-    }
 
-    // Iniciar monitor de eventos
-    setInterval(randomEvent, 60000);
-</script>
+        // Simulação de Evento (Hacker)
+        function triggerHacker() {
+            if (Math.random() > 0.7) {
+                document.getElementById('hacker-alert').classList.remove('hidden');
+            }
+        }
+
+        function defendSystem() {
+            document.getElementById('hacker-alert').classList.add('hidden');
+            alert("Sistema Protegido!");
+        }
+
+        setInterval(update, 1000);
+        setInterval(triggerHacker, 15000); // Tenta um ataque a cada 15 seg
+    </script>
+</body>
+</html>
