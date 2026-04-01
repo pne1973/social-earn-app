@@ -3,63 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Real Estate v33.21 - Official</title>
+    <title>Apex Real Estate v33.22</title>
     <style>
         :root { 
             --google-blue: #1a73e8; --google-green: #34a853; --google-red: #ea4335; 
-            --google-yellow: #fbbc05; --dark-bg: #121212; --card-light: #ffffff;
+            --google-yellow: #fbbc05; --dark-bg: #121212;
         }
-        
-        body { font-family: 'Roboto', sans-serif; background: var(--dark-bg); margin: 0; padding: 0; color: #fff; overflow-x: hidden; }
+        body { font-family: 'Roboto', sans-serif; background: var(--dark-bg); margin: 0; padding: 0; color: #fff; }
 
-        /* Cabeçalho e Navegação */
+        /* Banner de Anúncio Superior */
+        .ad-top-banner { background: #fff; color: #70757a; text-align: center; padding: 8px; font-size: 11px; border-bottom: 1px solid #ddd; }
+
         .header-app { background: #1f1f1f; padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
         .nav-tabs { display: flex; gap: 10px; margin-top: 10px; }
         .tab-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #333; color: #aaa; font-weight: bold; cursor: pointer; }
         .tab-btn.active { background: var(--google-blue); color: white; }
 
-        /* Painel de Saldo Central */
         .main-wallet { 
             background: linear-gradient(135deg, #1a73e8, #0b51b7); 
             margin: 15px; padding: 25px; border-radius: 20px; text-align: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
-        .balance-val { font-size: 38px; font-weight: 800; margin: 10px 0; letter-spacing: -1px; }
 
-        /* Lista de Imóveis */
         .container { padding: 0 15px 100px 15px; }
         .property-card { 
-            background: var(--card-light); color: #202124; 
+            background: #ffffff; color: #202124; 
             border-radius: 18px; padding: 20px; margin-bottom: 15px;
-            position: relative; transition: transform 0.2s;
+            position: relative;
         }
-        .prop-status { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .badge-type { background: #e8f0fe; color: var(--google-blue); padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; }
-        
-        .income-box { border-left: 4px solid var(--google-green); padding-left: 15px; margin: 15px 0; }
-        .income-label { font-size: 12px; color: #70757a; text-transform: uppercase; }
+
         .income-amount { font-size: 26px; font-weight: 700; color: var(--google-green); }
 
-        /* Barras de Desgaste */
-        .maintenance-zone { margin-top: 15px; }
-        .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: #5f6368; margin-bottom: 5px; }
-        .bar-bg { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
-        .bar-fill { height: 100%; transition: width 0.5s; }
-
-        /* Botões de Ação */
-        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-action { padding: 12px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; }
-        .btn-collect { background: var(--google-blue); color: white; }
-        .btn-reform { background: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; }
-        .btn-lock { background: #f8f9fa; color: #9aa0a6; border: 1px dashed #ccc; grid-column: span 2; padding: 20px; cursor: not-allowed; }
-
-        /* Eventos de Crise */
+        /* Botões de Monetização */
+        .btn-ad-gold { 
+            background: var(--google-yellow); color: #000; border: none; 
+            padding: 12px; border-radius: 25px; font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer;
+        }
+        
         .crisis-overlay {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(234, 67, 53, 0.95); border-radius: 18px;
+            background: rgba(0, 0, 0, 0.9); border-radius: 18px;
             display: flex; flex-direction: column; justify-content: center;
-            align-items: center; color: white; text-align: center; padding: 20px;
-            z-index: 5;
+            align-items: center; color: white; text-align: center; padding: 20px; z-index: 10;
         }
 
         .hidden { display: none !important; }
@@ -67,174 +51,128 @@
 </head>
 <body>
 
+    <div class="ad-top-banner">PUBLICIDADE: Aumente os seus rendimentos com o Apex Premium</div>
+
     <div class="header-app">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <b style="color: var(--google-blue);">APEX REAL ESTATE</b>
-            <span style="font-size: 11px; opacity: 0.6;">Admin ID: 5401881400</span>
+            <span style="font-size: 11px; opacity: 0.6;">ID: 5401881400</span>
         </div>
         <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('empire')">MEU IMPÉRIO</button>
-            <button class="tab-btn" onclick="switchTab('wallet')">CARTEIRA</button>
+            <button class="tab-btn active" id="tab-emp" onclick="switchTab('empire')">IMÓVEIS</button>
+            <button class="tab-btn" id="tab-wal" onclick="switchTab('wallet')">CARTEIRA</button>
         </div>
     </div>
 
     <div id="tab-empire" class="container">
         <div class="main-wallet">
-            <div style="font-size: 11px; opacity: 0.9; text-transform: uppercase;">Capital Disponível</div>
-            <div class="balance-val">€ <span id="total-balance">0.0000</span></div>
-            <div style="font-size: 10px; background: rgba(255,255,255,0.2); display: inline-block; padding: 3px 10px; border-radius: 10px;">
-                INVESTIDOR NÍVEL: <span id="investor-lvl">INICIANTE</span>
-            </div>
+            <div style="font-size: 11px; opacity: 0.9;">SALDO DISPONÍVEL</div>
+            <div style="font-size: 32px; font-weight: 800; margin: 5px 0;">€ <span id="total-balance">0.0000</span></div>
+            <button onclick="showRewardAd('boost')" class="btn-ad-gold" style="padding: 8px; font-size: 11px;">⚡ VER VÍDEO: RENDA 2X (2m)</button>
         </div>
 
         <div id="properties-list">
             <div class="property-card" id="prop-0">
                 <div id="crisis-0" class="crisis-overlay hidden">
-                    <h3>⚠️ CANO REBENTADO!</h3>
-                    <p>A renda está suspensa até o reparo.</p>
-                    <button onclick="fixProperty(0)" class="btn-action" style="background: white; color: var(--google-red);">REPARAR AGORA</button>
-                </div>
-                
-                <div class="prop-status">
-                    <span class="badge-type" id="p0-name">🏠 QUARTO ALUGADO</span>
-                    <span style="font-size: 11px; color: #70757a;">Estabilidade: <span id="p0-health-txt">100</span>%</span>
+                    <h3 style="color: var(--google-red);">⚠️ ALERTA DE MANUTENÇÃO</h3>
+                    <p style="font-size: 12px;">O imóvel sofreu danos estruturais e a renda parou.</p>
+                    <button onclick="showRewardAd('repair', 0)" class="btn-ad-gold">REPARAR COM VÍDEO (GRÁTIS)</button>
+                    <button onclick="fixWithCash(0)" style="background: transparent; color: #fff; border: 1px solid #555; margin-top: 10px; padding: 5px; cursor: pointer; border-radius: 5px;">Reparar com Dinheiro (€0.0200)</button>
                 </div>
 
-                <div class="income-box">
-                    <div class="income-label">Renda Pendente</div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span id="p0-name" style="font-weight: bold; color: var(--google-blue);">🏠 QUARTO ALUGADO</span>
+                    <span style="font-size: 11px; color: #70757a;">Estado: <span id="p0-health-txt">100</span>%</span>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <div style="font-size: 12px; color: #70757a;">RENDA PENDENTE</div>
                     <div class="income-amount">€ <span id="p0-acc">0.0000</span></div>
                 </div>
 
-                <div class="maintenance-zone">
-                    <div class="bar-bg">
-                        <div id="p0-bar" class="bar-fill" style="width: 100%; background: var(--google-green);"></div>
-                    </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button onclick="collectRent(0)" style="background: var(--google-blue); color: white; border: none; padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer;">RECOLHER</button>
+                    <button onclick="upgradeProp(0)" style="background: #f1f3f4; color: #202124; border: 1px solid #dadce0; padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer;">REFORMA</button>
                 </div>
-
-                <div class="actions-grid">
-                    <button onclick="collectRent(0)" class="btn-action btn-collect">RECOLHER €</button>
-                    <button onclick="upgradeProp(0)" class="btn-action btn-reform">REFORMA (€<span id="p0-cost">0.0500</span>)</button>
-                </div>
-            </div>
-
-            <div class="property-card" id="slot-1">
-                <button class="btn-lock" onclick="buyNewSlot(1)">
-                    <div style="font-size: 20px;">🔒</div>
-                    <b>ADQUIRIR NOVO IMÓVEL</b><br>
-                    <small>Custo de Escritura: €1.5000</small>
-                </button>
             </div>
         </div>
     </div>
 
-    <div id="tab-wallet" class="container hidden" style="margin-top: 20px;">
-        <div class="property-card">
-            <h3 style="margin-top:0">Gestão Financeira</h3>
-            <div style="padding: 15px; background: #f8f9fa; border-radius: 12px; margin-bottom: 10px;">
-                <small>Mínimo para levantamento:</small>
-                <div style="font-size: 20px; font-weight: bold; color: var(--google-blue);">€ 50.0000</div>
+    <div id="tab-wallet" class="container hidden">
+        <div class="property-card" style="margin-top: 20px; text-align: center;">
+            <p style="color: #70757a; font-size: 12px;">Levantamento PayPal</p>
+            <h2 style="color: var(--google-blue); margin-bottom: 30px;">Mínimo: € 50.00</h2>
+            <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; font-size: 11px; margin-bottom: 20px;">
+                DICA: Ver anúncios de "Reparação" aumenta a sua pontuação de confiança interna.
             </div>
-            <button class="btn-action btn-collect" style="width:100%; opacity: 0.5;" disabled>SOLICITAR PAYPAL</button>
-            <p style="font-size: 11px; color: #9aa0a6; text-align: center; margin-top: 15px;">
-                Todos os ganhos são baseados em simulação de tempo de uso.
-            </p>
+            <button disabled style="width: 100%; padding: 15px; border-radius: 30px; border: none; background: #ccc; color: #666; font-weight: bold;">SOLICITAR PAGAMENTO</button>
+        </div>
+        <div style="background: #fff; padding: 20px; border-radius: 15px; text-align: center; color: #202124;">
+            <small>ANÚNCIO PARCEIRO</small>
+            <div style="height: 100px; background: #eee; margin-top: 10px; display: flex; align-items: center; justify-content: center;">
+                [Espaço para Banner AdSense/Telegram]
+            </div>
         </div>
     </div>
 
     <script>
-        // Lógica de Dados v33.21
         let mainBalance = 0.0000;
-        let props = [
-            { id: 0, name: "QUARTO ALUGADO", acc: 0.0, speed: 0.0001, health: 100, cost: 0.0500, active: true, crisis: false }
-        ];
-
-        const propLevels = ["QUARTO ALUGADO", "APARTAMENTO T1", "VIVENDA LUXO", "MANSÃO APEX", "HOTEL 5 ESTRELAS"];
+        let adMultiplier = 1.0;
+        let props = [{ id: 0, acc: 0.0, speed: 0.0001, health: 100, crisis: false }];
 
         function gameLoop() {
-            props.forEach((p, index) => {
-                if (p.active && !p.crisis) {
-                    p.acc += p.speed;
-                    p.health -= 0.08; // Desgaste suave
-
-                    if (p.health <= 0) {
-                        p.health = 0;
-                        triggerCrisis(index);
-                    }
-                    
-                    // Sorteio de crise aleatória (0.5% de chance por segundo)
-                    if (Math.random() < 0.005) triggerCrisis(index);
+            props.forEach((p, i) => {
+                if (!p.crisis) {
+                    p.acc += (p.speed * adMultiplier);
+                    p.health -= 0.1;
+                    if (p.health <= 0) { p.health = 0; p.crisis = true; }
                 }
-                updateUI(index);
+                updateUI(i);
             });
             document.getElementById('total-balance').innerText = mainBalance.toFixed(4);
         }
 
         function updateUI(i) {
             let p = props[i];
-            document.getElementById(`p${i}-acc`).innerText = p.acc.toFixed(4);
-            document.getElementById(`p${i}-health-txt`).innerText = Math.floor(p.health);
-            document.getElementById(`p${i}-cost`).innerText = p.cost.toFixed(4);
-            
-            let bar = document.getElementById(`p${i}-bar`);
-            bar.style.width = p.health + "%";
-            bar.style.background = p.health < 30 ? "var(--google-red)" : (p.health < 70 ? "var(--google-yellow)" : "var(--google-green)");
+            document.getElementById(`p0-acc`).innerText = p.acc.toFixed(4);
+            document.getElementById(`p0-health-txt`).innerText = Math.floor(p.health);
+            document.getElementById(`crisis-0`).classList.toggle('hidden', !p.crisis);
+        }
 
-            if (p.crisis) document.getElementById(`crisis-${i}`).classList.remove('hidden');
-            else document.getElementById(`crisis-${i}`).classList.add('hidden');
+        function showRewardAd(type, index) {
+            // Simulação de chamada de anúncio (Reward Video)
+            alert("A carregar vídeo publicitário...");
+            setTimeout(() => {
+                if (type === 'repair') {
+                    props[index].health = 100;
+                    props[index].crisis = false;
+                    alert("Imóvel Reparado e Integridade 100%!");
+                } else if (type === 'boost') {
+                    adMultiplier = 2.0;
+                    alert("BÓNUS ATIVO: Renda duplicada por 2 minutos!");
+                    setTimeout(() => { adMultiplier = 1.0; alert("O bónus de renda expirou."); }, 120000);
+                }
+            }, 2000);
+        }
+
+        function fixWithCash(i) {
+            if (mainBalance >= 0.02) {
+                mainBalance -= 0.02;
+                props[i].health = 100;
+                props[i].crisis = false;
+            } else { alert("Saldo insuficiente. Veja um anúncio para reparar grátis!"); }
         }
 
         function collectRent(i) {
             mainBalance += props[i].acc;
             props[i].acc = 0;
-            if (mainBalance > 10.0) document.getElementById('investor-lvl').innerText = "PROFISSIONAL";
-        }
-
-        function upgradeProp(i) {
-            let p = props[i];
-            if (mainBalance >= p.cost) {
-                mainBalance -= p.cost;
-                p.speed *= 2.4;
-                p.cost *= 3.5;
-                p.health = 100;
-                
-                // Evoluir nome do imóvel
-                let currentLvl = propLevels.indexOf(p.name);
-                if (currentLvl < propLevels.length -1) {
-                    p.name = propLevels[currentLvl + 1];
-                    document.getElementById(`p${i}-name`).innerText = "🏠 " + p.name;
-                }
-            } else {
-                alert("Saldo insuficiente para reforma!");
-            }
-        }
-
-        function triggerCrisis(i) {
-            props[i].crisis = true;
-        }
-
-        function fixProperty(i) {
-            // Reparo custa ver um anúncio (simulação) ou pequena taxa
-            alert("Enviando equipa de manutenção...");
-            setTimeout(() => {
-                props[i].health = 100;
-                props[i].crisis = false;
-            }, 1000);
-        }
-
-        function buyNewSlot(i) {
-            if (mainBalance >= 1.5) {
-                mainBalance -= 1.5;
-                alert("Novo imóvel adquirido com sucesso!");
-                // Aqui poderíamos clonar o nó HTML para criar o novo card
-            } else {
-                alert("Necessita de €1.5000 para a escritura.");
-            }
         }
 
         function switchTab(tab) {
             document.getElementById('tab-empire').classList.toggle('hidden', tab !== 'empire');
             document.getElementById('tab-wallet').classList.toggle('hidden', tab !== 'wallet');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.innerText.includes(tab === 'empire' ? 'IMPÉRIO' : 'CARTEIRA')));
+            document.getElementById('tab-emp').classList.toggle('active', tab === 'empire');
+            document.getElementById('tab-wal').classList.toggle('active', tab === 'wallet');
         }
 
         setInterval(gameLoop, 1000);
